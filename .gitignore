@@ -1,0 +1,30 @@
+# Composer
+/vendor/
+composer.lock
+
+# PHPUnit
+/tests/coverage/
+.phpunit.result.cache
+
+# PHPStan
+/phpstan.neon
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# WordPress
+wp-config.php
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
