@@ -1406,13 +1406,13 @@ final class RateLimiter {
 - Add comprehensive documentation
 
 **Acceptance criteria:**
-- [ ] All rate limiting tests pass (GREEN)
-- [ ] Per-minute limits enforced
-- [ ] Per-hour limits enforced
-- [ ] Both user and IP tracked
-- [ ] Returns retry_after seconds when exceeded
-- [ ] RateLimitCalculator has no side effects
-- [ ] RateLimit and RateLimitResult are immutable
+- [x] All rate limiting tests pass (GREEN)
+- [x] Per-minute limits enforced
+- [x] Per-hour limits enforced
+- [x] Both user and IP tracked
+- [x] Returns retry_after seconds when exceeded
+- [x] RateLimitCalculator has no side effects
+- [x] RateLimit and RateLimitResult are immutable
 
 ---
 
