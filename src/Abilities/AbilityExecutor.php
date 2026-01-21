@@ -34,14 +34,14 @@ final class AbilityExecutor {
      *
      * @var PermissionSettings
      */
-    private PermissionSettings $permission_settings;
+    private PermissionSettings $permissionSettings;
 
     /**
      * Rate limiter.
      *
      * @var RateLimiterInterface
      */
-    private RateLimiterInterface $rate_limiter;
+    private RateLimiterInterface $rateLimiter;
 
     /**
      * Activity logger.
@@ -55,26 +55,26 @@ final class AbilityExecutor {
      *
      * @var WebhookManagerInterface
      */
-    private WebhookManagerInterface $webhook_manager;
+    private WebhookManagerInterface $webhookManager;
 
     /**
      * Constructor.
      *
-     * @param PermissionSettings      $permission_settings Permission settings.
-     * @param RateLimiterInterface    $rate_limiter        Rate limiter.
-     * @param ActivityLoggerInterface $logger              Activity logger.
-     * @param WebhookManagerInterface $webhook_manager     Webhook manager.
+     * @param PermissionSettings      $permissionSettings Permission settings.
+     * @param RateLimiterInterface    $rateLimiter        Rate limiter.
+     * @param ActivityLoggerInterface $logger             Activity logger.
+     * @param WebhookManagerInterface $webhookManager     Webhook manager.
      */
     public function __construct(
-        PermissionSettings $permission_settings,
-        RateLimiterInterface $rate_limiter,
+        PermissionSettings $permissionSettings,
+        RateLimiterInterface $rateLimiter,
         ActivityLoggerInterface $logger,
-        WebhookManagerInterface $webhook_manager
+        WebhookManagerInterface $webhookManager
     ) {
-        $this->permission_settings = $permission_settings;
-        $this->rate_limiter        = $rate_limiter;
-        $this->logger              = $logger;
-        $this->webhook_manager     = $webhook_manager;
+        $this->permissionSettings = $permissionSettings;
+        $this->rateLimiter        = $rateLimiter;
+        $this->logger             = $logger;
+        $this->webhookManager     = $webhookManager;
     }
 
     /**
@@ -140,7 +140,7 @@ final class AbilityExecutor {
             $context['success'] = true;
 
             // Record rate limit usage.
-            $this->rate_limiter->record(
+            $this->rateLimiter->record(
                 $ability->getName(),
                 $user_id,
                 $ip_address
@@ -207,8 +207,8 @@ final class AbilityExecutor {
      * @return Result|null Failure result if denied, null if allowed.
      */
     private function checkAbilityPermission( string $ability_name ): ?Result {
-        if ( isset( $this->permission_settings->ability_settings[ $ability_name ] ) ) {
-            $ability_settings = $this->permission_settings->ability_settings[ $ability_name ];
+        if ( isset( $this->permissionSettings->ability_settings[ $ability_name ] ) ) {
+            $ability_settings = $this->permissionSettings->ability_settings[ $ability_name ];
             if ( isset( $ability_settings['enabled'] ) && false === $ability_settings['enabled'] ) {
                 return Result::failure(
                     'ability_disabled',
@@ -227,11 +227,11 @@ final class AbilityExecutor {
      * @return Result|null Failure result if denied, null if allowed.
      */
     private function checkCategoryPermission( string $category, string $operation ): ?Result {
-        if ( ! isset( $this->permission_settings->category_settings[ $category ] ) ) {
+        if ( ! isset( $this->permissionSettings->category_settings[ $category ] ) ) {
             return null;
         }
 
-        $category_settings = $this->permission_settings->category_settings[ $category ];
+        $category_settings = $this->permissionSettings->category_settings[ $category ];
 
         // Check operation-specific permission.
         $is_read_disabled  = 'read' === $operation && isset( $category_settings['enable_read'] ) && false === $category_settings['enable_read'];
@@ -254,14 +254,14 @@ final class AbilityExecutor {
      * @return Result|null Failure result if denied, null if allowed.
      */
     private function checkGlobalPermission( string $operation ): ?Result {
-        if ( 'read' === $operation && ! $this->permission_settings->global_read_enabled ) {
+        if ( 'read' === $operation && ! $this->permissionSettings->global_read_enabled ) {
             return Result::failure(
                 'ability_disabled',
                 'Global read operations are disabled.'
             );
         }
 
-        if ( 'write' === $operation && ! $this->permission_settings->global_write_enabled ) {
+        if ( 'write' === $operation && ! $this->permissionSettings->global_write_enabled ) {
             return Result::failure(
                 'ability_disabled',
                 'Global write operations are disabled.'
@@ -278,7 +278,7 @@ final class AbilityExecutor {
      * @return Result Success if allowed, failure if rate limited.
      */
     private function checkRateLimit( array $context ): Result {
-        $result = $this->rate_limiter->check(
+        $result = $this->rateLimiter->check(
             $context['ability_name'],
             $context['user_id'],
             $context['ip_address']
@@ -304,7 +304,7 @@ final class AbilityExecutor {
      * @return string Correlation ID.
      */
     private function logBeforeExecute( array $context ): string {
-        return $this->logger->log_before_execute(
+        return $this->logger->logBeforeExecute(
             $context['ability_name'],
             $context['category'],
             $context['operation'],
@@ -332,7 +332,7 @@ final class AbilityExecutor {
         ?string $error_message,
         float $start_time
     ): void {
-        $this->logger->log_after_execute(
+        $this->logger->logAfterExecute(
             $correlation_id,
             $output,
             $success,
@@ -348,7 +348,7 @@ final class AbilityExecutor {
      * @return void
      */
     private function fireBeforeWebhook( array $context ): void {
-        $this->webhook_manager->trigger(
+        $this->webhookManager->trigger(
             'ability.before_execute',
             [
                 'ability_name' => $context['ability_name'],
@@ -368,7 +368,7 @@ final class AbilityExecutor {
      * @return void
      */
     private function fireAfterWebhook( array $context ): void {
-        $this->webhook_manager->trigger(
+        $this->webhookManager->trigger(
             'ability.after_execute',
             [
                 'ability_name'      => $context['ability_name'],
@@ -387,7 +387,7 @@ final class AbilityExecutor {
      * @return void
      */
     private function fireFailedWebhook( array $context ): void {
-        $this->webhook_manager->trigger(
+        $this->webhookManager->trigger(
             'ability.failed',
             [
                 'ability_name'      => $context['ability_name'],

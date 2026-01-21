@@ -25,19 +25,19 @@ final class ActivityLogger implements ActivityLoggerInterface {
      *
      * @var callable():string
      */
-    private $uuid_generator;
+    private $uuidGenerator;
 
     /**
      * Constructor.
      *
      * @param LogRepository $repository     Log repository for database operations.
-     * @param callable      $uuid_generator UUID generator function.
+     * @param callable      $uuidGenerator UUID generator function.
      */
     public function __construct(
         private readonly LogRepository $repository,
-        callable $uuid_generator
+        callable $uuidGenerator
     ) {
-        $this->uuid_generator = $uuid_generator;
+        $this->uuidGenerator = $uuidGenerator;
     }
 
     /**
@@ -64,7 +64,7 @@ final class ActivityLogger implements ActivityLoggerInterface {
         string $ip_address,
         ?array $input = null
     ): string {
-        $correlation_id = ( $this->uuid_generator )();
+        $correlation_id = ( $this->uuidGenerator )();
 
         // Redact sensitive fields from input before logging (pure function).
         $redacted_input = null !== $input ? PrivacyRedactor::redact( $input ) : null;

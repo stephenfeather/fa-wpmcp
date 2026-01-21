@@ -25,7 +25,7 @@ class LogRepository {
      *
      * @var string
      */
-    private string $table_name;
+    private string $tableName;
 
     /**
      * WordPress database instance.
@@ -40,8 +40,8 @@ class LogRepository {
      * @param \wpdb $wpdb WordPress database instance.
      */
     public function __construct( \wpdb $wpdb ) {
-        $this->wpdb       = $wpdb;
-        $this->table_name = $wpdb->prefix . 'fa_wpmcp_activity_log';
+        $this->wpdb      = $wpdb;
+        $this->tableName = $wpdb->prefix . 'fa_wpmcp_activity_log';
     }
 
     /**
@@ -54,7 +54,7 @@ class LogRepository {
      */
     public function insert( LogEntry $entry ): int|false {
         $result = $this->wpdb->insert(
-            $this->table_name,
+            $this->tableName,
             array(
                 'correlation_id'    => $entry->correlation_id,
                 'timestamp'         => current_time( 'mysql' ),
@@ -128,7 +128,7 @@ class LogRepository {
         }
 
         return $this->wpdb->update(
-            $this->table_name,
+            $this->tableName,
             $update_data,
             array( 'correlation_id' => $correlation_id ),
             $format,
@@ -149,7 +149,7 @@ class LogRepository {
         // Table name is a property set in constructor, not user input.
         $result = $this->wpdb->get_row(
             $this->wpdb->prepare(
-                "SELECT * FROM {$this->table_name} WHERE correlation_id = %s",
+                "SELECT * FROM {$this->tableName} WHERE correlation_id = %s",
                 $correlation_id
             )
         );
@@ -171,7 +171,7 @@ class LogRepository {
         // Table name is a property set in constructor, not user input.
         return $this->wpdb->query(
             $this->wpdb->prepare(
-                "DELETE FROM {$this->table_name} WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)",
+                "DELETE FROM {$this->tableName} WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)",
                 $days
             )
         );
