@@ -97,7 +97,7 @@ Configure via WordPress options or filters (see [Configuration](#configuration))
 - **Code Quality:** Professional-grade implementation
   - PSR-12 coding standards
   - PHPStan level 8 static analysis
-  - 174 unit tests, 64%+ coverage
+  - 494 unit tests, 78.21% coverage
   - Type-safe with PHP 8.1 features
 
 ## Architecture
@@ -207,7 +207,7 @@ composer test:coverage
 
 View report at `tests/coverage/index.html`.
 
-Current coverage: **64.33%** (606/942 lines)
+Current coverage: **78.21%** (494 tests, 1172 assertions)
 
 ### Creating New Abilities
 
@@ -412,6 +412,10 @@ if (!hash_equals($expected, $signature)) {
 - [x] Privacy redaction system (PrivacyRedactor)
 - [x] HTTP response formatting utilities
 - [x] Database schema and migrations
+- [x] **Post Abilities** - Complete CRUD operations for posts
+- [x] **Comment Abilities** - Complete CRUD operations for comments
+- [x] **Media Abilities** - Media library management (list, get, update, upload)
+- [x] **Taxonomy Abilities** - Taxonomy management (list terms, get, create, update)
 
 ### Future Enhancements
 - [ ] **GDPR Compliance** - WordPress privacy hooks
@@ -420,14 +424,13 @@ if (!hash_equals($expected, $signature)) {
   - [ ] Activity log export/deletion for user requests
 - [ ] **Uninstall Handler** - Clean database on plugin removal
 - [ ] **Integration Tests** - E2E testing with WordPress
-- [ ] **Concrete Abilities** - Post/page/user operations
-- [ ] Media/attachment abilities
-- [ ] User management abilities
-- [ ] Taxonomy (categories/tags) abilities
-- [ ] Comment management abilities
-- [ ] Plugin/theme abilities
-- [ ] Multisite support
-- [ ] GraphQL endpoint option
+- [ ] **User Management Abilities** - User CRUD operations
+- [ ] **Page Abilities** - Page-specific operations
+- [ ] **Plugin/Theme Abilities** - Plugin and theme management
+- [ ] **Multisite Support** - Multi-site network compatibility
+- [ ] **GraphQL Endpoint** - Optional GraphQL API
+- [ ] **Delete Operations** - Delete abilities for media and taxonomies
+- [ ] **Bulk Operations** - Bulk operations for terms and media
 
 ## Troubleshooting
 
@@ -544,4 +547,4 @@ Email: stephen@feather.us
 
 ---
 
-**Version:** 1.0.0 ✅ | Framework Complete | Core infrastructure with permissions, rate limiting, logging, webhooks, and error handling
+**Version:** 1.0.0 ✅ | Framework Complete | Core infrastructure with Posts, Comments, Media, and Taxonomy abilities
