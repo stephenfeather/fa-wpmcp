@@ -1,0 +1,127 @@
+---
+session: phase-1-13-decision
+date: 2026-01-21
+status: complete
+outcome: DECISION_MADE
+---
+
+goal: Document decision to defer GDPR compliance (Phase 1.13) to future release
+now: Phase 1.12 complete, documentation updated, ready for next priorities
+test: composer test && composer phpcs (346 tests passing, 71.13% coverage)
+
+done_this_session:
+  - task: Resumed from Phase 1.12 handoff (commit a4aff85)
+    files: [thoughts/shared/handoffs/kraken-phase-1.12/2026-01-21_10-55_phase-1-12-committed.yaml]
+  - task: Reviewed Phase 1.13 GDPR requirements from plan
+    files: [thoughts/shared/plans/PLAN-wp-abilities-plugin.md]
+  - task: Updated README Standards Compliance section to reflect privacy features
+    files: [README.md]
+    details: Changed "GDPR Ready" to "Privacy & Security" with note about future GDPR compliance
+  - task: Updated README Roadmap with completed phases and future enhancements
+    files: [README.md]
+    details: Moved GDPR compliance to future enhancements, added completed phases section
+  - task: Updated README status line to reflect Phase 1.12 complete
+    files: [README.md]
+    details: Status shows Phase 1.12 complete with GDPR deferred
+
+blockers: []
+
+questions: []
+
+decisions:
+  - defer_gdpr_compliance: Phase 1.13 (GDPR compliance) deferred to future release
+  - focus_on_core_functionality: Prioritize completing core plugin framework over WordPress-specific privacy hooks
+  - privacy_foundation_complete: PrivacyRedactor provides privacy-conscious foundation for future GDPR work
+  - transparent_documentation: README clearly states GDPR compliance is planned, not yet implemented
+  - future_implementation_ready: When GDPR is needed, PrivacyRedactor can be reused in export/erasure hooks
+
+findings:
+  - privacy_infrastructure_exists: PrivacyRedactor (Phase 1.12) provides PII redaction capability
+  - gdpr_hooks_straightforward: WordPress privacy API is well-documented, implementation is not complex
+  - deferral_acceptable: Plugin is usable without GDPR hooks; can be added in point release
+  - documentation_honest: README accurately reflects current privacy features vs planned GDPR compliance
+
+worked:
+  - Transparent documentation of what's implemented vs planned
+  - Reframing "GDPR Ready" to "Privacy & Security" with specific feature list
+  - Adding completed phases to roadmap for better project visibility
+  - Using "future enhancements" section for deferred work
+
+failed: []
+
+next:
+  - Decide on next priority: Phase 1.14 (Uninstall), Phase 1.15 (Integration Tests), or Phase 1.16 (Documentation)
+  - Consider: Skip to concrete abilities implementation (actual WordPress operations)
+  - Consider: Create release checklist for v1.0 without GDPR
+  - Future: Implement Phase 1.13 when GDPR compliance becomes required
+
+files:
+  created: [thoughts/shared/handoffs/kraken-phase-1.12/2026-01-21_11-25_phase-1-13-deferred.yaml]
+  modified: [README.md]
+
+test_results:
+  total: 346
+  assertions: 767
+  passing: 346
+  risky: 27
+  coverage: 71.13%
+  phpcs: clean
+
+commits: []
+
+documentation_changes:
+  readme_standards_compliance:
+    before: "GDPR Ready: Privacy-first design with PII redaction, user consent, retention policies, right to erasure"
+    after: "Privacy & Security: PII redaction (PrivacyRedactor), HMAC signing, rate limiting, audit trail. Note: Full GDPR compliance planned for future release"
+    location: README.md:85-90
+
+  readme_roadmap:
+    added_section: "Completed Phases" showing Phase 1.1-1.12 complete
+    moved_gdpr: From "Phase 1.13 (Next)" to "Future Enhancements"
+    location: README.md:538-558
+
+  readme_status:
+    before: "Phase 1.9 Complete ✅ | Framework ready for concrete ability implementations"
+    after: "Phase 1.12 Complete ✅ | Error handling & privacy redaction implemented | GDPR compliance deferred to future release"
+    location: README.md:675
+
+architecture_notes:
+  - Phase 1.12 completed: ErrorCodes, ResponseFormatter, PrivacyRedactor all implemented
+  - Phase 1.13 deferred: GDPRCompliance class not created, no privacy hooks registered
+  - Privacy foundation ready: PrivacyRedactor can be integrated into future GDPR export/erasure
+  - Documentation transparency: README shows completed work vs planned future work
+  - No technical debt: Deferral is strategic decision, not technical blocker
+
+key_files:
+  - README.md:85-90: Privacy & Security section with GDPR deferral note
+  - README.md:538-558: Roadmap with completed phases and future GDPR work
+  - README.md:675: Status line showing Phase 1.12 complete
+  - thoughts/shared/plans/PLAN-wp-abilities-plugin.md:2752-2798: Phase 1.13 spec (deferred)
+  - src/Http/PrivacyRedactor.php: Existing privacy redaction utility (reusable for GDPR)
+
+handoff_context:
+  - resumed_from: thoughts/shared/handoffs/kraken-phase-1.12/2026-01-21_10-55_phase-1-12-committed.yaml
+  - plan: thoughts/shared/plans/PLAN-wp-abilities-plugin.md
+  - specification: thoughts/shared/specs/wp-abilities-plugin-spec.md
+  - phase_1_12_commit: a4aff85 (Error handling and privacy redaction)
+
+implementation_status:
+  - Phase 1.1-1.12: COMPLETE ✅
+  - Phase 1.13 GDPR: DEFERRED (moved to future enhancements)
+  - Phase 1.14 Uninstall: PENDING (next candidate)
+  - Phase 1.15 Integration Tests: PENDING
+  - Phase 1.16 Documentation: PENDING
+
+next_priorities:
+  - option_1: Phase 1.14 Uninstall Handler (clean database on plugin removal)
+  - option_2: Phase 1.15 Integration Tests (E2E testing with WordPress)
+  - option_3: Skip to concrete abilities (GetPost, CreatePost, etc.)
+  - option_4: Prepare v1.0 release (without GDPR compliance)
+  - recommendation: Clarify product goals - is this a framework or a complete plugin?
+
+strategic_considerations:
+  - Framework vs Product: Current state is a solid framework; concrete abilities make it a product
+  - GDPR Timing: Can be added in v1.1 if needed for EU users
+  - Integration Tests: Valuable but time-consuming; may not block v1.0
+  - Uninstall Handler: Good practice, relatively quick to implement
+  - Documentation: README is comprehensive; may need user guide for concrete abilities

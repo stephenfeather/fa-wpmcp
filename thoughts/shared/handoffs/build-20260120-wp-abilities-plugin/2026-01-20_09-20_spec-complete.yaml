@@ -1,0 +1,69 @@
+---
+session: build-20260120-wp-abilities-plugin
+date: 2026-01-20
+status: partial
+outcome: PARTIAL_PLUS
+---
+
+goal: WordPress Abilities plugin specification complete and validated
+now: Create implementation plan with plan-agent
+test: grep -q "correlation_id VARCHAR" thoughts/shared/specs/wp-abilities-plugin-spec.md
+
+done_this_session:
+  - task: External research on Abilities API and MCP Adapter
+    files: [thoughts/shared/handoffs/build-20260120-wp-abilities-plugin/external-research.md]
+  - task: Discovery interview and comprehensive specification
+    files: [thoughts/shared/specs/wp-abilities-plugin-spec.md]
+  - task: Fixed 9 specification inconsistencies
+    files: [thoughts/shared/handoffs/build-20260120-wp-abilities-plugin/spec-fixes.md]
+  - task: Created workflow handoff document
+    files: [thoughts/shared/handoffs/build-20260120-wp-abilities-plugin/HANDOFF.md]
+
+blockers: []
+
+questions: []
+
+decisions:
+  - mcp_route_versioning: "Use versioned route /wp-json/fa-wpmcp/v1/mcp to allow future breaking changes"
+  - server_id: "Standardized to fa-wpmcp matching plugin slug and WordPress conventions"
+  - rate_limiting_strategy: "Dual tracking by user ID and IP hash to prevent both single-user and distributed abuse"
+  - background_jobs: "Action Scheduler primary with WP-Cron fallback for webhook queue processing"
+  - multisite_support: "Phase 1 explicitly single-site only, activate check prevents multisite install"
+  - permission_model: "Multi-level hierarchy - global → category → ability with custom fa_wpmcp_* capabilities"
+  - authentication: "Dedicated service accounts (ai-agent-{identifier}) with Application Password rotation every 30 days"
+
+findings:
+  - abilities_api_hooks: "Categories must register on wp_abilities_api_categories_init before abilities on wp_abilities_api_init"
+  - json_schema_validation: "Abilities API handles input validation, plugin adds additional sanitization in execute callbacks"
+  - correlation_ids_essential: "UUID v4 correlation IDs required for tracing across logs, webhooks, and external systems"
+  - application_password_auditing: "Use application_password_did_authenticate hook to log all auth events"
+  - rate_limit_storage: "Transients work for rate limiting but custom table required for webhook queue reliability"
+  - error_taxonomy: "Must use standardized error codes (authentication_required, insufficient_permissions) not rest_forbidden"
+
+worked:
+  - Comprehensive specification approach with 12 detailed sections covering all architectural areas
+  - Multi-round discovery interview using AskUserQuestion to gather requirements incrementally
+  - External research before specification ensured technical decisions grounded in real implementation patterns
+  - Spec review process caught 9 critical inconsistencies before implementation
+  - Framework-first approach allows easy extension to all WordPress areas
+
+failed:
+  - Initial spec missed correlation_id in activity log schema (caught in review)
+  - Inconsistent server ID naming across spec (fixed to fa-wpmcp throughout)
+  - WordPress version matrix showed 6.5 when minimum is 6.9 (typo fixed)
+
+next:
+  - Run plan-agent to create detailed implementation plan
+  - Validate plan with validate-agent against 2026 best practices
+  - Implement core framework with 4 example Post abilities
+  - Write unit tests achieving 70%+ coverage
+  - Verify PHPCS compliance with WordPress Coding Standards
+
+files:
+  created:
+    - thoughts/shared/handoffs/build-20260120-wp-abilities-plugin/external-research.md
+    - thoughts/shared/specs/wp-abilities-plugin-spec.md
+    - thoughts/shared/handoffs/build-20260120-wp-abilities-plugin/spec-fixes.md
+    - thoughts/shared/handoffs/build-20260120-wp-abilities-plugin/HANDOFF.md
+    - thoughts/shared/handoffs/build-20260120-wp-abilities-plugin/orchestration.yaml
+  modified: []

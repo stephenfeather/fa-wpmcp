@@ -16,140 +16,140 @@ namespace FAWpmcp\Webhooks;
  * Uses Action Scheduler when available, falls back to WP-Cron.
  */
 final class WebhookScheduler {
-	private const ACTION_HOOK   = 'fa_wpmcp_process_webhook_queue';
-	private const ACTION_GROUP  = 'fa-wpmcp-webhooks';
-	private const CRON_INTERVAL = 'five_minutes';
+    private const ACTION_HOOK   = 'fa_wpmcp_process_webhook_queue';
+    private const ACTION_GROUP  = 'fa-wpmcp-webhooks';
+    private const CRON_INTERVAL = 'five_minutes';
 
-	/**
-	 * Constructor.
-	 *
-	 * @param WebhookManager $manager Webhook manager.
-	 */
-	public function __construct(
-		private readonly WebhookManager $manager
-	) {}
+    /**
+     * Constructor.
+     *
+     * @param WebhookManager $manager Webhook manager.
+     */
+    public function __construct(
+        private readonly WebhookManager $manager
+    ) {}
 
-	/**
-	 * Initialize scheduler.
-	 *
-	 * Sets up recurring job to process webhook queue.
-	 * Uses Action Scheduler if available, WP-Cron otherwise.
-	 */
-	public function init(): void {
-		// Register action hook for queue processing.
-		add_action( self::ACTION_HOOK, array( $this, 'process_queue' ) );
+    /**
+     * Initialize scheduler.
+     *
+     * Sets up recurring job to process webhook queue.
+     * Uses Action Scheduler if available, WP-Cron otherwise.
+     */
+    public function init(): void {
+        // Register action hook for queue processing.
+        add_action( self::ACTION_HOOK, array( $this, 'process_queue' ) );
 
-		// Register custom cron interval.
-		add_filter( 'cron_schedules', array( $this, 'register_cron_interval' ) );
+        // Register custom cron interval.
+        add_filter( 'cron_schedules', array( $this, 'register_cron_interval' ) );
 
-		// Schedule recurring job.
-		add_action( 'init', array( $this, 'schedule_recurring_job' ) );
-	}
+        // Schedule recurring job.
+        add_action( 'init', array( $this, 'schedule_recurring_job' ) );
+    }
 
-	/**
-	 * Process webhook queue.
-	 *
-	 * Called by Action Scheduler or WP-Cron.
-	 */
-	public function process_queue(): void {
-		$this->manager->process_queue();
-	}
+    /**
+     * Process webhook queue.
+     *
+     * Called by Action Scheduler or WP-Cron.
+     */
+    public function process_queue(): void {
+        $this->manager->process_queue();
+    }
 
-	/**
-	 * Schedule recurring job.
-	 *
-	 * Uses Action Scheduler if available, WP-Cron otherwise.
-	 */
-	public function schedule_recurring_job(): void {
-		if ( $this->is_action_scheduler_available() ) {
-			$this->schedule_with_action_scheduler();
-		} else {
-			$this->schedule_with_wp_cron();
-		}
-	}
+    /**
+     * Schedule recurring job.
+     *
+     * Uses Action Scheduler if available, WP-Cron otherwise.
+     */
+    public function schedule_recurring_job(): void {
+        if ( $this->is_action_scheduler_available() ) {
+            $this->schedule_with_action_scheduler();
+        } else {
+            $this->schedule_with_wp_cron();
+        }
+    }
 
-	/**
-	 * Check if Action Scheduler is available.
-	 *
-	 * @return bool True if Action Scheduler is available.
-	 */
-	private function is_action_scheduler_available(): bool {
-		return function_exists( 'as_has_scheduled_action' )
-			&& function_exists( 'as_schedule_recurring_action' );
-	}
+    /**
+     * Check if Action Scheduler is available.
+     *
+     * @return bool True if Action Scheduler is available.
+     */
+    private function is_action_scheduler_available(): bool {
+        return function_exists( 'as_has_scheduled_action' )
+            && function_exists( 'as_schedule_recurring_action' );
+    }
 
-	/**
-	 * Schedule with Action Scheduler.
-	 *
-	 * Schedules recurring action every 5 minutes.
-	 */
-	private function schedule_with_action_scheduler(): void {
-		// Check if already scheduled.
-		if ( as_has_scheduled_action( self::ACTION_HOOK, array(), self::ACTION_GROUP ) ) {
-			return;
-		}
+    /**
+     * Schedule with Action Scheduler.
+     *
+     * Schedules recurring action every 5 minutes.
+     */
+    private function schedule_with_action_scheduler(): void {
+        // Check if already scheduled.
+        if ( as_has_scheduled_action( self::ACTION_HOOK, array(), self::ACTION_GROUP ) ) {
+            return;
+        }
 
-		// Schedule recurring action every 5 minutes.
-		as_schedule_recurring_action(
-			time(),
-			300, // 5 minutes in seconds.
-			self::ACTION_HOOK,
-			array(),
-			self::ACTION_GROUP,
-			true // Unique.
-		);
-	}
+        // Schedule recurring action every 5 minutes.
+        as_schedule_recurring_action(
+            time(),
+            300, // 5 minutes in seconds.
+            self::ACTION_HOOK,
+            array(),
+            self::ACTION_GROUP,
+            true // Unique.
+        );
+    }
 
-	/**
-	 * Schedule with WP-Cron.
-	 *
-	 * Schedules WP-Cron event every 5 minutes.
-	 */
-	private function schedule_with_wp_cron(): void {
-		// Check if already scheduled.
-		if ( wp_next_scheduled( self::ACTION_HOOK ) ) {
-			return;
-		}
+    /**
+     * Schedule with WP-Cron.
+     *
+     * Schedules WP-Cron event every 5 minutes.
+     */
+    private function schedule_with_wp_cron(): void {
+        // Check if already scheduled.
+        if ( wp_next_scheduled( self::ACTION_HOOK ) ) {
+            return;
+        }
 
-		// Schedule recurring cron event.
-		wp_schedule_event( time(), self::CRON_INTERVAL, self::ACTION_HOOK );
-	}
+        // Schedule recurring cron event.
+        wp_schedule_event( time(), self::CRON_INTERVAL, self::ACTION_HOOK );
+    }
 
-	/**
-	 * Register custom cron interval.
-	 *
-	 * Adds 5-minute interval for WP-Cron fallback.
-	 *
-	 * @param array<string, array<string, mixed>> $schedules Existing schedules.
-	 * @return array<string, array<string, mixed>> Modified schedules.
-	 */
-	public function register_cron_interval( array $schedules ): array {
-		if ( ! isset( $schedules[ self::CRON_INTERVAL ] ) ) {
-			$schedules[ self::CRON_INTERVAL ] = array(
-				'interval' => 300,
-				'display'  => __( 'Every 5 Minutes', 'fa-wpmcp' ),
-			);
-		}
+    /**
+     * Register custom cron interval.
+     *
+     * Adds 5-minute interval for WP-Cron fallback.
+     *
+     * @param array<string, array<string, mixed>> $schedules Existing schedules.
+     * @return array<string, array<string, mixed>> Modified schedules.
+     */
+    public function register_cron_interval( array $schedules ): array {
+        if ( ! isset( $schedules[ self::CRON_INTERVAL ] ) ) {
+            $schedules[ self::CRON_INTERVAL ] = array(
+                'interval' => 300,
+                'display'  => __( 'Every 5 Minutes', 'fa-wpmcp' ),
+            );
+        }
 
-		return $schedules;
-	}
+        return $schedules;
+    }
 
-	/**
-	 * Unschedule all jobs.
-	 *
-	 * Removes both Action Scheduler and WP-Cron jobs.
-	 * Called on plugin deactivation.
-	 */
-	public function unschedule(): void {
-		// Unschedule Action Scheduler actions.
-		if ( $this->is_action_scheduler_available() ) {
-			as_unschedule_all_actions( self::ACTION_HOOK, array(), self::ACTION_GROUP );
-		}
+    /**
+     * Unschedule all jobs.
+     *
+     * Removes both Action Scheduler and WP-Cron jobs.
+     * Called on plugin deactivation.
+     */
+    public function unschedule(): void {
+        // Unschedule Action Scheduler actions.
+        if ( $this->is_action_scheduler_available() ) {
+            as_unschedule_all_actions( self::ACTION_HOOK, array(), self::ACTION_GROUP );
+        }
 
-		// Unschedule WP-Cron events.
-		$timestamp = wp_next_scheduled( self::ACTION_HOOK );
-		if ( $timestamp ) {
-			wp_unschedule_event( $timestamp, self::ACTION_HOOK );
-		}
-	}
+        // Unschedule WP-Cron events.
+        $timestamp = wp_next_scheduled( self::ACTION_HOOK );
+        if ( $timestamp ) {
+            wp_unschedule_event( $timestamp, self::ACTION_HOOK );
+        }
+    }
 }

@@ -11,12 +11,12 @@ declare(strict_types=1);
 
 // Exit if accessed directly or not during uninstall.
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	exit;
+    exit;
 }
 
 // Exit if user requested data preservation.
 if ( defined( 'FA_WPMCP_PRESERVE_DATA_ON_UNINSTALL' ) && FA_WPMCP_PRESERVE_DATA_ON_UNINSTALL ) {
-	return;
+    return;
 }
 
 global $wpdb;
@@ -63,7 +63,7 @@ $wpdb->query( "DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE 'fa_wpmcp_%'" )
 
 // Delete multisite options if in network.
 if ( is_multisite() ) {
-	$wpdb->query( "DELETE FROM {$wpdb->sitemeta} WHERE meta_key LIKE 'fa_wpmcp_%'" );
+    $wpdb->query( "DELETE FROM {$wpdb->sitemeta} WHERE meta_key LIKE 'fa_wpmcp_%'" );
 }
 
 /*
@@ -78,6 +78,6 @@ wp_clear_scheduled_hook( 'fa_wpmcp_cleanup_old_logs' );
 
 // Clear Action Scheduler actions if available.
 if ( function_exists( 'as_unschedule_all_actions' ) ) {
-	as_unschedule_all_actions( 'fa_wpmcp_process_webhook' );
-	as_unschedule_all_actions( 'fa_wpmcp_retry_webhook' );
+    as_unschedule_all_actions( 'fa_wpmcp_process_webhook' );
+    as_unschedule_all_actions( 'fa_wpmcp_retry_webhook' );
 }

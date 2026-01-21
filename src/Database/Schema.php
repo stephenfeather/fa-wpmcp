@@ -19,83 +19,83 @@ namespace FAWpmcp\Database;
  * @package FAWpmcp\Database
  */
 final class Schema {
-	/**
-	 * Generate activity log table SQL.
-	 *
-	 * Pure function: same prefix always produces same SQL.
-	 *
-	 * @param string $prefix Database table prefix (e.g., 'wp_').
-	 * @return string SQL CREATE TABLE statement.
-	 */
-	public static function get_activity_log_schema( string $prefix ): string {
-		$table = "{$prefix}fa_wpmcp_activity_log";
+    /**
+     * Generate activity log table SQL.
+     *
+     * Pure function: same prefix always produces same SQL.
+     *
+     * @param string $prefix Database table prefix (e.g., 'wp_').
+     * @return string SQL CREATE TABLE statement.
+     */
+    public static function get_activity_log_schema( string $prefix ): string {
+        $table = "{$prefix}fa_wpmcp_activity_log";
 
-		return "CREATE TABLE {$table} (
-			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-			correlation_id VARCHAR(36) NOT NULL,
-			timestamp DATETIME NOT NULL,
-			user_id BIGINT UNSIGNED NOT NULL,
-			user_login VARCHAR(60) NOT NULL,
-			ip_address VARCHAR(45) NOT NULL,
-			ability_name VARCHAR(255) NOT NULL,
-			ability_category VARCHAR(100) NOT NULL,
-			operation_type ENUM('read', 'write') NOT NULL,
-			input_data LONGTEXT,
-			output_data LONGTEXT,
-			success BOOLEAN NOT NULL,
-			error_message TEXT,
-			execution_time_ms INT UNSIGNED,
-			PRIMARY KEY (id),
-			INDEX idx_correlation_id (correlation_id),
-			INDEX idx_timestamp (timestamp),
-			INDEX idx_user_id (user_id),
-			INDEX idx_ability_name (ability_name),
-			INDEX idx_success (success)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-	}
+        return "CREATE TABLE {$table} (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            correlation_id VARCHAR(36) NOT NULL,
+            timestamp DATETIME NOT NULL,
+            user_id BIGINT UNSIGNED NOT NULL,
+            user_login VARCHAR(60) NOT NULL,
+            ip_address VARCHAR(45) NOT NULL,
+            ability_name VARCHAR(255) NOT NULL,
+            ability_category VARCHAR(100) NOT NULL,
+            operation_type ENUM('read', 'write') NOT NULL,
+            input_data LONGTEXT,
+            output_data LONGTEXT,
+            success BOOLEAN NOT NULL,
+            error_message TEXT,
+            execution_time_ms INT UNSIGNED,
+            PRIMARY KEY (id),
+            INDEX idx_correlation_id (correlation_id),
+            INDEX idx_timestamp (timestamp),
+            INDEX idx_user_id (user_id),
+            INDEX idx_ability_name (ability_name),
+            INDEX idx_success (success)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+    }
 
-	/**
-	 * Generate webhook queue table SQL.
-	 *
-	 * Pure function: same prefix always produces same SQL.
-	 *
-	 * @param string $prefix Database table prefix (e.g., 'wp_').
-	 * @return string SQL CREATE TABLE statement.
-	 */
-	public static function get_webhook_queue_schema( string $prefix ): string {
-		$table = "{$prefix}fa_wpmcp_webhook_queue";
+    /**
+     * Generate webhook queue table SQL.
+     *
+     * Pure function: same prefix always produces same SQL.
+     *
+     * @param string $prefix Database table prefix (e.g., 'wp_').
+     * @return string SQL CREATE TABLE statement.
+     */
+    public static function get_webhook_queue_schema( string $prefix ): string {
+        $table = "{$prefix}fa_wpmcp_webhook_queue";
 
-		return "CREATE TABLE {$table} (
-			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-			url VARCHAR(2048) NOT NULL,
-			event_type VARCHAR(100) NOT NULL,
-			payload LONGTEXT NOT NULL,
-			signature VARCHAR(64) NOT NULL,
-			status ENUM('pending', 'processing', 'completed', 'failed') NOT NULL DEFAULT 'pending',
-			retry_count TINYINT UNSIGNED NOT NULL DEFAULT 0,
-			created_at DATETIME NOT NULL,
-			next_retry_at DATETIME,
-			completed_at DATETIME,
-			error_message TEXT,
-			PRIMARY KEY (id),
-			INDEX idx_status (status),
-			INDEX idx_next_retry_at (next_retry_at),
-			INDEX idx_event_type (event_type)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-	}
+        return "CREATE TABLE {$table} (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            url VARCHAR(2048) NOT NULL,
+            event_type VARCHAR(100) NOT NULL,
+            payload LONGTEXT NOT NULL,
+            signature VARCHAR(64) NOT NULL,
+            status ENUM('pending', 'processing', 'completed', 'failed') NOT NULL DEFAULT 'pending',
+            retry_count TINYINT UNSIGNED NOT NULL DEFAULT 0,
+            created_at DATETIME NOT NULL,
+            next_retry_at DATETIME,
+            completed_at DATETIME,
+            error_message TEXT,
+            PRIMARY KEY (id),
+            INDEX idx_status (status),
+            INDEX idx_next_retry_at (next_retry_at),
+            INDEX idx_event_type (event_type)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+    }
 
-	/**
-	 * Get all schema SQL statements.
-	 *
-	 * Pure function: returns array of SQL strings.
-	 *
-	 * @param string $prefix Database table prefix (e.g., 'wp_').
-	 * @return array<int, string> Array of CREATE TABLE statements.
-	 */
-	public static function get_all_schemas( string $prefix ): array {
-		return array(
-			self::get_activity_log_schema( $prefix ),
-			self::get_webhook_queue_schema( $prefix ),
-		);
-	}
+    /**
+     * Get all schema SQL statements.
+     *
+     * Pure function: returns array of SQL strings.
+     *
+     * @param string $prefix Database table prefix (e.g., 'wp_').
+     * @return array<int, string> Array of CREATE TABLE statements.
+     */
+    public static function get_all_schemas( string $prefix ): array {
+        return array(
+            self::get_activity_log_schema( $prefix ),
+            self::get_webhook_queue_schema( $prefix ),
+        );
+    }
 }

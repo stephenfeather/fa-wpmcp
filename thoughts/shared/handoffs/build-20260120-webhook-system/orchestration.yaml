@@ -1,0 +1,49 @@
+---
+session: build-20260120-webhook-system
+mode: tdd
+description: Phase 1.7 - Webhook System (HMAC signing, Action Scheduler integration, retry queue)
+started: 2026-01-20T18:45:00Z
+chain:
+  - phase_1_7a_tests
+  - phase_1_7b_implementation
+  - phase_1_7c_refactor
+current_phase: 0
+phases:
+  - name: Phase 1.7a - Write Webhook Tests (RED)
+    status: pending
+    files_to_create:
+      - tests/phpunit/ValueObjects/WebhookPayloadTest.php
+      - tests/phpunit/Webhooks/PayloadBuilderTest.php
+      - tests/phpunit/Webhooks/SignatureGeneratorTest.php
+      - tests/phpunit/Webhooks/WebhookManagerTest.php
+  - name: Phase 1.7b - Implement Webhook System (GREEN)
+    status: pending
+    files_to_create:
+      - src/ValueObjects/WebhookPayload.php
+      - src/Webhooks/PayloadBuilder.php
+      - src/Webhooks/SignatureGenerator.php
+      - src/Webhooks/WebhookQueue.php
+      - src/Webhooks/WebhookSender.php
+      - src/Webhooks/WebhookConfig.php
+      - src/Webhooks/WebhookManager.php
+  - name: Phase 1.7c - Refactor Webhook System (REFACTOR)
+    status: pending
+    focus:
+      - Ensure PayloadBuilder is pure
+      - Ensure SignatureGenerator is pure
+      - Extract retry logic to pure calculator
+      - Add comprehensive error handling
+
+acceptance_criteria:
+  - All webhook tests pass (GREEN)
+  - Webhooks fire on ability.before_execute
+  - Webhooks fire on ability.after_execute
+  - Webhooks fire on ability.failed
+  - HMAC signature in X-FA-WPMCP-Signature header
+  - Failed webhooks retry with exponential backoff
+  - PayloadBuilder and SignatureGenerator are pure functions
+
+dependencies:
+  - Phase 1.3 (Database Schema)
+  - Phase 1.5 (Activity Logging)
+---

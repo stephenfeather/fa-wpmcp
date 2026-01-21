@@ -1,0 +1,165 @@
+---
+session: kraken-phase-1.14
+date: 2026-01-21
+status: complete
+outcome: SUCCEEDED
+---
+
+goal: Phase 1.14 - Uninstall Handler complete, tested, and committed
+now: Phase 1.15 - Integration Tests (or skip to concrete abilities)
+test: composer test && composer phpcs (357 tests passing, 71.13% coverage)
+
+done_this_session:
+  - task: Resumed from Phase 1.13 deferral decision
+    files: [thoughts/shared/handoffs/kraken-phase-1.12/2026-01-21_11-25_phase-1-13-deferred.yaml]
+  - task: Phase 1.14a (RED) - Created 11 comprehensive uninstall tests
+    files: [tests/phpunit/UninstallTest.php]
+  - task: Phase 1.14b (GREEN) - Implemented complete uninstall.php handler
+    files: [uninstall.php]
+  - task: Phase 1.14c (REFACTOR) - Added safety checks and data preservation option
+    files: [uninstall.php]
+  - task: Fixed code standards issues (strict_types, @throws tags)
+    files: [uninstall.php, tests/phpunit/UninstallTest.php]
+  - task: Created git commit 36de32d for Phase 1.14 implementation
+    files: [.git/refs/heads/develop]
+
+blockers: []
+
+questions: []
+
+decisions:
+  - complete_cleanup: Uninstall removes all plugin data (tables, options, transients, user meta, scheduled tasks)
+  - preservation_constant: FA_WPMCP_PRESERVE_DATA_ON_UNINSTALL allows users to keep data
+  - multisite_support: Uninstall handles multisite sitemeta cleanup with is_multisite() check
+  - action_scheduler_compatible: Checks for as_unschedule_all_actions() before calling
+  - no_logging: Uninstall doesn't log (plugin is being deleted, nowhere to log to)
+  - simple_implementation: Direct wpdb queries, no dependencies on plugin classes
+  - exit_early: Returns immediately if WP_UNINSTALL_PLUGIN not defined or preservation constant set
+
+findings:
+  - tdd_effectiveness: 11 tests written first (RED), all passing after implementation (GREEN)
+  - test_coverage_impact: Added 11 tests, 27 assertions (357 total tests, 794 assertions)
+  - brain_monkey_limitations: Cannot mock PHP internals (defined, function_exists) - tested logic patterns instead
+  - uninstall_simplicity: WordPress uninstall.php requires no plugin classes, just direct cleanup
+  - safety_first: Multiple safety checks prevent accidental data loss
+  - multisite_awareness: Handles both single site and multisite installations
+
+worked:
+  - Writing comprehensive tests covering all cleanup scenarios
+  - Direct wpdb queries for reliable cleanup
+  - Checking for Action Scheduler before calling its functions
+  - Adding FA_WPMCP_PRESERVE_DATA_ON_UNINSTALL escape hatch
+  - Testing logic patterns when Brain\Monkey can't mock internals
+  - Clear section comments in uninstall.php for maintainability
+
+failed: []
+
+next:
+  - Option 1: Phase 1.15 (Integration Tests) - E2E testing with WordPress
+  - Option 2: Skip to concrete abilities (GetPost, CreatePost, UpdatePost, ListPosts)
+  - Option 3: Prepare v1.0 release - Framework-complete state
+  - Option 4: Phase 1.16 (Documentation) - User guides and API docs
+  - Recommend: Concrete abilities to make plugin functional beyond framework
+
+files:
+  created: [tests/phpunit/UninstallTest.php, thoughts/shared/handoffs/kraken-phase-1.14/2026-01-21_11-37_phase-1-14-complete.yaml]
+  modified: [uninstall.php]
+
+test_results:
+  total: 357
+  assertions: 794
+  passing: 357
+  risky: 27
+  coverage: 71.13%
+  phpcs: clean
+
+commits:
+  - 36de32d: Implement uninstall handler with comprehensive cleanup
+
+cleanup_coverage:
+  tables_dropped:
+    - fa_wpmcp_activity_log: "Removes all activity log entries"
+    - fa_wpmcp_webhook_queue: "Removes all queued webhooks"
+
+  options_deleted:
+    - fa_wpmcp_*: "All plugin options (permissions, rate limits, webhooks, settings)"
+    - _transient_fa_wpmcp_*: "All transient values"
+    - _transient_timeout_fa_wpmcp_*: "All transient timeouts"
+
+  user_meta_deleted:
+    - fa_wpmcp_*: "All plugin-specific user metadata"
+
+  multisite_meta_deleted:
+    - fa_wpmcp_*: "All site meta (if multisite)"
+
+  scheduled_tasks_cleared:
+    - fa_wpmcp_process_webhook_queue: "WP-Cron webhook processing"
+    - fa_wpmcp_cleanup_old_logs: "WP-Cron log cleanup"
+    - fa_wpmcp_process_webhook: "Action Scheduler webhook processing"
+    - fa_wpmcp_retry_webhook: "Action Scheduler webhook retries"
+
+architecture_notes:
+  - uninstall.php at root (WordPress standard location)
+  - No plugin class dependencies (runs standalone)
+  - Uses global $wpdb for database access
+  - Checks WP_UNINSTALL_PLUGIN constant for security
+  - Supports FA_WPMCP_PRESERVE_DATA_ON_UNINSTALL constant for data retention
+  - Handles both WP-Cron and Action Scheduler cleanup
+  - Multisite-aware with is_multisite() check
+  - Clean section separation with comments
+
+key_files:
+  - uninstall.php:13-15: WP_UNINSTALL_PLUGIN security check
+  - uninstall.php:16-18: Data preservation constant check
+  - uninstall.php:29-32: Database table drops
+  - uninstall.php:41-45: Options and transients deletion
+  - uninstall.php:54: User meta deletion
+  - uninstall.php:63-65: Multisite sitemeta deletion
+  - uninstall.php:74-75: WP-Cron hook clearing
+  - uninstall.php:78-81: Action Scheduler cleanup with function_exists check
+  - tests/phpunit/UninstallTest.php:55-65: Exit security test
+  - tests/phpunit/UninstallTest.php:260-290: Complete uninstall integration test
+
+handoff_context:
+  - resumed_from: thoughts/shared/handoffs/kraken-phase-1.12/2026-01-21_11-25_phase-1-13-deferred.yaml
+  - plan: thoughts/shared/plans/PLAN-wp-abilities-plugin.md (Phase 1.14 lines 2801-2852)
+  - specification: thoughts/shared/specs/wp-abilities-plugin-spec.md (lines 709-740)
+  - phase_1_12_commit: a4aff85 (Error handling and privacy redaction)
+  - phase_1_14_commit: 36de32d (Uninstall handler)
+
+implementation_status:
+  - Phase 1.1-1.12: COMPLETE ✅
+  - Phase 1.13 GDPR: DEFERRED (moved to future enhancements)
+  - Phase 1.14 Uninstall: COMPLETE ✅ (committed 36de32d)
+  - Phase 1.15 Integration Tests: PENDING (next candidate)
+  - Phase 1.16 Documentation: PENDING
+  - Concrete Abilities: NOT STARTED (alternative next step)
+
+strategic_considerations:
+  - framework_complete: Core infrastructure is fully implemented and tested
+  - functional_gap: No concrete abilities yet (can't read/write posts, users, etc.)
+  - integration_tests_value: Would verify WordPress integration but time-consuming
+  - concrete_abilities_priority: Would make plugin actually useful for AI agents
+  - documentation_completeness: README is comprehensive, API docs could be enhanced
+  - v1_0_readiness: Could release as framework-only or wait for concrete abilities
+
+next_decision_point:
+  question: "What makes this plugin valuable to users?"
+  option_1: "Integration tests first - ensure framework works with WordPress"
+  option_2: "Concrete abilities first - make plugin functional for AI agents"
+  option_3: "Documentation first - explain how to extend the framework"
+  recommendation: "Concrete abilities - the framework is solid, now make it useful"
+
+test_coverage_details:
+  uninstall_tests:
+    - test_exits_if_not_uninstalling: Security check for WP_UNINSTALL_PLUGIN
+    - test_drops_activity_log_table: Verifies table cleanup
+    - test_drops_webhook_queue_table: Verifies table cleanup
+    - test_deletes_all_plugin_options: Verifies options cleanup
+    - test_deletes_all_transients: Verifies transient cleanup
+    - test_deletes_all_user_meta: Verifies user meta cleanup
+    - test_deletes_multisite_options: Verifies sitemeta cleanup
+    - test_preserve_data_constant_pattern: Verifies preservation logic
+    - test_clears_scheduled_cron_events: Verifies WP-Cron cleanup
+    - test_clears_action_scheduler_actions: Verifies Action Scheduler cleanup
+    - test_complete_uninstall_runs_all_steps: Integration test for complete cleanup

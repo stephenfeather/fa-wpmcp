@@ -1,0 +1,134 @@
+---
+session: build-20260120-webhook-system
+date: 2026-01-20
+status: complete
+outcome: SUCCEEDED
+---
+
+goal: Complete Phase 1.7 webhook system with Action Scheduler integration
+now: Ready for Phase 1.8 Ability Framework (ExecutionPipeline, AbilityRegistry, AbstractAbility)
+test: composer test && composer phpcs
+
+done_this_session:
+  - task: Updated webhook_queue schema to include url column
+    files: [src/Database/Schema.php]
+  - task: Implemented webhook value objects and interfaces (pure functions)
+    files: [src/ValueObjects/WebhookPayload.php, src/ValueObjects/WebhookResult.php, src/Webhooks/PayloadBuilder.php, src/Webhooks/SignatureGenerator.php, src/Webhooks/RetryCalculator.php, src/Webhooks/WebhookQueue.php, src/Webhooks/WebhookSender.php, src/Webhooks/WebhookConfig.php, src/Webhooks/WebhookManager.php]
+  - task: Created webhook tests (24 tests with TDD approach)
+    files: [tests/phpunit/ValueObjects/WebhookPayloadTest.php, tests/phpunit/Webhooks/PayloadBuilderTest.php, tests/phpunit/Webhooks/SignatureGeneratorTest.php, tests/phpunit/Webhooks/WebhookManagerTest.php]
+  - task: Implemented concrete webhook classes using WordPress APIs
+    files: [src/Webhooks/DatabaseWebhookQueue.php, src/Webhooks/WpHttpWebhookSender.php, src/Webhooks/OptionsWebhookConfig.php]
+  - task: Added Action Scheduler integration with WP-Cron fallback
+    files: [src/Webhooks/WebhookScheduler.php, src/Webhooks/WebhookService.php]
+  - task: Applied WordPress coding standards to all webhook files
+    files: [.phpcs.xml]
+  - task: Created 4 git commits for webhook system
+    files: []
+
+blockers: []
+
+questions: []
+
+decisions:
+  - pure_functional_core: PayloadBuilder, SignatureGenerator, and RetryCalculator are pure functions (no side effects, deterministic) for easy testing
+  - interface_based_boundaries: WebhookQueue, WebhookSender, and WebhookConfig are interfaces - enables dependency injection and mocking
+  - immutable_value_objects: WebhookPayload and WebhookResult use PHP 8.1 readonly properties for true immutability
+  - hmac_sha256_signatures: HMAC-SHA256 with timing-safe comparison (hash_equals) to prevent timing attacks
+  - exponential_backoff_retry: Failed webhooks retry with exponential backoff (60s, 120s, 240s) then permanently fail after 3 attempts
+  - database_queue_implementation: DatabaseWebhookQueue uses wp_fa_wpmcp_webhook_queue table with url column
+  - action_scheduler_primary: Use Action Scheduler as primary with runtime availability check via function_exists()
+  - wp_cron_fallback: Graceful degradation to WP-Cron if Action Scheduler unavailable
+  - five_minute_interval: Process webhook queue every 5 minutes (300 seconds)
+  - ability_lifecycle_hooks: WebhookService listens to fa_wpmcp_ability_before_execute, fa_wpmcp_ability_after_execute, fa_wpmcp_ability_failed
+
+findings:
+  - url_column_needed: Original Phase 1.3 schema didn't have url column - webhooks need to know where to send
+  - wpdb_prepare_table_names: PHPCS requires table names outside of prepare() but allows disable comments when table is constructed safely (following LogRepository pattern)
+  - wp_remote_post_defaults: "Used 10-second timeout, blocked redirects (redirection: 0), proper headers (Content-Type, X-FA-WPMCP-Signature)"
+  - random_bytes_secure: PHP random_bytes() provides cryptographically secure random for webhook secrets
+  - action_scheduler_installed: Action Scheduler ^3.7 already in composer.json from Phase 1.1
+  - runtime_check_needed: Must check function_exists() for Action Scheduler functions to support environments without it
+  - unique_flag_prevents_duplicates: as_schedule_recurring_action() with unique=true prevents duplicate schedules
+
+worked:
+  - TDD Red-Green-Refactor approach maintained code quality throughout
+  - Following established patterns from Phase 1.5/1.6 (immutability, pure functions, interfaces) accelerated development
+  - Interface-first design made testing easy - no concrete implementations needed in tests
+  - WebhookScheduler detects Action Scheduler availability with function_exists()
+  - WebhookService acts as facade/coordinator for all webhook components
+  - Morph edit tool efficiently applied changes across multiple files
+  - PHPCS disable comments with rationale kept code standards clean
+
+failed: []
+
+next:
+  - Wire WebhookService into main plugin class initialization (call $webhookService->init() in plugin bootstrap)
+  - Add plugin deactivation hook to call $webhookService->deactivate() for cleanup
+  - Phase 1.8 Ability Framework - implement ExecutionPipeline (composable pipeline pattern)
+  - Phase 1.8 Ability Framework - implement AbilityRegistry (central ability registration)
+  - Phase 1.8 Ability Framework - implement AbstractAbility base class
+  - Phase 1.8 Ability Framework - implement AbilityExecutor (ties together permissions, rate limiting, logging, webhooks)
+
+files:
+  created:
+    - src/ValueObjects/WebhookPayload.php
+    - src/ValueObjects/WebhookResult.php
+    - src/Webhooks/PayloadBuilder.php
+    - src/Webhooks/SignatureGenerator.php
+    - src/Webhooks/RetryCalculator.php
+    - src/Webhooks/WebhookQueue.php
+    - src/Webhooks/WebhookSender.php
+    - src/Webhooks/WebhookConfig.php
+    - src/Webhooks/WebhookManager.php
+    - src/Webhooks/DatabaseWebhookQueue.php
+    - src/Webhooks/WpHttpWebhookSender.php
+    - src/Webhooks/OptionsWebhookConfig.php
+    - src/Webhooks/WebhookScheduler.php
+    - src/Webhooks/WebhookService.php
+    - tests/phpunit/ValueObjects/WebhookPayloadTest.php
+    - tests/phpunit/Webhooks/PayloadBuilderTest.php
+    - tests/phpunit/Webhooks/SignatureGeneratorTest.php
+    - tests/phpunit/Webhooks/WebhookManagerTest.php
+  modified:
+    - src/Database/Schema.php
+    - .phpcs.xml
+    - .gitignore
+
+test_results:
+  total_tests: 131
+  assertions: 298
+  status: passing
+  phpcs: clean
+  coverage: 52.45%
+  risky: 6 (Mockery-based tests, acceptable)
+
+architecture_notes:
+  - PayloadBuilder uses static pure functions at src/Webhooks/PayloadBuilder.php:22
+  - SignatureGenerator generates HMAC-SHA256 at src/Webhooks/SignatureGenerator.php:22
+  - RetryCalculator uses exponential backoff at src/Webhooks/RetryCalculator.php:24
+  - WebhookManager orchestrates trigger/queue/send at src/Webhooks/WebhookManager.php:39
+  - DatabaseWebhookQueue uses wp_fa_wpmcp_webhook_queue table at src/Webhooks/DatabaseWebhookQueue.php:55
+  - WpHttpWebhookSender uses wp_remote_post() at src/Webhooks/WpHttpWebhookSender.php:28
+  - OptionsWebhookConfig auto-generates secret at src/Webhooks/OptionsWebhookConfig.php:48
+  - WebhookScheduler detects Action Scheduler at src/Webhooks/WebhookScheduler.php:76
+  - WebhookService wires all components at src/Webhooks/WebhookService.php:38
+  - Action hook: fa_wpmcp_process_webhook_queue (scheduled every 5 minutes)
+  - Action group: fa-wpmcp-webhooks (for Action Scheduler organization)
+
+implementation_status:
+  - Phase 1.1 Project Scaffolding - COMPLETE
+  - Phase 1.2 Core Plugin Class - COMPLETE
+  - Phase 1.3 Database Schema - COMPLETE
+  - Phase 1.4 Permission System - COMPLETE
+  - Phase 1.5 Activity Logging - COMPLETE
+  - Phase 1.6 Rate Limiting - COMPLETE
+  - Phase 1.7 Webhook System - COMPLETE (this session)
+  - Phase 1.8 Ability Framework - NEXT
+
+commits_created:
+  - d2f2a93: Add webhook system with pure functions and interface-based design
+  - de6ff95: Implement concrete webhook classes using WordPress APIs
+  - 07b5d63: Add Action Scheduler integration for webhook queue processing
+  - 6dcf007: Ignore opc directory in gitignore
+
+plan_reference: thoughts/shared/plans/PLAN-wp-abilities-plugin.md:1419-1718
