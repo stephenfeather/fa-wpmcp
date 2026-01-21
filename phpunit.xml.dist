@@ -17,6 +17,7 @@
 	<coverage processUncoveredFiles="true">
 		<include>
 			<directory suffix=".php">src</directory>
+			<file>uninstall.php</file>
 		</include>
 		<exclude>
 			<directory>vendor</directory>
