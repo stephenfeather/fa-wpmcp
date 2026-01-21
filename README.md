@@ -82,11 +82,12 @@ Configure via WordPress options or filters (see [Configuration](#configuration))
 
 ### Standards Compliance
 
-- **GDPR Ready:** Privacy-first design
-  - PII redaction in logs
-  - User consent tracking
-  - Data retention policies
-  - Right to erasure support
+- **Privacy & Security:** Privacy-first design
+  - PII redaction in logs (via PrivacyRedactor)
+  - HMAC-SHA256 webhook signing
+  - Rate limiting protection
+  - Activity audit trail
+  - *Note: Full GDPR compliance (data export/erasure hooks) planned for future release*
 
 - **Code Quality:** Professional-grade implementation
   - PSR-12 coding standards
@@ -534,18 +535,20 @@ if (!hash_equals($expected, $signature)) {
 
 ## Roadmap
 
-### Phase 1.10 (Next) - Concrete Abilities
-- [ ] GetPostAbility - Read single post
-- [ ] CreatePostAbility - Create new post
-- [ ] UpdatePostAbility - Modify existing post
-- [ ] ListPostsAbility - Query posts with pagination
-
-### Phase 1.11 - WordPress Registration
-- [ ] Integrate with WordPress Abilities API
-- [ ] Register abilities via `wp_register_ability()`
-- [ ] REST API endpoints
+### Completed Phases ✅
+- [x] Phase 1.1-1.12: Core framework, permissions, rate limiting, logging, webhooks, error handling
+- [x] Privacy redaction system (PrivacyRedactor)
+- [x] HTTP response formatting utilities
+- [x] Database schema and migrations
 
 ### Future Enhancements
+- [ ] **GDPR Compliance** - WordPress privacy hooks
+  - [ ] User data export (wp_privacy_personal_data_exporters)
+  - [ ] User data erasure (wp_privacy_personal_data_erasers)
+  - [ ] Activity log export/deletion for user requests
+- [ ] **Uninstall Handler** - Clean database on plugin removal
+- [ ] **Integration Tests** - E2E testing with WordPress
+- [ ] **Concrete Abilities** - Post/page/user operations
 - [ ] Media/attachment abilities
 - [ ] User management abilities
 - [ ] Taxonomy (categories/tags) abilities
@@ -669,4 +672,4 @@ Email: stephen@feather.us
 
 ---
 
-**Status:** Phase 1.9 Complete ✅ | Framework ready for concrete ability implementations
+**Status:** Phase 1.12 Complete ✅ | Error handling & privacy redaction implemented | GDPR compliance deferred to future release
