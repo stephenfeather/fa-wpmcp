@@ -104,12 +104,20 @@ final class SettingsPage {
 	private AbilityRegistry $registry;
 
 	/**
+	 * Settings sanitizer.
+	 *
+	 * @var SettingsSanitizer
+	 */
+	private SettingsSanitizer $sanitizer;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param AbilityRegistry $registry Ability registry instance.
 	 */
 	public function __construct( AbilityRegistry $registry ) {
 		$this->registry = $registry;
+		$this->sanitizer = new SettingsSanitizer();
 	}
 
 	/**
@@ -684,8 +692,8 @@ final class SettingsPage {
 		$settings = array(
 			'global_read_enabled'  => isset( $_POST['global_read_enabled'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['global_read_enabled'] ) ),
 			'global_write_enabled' => isset( $_POST['global_write_enabled'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['global_write_enabled'] ) ),
-			'category_settings'    => $this->sanitize_category_settings( $category_settings ),
-			'ability_settings'     => $this->sanitize_ability_settings( $ability_settings ),
+			'category_settings'    => $this->sanitizer->sanitize_category_settings( $category_settings ),
+			'ability_settings'     => $this->sanitizer->sanitize_ability_settings( $ability_settings ),
 		);
 
 		update_option( 'fa_wpmcp_permissions', $settings );
@@ -732,7 +740,7 @@ final class SettingsPage {
 		$settings = array(
 			'default_requests_per_minute' => isset( $_POST['default_requests_per_minute'] ) ? absint( wp_unslash( $_POST['default_requests_per_minute'] ) ) : 60,
 			'default_requests_per_hour'   => isset( $_POST['default_requests_per_hour'] ) ? absint( wp_unslash( $_POST['default_requests_per_hour'] ) ) : 500,
-			'ability_rate_limits'         => $this->sanitize_ability_rate_limits( $ability_rate_limits ),
+			'ability_rate_limits'         => $this->sanitizer->sanitize_ability_rate_limits( $ability_rate_limits ),
 		);
 
 		update_option( 'fa_wpmcp_rate_limits', $settings );
@@ -779,7 +787,7 @@ final class SettingsPage {
 
 		$settings = array(
 			'webhook_secret'    => $webhook_secret,
-			'webhook_endpoints' => $this->sanitize_webhook_endpoints( $webhook_endpoints ),
+			'webhook_endpoints' => $this->sanitizer->sanitize_webhook_endpoints( $webhook_endpoints ),
 		);
 
 		update_option( 'fa_wpmcp_webhooks', $settings );
@@ -853,143 +861,5 @@ final class SettingsPage {
 		}
 
 		return array_merge( $defaults, $settings );
-	}
-
-	/**
-	 * Sanitize category settings.
-	 *
-	 * @param mixed $input Raw input data.
-	 * @return array<string, array<string, bool>> Sanitized settings.
-	 */
-	private function sanitize_category_settings( $input ): array {
-		if ( ! is_array( $input ) ) {
-			return array();
-		}
-
-		$sanitized = array();
-
-		foreach ( $input as $category => $settings ) {
-			$category = sanitize_text_field( $category );
-			$sanitized[ $category ] = array(
-				'enable_read'  => isset( $settings['enable_read'] ) && '1' === sanitize_text_field( $settings['enable_read'] ),
-				'enable_write' => isset( $settings['enable_write'] ) && '1' === sanitize_text_field( $settings['enable_write'] ),
-			);
-		}
-
-		return $sanitized;
-	}
-
-	/**
-	 * Sanitize ability settings.
-	 *
-	 * @param mixed $input Raw input data.
-	 * @return array<string, array<string, bool>> Sanitized settings.
-	 */
-	private function sanitize_ability_settings( $input ): array {
-		if ( ! is_array( $input ) ) {
-			return array();
-		}
-
-		$sanitized = array();
-
-		foreach ( $input as $ability => $settings ) {
-			$ability = sanitize_text_field( $ability );
-			$sanitized[ $ability ] = array(
-				'enabled' => isset( $settings['enabled'] ) && '1' === sanitize_text_field( $settings['enabled'] ),
-			);
-		}
-
-		return $sanitized;
-	}
-
-	/**
-	 * Sanitize ability rate limits.
-	 *
-	 * @param mixed $input Raw input data.
-	 * @return array<string, array<string, int>> Sanitized settings.
-	 */
-	private function sanitize_ability_rate_limits( $input ): array {
-		if ( ! is_array( $input ) ) {
-			return array();
-		}
-
-		$sanitized = array();
-
-		foreach ( $input as $ability => $limits ) {
-			$ability = sanitize_text_field( $ability );
-			$sanitized[ $ability ] = array(
-				'requests_per_minute' => absint( $limits['requests_per_minute'] ?? 0 ),
-				'requests_per_hour'   => absint( $limits['requests_per_hour'] ?? 0 ),
-			);
-		}
-
-		return $sanitized;
-	}
-
-	/**
-	 * Sanitize webhook endpoints.
-	 *
-	 * @param mixed $input Raw input data.
-	 * @return array<array<string, mixed>> Sanitized endpoints.
-	 */
-	private function sanitize_webhook_endpoints( $input ): array {
-		if ( ! is_array( $input ) ) {
-			return array();
-		}
-
-		$sanitized = array();
-
-		foreach ( $input as $endpoint ) {
-			$sanitized_endpoint = $this->sanitize_single_endpoint( $endpoint );
-			if ( $sanitized_endpoint !== null ) {
-				$sanitized[] = $sanitized_endpoint;
-			}
-		}
-
-		return $sanitized;
-	}
-
-	/**
-	 * Sanitize a single webhook endpoint.
-	 *
-	 * @param mixed $endpoint Endpoint data.
-	 * @return array<string, mixed>|null Sanitized endpoint or null if invalid.
-	 */
-	private function sanitize_single_endpoint( $endpoint ): ?array {
-		if ( ! is_array( $endpoint ) ) {
-			return null;
-		}
-
-		$url = isset( $endpoint['url'] ) ? esc_url_raw( $endpoint['url'] ) : '';
-		if ( empty( $url ) ) {
-			return null;
-		}
-
-		return array(
-			'url'    => $url,
-			'events' => $this->sanitize_webhook_events( $endpoint['events'] ?? null ),
-		);
-	}
-
-	/**
-	 * Sanitize webhook events array.
-	 *
-	 * @param mixed $events Raw events data.
-	 * @return array<string> Sanitized event names.
-	 */
-	private function sanitize_webhook_events( $events ): array {
-		if ( ! is_array( $events ) ) {
-			return array();
-		}
-
-		$sanitized = array();
-		foreach ( $events as $event ) {
-			$event = sanitize_text_field( $event );
-			if ( in_array( $event, self::WEBHOOK_EVENTS, true ) ) {
-				$sanitized[] = $event;
-			}
-		}
-
-		return $sanitized;
 	}
 }
