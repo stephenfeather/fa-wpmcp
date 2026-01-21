@@ -74,6 +74,11 @@ final class Plugin {
 		$this->register_post_abilities( $ability_registry );
 		$this->register_service( 'ability_registry', $ability_registry );
 
+		// Initialize Admin Settings Page.
+		$settings_page = new \FAWpmcp\Admin\SettingsPage( $ability_registry );
+		$settings_page->init();
+		$this->register_service( 'settings_page', $settings_page );
+
 		// 2. Create dependencies for AbilityExecutor.
 		// Permission settings from WordPress options.
 		$permission_settings = \FAWpmcp\Permissions\OptionsPermissionSettings::load();
