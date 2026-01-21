@@ -1,12 +1,12 @@
 {
-	"name": "featherart/fa-wpmcp",
+	"name": "stephenfeather/fa-wpmcp",
 	"description": "WordPress plugin that exposes WordPress functionality to AI agents via Abilities API and MCP Adapter",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
 	"authors": [
 		{
-			"name": "Feather Art",
-			"email": "contact@featherart.com"
+			"name": "Stephen Feather",
+			"email": "sfeather@gmail.com"
 		}
 	],
 	"require": {
