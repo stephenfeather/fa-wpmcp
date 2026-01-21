@@ -66,4 +66,15 @@
 		<exclude-pattern>*/src/*</exclude-pattern>
 		<exclude-pattern>*/tests/*</exclude-pattern>
 	</rule>
+
+	<!-- Exclude doc comment requirements for test methods and value object constructors -->
+	<rule ref="Squiz.Commenting.FunctionComment.Missing">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.ClassComment.Missing">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.InlineComment.InvalidEndChar">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
 </ruleset>
