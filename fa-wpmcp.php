@@ -29,6 +29,7 @@ define( 'FA_WPMCP_VERSION', '1.0.0' );
 define( 'FA_WPMCP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'FA_WPMCP_URL', plugin_dir_url( __FILE__ ) );
 define( 'FA_WPMCP_BASENAME', plugin_basename( __FILE__ ) );
+define( 'FA_WPMCP_ACTIVATION_ERROR_TITLE', 'Plugin Activation Error' );
 
 // Load Composer autoloader.
 $autoloader = FA_WPMCP_PATH . 'vendor/autoload.php';
@@ -64,7 +65,7 @@ register_activation_hook(
 			deactivate_plugins( FA_WPMCP_BASENAME );
 			wp_die(
 				esc_html__( 'FA WPMCP requires PHP 8.1 or higher.', 'fa-wpmcp' ),
-				esc_html__( 'Plugin Activation Error', 'fa-wpmcp' ),
+				esc_html__( FA_WPMCP_ACTIVATION_ERROR_TITLE, 'fa-wpmcp' ),
 				array( 'back_link' => true )
 			);
 		}
@@ -74,7 +75,7 @@ register_activation_hook(
 			deactivate_plugins( FA_WPMCP_BASENAME );
 			wp_die(
 				esc_html__( 'FA WPMCP requires WordPress 6.9 or higher.', 'fa-wpmcp' ),
-				esc_html__( 'Plugin Activation Error', 'fa-wpmcp' ),
+				esc_html__( FA_WPMCP_ACTIVATION_ERROR_TITLE, 'fa-wpmcp' ),
 				array( 'back_link' => true )
 			);
 		}
@@ -84,7 +85,7 @@ register_activation_hook(
 			deactivate_plugins( FA_WPMCP_BASENAME );
 			wp_die(
 				esc_html__( 'FA WPMCP requires WordPress Abilities API (WordPress 6.9+).', 'fa-wpmcp' ),
-				esc_html__( 'Plugin Activation Error', 'fa-wpmcp' ),
+				esc_html__( FA_WPMCP_ACTIVATION_ERROR_TITLE, 'fa-wpmcp' ),
 				array( 'back_link' => true )
 			);
 		}

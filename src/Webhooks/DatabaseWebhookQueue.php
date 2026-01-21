@@ -19,6 +19,13 @@ use DateTimeImmutable;
  */
 final class DatabaseWebhookQueue implements WebhookQueue {
 	/**
+	 * MySQL datetime format for timestamps.
+	 *
+	 * @var string
+	 */
+	private const MYSQL_DATETIME_FORMAT = 'Y-m-d H:i:s';
+
+	/**
 	 * Enqueue a webhook for delivery.
 	 *
 	 * @param string         $url     Webhook URL.
@@ -40,7 +47,7 @@ final class DatabaseWebhookQueue implements WebhookQueue {
 				'payload'    => $json_payload,
 				'signature'  => '', // Will be generated during send.
 				'status'     => 'pending',
-				'created_at' => gmdate( 'Y-m-d H:i:s' ),
+				'created_at' => gmdate( self::MYSQL_DATETIME_FORMAT ),
 			),
 			array( '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
@@ -57,7 +64,7 @@ final class DatabaseWebhookQueue implements WebhookQueue {
 		global $wpdb;
 
 		$table = $wpdb->prefix . 'fa_wpmcp_webhook_queue';
-		$now   = gmdate( 'Y-m-d H:i:s' );
+		$now   = gmdate( self::MYSQL_DATETIME_FORMAT );
 		$sql   = "SELECT id, url, payload, retry_count
 			FROM $table
 			WHERE status = 'pending'
@@ -103,7 +110,7 @@ final class DatabaseWebhookQueue implements WebhookQueue {
 			$table,
 			array(
 				'status'       => 'completed',
-				'completed_at' => gmdate( 'Y-m-d H:i:s' ),
+				'completed_at' => gmdate( self::MYSQL_DATETIME_FORMAT ),
 			),
 			array( 'id' => $id ),
 			array( '%s', '%s' ),
@@ -155,7 +162,7 @@ final class DatabaseWebhookQueue implements WebhookQueue {
 		$wpdb->query(
 			$wpdb->prepare(
 				$sql,
-				$next_attempt->format( 'Y-m-d H:i:s' ),
+				$next_attempt->format( self::MYSQL_DATETIME_FORMAT ),
 				$id
 			)
 		);
