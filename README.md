@@ -42,6 +42,8 @@ Default permissions:
 
 Configure via WordPress options or filters (see [Configuration](#configuration)).
 
+**For detailed MCP integration and API documentation, see [MCP Documentation](docs/MCP_DOCUMENTATION.md).**
+
 ## Features
 
 ### Core Framework
