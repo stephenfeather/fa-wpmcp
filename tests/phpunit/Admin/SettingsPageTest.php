@@ -217,7 +217,7 @@ class SettingsPageTest extends TestCase {
 
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
-		$settings_page->register_menu();
+		$settings_page->registerMenu();
 	}
 
 	/**
@@ -229,7 +229,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
 
-		$this->assertEquals( 'fa-wpmcp', $settings_page->get_menu_slug() );
+		$this->assertEquals( 'fa-wpmcp', $settings_page->getMenuSlug() );
 	}
 
 	/**
@@ -241,7 +241,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
 
-		$this->assertEquals( 'manage_options', $settings_page->get_capability() );
+		$this->assertEquals( 'manage_options', $settings_page->getCapability() );
 	}
 
 	/**
@@ -275,7 +275,7 @@ class SettingsPageTest extends TestCase {
 
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
-		$settings_page->register_menu();
+		$settings_page->registerMenu();
 	}
 
 	// =========================================================================
@@ -313,7 +313,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_settings_page();
+		$output = $settings_page->renderSettingsPage();
 
 		$this->assertStringContainsString( '<form', $output );
 		$this->assertStringContainsString( 'method="post"', $output );
@@ -350,7 +350,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_settings_page();
+		$output = $settings_page->renderSettingsPage();
 
 		$this->assertStringContainsString( 'fa_wpmcp_nonce', $output );
 	}
@@ -385,7 +385,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_settings_page();
+		$output = $settings_page->renderSettingsPage();
 
 		$this->assertStringContainsString( 'action="http://example.com/wp-admin/admin-post.php"', $output );
 		$this->assertStringContainsString( 'name="action" value="fa_wpmcp_save_settings"', $output );
@@ -435,7 +435,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_permissions_page();
+		$output = $settings_page->renderPermissionsPage();
 
 		$this->assertStringContainsString( 'global_read_enabled', $output );
 		$this->assertStringContainsString( 'global_write_enabled', $output );
@@ -504,7 +504,7 @@ class SettingsPageTest extends TestCase {
 		);
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_permissions_page();
+		$output = $settings_page->renderPermissionsPage();
 
 		$this->assertStringContainsString( 'category_settings[posts-pages]', $output );
 		$this->assertStringContainsString( 'enable_read', $output );
@@ -562,7 +562,7 @@ class SettingsPageTest extends TestCase {
 		);
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_permissions_page();
+		$output = $settings_page->renderPermissionsPage();
 
 		$this->assertStringContainsString( 'ability_settings[fa-wpmcp/create-post]', $output );
 		$this->assertStringContainsString( 'Create Post', $output );
@@ -611,7 +611,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_permissions_page();
+		$output = $settings_page->renderPermissionsPage();
 
 		// Global read should be checked by default.
 		$this->assertStringContainsString( 'global_read_enabled', $output );
@@ -655,7 +655,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_rate_limits_page();
+		$output = $settings_page->renderRateLimitsPage();
 
 		$this->assertStringContainsString( 'default_requests_per_minute', $output );
 		$this->assertStringContainsString( 'default_requests_per_hour', $output );
@@ -708,7 +708,7 @@ class SettingsPageTest extends TestCase {
 		);
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_rate_limits_page();
+		$output = $settings_page->renderRateLimitsPage();
 
 		$this->assertStringContainsString( 'ability_rate_limits[fa-wpmcp/create-post]', $output );
 		$this->assertStringContainsString( 'requests_per_minute', $output );
@@ -749,7 +749,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_rate_limits_page();
+		$output = $settings_page->renderRateLimitsPage();
 
 		$this->assertStringContainsString( 'value="60"', $output );
 		$this->assertStringContainsString( 'value="500"', $output );
@@ -807,7 +807,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_webhooks_page();
+		$output = $settings_page->renderWebhooksPage();
 
 		$this->assertStringContainsString( 'webhook_endpoints', $output );
 		$this->assertStringContainsString( 'type="url"', $output );
@@ -857,7 +857,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_webhooks_page();
+		$output = $settings_page->renderWebhooksPage();
 
 		$this->assertStringContainsString( 'webhook_secret', $output );
 		$this->assertStringContainsString( 'type="password"', $output );
@@ -911,7 +911,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_webhooks_page();
+		$output = $settings_page->renderWebhooksPage();
 
 		$this->assertStringContainsString( 'ability.before_execute', $output );
 		$this->assertStringContainsString( 'ability.after_execute', $output );
@@ -961,7 +961,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
 
-		$settings_page->handle_settings_save();
+		$settings_page->handleSettingsSave();
 
 		// Clean up.
 		unset( $_POST['fa_wpmcp_nonce'], $_POST['action'] );
@@ -994,7 +994,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
 
-		$settings_page->handle_settings_save();
+		$settings_page->handleSettingsSave();
 
 		// Clean up.
 		unset( $_POST['fa_wpmcp_nonce'], $_POST['action'] );
@@ -1039,7 +1039,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
 
-		$settings_page->handle_settings_save();
+		$settings_page->handleSettingsSave();
 
 		// Clean up.
 		unset( $_POST['fa_wpmcp_nonce'], $_POST['action'] );
@@ -1078,7 +1078,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_settings_page();
+		$output = $settings_page->renderSettingsPage();
 
 		$this->assertNotEmpty( $output );
 	}
@@ -1109,7 +1109,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
 
-		$settings_page->render_settings_page();
+		$settings_page->renderSettingsPage();
 	}
 
 	/**
@@ -1141,7 +1141,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$settings_page->render_settings_page();
+		$settings_page->renderSettingsPage();
 
 		// Verify current_user_can was called with correct argument.
 		$this->assertTrue( true ); // Brain\Monkey expectations verify this.
@@ -1178,7 +1178,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
 
-		$settings_page->handle_settings_save();
+		$settings_page->handleSettingsSave();
 
 		// Clean up.
 		unset( $_POST['fa_wpmcp_nonce'], $_POST['action'] );
@@ -1210,7 +1210,7 @@ class SettingsPageTest extends TestCase {
 		$settings_page = new SettingsPage( $registry );
 
 		// Simulate being on plugin page.
-		$settings_page->enqueue_assets( 'toplevel_page_fa-wpmcp' );
+		$settings_page->enqueueAssets( 'toplevel_page_fa-wpmcp' );
 	}
 
 	/**
@@ -1236,7 +1236,7 @@ class SettingsPageTest extends TestCase {
 		$settings_page = new SettingsPage( $registry );
 
 		// Simulate being on plugin page.
-		$settings_page->enqueue_assets( 'toplevel_page_fa-wpmcp' );
+		$settings_page->enqueueAssets( 'toplevel_page_fa-wpmcp' );
 	}
 
 	/**
@@ -1255,9 +1255,9 @@ class SettingsPageTest extends TestCase {
 		$settings_page = new SettingsPage( $registry );
 
 		// Simulate being on a different admin page.
-		$settings_page->enqueue_assets( 'edit.php' );
-		$settings_page->enqueue_assets( 'plugins.php' );
-		$settings_page->enqueue_assets( 'options-general.php' );
+		$settings_page->enqueueAssets( 'edit.php' );
+		$settings_page->enqueueAssets( 'plugins.php' );
+		$settings_page->enqueueAssets( 'options-general.php' );
 	}
 
 	/**
@@ -1276,9 +1276,9 @@ class SettingsPageTest extends TestCase {
 		$settings_page = new SettingsPage( $registry );
 
 		// Simulate being on plugin subpages.
-		$settings_page->enqueue_assets( 'fa-wpmcp_page_fa-wpmcp-permissions' );
-		$settings_page->enqueue_assets( 'fa-wpmcp_page_fa-wpmcp-rate-limits' );
-		$settings_page->enqueue_assets( 'fa-wpmcp_page_fa-wpmcp-webhooks' );
+		$settings_page->enqueueAssets( 'fa-wpmcp_page_fa-wpmcp-permissions' );
+		$settings_page->enqueueAssets( 'fa-wpmcp_page_fa-wpmcp-rate-limits' );
+		$settings_page->enqueueAssets( 'fa-wpmcp_page_fa-wpmcp-webhooks' );
 	}
 
 	// =========================================================================
@@ -1341,7 +1341,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
 
-		$settings_page->handle_permissions_save();
+		$settings_page->handlePermissionsSave();
 
 		// Clean up.
 		unset( $_POST['fa_wpmcp_nonce'], $_POST['action'], $_POST['global_read_enabled'], $_POST['global_write_enabled'], $_POST['category_settings'] );
@@ -1400,7 +1400,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
 
-		$settings_page->handle_rate_limits_save();
+		$settings_page->handleRateLimitsSave();
 
 		// Clean up.
 		unset( $_POST['fa_wpmcp_nonce'], $_POST['action'], $_POST['default_requests_per_minute'], $_POST['default_requests_per_hour'] );
@@ -1458,7 +1458,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 		$settings_page = new SettingsPage( $registry );
 
-		$settings_page->handle_webhooks_save();
+		$settings_page->handleWebhooksSave();
 
 		// Clean up.
 		unset( $_POST['fa_wpmcp_nonce'], $_POST['action'], $_POST['webhook_endpoints'], $_POST['webhook_secret'] );
@@ -1538,7 +1538,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_settings_page();
+		$output = $settings_page->renderSettingsPage();
 
 		$this->assertStringContainsString( 'notice-success', $output );
 		$this->assertStringContainsString( 'Settings saved', $output );
@@ -1577,7 +1577,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->render_settings_page();
+		$output = $settings_page->renderSettingsPage();
 
 		$this->assertStringContainsString( 'notice-error', $output );
 

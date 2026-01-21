@@ -363,7 +363,7 @@ final class SettingsPage {
                 $ability_settings = $settings['ability_settings'][ $name ] ?? array();
 
                 $output .= '<tr>';
-                $output .= '<th scope="row">' . esc_html( $ability->get_label() ) . '</th>';
+                $output .= '<th scope="row">' . esc_html( $ability->getLabel() ) . '</th>';
                 $output .= '<td>';
                 $output .= '<label>';
                 $output .= '<input type="checkbox" name="ability_settings[' . esc_attr( $name ) . '][enabled]" value="1" ';
@@ -446,7 +446,7 @@ final class SettingsPage {
                 $ability_limits = $settings['ability_rate_limits'][ $name ] ?? array();
 
                 $output .= '<tr>';
-                $output .= '<th scope="row">' . esc_html( $ability->get_label() ) . '</th>';
+                $output .= '<th scope="row">' . esc_html( $ability->getLabel() ) . '</th>';
                 $output .= '<td>';
 
                 $output .= '<label>' . esc_html( 'Per minute: ' ) . '</label>';
