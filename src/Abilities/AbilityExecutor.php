@@ -188,20 +188,11 @@ final class AbilityExecutor {
 		$category     = $context['category'];
 		$operation    = $context['operation'];
 
-		// Check ability-specific settings first.
-		$failure = $this->check_ability_permission( $ability_name );
-		if ( $failure !== null ) {
-			return $failure;
-		}
+		// Check all permission levels (ability, category, global) - first failure wins.
+		$failure = $this->check_ability_permission( $ability_name )
+				?? $this->check_category_permission( $category, $operation )
+				?? $this->check_global_permission( $operation );
 
-		// Check category-level permissions.
-		$failure = $this->check_category_permission( $category, $operation );
-		if ( $failure !== null ) {
-			return $failure;
-		}
-
-		// Check global permissions.
-		$failure = $this->check_global_permission( $operation );
 		if ( $failure !== null ) {
 			return $failure;
 		}
