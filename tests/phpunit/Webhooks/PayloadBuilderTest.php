@@ -20,16 +20,22 @@ class PayloadBuilderTest extends TestCase {
 
 		$payload = PayloadBuilder::build(
 			event: 'ability.after_execute',
-			ability_name: 'fa-wpmcp/create-post',
-			category: 'posts-pages',
-			operation: 'write',
-			user_id: 1,
-			user_login: 'admin',
-			ip: '192.168.1.1',
-			input: [ 'title' => 'Test Post' ],
-			output: [ 'post_id' => 42 ],
-			success: true,
-			execution_time_ms: 150,
+			ability: [
+				'name'      => 'fa-wpmcp/create-post',
+				'category'  => 'posts-pages',
+				'operation' => 'write',
+			],
+			user: [
+				'user_id'    => 1,
+				'user_login' => 'admin',
+				'ip'         => '192.168.1.1',
+			],
+			execution: [
+				'input'             => [ 'title' => 'Test Post' ],
+				'output'            => [ 'post_id' => 42 ],
+				'success'           => true,
+				'execution_time_ms' => 150,
+			],
 			timestamp: $timestamp,
 		);
 
@@ -50,31 +56,43 @@ class PayloadBuilderTest extends TestCase {
 
 		$payload1 = PayloadBuilder::build(
 			event: 'ability.after_execute',
-			ability_name: 'fa-wpmcp/list-posts',
-			category: 'posts-pages',
-			operation: 'read',
-			user_id: 1,
-			user_login: 'admin',
-			ip: '127.0.0.1',
-			input: [],
-			output: [],
-			success: true,
-			execution_time_ms: 100,
+			ability: [
+				'name'      => 'fa-wpmcp/list-posts',
+				'category'  => 'posts-pages',
+				'operation' => 'read',
+			],
+			user: [
+				'user_id'    => 1,
+				'user_login' => 'admin',
+				'ip'         => '127.0.0.1',
+			],
+			execution: [
+				'input'             => [],
+				'output'            => [],
+				'success'           => true,
+				'execution_time_ms' => 100,
+			],
 			timestamp: $timestamp,
 		);
 
 		$payload2 = PayloadBuilder::build(
 			event: 'ability.after_execute',
-			ability_name: 'fa-wpmcp/list-posts',
-			category: 'posts-pages',
-			operation: 'read',
-			user_id: 1,
-			user_login: 'admin',
-			ip: '127.0.0.1',
-			input: [],
-			output: [],
-			success: true,
-			execution_time_ms: 100,
+			ability: [
+				'name'      => 'fa-wpmcp/list-posts',
+				'category'  => 'posts-pages',
+				'operation' => 'read',
+			],
+			user: [
+				'user_id'    => 1,
+				'user_login' => 'admin',
+				'ip'         => '127.0.0.1',
+			],
+			execution: [
+				'input'             => [],
+				'output'            => [],
+				'success'           => true,
+				'execution_time_ms' => 100,
+			],
 			timestamp: $timestamp,
 		);
 
@@ -87,16 +105,22 @@ class PayloadBuilderTest extends TestCase {
 
 		$payload = PayloadBuilder::build(
 			event: 'ability.before_execute',
-			ability_name: 'fa-wpmcp/create-post',
-			category: 'posts-pages',
-			operation: 'write',
-			user_id: 1,
-			user_login: 'admin',
-			ip: '192.168.1.1',
-			input: [],
-			output: [],
-			success: true,
-			execution_time_ms: 50,
+			ability: [
+				'name'      => 'fa-wpmcp/create-post',
+				'category'  => 'posts-pages',
+				'operation' => 'write',
+			],
+			user: [
+				'user_id'    => 1,
+				'user_login' => 'admin',
+				'ip'         => '192.168.1.1',
+			],
+			execution: [
+				'input'             => [],
+				'output'            => [],
+				'success'           => true,
+				'execution_time_ms' => 50,
+			],
 			timestamp: null,
 		);
 
@@ -111,16 +135,22 @@ class PayloadBuilderTest extends TestCase {
 	public function test_builds_before_execute_payload(): void {
 		$payload = PayloadBuilder::build(
 			event: 'ability.before_execute',
-			ability_name: 'fa-wpmcp/create-post',
-			category: 'posts-pages',
-			operation: 'write',
-			user_id: 1,
-			user_login: 'admin',
-			ip: '192.168.1.1',
-			input: [ 'title' => 'Test' ],
-			output: [],
-			success: true,
-			execution_time_ms: 0,
+			ability: [
+				'name'      => 'fa-wpmcp/create-post',
+				'category'  => 'posts-pages',
+				'operation' => 'write',
+			],
+			user: [
+				'user_id'    => 1,
+				'user_login' => 'admin',
+				'ip'         => '192.168.1.1',
+			],
+			execution: [
+				'input'             => [ 'title' => 'Test' ],
+				'output'            => [],
+				'success'           => true,
+				'execution_time_ms' => 0,
+			],
 		);
 
 		$this->assertEquals( 'ability.before_execute', $payload->event );
@@ -130,16 +160,22 @@ class PayloadBuilderTest extends TestCase {
 	public function test_builds_failed_payload(): void {
 		$payload = PayloadBuilder::build(
 			event: 'ability.failed',
-			ability_name: 'fa-wpmcp/delete-post',
-			category: 'posts-pages',
-			operation: 'write',
-			user_id: 1,
-			user_login: 'admin',
-			ip: '192.168.1.1',
-			input: [ 'post_id' => 99 ],
-			output: [ 'error' => 'Post not found' ],
-			success: false,
-			execution_time_ms: 25,
+			ability: [
+				'name'      => 'fa-wpmcp/delete-post',
+				'category'  => 'posts-pages',
+				'operation' => 'write',
+			],
+			user: [
+				'user_id'    => 1,
+				'user_login' => 'admin',
+				'ip'         => '192.168.1.1',
+			],
+			execution: [
+				'input'             => [ 'post_id' => 99 ],
+				'output'            => [ 'error' => 'Post not found' ],
+				'success'           => false,
+				'execution_time_ms' => 25,
+			],
 		);
 
 		$this->assertEquals( 'ability.failed', $payload->event );

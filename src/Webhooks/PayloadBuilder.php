@@ -23,50 +23,36 @@ final class PayloadBuilder {
 	 *
 	 * Pure function: same inputs produce same payload.
 	 *
-	 * @param string                 $event             Event name (e.g., 'ability.after_execute').
-	 * @param string                 $ability_name      Ability name (e.g., 'fa-wpmcp/create-post').
-	 * @param string                 $category          Category (e.g., 'posts-pages').
-	 * @param string                 $operation         Operation (e.g., 'read', 'write').
-	 * @param int                    $user_id           WordPress user ID.
-	 * @param string                 $user_login        WordPress user login.
-	 * @param string                 $ip                IP address.
-	 * @param array<string, mixed>   $input             Input parameters.
-	 * @param array<string, mixed>   $output            Output data.
-	 * @param bool                   $success           Whether execution succeeded.
-	 * @param int                    $execution_time_ms Execution time in milliseconds.
-	 * @param DateTimeImmutable|null $timestamp         Timestamp (null = current time).
+	 * @param string                 $event     Event name (e.g., 'ability.after_execute').
+	 * @param array<string, mixed>   $ability   Ability context (name, category, operation).
+	 * @param array<string, mixed>   $user      User context (user_id, user_login, ip).
+	 * @param array<string, mixed>   $execution Execution data (input, output, success, execution_time_ms).
+	 * @param DateTimeImmutable|null $timestamp Timestamp (null = current time).
 	 */
 	public static function build(
 		string $event,
-		string $ability_name,
-		string $category,
-		string $operation,
-		int $user_id,
-		string $user_login,
-		string $ip,
-		array $input,
-		array $output,
-		bool $success,
-		int $execution_time_ms,
+		array $ability,
+		array $user,
+		array $execution,
 		?DateTimeImmutable $timestamp = null,
 	): WebhookPayload {
 		return new WebhookPayload(
 			event: $event,
 			timestamp: $timestamp ?? new DateTimeImmutable(),
 			ability: [
-				'name'      => $ability_name,
-				'category'  => $category,
-				'operation' => $operation,
+				'name'      => $ability['name'],
+				'category'  => $ability['category'],
+				'operation' => $ability['operation'],
 			],
 			user: [
-				'id'    => $user_id,
-				'login' => $user_login,
-				'ip'    => $ip,
+				'id'    => $user['user_id'],
+				'login' => $user['user_login'],
+				'ip'    => $user['ip'],
 			],
-			input: $input,
-			output: $output,
-			success: $success,
-			execution_time_ms: $execution_time_ms,
+			input: $execution['input'],
+			output: $execution['output'],
+			success: $execution['success'],
+			execution_time_ms: $execution['execution_time_ms'],
 		);
 	}
 }

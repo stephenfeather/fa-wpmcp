@@ -47,16 +47,22 @@ final class WebhookManager implements WebhookManagerInterface {
 		// Build payload (pure function).
 		$payload = PayloadBuilder::build(
 			event: $event,
-			ability_name: $context['ability_name'],
-			category: $context['category'],
-			operation: $context['operation'],
-			user_id: $context['user_id'],
-			user_login: $context['user_login'],
-			ip: $context['ip'],
-			input: $redacted_input,
-			output: $redacted_output,
-			success: $context['success'],
-			execution_time_ms: $context['execution_time_ms'],
+			ability: [
+				'name'      => $context['ability_name'],
+				'category'  => $context['category'],
+				'operation' => $context['operation'],
+			],
+			user: [
+				'user_id'    => $context['user_id'],
+				'user_login' => $context['user_login'],
+				'ip'         => $context['ip'],
+			],
+			execution: [
+				'input'             => $redacted_input,
+				'output'            => $redacted_output,
+				'success'           => $context['success'],
+				'execution_time_ms' => $context['execution_time_ms'],
+			],
 		);
 
 		// Get subscribed URLs (side effect: config read).
