@@ -62,6 +62,41 @@ final class SettingsPage {
 	);
 
 	/**
+	 * Error message: Permission denied to access page.
+	 *
+	 * @var string
+	 */
+	private const MSG_NO_ACCESS = 'You do not have permission to access this page.';
+
+	/**
+	 * Error title: Permission denied.
+	 *
+	 * @var string
+	 */
+	private const MSG_PERMISSION_DENIED = 'Permission Denied';
+
+	/**
+	 * Error message: Security check failed.
+	 *
+	 * @var string
+	 */
+	private const MSG_SECURITY_FAILED = 'Security check failed. Please try again.';
+
+	/**
+	 * Error title: Security error.
+	 *
+	 * @var string
+	 */
+	private const MSG_SECURITY_ERROR = 'Security Error';
+
+	/**
+	 * Error message: No permission to perform action.
+	 *
+	 * @var string
+	 */
+	private const MSG_NO_PERMISSION = 'You do not have permission to perform this action.';
+
+	/**
 	 * Ability registry.
 	 *
 	 * @var AbilityRegistry
@@ -199,8 +234,8 @@ final class SettingsPage {
 	public function render_settings_page(): string {
 		if ( ! current_user_can( self::CAPABILITY ) ) {
 			wp_die(
-				'You do not have permission to access this page.',
-				'Permission Denied',
+				self::MSG_NO_ACCESS,
+				self::MSG_PERMISSION_DENIED,
 				array( 'response' => 403 )
 			);
 			return '';
@@ -236,8 +271,8 @@ final class SettingsPage {
 	public function render_permissions_page(): string {
 		if ( ! current_user_can( self::CAPABILITY ) ) {
 			wp_die(
-				'You do not have permission to access this page.',
-				'Permission Denied',
+				self::MSG_NO_ACCESS,
+				self::MSG_PERMISSION_DENIED,
 				array( 'response' => 403 )
 			);
 			return '';
@@ -353,8 +388,8 @@ final class SettingsPage {
 	public function render_rate_limits_page(): string {
 		if ( ! current_user_can( self::CAPABILITY ) ) {
 			wp_die(
-				'You do not have permission to access this page.',
-				'Permission Denied',
+				self::MSG_NO_ACCESS,
+				self::MSG_PERMISSION_DENIED,
 				array( 'response' => 403 )
 			);
 			return '';
@@ -441,8 +476,8 @@ final class SettingsPage {
 	public function render_webhooks_page(): string {
 		if ( ! current_user_can( self::CAPABILITY ) ) {
 			wp_die(
-				'You do not have permission to access this page.',
-				'Permission Denied',
+				self::MSG_NO_ACCESS,
+				self::MSG_PERMISSION_DENIED,
 				array( 'response' => 403 )
 			);
 			return '';
@@ -582,8 +617,8 @@ final class SettingsPage {
 
 		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
 			wp_die(
-				'Security check failed. Please try again.',
-				'Security Error',
+				self::MSG_SECURITY_FAILED,
+				self::MSG_SECURITY_ERROR,
 				array( 'response' => 403 )
 			);
 			return;
@@ -591,8 +626,8 @@ final class SettingsPage {
 
 		if ( ! current_user_can( self::CAPABILITY ) ) {
 			wp_die(
-				'You do not have permission to perform this action.',
-				'Permission Denied',
+				self::MSG_NO_PERMISSION,
+				self::MSG_PERMISSION_DENIED,
 				array( 'response' => 403 )
 			);
 			return;
@@ -624,8 +659,8 @@ final class SettingsPage {
 
 		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
 			wp_die(
-				'Security check failed. Please try again.',
-				'Security Error',
+				self::MSG_SECURITY_FAILED,
+				self::MSG_SECURITY_ERROR,
 				array( 'response' => 403 )
 			);
 			return;
@@ -633,8 +668,8 @@ final class SettingsPage {
 
 		if ( ! current_user_can( self::CAPABILITY ) ) {
 			wp_die(
-				'You do not have permission to perform this action.',
-				'Permission Denied',
+				self::MSG_NO_PERMISSION,
+				self::MSG_PERMISSION_DENIED,
 				array( 'response' => 403 )
 			);
 			return;
@@ -674,8 +709,8 @@ final class SettingsPage {
 
 		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
 			wp_die(
-				'Security check failed. Please try again.',
-				'Security Error',
+				self::MSG_SECURITY_FAILED,
+				self::MSG_SECURITY_ERROR,
 				array( 'response' => 403 )
 			);
 			return;
@@ -683,8 +718,8 @@ final class SettingsPage {
 
 		if ( ! current_user_can( self::CAPABILITY ) ) {
 			wp_die(
-				'You do not have permission to perform this action.',
-				'Permission Denied',
+				self::MSG_NO_PERMISSION,
+				self::MSG_PERMISSION_DENIED,
 				array( 'response' => 403 )
 			);
 			return;
@@ -721,8 +756,8 @@ final class SettingsPage {
 
 		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
 			wp_die(
-				'Security check failed. Please try again.',
-				'Security Error',
+				self::MSG_SECURITY_FAILED,
+				self::MSG_SECURITY_ERROR,
 				array( 'response' => 403 )
 			);
 			return;
@@ -730,8 +765,8 @@ final class SettingsPage {
 
 		if ( ! current_user_can( self::CAPABILITY ) ) {
 			wp_die(
-				'You do not have permission to perform this action.',
-				'Permission Denied',
+				self::MSG_NO_PERMISSION,
+				self::MSG_PERMISSION_DENIED,
 				array( 'response' => 403 )
 			);
 			return;
