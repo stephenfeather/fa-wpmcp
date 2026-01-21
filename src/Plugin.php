@@ -62,6 +62,11 @@ final class Plugin {
 	 */
 	public function init(): void {
 		$this->register_hooks();
+
+		// Initialize webhook system.
+		$webhook_service = new \FAWpmcp\Webhooks\WebhookService();
+		$webhook_service->init();
+		$this->register_service( 'webhook', $webhook_service );
 	}
 
 	/**
@@ -139,7 +144,11 @@ final class Plugin {
 	 * @return void
 	 */
 	public function deactivate(): void {
-		// Deactivation logic will be added in later phases.
+		// Clean up webhook system.
+		$webhook_service = $this->get_service( 'webhook' );
+		if ( $webhook_service instanceof \FAWpmcp\Webhooks\WebhookService ) {
+			$webhook_service->deactivate();
+		}
 	}
 
 	/**
