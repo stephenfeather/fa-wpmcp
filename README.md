@@ -99,112 +99,31 @@ Configure via WordPress options or filters (see [Configuration](#configuration))
 
 ## Architecture
 
-### Design Principles
+The plugin follows professional software engineering practices: TDD, functional programming, SOLID principles, and strict type safety.
 
-This plugin follows:
-- **Test-Driven Development (TDD):** Tests written before implementation
-- **Functional Programming (FP):** Pure functions, immutable value objects
-- **SOLID Principles:** Single responsibility, dependency injection
-- **Type Safety:** Strict types, readonly properties, interface contracts
+**For complete architecture documentation, see [Architecture Guide](docs/ARCHITECTURE.md).**
 
-### Component Overview
+### Quick Overview
 
+**Design Principles:**
+- Test-Driven Development (TDD)
+- Functional Programming (FP) with immutable value objects
+- SOLID principles with dependency injection
+- Type safety with PHP 8.1+ features
+
+**Core Components:**
+- **Ability Framework** - Registry, executor, pipeline orchestration
+- **Permission System** - Multi-level access control (global/category/ability)
+- **Rate Limiting** - Dual-track (per-user/per-IP) with transient storage
+- **Activity Logging** - Audit trail with correlation IDs and PII redaction
+- **Webhooks** - Event-driven notifications with HMAC signing
+
+**Request Flow:**
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         Plugin Core                          │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  ┌─────────────────┐      ┌──────────────────┐              │
-│  │ AbilityRegistry │◄─────┤ AbstractAbility  │              │
-│  └────────┬────────┘      └──────────────────┘              │
-│           │                                                   │
-│           ▼                                                   │
-│  ┌─────────────────┐                                         │
-│  │ AbilityExecutor │                                         │
-│  └────────┬────────┘                                         │
-│           │                                                   │
-│  ┌────────┴─────────┬─────────────┬──────────────┐          │
-│  ▼                  ▼             ▼              ▼          │
-│ PermissionChecker RateLimiter  ActivityLogger WebhookManager│
-└─────────────────────────────────────────────────────────────┘
-
-Flow: Request → Permissions → Rate Limit → Execute → Log → Webhook
+Request → Permissions → Rate Limit → Execute → Log → Webhook
 ```
 
-### Key Components
-
-#### 1. Ability Framework (src/Abilities/)
-
-- **AbilityRegistry:** Central registry for all abilities
-- **AbilityExecutor:** Pipeline orchestration with middleware
-- **AbstractAbility:** Base class for ability implementations
-- **ExecutionPipeline:** Composable middleware pipeline
-
-#### 2. Permissions (src/Permissions/)
-
-- **PermissionChecker:** Multi-level permission validation
-- **PermissionSettings:** Immutable value object (readonly)
-- **OptionsPermissionSettings:** WordPress options persistence
-
-#### 3. Rate Limiting (src/RateLimiting/)
-
-- **RateLimiter:** Main rate limiting logic
-- **RateLimitStore:** Interface for storage backends
-- **TransientRateLimitStore:** WordPress transients implementation
-- **RateLimitConfig:** Configuration interface
-- **OptionsRateLimitConfig:** WordPress options implementation
-- **RateLimitCalculator:** Pure function calculations
-
-#### 4. Activity Logging (src/Logging/)
-
-- **ActivityLogger:** Main logging coordinator
-- **LogRepository:** Database persistence layer
-- **LogEntryBuilder:** Fluent builder for log entries
-- **LogEntry:** Immutable value object
-
-#### 5. Webhooks (src/Webhooks/)
-
-- **WebhookService:** WordPress hooks integration
-- **WebhookManager:** Queue processing and delivery
-- **WebhookQueue:** Interface for queue backends
-- **DatabaseWebhookQueue:** Database implementation
-- **WebhookScheduler:** Action Scheduler/WP-Cron integration
-- **SignatureGenerator:** HMAC signing/verification
-- **PayloadBuilder:** Webhook payload construction
-
-### Database Schema
-
-#### Activity Logs Table
-
-```sql
-fa_wpmcp_activity_log:
-  - id (bigint, auto)
-  - correlation_id (varchar 36, indexed)
-  - user_id (bigint, nullable)
-  - ip_address (varchar 45)
-  - ability_name (varchar 255, indexed)
-  - input (longtext, JSON)
-  - output (longtext, JSON, nullable)
-  - success (tinyint)
-  - error_message (text, nullable)
-  - execution_time_ms (int, nullable)
-  - created_at (datetime, indexed)
-```
-
-#### Webhook Queue Table
-
-```sql
-fa_wpmcp_webhook_queue:
-  - id (bigint, auto)
-  - url (text)
-  - payload (longtext, JSON)
-  - signature (varchar 255)
-  - status (varchar 20, indexed)
-  - attempts (int, default 0)
-  - next_attempt_at (datetime, indexed, nullable)
-  - created_at (datetime)
-  - updated_at (datetime)
-```
+See the [Architecture Guide](docs/ARCHITECTURE.md) for detailed component documentation, database schema, design patterns, and extension points.
 
 ## Configuration
 
