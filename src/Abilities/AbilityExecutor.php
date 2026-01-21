@@ -189,6 +189,33 @@ final class AbilityExecutor {
 		$operation    = $context['operation'];
 
 		// Check ability-specific settings first.
+		$failure = $this->check_ability_permission( $ability_name );
+		if ( $failure !== null ) {
+			return $failure;
+		}
+
+		// Check category-level permissions.
+		$failure = $this->check_category_permission( $category, $operation );
+		if ( $failure !== null ) {
+			return $failure;
+		}
+
+		// Check global permissions.
+		$failure = $this->check_global_permission( $operation );
+		if ( $failure !== null ) {
+			return $failure;
+		}
+
+		return Result::success( $context );
+	}
+
+	/**
+	 * Check ability-specific permission.
+	 *
+	 * @param string $ability_name Ability name.
+	 * @return Result|null Failure result if denied, null if allowed.
+	 */
+	private function check_ability_permission( string $ability_name ): ?Result {
 		if ( isset( $this->permission_settings->ability_settings[ $ability_name ] ) ) {
 			$ability_settings = $this->permission_settings->ability_settings[ $ability_name ];
 			if ( isset( $ability_settings['enabled'] ) && false === $ability_settings['enabled'] ) {
@@ -198,29 +225,47 @@ final class AbilityExecutor {
 				);
 			}
 		}
+		return null;
+	}
 
-		// Check category settings.
-		if ( isset( $this->permission_settings->category_settings[ $category ] ) ) {
-			$category_settings = $this->permission_settings->category_settings[ $category ];
-
-			// Check read operation permission.
-			if ( 'read' === $operation && isset( $category_settings['enable_read'] ) && false === $category_settings['enable_read'] ) {
-				return Result::failure(
-					'ability_disabled',
-					sprintf( 'Read operations in category "%s" are disabled.', $category )
-				);
-			}
-
-			// Check write operation permission.
-			if ( 'write' === $operation && isset( $category_settings['enable_write'] ) && false === $category_settings['enable_write'] ) {
-				return Result::failure(
-					'ability_disabled',
-					sprintf( 'Write operations in category "%s" are disabled.', $category )
-				);
-			}
+	/**
+	 * Check category-level permission.
+	 *
+	 * @param string $category Category name.
+	 * @param string $operation Operation type (read/write).
+	 * @return Result|null Failure result if denied, null if allowed.
+	 */
+	private function check_category_permission( string $category, string $operation ): ?Result {
+		if ( ! isset( $this->permission_settings->category_settings[ $category ] ) ) {
+			return null;
 		}
 
-		// Check global settings.
+		$category_settings = $this->permission_settings->category_settings[ $category ];
+
+		if ( 'read' === $operation && isset( $category_settings['enable_read'] ) && false === $category_settings['enable_read'] ) {
+			return Result::failure(
+				'ability_disabled',
+				sprintf( 'Read operations in category "%s" are disabled.', $category )
+			);
+		}
+
+		if ( 'write' === $operation && isset( $category_settings['enable_write'] ) && false === $category_settings['enable_write'] ) {
+			return Result::failure(
+				'ability_disabled',
+				sprintf( 'Write operations in category "%s" are disabled.', $category )
+			);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Check global permission.
+	 *
+	 * @param string $operation Operation type (read/write).
+	 * @return Result|null Failure result if denied, null if allowed.
+	 */
+	private function check_global_permission( string $operation ): ?Result {
 		if ( 'read' === $operation && ! $this->permission_settings->global_read_enabled ) {
 			return Result::failure(
 				'ability_disabled',
@@ -235,7 +280,7 @@ final class AbilityExecutor {
 			);
 		}
 
-		return Result::success( $context );
+		return null;
 	}
 
 	/**

@@ -25,21 +25,12 @@ final class OptionsWebhookConfig implements WebhookConfig {
 	public function get_subscribed_urls( string $event ): array {
 		$all_urls = get_option( 'fa_wpmcp_webhook_urls', array() );
 
-		if ( ! is_array( $all_urls ) ) {
+		// Validate we have proper structure: array -> event key exists -> event value is array.
+		if ( ! is_array( $all_urls ) || ! isset( $all_urls[ $event ] ) || ! is_array( $all_urls[ $event ] ) ) {
 			return array();
 		}
 
-		if ( ! isset( $all_urls[ $event ] ) ) {
-			return array();
-		}
-
-		$urls = $all_urls[ $event ];
-
-		if ( ! is_array( $urls ) ) {
-			return array();
-		}
-
-		return array_values( $urls );
+		return array_values( $all_urls[ $event ] );
 	}
 
 	/**

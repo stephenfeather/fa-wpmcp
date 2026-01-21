@@ -41,16 +41,14 @@ final class RateLimitCalculator {
 			return RateLimitResult::allowed();
 		}
 
-		// Check minute limit first (takes precedence).
-		if ( $limit->requests_per_minute > 0 && $current_minute_count >= $limit->requests_per_minute ) {
-			$retry_after = self::calculate_retry_after( 'minute', time() );
-			return RateLimitResult::denied( $retry_after, 'minute' );
-		}
+		// Check minute limit first (takes precedence over hour).
+		$minute_exceeded = $limit->requests_per_minute > 0 && $current_minute_count >= $limit->requests_per_minute;
+		$hour_exceeded   = $limit->requests_per_hour > 0 && $current_hour_count >= $limit->requests_per_hour;
 
-		// Check hour limit.
-		if ( $limit->requests_per_hour > 0 && $current_hour_count >= $limit->requests_per_hour ) {
-			$retry_after = self::calculate_retry_after( 'hour', time() );
-			return RateLimitResult::denied( $retry_after, 'hour' );
+		if ( $minute_exceeded || $hour_exceeded ) {
+			$limit_type  = $minute_exceeded ? 'minute' : 'hour';
+			$retry_after = self::calculate_retry_after( $limit_type, time() );
+			return RateLimitResult::denied( $retry_after, $limit_type );
 		}
 
 		return RateLimitResult::allowed();
