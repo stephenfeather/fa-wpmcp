@@ -1,0 +1,55 @@
+name: Package Release
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    env:
+      PLUGIN_SLUG: fa-wpmcp
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+
+      - name: Install production dependencies
+        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
+
+      - name: Build release directory
+        run: |
+          mkdir -p build/${PLUGIN_SLUG}
+          rsync -a --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='docs' \
+            --exclude='tests' \
+            --exclude='thoughts' \
+            --exclude='opc' \
+            --exclude='phpunit.xml.dist' \
+            --exclude='SECURITY_CHECKLIST.md' \
+            --exclude='SECURITY_REPORT.md' \
+            ./ build/${PLUGIN_SLUG}/
+
+      - name: Create zip archive
+        run: |
+          cd build
+          zip -r "${PLUGIN_SLUG}-${GITHUB_REF_NAME}.zip" "${PLUGIN_SLUG}"
+
+      - name: Upload release asset
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/${{ env.PLUGIN_SLUG }}-${{ github.ref_name }}.zip
+
+      - name: Upload workflow artifact
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PLUGIN_SLUG }}-${{ github.ref_name }}
+          path: build/${{ env.PLUGIN_SLUG }}-${{ github.ref_name }}.zip
