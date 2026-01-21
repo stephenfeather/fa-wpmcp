@@ -614,8 +614,6 @@ add_action('fa_wpmcp_cleanup_logs', function() {
 
 ### Reporting Vulnerabilities
 
-Report security issues to: contact@featherart.com
-
 Please do NOT open public issues for security vulnerabilities.
 
 ### Security Features
@@ -658,9 +656,9 @@ GPL v2 or later - https://www.gnu.org/licenses/gpl-2.0.html
 
 ## Author
 
-**Feather Art**  
-Website: https://featherart.com  
-Email: contact@featherart.com
+**Stephen Feather**  
+Website: https://stephenfeather.com  
+Email: stephen@feather.us
 
 ## Acknowledgments
 
