@@ -124,6 +124,20 @@ class GetPostTest extends TestCase {
 	}
 
 	/**
+	 * Test input schema supports optional post_type parameter.
+	 *
+	 * @return void
+	 */
+	public function test_input_schema_supports_post_type(): void {
+		$ability = new GetPost();
+		$schema  = $ability->get_input_schema();
+
+		$this->assertArrayHasKey( 'post_type', $schema['properties'] );
+		$this->assertEquals( 'string', $schema['properties']['post_type']['type'] );
+		$this->assertNotContains( 'post_type', $schema['required'] ?? array() );
+	}
+
+	/**
 	 * Test output schema has expected structure.
 	 *
 	 * @return void
@@ -422,5 +436,70 @@ class GetPostTest extends TestCase {
 
 		$this->assertEquals( 5, $result['post']['author']['id'] );
 		$this->assertEquals( 'Jane Smith', $result['post']['author']['name'] );
+	}
+
+	/**
+	 * Test execute accepts page post type.
+	 *
+	 * @return void
+	 */
+	public function test_execute_accepts_page_post_type(): void {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
+		$mock_post = Mockery::mock( 'WP_Post' );
+		$mock_post->ID = 10;
+		$mock_post->post_title = 'Test Page';
+		$mock_post->post_content = 'Page content';
+		$mock_post->post_excerpt = '';
+		$mock_post->post_status = 'publish';
+		$mock_post->post_type = 'page';
+		$mock_post->post_author = 1;
+		$mock_post->post_date = '2025-01-20 12:00:00';
+		$mock_post->post_modified = '2025-01-20 12:00:00';
+		$mock_post->post_name = 'test-page';
+
+		Functions\expect( 'get_post' )->andReturn( $mock_post );
+		Functions\expect( 'get_permalink' )->andReturn( 'https://example.com/test-page/' );
+		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=10&action=edit' );
+		Functions\expect( 'get_post_meta' )->andReturn( array() );
+		Functions\expect( 'get_the_post_thumbnail_url' )->andReturn( '' );
+		Functions\expect( 'wp_get_post_categories' )->andReturn( array() );
+		Functions\expect( 'wp_get_post_tags' )->andReturn( array() );
+		Functions\expect( 'get_the_author_meta' )->andReturn( 'Author' );
+
+		$ability = new GetPost();
+		$result  = $ability->do_execute(
+			array(
+				'post_id'   => 10,
+				'post_type' => 'page',
+			)
+		);
+
+		$this->assertEquals( 10, $result['post']['id'] );
+		$this->assertEquals( 'page', $result['post']['type'] );
+	}
+
+	/**
+	 * Test execute throws exception when post_type mismatch.
+	 *
+	 * @return void
+	 */
+	public function test_execute_throws_when_post_type_mismatch(): void {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
+		$mock_post = Mockery::mock( 'WP_Post' );
+		$mock_post->ID = 10;
+		$mock_post->post_type = 'page';
+
+		Functions\expect( 'get_post' )->andReturn( $mock_post );
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'Post type mismatch' );
+
+		$ability = new GetPost();
+		$ability->do_execute(
+			array(
+				'post_id'   => 10,
+				'post_type' => 'post',
+			)
+		);
 	}
 }

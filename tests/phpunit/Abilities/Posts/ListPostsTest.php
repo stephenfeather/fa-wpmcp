@@ -140,6 +140,20 @@ class ListPostsTest extends TestCase {
 	}
 
 	/**
+	 * Test input schema supports post_type parameter.
+	 *
+	 * @return void
+	 */
+	public function test_input_schema_supports_post_type(): void {
+		$ability = new ListPosts();
+		$schema  = $ability->get_input_schema();
+
+		$this->assertArrayHasKey( 'post_type', $schema['properties'] );
+		$this->assertEquals( 'string', $schema['properties']['post_type']['type'] );
+		$this->assertEquals( 'post', $schema['properties']['post_type']['default'] );
+	}
+
+	/**
 	 * Test output schema has expected structure.
 	 *
 	 * @return void
@@ -434,6 +448,54 @@ class ListPostsTest extends TestCase {
 
 		$this->assertEquals( 'title', $args['orderby'] );
 		$this->assertEquals( 'ASC', $args['order'] );
+	}
+
+	/**
+	 * Test execute defaults to post type.
+	 *
+	 * @return void
+	 */
+	public function test_execute_defaults_to_post_type(): void {
+		$ability = new ListPosts();
+
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'build_query_args' );
+
+		$args = $method->invoke( $ability, array() );
+
+		$this->assertEquals( 'post', $args['post_type'] );
+	}
+
+	/**
+	 * Test execute filters by post_type page.
+	 *
+	 * @return void
+	 */
+	public function test_execute_filters_by_page_type(): void {
+		$ability = new ListPosts();
+
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'build_query_args' );
+
+		$args = $method->invoke( $ability, array( 'post_type' => 'page' ) );
+
+		$this->assertEquals( 'page', $args['post_type'] );
+	}
+
+	/**
+	 * Test execute supports custom post types.
+	 *
+	 * @return void
+	 */
+	public function test_execute_supports_custom_post_types(): void {
+		$ability = new ListPosts();
+
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'build_query_args' );
+
+		$args = $method->invoke( $ability, array( 'post_type' => 'custom_type' ) );
+
+		$this->assertEquals( 'custom_type', $args['post_type'] );
 	}
 
 	/**

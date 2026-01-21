@@ -153,6 +153,20 @@ class CreatePostTest extends TestCase {
 	}
 
 	/**
+	 * Test input schema supports post_type parameter.
+	 *
+	 * @return void
+	 */
+	public function test_input_schema_supports_post_type(): void {
+		$ability = new CreatePost();
+		$schema  = $ability->get_input_schema();
+
+		$this->assertArrayHasKey( 'post_type', $schema['properties'] );
+		$this->assertEquals( 'string', $schema['properties']['post_type']['type'] );
+		$this->assertEquals( 'post', $schema['properties']['post_type']['default'] );
+	}
+
+	/**
 	 * Test output schema has expected structure.
 	 *
 	 * @return void
@@ -624,5 +638,102 @@ class CreatePostTest extends TestCase {
 		);
 
 		$this->assertEquals( 'draft', $result['status'] );
+	}
+
+	/**
+	 * Test execute defaults to post type.
+	 *
+	 * @return void
+	 */
+	public function test_execute_defaults_to_post_type(): void {
+		Functions\expect( 'sanitize_text_field' )->andReturnFirstArg();
+
+		Functions\expect( 'wp_insert_post' )
+			->once()
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return 'post' === $args['post_type'];
+					}
+				),
+				true
+			)
+			->andReturn( 1 );
+
+		Functions\expect( 'is_wp_error' )->andReturn( false );
+		Functions\expect( 'get_permalink' )->andReturn( 'https://example.com/test/' );
+		Functions\expect( 'get_post_status' )->andReturn( 'draft' );
+		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
+
+		$ability = new CreatePost();
+		$ability->do_execute( array( 'title' => 'Test' ) );
+	}
+
+	/**
+	 * Test execute creates page when post_type is page.
+	 *
+	 * @return void
+	 */
+	public function test_execute_creates_page_type(): void {
+		Functions\expect( 'sanitize_text_field' )->andReturnFirstArg();
+
+		Functions\expect( 'wp_insert_post' )
+			->once()
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return 'page' === $args['post_type'];
+					}
+				),
+				true
+			)
+			->andReturn( 1 );
+
+		Functions\expect( 'is_wp_error' )->andReturn( false );
+		Functions\expect( 'get_permalink' )->andReturn( 'https://example.com/test-page/' );
+		Functions\expect( 'get_post_status' )->andReturn( 'draft' );
+		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
+
+		$ability = new CreatePost();
+		$ability->do_execute(
+			array(
+				'title'     => 'Test',
+				'post_type' => 'page',
+			)
+		);
+	}
+
+	/**
+	 * Test execute supports custom post types.
+	 *
+	 * @return void
+	 */
+	public function test_execute_supports_custom_post_types(): void {
+		Functions\expect( 'sanitize_text_field' )->andReturnFirstArg();
+
+		Functions\expect( 'wp_insert_post' )
+			->once()
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return 'custom_type' === $args['post_type'];
+					}
+				),
+				true
+			)
+			->andReturn( 1 );
+
+		Functions\expect( 'is_wp_error' )->andReturn( false );
+		Functions\expect( 'get_permalink' )->andReturn( 'https://example.com/custom/' );
+		Functions\expect( 'get_post_status' )->andReturn( 'draft' );
+		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
+
+		$ability = new CreatePost();
+		$ability->do_execute(
+			array(
+				'title'     => 'Test',
+				'post_type' => 'custom_type',
+			)
+		);
 	}
 }

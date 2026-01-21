@@ -142,6 +142,20 @@ class UpdatePostTest extends TestCase {
 	}
 
 	/**
+	 * Test input schema supports optional post_type parameter.
+	 *
+	 * @return void
+	 */
+	public function test_input_schema_supports_post_type(): void {
+		$ability = new UpdatePost();
+		$schema  = $ability->get_input_schema();
+
+		$this->assertArrayHasKey( 'post_type', $schema['properties'] );
+		$this->assertEquals( 'string', $schema['properties']['post_type']['type'] );
+		$this->assertNotContains( 'post_type', $schema['required'] ?? array() );
+	}
+
+	/**
 	 * Test output schema has expected structure.
 	 *
 	 * @return void
@@ -704,5 +718,62 @@ class UpdatePostTest extends TestCase {
 		);
 
 		$this->assertTrue( $result['updated'] );
+	}
+
+	/**
+	 * Test execute accepts page post type.
+	 *
+	 * @return void
+	 */
+	public function test_execute_accepts_page_post_type(): void {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
+		$mock_post = Mockery::mock( 'WP_Post' );
+		$mock_post->ID = 10;
+		$mock_post->post_type = 'page';
+
+		Functions\expect( 'get_post' )->andReturn( $mock_post );
+		Functions\expect( 'sanitize_text_field' )->andReturnFirstArg();
+		Functions\expect( 'wp_update_post' )->andReturn( 10 );
+		Functions\expect( 'is_wp_error' )->andReturn( false );
+		Functions\expect( 'get_permalink' )->andReturn( 'https://example.com/test-page/' );
+		Functions\expect( 'get_post_status' )->andReturn( 'publish' );
+		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=10&action=edit' );
+
+		$ability = new UpdatePost();
+		$result  = $ability->do_execute(
+			array(
+				'post_id'   => 10,
+				'title'     => 'Updated Page',
+				'post_type' => 'page',
+			)
+		);
+
+		$this->assertTrue( $result['updated'] );
+	}
+
+	/**
+	 * Test execute throws exception when post_type mismatch.
+	 *
+	 * @return void
+	 */
+	public function test_execute_throws_when_post_type_mismatch(): void {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
+		$mock_post = Mockery::mock( 'WP_Post' );
+		$mock_post->ID = 10;
+		$mock_post->post_type = 'page';
+
+		Functions\expect( 'get_post' )->andReturn( $mock_post );
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'Post type mismatch' );
+
+		$ability = new UpdatePost();
+		$ability->do_execute(
+			array(
+				'post_id'   => 10,
+				'title'     => 'Updated',
+				'post_type' => 'post',
+			)
+		);
 	}
 }

@@ -38,4 +38,17 @@ final class UpdateCommentTest extends TestCase {
 
 		$this->assertEquals( 42, $result['comment_id'] );
 	}
+
+	public function test_throws_exception_when_update_fails(): void {
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'Failed to update comment status' );
+
+		Functions\expect( 'wp_set_comment_status' )->once()->andReturn( false );
+
+		$ability = new UpdateComment();
+		$ability->do_execute( array(
+			'comment_id' => 42,
+			'status'     => 'trash',
+		) );
+	}
 }

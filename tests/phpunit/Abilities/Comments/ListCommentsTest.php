@@ -108,6 +108,7 @@ final class ListCommentsTest extends TestCase {
 			->andReturn( array() );
 
 		Functions\expect( 'wp_count_comments' )
+			->with( 42 )
 			->andReturn( (object) array( 'approved' => '0' ) );
 
 		$ability = new ListComments();
@@ -136,5 +137,62 @@ final class ListCommentsTest extends TestCase {
 		$result  = $ability->do_execute( array( 'status' => 'hold' ) );
 
 		$this->assertEquals( 5, $result['total'] );
+	}
+
+	/**
+	 * Test returns total for all statuses.
+	 *
+	 * @return void
+	 */
+	public function test_counts_all_status(): void {
+		Functions\expect( 'get_comments' )
+			->once()
+			->andReturn( array() );
+
+		Functions\expect( 'wp_count_comments' )
+			->andReturn( (object) array( 'total_comments' => '12' ) );
+
+		$ability = new ListComments();
+		$result  = $ability->do_execute( array( 'status' => 'all' ) );
+
+		$this->assertEquals( 12, $result['total'] );
+	}
+
+	/**
+	 * Test returns spam count when status is spam.
+	 *
+	 * @return void
+	 */
+	public function test_counts_spam_status(): void {
+		Functions\expect( 'get_comments' )
+			->once()
+			->andReturn( array() );
+
+		Functions\expect( 'wp_count_comments' )
+			->andReturn( (object) array( 'spam' => '3' ) );
+
+		$ability = new ListComments();
+		$result  = $ability->do_execute( array( 'status' => 'spam' ) );
+
+		$this->assertEquals( 3, $result['total'] );
+	}
+
+	/**
+	 * Test returns trash count when status is trash.
+	 *
+	 * @return void
+	 */
+	public function test_counts_trash_status(): void {
+		Functions\expect( 'get_comments' )
+			->once()
+			->andReturn( array() );
+
+		Functions\expect( 'wp_count_comments' )
+			->andReturn( (object) array( 'trash' => '2' ) );
+
+		$ability = new ListComments();
+		$result  = $ability->do_execute( array( 'status' => 'trash' ) );
+
+		$this->assertEquals( 2, $result['total'] );
 	}
 }
