@@ -67,6 +67,7 @@ final class Schema {
 
 		return "CREATE TABLE {$table} (
 			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+			url VARCHAR(2048) NOT NULL,
 			event_type VARCHAR(100) NOT NULL,
 			payload LONGTEXT NOT NULL,
 			signature VARCHAR(64) NOT NULL,
