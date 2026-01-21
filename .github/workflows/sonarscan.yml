@@ -27,13 +27,12 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Create coverage directory
-        run: mkdir -p coverage
+        run: mkdir -p tests/coverage
 
       - name: Run tests with coverage
         run: |
           vendor/bin/phpunit \
-            --coverage-clover=coverage/clover.xml \
-            --log-junit=coverage/junit.xml
+            --log-junit=tests/coverage/junit.xml
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarqube-scan-action@v7
@@ -44,7 +43,7 @@ jobs:
           args: >
             -Dsonar.projectKey=stephenfeather_fa-wpmcp
             -Dsonar.organization=stephenfeather
-            -Dsonar.php.coverage.reportPaths=coverage/clover.xml
-            -Dsonar.php.tests.reportPath=coverage/junit.xml
+            -Dsonar.php.coverage.reportPaths=tests/coverage/clover.xml
+            -Dsonar.php.tests.reportPath=tests/coverage/junit.xml
             -Dsonar.language=php
             -Dsonar.exclusions=vendor/**,node_modules/**,tests/**,.claude/**,.tldr/**,opc/**,thoughts/**

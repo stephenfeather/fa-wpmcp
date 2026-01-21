@@ -25,6 +25,7 @@
 		<report>
 			<html outputDirectory="tests/coverage"/>
 			<text outputFile="php://stdout" showOnlySummary="true"/>
+			<clover outputFile="tests/coverage/clover.xml"/>
 		</report>
 	</coverage>
 
