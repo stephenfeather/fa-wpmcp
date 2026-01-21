@@ -11,6 +11,7 @@ namespace FAWpmcp\Tests\Logging;
 
 use FAWpmcp\Logging\ActivityLogger;
 use FAWpmcp\Logging\LogRepository;
+use FAWpmcp\Http\PrivacyRedactor;
 use FAWpmcp\ValueObjects\LogEntry;
 use PHPUnit\Framework\TestCase;
 use Mockery;
@@ -214,5 +215,182 @@ class ActivityLoggerTest extends TestCase {
 
 		// Verify correlation ID was returned correctly.
 		$this->assertEquals( 'time-uuid', $correlation_id );
+	}
+
+	/**
+	 * Test log_before_execute redacts password field in input data.
+	 *
+	 * @return void
+	 */
+	public function test_redacts_password_in_input_data(): void {
+		$repository = Mockery::mock( LogRepository::class );
+		$repository->shouldReceive( 'insert' )
+			->once()
+			->with(
+				Mockery::on(
+					function ( $entry ) {
+						// Verify the input data has password redacted.
+						$input = $entry->input_data;
+						return '[REDACTED]' === $input['password']
+							&& 'testuser' === $input['username'];
+					}
+				)
+			)
+			->andReturn( 1 );
+
+		$uuid_generator = fn() => 'redact-uuid';
+		$logger         = new ActivityLogger( $repository, $uuid_generator );
+
+		$correlation_id = $logger->log_before_execute(
+			'fa-wpmcp/create-user',
+			'users',
+			'write',
+			1,
+			'admin',
+			'127.0.0.1',
+			array(
+				'username' => 'testuser',
+				'password' => 'secret123',
+			)
+		);
+
+		$this->assertSame( 'redact-uuid', $correlation_id );
+	}
+
+	/**
+	 * Test log_after_execute redacts token field in output data.
+	 *
+	 * @return void
+	 */
+	public function test_redacts_token_in_output_data(): void {
+		$repository = Mockery::mock( LogRepository::class );
+		$repository->shouldReceive( 'insert' )->once()->andReturn( 1 );
+		$repository->shouldReceive( 'update_by_correlation_id' )
+			->once()
+			->with(
+				'token-uuid',
+				Mockery::on(
+					function ( $data ) {
+						// Verify the output data has token redacted.
+						$output = $data['output_data'];
+						return '[REDACTED]' === $output['token']
+							&& 'user-123' === $output['user_id'];
+					}
+				)
+			)
+			->andReturn( 1 );
+
+		$uuid_generator = fn() => 'token-uuid';
+		$logger         = new ActivityLogger( $repository, $uuid_generator );
+
+		$start_time     = microtime( true );
+		$correlation_id = $logger->log_before_execute(
+			'fa-wpmcp/login',
+			'auth',
+			'write',
+			1,
+			'admin',
+			'127.0.0.1',
+			array()
+		);
+
+		$logger->log_after_execute(
+			$correlation_id,
+			array(
+				'user_id' => 'user-123',
+				'token'   => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
+			),
+			true,
+			null,
+			$start_time
+		);
+
+		$this->assertSame( 'token-uuid', $correlation_id );
+	}
+
+	/**
+	 * Test that non-sensitive fields are preserved unchanged.
+	 *
+	 * @return void
+	 */
+	public function test_preserves_non_sensitive_fields(): void {
+		$repository = Mockery::mock( LogRepository::class );
+		$repository->shouldReceive( 'insert' )
+			->once()
+			->with(
+				Mockery::on(
+					function ( $entry ) {
+						// Verify non-sensitive fields are preserved.
+						$input = $entry->input_data;
+						return 'Test Post' === $input['title']
+							&& 'This is content' === $input['content']
+							&& 'published' === $input['status'];
+					}
+				)
+			)
+			->andReturn( 1 );
+
+		$uuid_generator = fn() => 'preserve-uuid';
+		$logger         = new ActivityLogger( $repository, $uuid_generator );
+
+		$correlation_id = $logger->log_before_execute(
+			'fa-wpmcp/create-post',
+			'posts-pages',
+			'write',
+			1,
+			'admin',
+			'127.0.0.1',
+			array(
+				'title'   => 'Test Post',
+				'content' => 'This is content',
+				'status'  => 'published',
+			)
+		);
+
+		$this->assertSame( 'preserve-uuid', $correlation_id );
+	}
+
+	/**
+	 * Test redacts nested sensitive fields in input data.
+	 *
+	 * @return void
+	 */
+	public function test_redacts_nested_sensitive_fields(): void {
+		$repository = Mockery::mock( LogRepository::class );
+		$repository->shouldReceive( 'insert' )
+			->once()
+			->with(
+				Mockery::on(
+					function ( $entry ) {
+						// Verify nested sensitive fields are redacted.
+						$input = $entry->input_data;
+						return '[REDACTED]' === $input['credentials']['password']
+							&& '[REDACTED]' === $input['credentials']['api_key']
+							&& 'testuser' === $input['credentials']['username'];
+					}
+				)
+			)
+			->andReturn( 1 );
+
+		$uuid_generator = fn() => 'nested-uuid';
+		$logger         = new ActivityLogger( $repository, $uuid_generator );
+
+		$correlation_id = $logger->log_before_execute(
+			'fa-wpmcp/auth',
+			'auth',
+			'write',
+			1,
+			'admin',
+			'127.0.0.1',
+			array(
+				'credentials' => array(
+					'username' => 'testuser',
+					'password' => 'secret123',
+					'api_key'  => 'key-abc-123',
+				),
+			)
+		);
+
+		$this->assertSame( 'nested-uuid', $correlation_id );
 	}
 }

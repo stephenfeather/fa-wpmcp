@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Webhooks;
 
+use FAWpmcp\Http\PrivacyRedactor;
+
 /**
  * Webhook system orchestrator.
  *
@@ -32,11 +34,16 @@ final class WebhookManager implements WebhookManagerInterface {
 	 * Trigger webhooks for an event.
 	 *
 	 * Builds payload and enqueues webhooks for subscribed URLs.
+	 * Sensitive fields in input/output are redacted before transmission.
 	 *
 	 * @param string               $event   Event name.
 	 * @param array<string, mixed> $context Event context data.
 	 */
 	public function trigger( string $event, array $context ): void {
+		// Redact sensitive fields from input/output before building payload (pure functions).
+		$redacted_input  = PrivacyRedactor::redact( $context['input'] );
+		$redacted_output = PrivacyRedactor::redact( $context['output'] );
+
 		// Build payload (pure function).
 		$payload = PayloadBuilder::build(
 			event: $event,
@@ -46,8 +53,8 @@ final class WebhookManager implements WebhookManagerInterface {
 			user_id: $context['user_id'],
 			user_login: $context['user_login'],
 			ip: $context['ip'],
-			input: $context['input'],
-			output: $context['output'],
+			input: $redacted_input,
+			output: $redacted_output,
 			success: $context['success'],
 			execution_time_ms: $context['execution_time_ms'],
 		);

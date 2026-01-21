@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace FAWpmcp\Tests\ValueObjects;
 
 use FAWpmcp\ValueObjects\Result;
+use FAWpmcp\Http\ResponseFormatter;
+use FAWpmcp\Http\ErrorCodes;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -109,5 +111,62 @@ class ResultTest extends TestCase {
 		$this->expectException( \Error::class );
 		// @phpstan-ignore-next-line - Intentionally testing immutability.
 		$result->value = 'modified';
+	}
+
+	/**
+	 * Test success result toResponse format.
+	 */
+	public function test_success_result_to_response_format(): void {
+		$result = Result::success(
+			array(
+				'post_id' => 42,
+				'title'   => 'Test Post',
+			)
+		);
+
+		$response = $result->to_response( 'corr-123', 150 );
+
+		$this->assertTrue( $response['success'] );
+		$this->assertArrayHasKey( 'data', $response );
+		$this->assertSame( 42, $response['data']['post_id'] );
+		$this->assertSame( 'Test Post', $response['data']['title'] );
+	}
+
+	/**
+	 * Test failure result toResponse format.
+	 */
+	public function test_failure_result_to_response_format(): void {
+		$result = Result::failure( ErrorCodes::NOT_FOUND, 'Post not found' );
+
+		$response = $result->to_response( 'corr-456', 50 );
+
+		$this->assertFalse( $response['success'] );
+		$this->assertArrayHasKey( 'error', $response );
+		$this->assertSame( ErrorCodes::NOT_FOUND, $response['error']['code'] );
+		$this->assertSame( 'Post not found', $response['error']['message'] );
+	}
+
+	/**
+	 * Test response includes correlation_id in meta.
+	 */
+	public function test_response_includes_correlation_id(): void {
+		$result = Result::success( array( 'status' => 'ok' ) );
+
+		$response = $result->to_response( 'unique-corr-id-789', 100 );
+
+		$this->assertArrayHasKey( 'meta', $response );
+		$this->assertSame( 'unique-corr-id-789', $response['meta']['correlation_id'] );
+	}
+
+	/**
+	 * Test response includes execution_time_ms in meta.
+	 */
+	public function test_response_includes_execution_time(): void {
+		$result = Result::success( array( 'data' => 'test' ) );
+
+		$response = $result->to_response( 'corr-time-test', 250 );
+
+		$this->assertArrayHasKey( 'meta', $response );
+		$this->assertSame( 250, $response['meta']['execution_time_ms'] );
 	}
 }

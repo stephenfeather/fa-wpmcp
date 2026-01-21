@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Logging;
 
+use FAWpmcp\Http\PrivacyRedactor;
+
 /**
  * Orchestrates activity logging for ability executions.
  *
@@ -64,12 +66,15 @@ final class ActivityLogger implements ActivityLoggerInterface {
 	): string {
 		$correlation_id = ( $this->uuid_generator )();
 
+		// Redact sensitive fields from input before logging (pure function).
+		$redacted_input = null !== $input ? PrivacyRedactor::redact( $input ) : null;
+
 		$entry = LogEntryBuilder::create()
 			->with_correlation_id( $correlation_id )
 			->with_user( $user_id, $user_login )
 			->with_ip_address( $ip_address )
 			->with_ability( $ability_name, $ability_category, $operation_type )
-			->with_input( $input )
+			->with_input( $redacted_input )
 			->build();
 
 		// Side effect: database write.
@@ -100,8 +105,11 @@ final class ActivityLogger implements ActivityLoggerInterface {
 	): void {
 		$execution_time_ms = $this->calculate_execution_time( $start_time );
 
+		// Redact sensitive fields from output before logging (pure function).
+		$redacted_output = null !== $output ? PrivacyRedactor::redact( $output ) : null;
+
 		$update_data = array(
-			'output_data'       => $output,
+			'output_data'       => $redacted_output,
 			'success'           => $success,
 			'error_message'     => $error_message,
 			'execution_time_ms' => $execution_time_ms,

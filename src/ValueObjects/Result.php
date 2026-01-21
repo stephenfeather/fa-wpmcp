@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace FAWpmcp\ValueObjects;
 
+use FAWpmcp\Http\ResponseFormatter;
+
 /**
  * Immutable Result container (Success or Failure).
  *
@@ -80,5 +82,27 @@ final readonly class Result {
 	 */
 	public function flat_map( callable $fn ): self {
 		return $this->is_success ? $fn( $this->value ) : $this;
+	}
+
+	/**
+	 * Convert result to API response format.
+	 *
+	 * Uses ResponseFormatter to create a consistent response structure.
+	 *
+	 * @param string $correlation_id    The correlation ID for request tracking.
+	 * @param int    $execution_time_ms The execution time in milliseconds.
+	 * @return array<string, mixed> The formatted response array.
+	 */
+	public function to_response( string $correlation_id, int $execution_time_ms ): array {
+		if ( $this->is_success ) {
+			// Ensure value is an array for ResponseFormatter.
+			$data = is_array( $this->value ) ? $this->value : array();
+			return ResponseFormatter::success( $data, $correlation_id, $execution_time_ms );
+		}
+
+		return ResponseFormatter::error(
+			$this->error_code ?? 'internal_error',
+			$this->error_message ?? 'An error occurred'
+		);
 	}
 }

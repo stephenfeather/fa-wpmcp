@@ -13,6 +13,7 @@ use FAWpmcp\Webhooks\WebhookManager;
 use FAWpmcp\Webhooks\WebhookQueue;
 use FAWpmcp\Webhooks\WebhookSender;
 use FAWpmcp\Webhooks\WebhookConfig;
+use FAWpmcp\Http\PrivacyRedactor;
 use FAWpmcp\ValueObjects\WebhookPayload;
 use FAWpmcp\ValueObjects\WebhookResult;
 use DateTimeImmutable;
@@ -285,5 +286,160 @@ class WebhookManagerTest extends TestCase {
 			->with( 2 );
 
 		$manager->process_queue();
+	}
+
+	/**
+	 * Test trigger redacts sensitive fields in webhook payload.
+	 *
+	 * @return void
+	 */
+	public function test_redacts_sensitive_fields_in_webhook_payload(): void {
+		$queue  = Mockery::mock( WebhookQueue::class );
+		$sender = Mockery::mock( WebhookSender::class );
+		$config = Mockery::mock( WebhookConfig::class );
+
+		$manager = new WebhookManager( $queue, $sender, $config );
+
+		$config->shouldReceive( 'get_subscribed_urls' )
+			->with( 'ability.after_execute' )
+			->andReturn( [ 'https://example.com/webhook' ] );
+
+		// Expect enqueue to be called with redacted payload.
+		$queue->shouldReceive( 'enqueue' )
+			->once()
+			->withArgs(
+				function ( $url, $payload ) {
+					// Verify api_key is redacted in input.
+					return $payload instanceof WebhookPayload
+						&& '[REDACTED]' === $payload->input['api_key']
+						&& 'admin' === $payload->user['login'];
+				}
+			);
+
+		$manager->trigger(
+			'ability.after_execute',
+			[
+				'ability_name'       => 'fa-wpmcp/external-api',
+				'category'           => 'integrations',
+				'operation'          => 'write',
+				'user_id'            => 1,
+				'user_login'         => 'admin',
+				'ip'                 => '192.168.1.1',
+				'input'              => [
+					'endpoint' => 'https://api.example.com',
+					'api_key'  => 'secret-key-12345',
+				],
+				'output'             => [ 'status' => 'success' ],
+				'success'            => true,
+				'execution_time_ms'  => 150,
+			]
+		);
+
+		$this->assertTrue( true, 'Webhook triggered with redacted payload' );
+	}
+
+	/**
+	 * Test trigger preserves webhook structure while redacting.
+	 *
+	 * @return void
+	 */
+	public function test_preserves_webhook_structure(): void {
+		$queue  = Mockery::mock( WebhookQueue::class );
+		$sender = Mockery::mock( WebhookSender::class );
+		$config = Mockery::mock( WebhookConfig::class );
+
+		$manager = new WebhookManager( $queue, $sender, $config );
+
+		$config->shouldReceive( 'get_subscribed_urls' )
+			->with( 'ability.after_execute' )
+			->andReturn( [ 'https://example.com/webhook' ] );
+
+		// Expect enqueue with correct structure.
+		$queue->shouldReceive( 'enqueue' )
+			->once()
+			->withArgs(
+				function ( $url, $payload ) {
+					// Verify structure is preserved.
+					return $payload instanceof WebhookPayload
+						&& 'ability.after_execute' === $payload->event
+						&& isset( $payload->ability['name'] )
+						&& isset( $payload->ability['category'] )
+						&& isset( $payload->ability['operation'] )
+						&& is_array( $payload->input )
+						&& is_array( $payload->output );
+				}
+			);
+
+		$manager->trigger(
+			'ability.after_execute',
+			[
+				'ability_name'       => 'fa-wpmcp/list-posts',
+				'category'           => 'posts-pages',
+				'operation'          => 'read',
+				'user_id'            => 1,
+				'user_login'         => 'admin',
+				'ip'                 => '127.0.0.1',
+				'input'              => [ 'page' => 1 ],
+				'output'             => [ 'posts' => [] ],
+				'success'            => true,
+				'execution_time_ms'  => 50,
+			]
+		);
+
+		$this->assertTrue( true, 'Webhook structure preserved' );
+	}
+
+	/**
+	 * Test trigger redacts nested sensitive fields in webhook payload.
+	 *
+	 * @return void
+	 */
+	public function test_redacts_nested_sensitive_in_webhooks(): void {
+		$queue  = Mockery::mock( WebhookQueue::class );
+		$sender = Mockery::mock( WebhookSender::class );
+		$config = Mockery::mock( WebhookConfig::class );
+
+		$manager = new WebhookManager( $queue, $sender, $config );
+
+		$config->shouldReceive( 'get_subscribed_urls' )
+			->with( 'ability.after_execute' )
+			->andReturn( [ 'https://example.com/webhook' ] );
+
+		// Expect enqueue with nested fields redacted.
+		$queue->shouldReceive( 'enqueue' )
+			->once()
+			->withArgs(
+				function ( $url, $payload ) {
+					// Verify nested password and access_token are redacted.
+					$input = $payload->input;
+					return '[REDACTED]' === $input['auth']['password']
+						&& '[REDACTED]' === $input['auth']['access_token']
+						&& 'testuser' === $input['auth']['username'];
+				}
+			);
+
+		$manager->trigger(
+			'ability.after_execute',
+			[
+				'ability_name'       => 'fa-wpmcp/authenticate',
+				'category'           => 'auth',
+				'operation'          => 'write',
+				'user_id'            => 1,
+				'user_login'         => 'admin',
+				'ip'                 => '192.168.1.1',
+				'input'              => [
+					'auth' => [
+						'username'     => 'testuser',
+						'password'     => 'secret123',
+						'access_token' => 'token-abc-123',
+					],
+				],
+				'output'             => [ 'authenticated' => true ],
+				'success'            => true,
+				'execution_time_ms'  => 100,
+			]
+		);
+
+		$this->assertTrue( true, 'Nested sensitive fields redacted in webhook' );
 	}
 }
