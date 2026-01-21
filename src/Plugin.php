@@ -74,6 +74,7 @@ final class Plugin {
         $this->registerPostAbilities( $ability_registry );
         $this->registerCommentAbilities( $ability_registry );
         $this->registerMediaAbilities( $ability_registry );
+        $this->registerTaxonomyAbilities( $ability_registry );
         $this->registerService( 'ability_registry', $ability_registry );
 
         // Initialize Admin Settings Page.
@@ -159,6 +160,19 @@ final class Plugin {
         $registry->register( new \FAWpmcp\Abilities\Media\ListMedia() );
         $registry->register( new \FAWpmcp\Abilities\Media\UploadMedia() );
         $registry->register( new \FAWpmcp\Abilities\Media\UpdateMedia() );
+    }
+
+    /**
+     * Register Taxonomy abilities with the registry.
+     *
+     * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private function registerTaxonomyAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+        $registry->register( new \FAWpmcp\Abilities\Taxonomies\GetTerm() );
+        $registry->register( new \FAWpmcp\Abilities\Taxonomies\ListTerms() );
+        $registry->register( new \FAWpmcp\Abilities\Taxonomies\CreateTerm() );
+        $registry->register( new \FAWpmcp\Abilities\Taxonomies\UpdateTerm() );
     }
 
     /**
