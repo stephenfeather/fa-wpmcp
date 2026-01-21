@@ -27,18 +27,10 @@ final class WebhookSchedulerTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		\Brain\Monkey\setUp();
-		$GLOBALS['as_has_scheduled_action_return'] = false;
-		$GLOBALS['as_schedule_recurring_action_calls'] = array();
-		$GLOBALS['as_unschedule_all_actions_calls'] = array();
 	}
 
 	protected function tearDown(): void {
 		\Brain\Monkey\tearDown();
-		unset(
-			$GLOBALS['as_has_scheduled_action_return'],
-			$GLOBALS['as_schedule_recurring_action_calls'],
-			$GLOBALS['as_unschedule_all_actions_calls']
-		);
 		parent::tearDown();
 	}
 
@@ -105,8 +97,21 @@ final class WebhookSchedulerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_schedule_with_action_scheduler_schedules_action(): void {
-		$this->ensure_action_scheduler_stubs();
-		$GLOBALS['as_has_scheduled_action_return'] = false;
+		Functions\expect( 'as_has_scheduled_action' )
+			->once()
+			->andReturn( false );
+
+		Functions\expect( 'as_schedule_recurring_action' )
+			->once()
+			->with(
+				Mockery::type( 'int' ),
+				300,
+				'fa_wpmcp_process_webhook_queue',
+				array(),
+				'fa-wpmcp-webhooks',
+				true
+			)
+			->andReturn( 1 );
 
 		$manager = new WebhookManager(
 			Mockery::mock( WebhookQueue::class ),
@@ -117,16 +122,7 @@ final class WebhookSchedulerTest extends TestCase {
 
 		$scheduler->schedule_recurring_job();
 
-		$this->assertCount( 1, $GLOBALS['as_schedule_recurring_action_calls'] );
-		$this->assertSame(
-			array(
-				'fa_wpmcp_process_webhook_queue',
-				array(),
-				'fa-wpmcp-webhooks',
-				true,
-			),
-			array_slice( $GLOBALS['as_schedule_recurring_action_calls'][0], 2 )
-		);
+		$this->assertTrue( true, 'Action Scheduler scheduling invoked' );
 	}
 
 	/**
@@ -135,8 +131,11 @@ final class WebhookSchedulerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_schedule_with_action_scheduler_skips_when_scheduled(): void {
-		$this->ensure_action_scheduler_stubs();
-		$GLOBALS['as_has_scheduled_action_return'] = true;
+		Functions\expect( 'as_has_scheduled_action' )
+			->once()
+			->andReturn( true );
+
+		Functions\expect( 'as_schedule_recurring_action' )->never();
 
 		$manager = new WebhookManager(
 			Mockery::mock( WebhookQueue::class ),
@@ -147,7 +146,7 @@ final class WebhookSchedulerTest extends TestCase {
 
 		$scheduler->schedule_recurring_job();
 
-		$this->assertSame( array(), $GLOBALS['as_schedule_recurring_action_calls'] );
+		$this->assertTrue( true, 'No scheduling when already scheduled' );
 	}
 
 	/**
@@ -180,7 +179,9 @@ final class WebhookSchedulerTest extends TestCase {
 	 * @return void
 	 */
 	public function test_unschedule_removes_jobs(): void {
-		$this->ensure_action_scheduler_stubs();
+		Functions\expect( 'as_unschedule_all_actions' )
+			->once()
+			->with( 'fa_wpmcp_process_webhook_queue', array(), 'fa-wpmcp-webhooks' );
 		Functions\expect( 'wp_next_scheduled' )
 			->once()
 			->with( 'fa_wpmcp_process_webhook_queue' )
@@ -199,37 +200,6 @@ final class WebhookSchedulerTest extends TestCase {
 		$scheduler = new WebhookScheduler( $manager );
 
 		$scheduler->unschedule();
-
-		$this->assertSame(
-			array(
-				array( 'fa_wpmcp_process_webhook_queue', array(), 'fa-wpmcp-webhooks' ),
-			),
-			$GLOBALS['as_unschedule_all_actions_calls']
-		);
-	}
-
-	/**
-	 * Define Action Scheduler stubs for function_exists checks.
-	 *
-	 * @return void
-	 */
-	private function ensure_action_scheduler_stubs(): void {
-		if ( ! function_exists( 'as_has_scheduled_action' ) ) {
-			eval(
-				'namespace { function as_has_scheduled_action() { return $GLOBALS["as_has_scheduled_action_return"] ?? false; } }'
-			);
-		}
-
-		if ( ! function_exists( 'as_schedule_recurring_action' ) ) {
-			eval(
-				'namespace { function as_schedule_recurring_action() { $GLOBALS["as_schedule_recurring_action_calls"][] = func_get_args(); return 1; } }'
-			);
-		}
-
-		if ( ! function_exists( 'as_unschedule_all_actions' ) ) {
-			eval(
-				'namespace { function as_unschedule_all_actions() { $GLOBALS["as_unschedule_all_actions_calls"][] = func_get_args(); return null; } }'
-			);
-		}
+		$this->assertTrue( true, 'Unschedule hooks invoked' );
 	}
 }
