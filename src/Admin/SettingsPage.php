@@ -905,31 +905,54 @@ final class SettingsPage {
 		$sanitized = array();
 
 		foreach ( $input as $endpoint ) {
-			if ( ! is_array( $endpoint ) ) {
-				continue;
+			$sanitized_endpoint = $this->sanitize_single_endpoint( $endpoint );
+			if ( $sanitized_endpoint !== null ) {
+				$sanitized[] = $sanitized_endpoint;
 			}
+		}
 
-			$url = isset( $endpoint['url'] ) ? esc_url_raw( $endpoint['url'] ) : '';
+		return $sanitized;
+	}
 
-			// Skip empty URLs.
-			if ( empty( $url ) ) {
-				continue;
+	/**
+	 * Sanitize a single webhook endpoint.
+	 *
+	 * @param mixed $endpoint Endpoint data.
+	 * @return array<string, mixed>|null Sanitized endpoint or null if invalid.
+	 */
+	private function sanitize_single_endpoint( $endpoint ): ?array {
+		if ( ! is_array( $endpoint ) ) {
+			return null;
+		}
+
+		$url = isset( $endpoint['url'] ) ? esc_url_raw( $endpoint['url'] ) : '';
+		if ( empty( $url ) ) {
+			return null;
+		}
+
+		return array(
+			'url'    => $url,
+			'events' => $this->sanitize_webhook_events( $endpoint['events'] ?? null ),
+		);
+	}
+
+	/**
+	 * Sanitize webhook events array.
+	 *
+	 * @param mixed $events Raw events data.
+	 * @return array<string> Sanitized event names.
+	 */
+	private function sanitize_webhook_events( $events ): array {
+		if ( ! is_array( $events ) ) {
+			return array();
+		}
+
+		$sanitized = array();
+		foreach ( $events as $event ) {
+			$event = sanitize_text_field( $event );
+			if ( in_array( $event, self::WEBHOOK_EVENTS, true ) ) {
+				$sanitized[] = $event;
 			}
-
-			$events = array();
-			if ( isset( $endpoint['events'] ) && is_array( $endpoint['events'] ) ) {
-				foreach ( $endpoint['events'] as $event ) {
-					$event = sanitize_text_field( $event );
-					if ( in_array( $event, self::WEBHOOK_EVENTS, true ) ) {
-						$events[] = $event;
-					}
-				}
-			}
-
-			$sanitized[] = array(
-				'url'    => $url,
-				'events' => $events,
-			);
 		}
 
 		return $sanitized;
