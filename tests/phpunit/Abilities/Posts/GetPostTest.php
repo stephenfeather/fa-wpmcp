@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace FAWpmcp\Tests\Abilities\Posts;
 
 use FAWpmcp\Abilities\Posts\GetPost;
+use FAWpmcp\Exceptions\PostNotFoundException;
+use FAWpmcp\Exceptions\PostTypeMismatchException;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -247,7 +249,7 @@ class GetPostTest extends TestCase {
 			->with( 9999 )
 			->andReturn( null );
 
-		$this->expectException( \RuntimeException::class );
+		$this->expectException( PostNotFoundException::class );
 		$this->expectExceptionMessage( 'Post not found' );
 
 		$ability = new GetPost();
@@ -491,7 +493,7 @@ class GetPostTest extends TestCase {
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
 
-		$this->expectException( \RuntimeException::class );
+		$this->expectException( PostTypeMismatchException::class );
 		$this->expectExceptionMessage( 'Post type mismatch' );
 
 		$ability = new GetPost();

@@ -53,6 +53,24 @@ final class GetCommentTest extends TestCase {
 		$this->assertEquals( 'comments', $ability->get_category() );
 		$this->assertEquals( 'Get Comment', $ability->get_label() );
 		$this->assertEquals( 'read', $ability->get_required_capability() );
+		$this->assertStringContainsString( 'comment', strtolower( $ability->get_description() ) );
+	}
+
+	/**
+	 * Test schema structures.
+	 *
+	 * @return void
+	 */
+	public function test_schema_structures(): void {
+		$ability      = new GetComment();
+		$input_schema = $ability->get_input_schema();
+		$this->assertEquals( 'object', $input_schema['type'] );
+		$this->assertArrayHasKey( 'comment_id', $input_schema['properties'] );
+		$this->assertContains( 'comment_id', $input_schema['required'] );
+
+		$output_schema = $ability->get_output_schema();
+		$this->assertEquals( 'object', $output_schema['type'] );
+		$this->assertArrayHasKey( 'comment', $output_schema['properties'] );
 	}
 
 	/**

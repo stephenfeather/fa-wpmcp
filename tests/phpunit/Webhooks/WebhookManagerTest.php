@@ -69,6 +69,8 @@ class WebhookManagerTest extends TestCase {
 				'execution_time_ms'  => 150,
 			]
 		);
+
+		$this->assertTrue( true, 'Webhook enqueued for each subscribed URL' );
 	}
 
 	public function test_trigger_does_nothing_when_no_subscribers(): void {
@@ -101,6 +103,8 @@ class WebhookManagerTest extends TestCase {
 				'execution_time_ms'  => 50,
 			]
 		);
+
+		$this->assertTrue( true, 'No enqueue calls when no subscribers' );
 	}
 
 	public function test_process_queue_sends_pending_webhooks(): void {
@@ -147,6 +151,8 @@ class WebhookManagerTest extends TestCase {
 			->with( 1 );
 
 		$manager->process_queue();
+
+		$this->assertTrue( true, 'Pending webhook processed successfully' );
 	}
 
 	public function test_process_queue_retries_failed_webhooks(): void {
@@ -192,6 +198,8 @@ class WebhookManagerTest extends TestCase {
 			);
 
 		$manager->process_queue();
+
+		$this->assertTrue( true, 'Failed webhook scheduled for retry' );
 	}
 
 	public function test_process_queue_marks_failed_after_max_retries(): void {
@@ -234,6 +242,8 @@ class WebhookManagerTest extends TestCase {
 			->with( 3, 'Max retries exceeded' );
 
 		$manager->process_queue();
+
+		$this->assertTrue( true, 'Failed webhook marked after max retries' );
 	}
 
 	public function test_process_queue_handles_multiple_webhooks(): void {
@@ -286,6 +296,8 @@ class WebhookManagerTest extends TestCase {
 			->with( 2 );
 
 		$manager->process_queue();
+
+		$this->assertTrue( true, 'Multiple webhooks processed' );
 	}
 
 	/**

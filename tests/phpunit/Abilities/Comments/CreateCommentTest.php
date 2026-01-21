@@ -24,6 +24,33 @@ final class CreateCommentTest extends TestCase {
 		$ability = new CreateComment();
 		$this->assertEquals( 'fa-wpmcp/create-comment', $ability->get_name() );
 		$this->assertEquals( 'comments', $ability->get_category() );
+		$this->assertEquals( 'Create Comment', $ability->get_label() );
+		$this->assertStringContainsString( 'comment', strtolower( $ability->get_description() ) );
+		$this->assertEquals( 'edit_posts', $ability->get_required_capability() );
+	}
+
+	public function test_input_schema_requires_fields(): void {
+		$ability = new CreateComment();
+		$schema  = $ability->get_input_schema();
+
+		$this->assertEquals( 'object', $schema['type'] );
+		$this->assertArrayHasKey( 'post_id', $schema['properties'] );
+		$this->assertArrayHasKey( 'author', $schema['properties'] );
+		$this->assertArrayHasKey( 'email', $schema['properties'] );
+		$this->assertArrayHasKey( 'content', $schema['properties'] );
+		$this->assertContains( 'post_id', $schema['required'] );
+		$this->assertContains( 'author', $schema['required'] );
+		$this->assertContains( 'email', $schema['required'] );
+		$this->assertContains( 'content', $schema['required'] );
+	}
+
+	public function test_output_schema_structure(): void {
+		$ability = new CreateComment();
+		$schema  = $ability->get_output_schema();
+
+		$this->assertEquals( 'object', $schema['type'] );
+		$this->assertArrayHasKey( 'comment_id', $schema['properties'] );
+		$this->assertArrayHasKey( 'link', $schema['properties'] );
 	}
 
 	public function test_creates_comment(): void {

@@ -24,6 +24,31 @@ final class UpdateCommentTest extends TestCase {
 		$ability = new UpdateComment();
 		$this->assertEquals( 'fa-wpmcp/update-comment', $ability->get_name() );
 		$this->assertEquals( 'comments', $ability->get_category() );
+		$this->assertEquals( 'Update Comment', $ability->get_label() );
+		$this->assertStringContainsString( 'comment', strtolower( $ability->get_description() ) );
+		$this->assertEquals( 'moderate_comments', $ability->get_required_capability() );
+	}
+
+	public function test_input_schema_requires_fields(): void {
+		$ability = new UpdateComment();
+		$schema  = $ability->get_input_schema();
+
+		$this->assertEquals( 'object', $schema['type'] );
+		$this->assertArrayHasKey( 'comment_id', $schema['properties'] );
+		$this->assertArrayHasKey( 'status', $schema['properties'] );
+		$this->assertContains( 'comment_id', $schema['required'] );
+		$this->assertContains( 'status', $schema['required'] );
+		$this->assertContains( 'approve', $schema['properties']['status']['enum'] );
+	}
+
+	public function test_output_schema_structure(): void {
+		$ability = new UpdateComment();
+		$schema  = $ability->get_output_schema();
+
+		$this->assertEquals( 'object', $schema['type'] );
+		$this->assertArrayHasKey( 'comment_id', $schema['properties'] );
+		$this->assertArrayHasKey( 'status', $schema['properties'] );
+		$this->assertArrayHasKey( 'link', $schema['properties'] );
 	}
 
 	public function test_updates_comment_status(): void {

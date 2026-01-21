@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace FAWpmcp\Tests\Abilities\Posts;
 
 use FAWpmcp\Abilities\Posts\UpdatePost;
+use FAWpmcp\Exceptions\PostNotFoundException;
+use FAWpmcp\Exceptions\PostTypeMismatchException;
+use FAWpmcp\Exceptions\PostUpdateException;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -182,7 +185,7 @@ class UpdatePostTest extends TestCase {
 			->with( 999 )
 			->andReturn( null );
 
-		$this->expectException( \RuntimeException::class );
+		$this->expectException( PostNotFoundException::class );
 		$this->expectExceptionMessage( 'Post not found' );
 
 		$ability = new UpdatePost();

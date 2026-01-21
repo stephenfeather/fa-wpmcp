@@ -54,6 +54,30 @@ final class ListCommentsTest extends TestCase {
 		$this->assertEquals( 'comments', $ability->get_category() );
 		$this->assertEquals( 'List Comments', $ability->get_label() );
 		$this->assertEquals( 'read', $ability->get_required_capability() );
+		$this->assertStringContainsString( 'comment', strtolower( $ability->get_description() ) );
+	}
+
+	/**
+	 * Test schema structures.
+	 *
+	 * @return void
+	 */
+	public function test_schema_structures(): void {
+		$ability      = new ListComments();
+		$input_schema = $ability->get_input_schema();
+
+		$this->assertEquals( 'object', $input_schema['type'] );
+		$this->assertArrayHasKey( 'page', $input_schema['properties'] );
+		$this->assertArrayHasKey( 'per_page', $input_schema['properties'] );
+		$this->assertArrayHasKey( 'post_id', $input_schema['properties'] );
+		$this->assertArrayHasKey( 'status', $input_schema['properties'] );
+
+		$output_schema = $ability->get_output_schema();
+		$this->assertEquals( 'object', $output_schema['type'] );
+		$this->assertArrayHasKey( 'comments', $output_schema['properties'] );
+		$this->assertArrayHasKey( 'total', $output_schema['properties'] );
+		$this->assertArrayHasKey( 'page', $output_schema['properties'] );
+		$this->assertArrayHasKey( 'per_page', $output_schema['properties'] );
 	}
 
 	/**
