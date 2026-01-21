@@ -64,10 +64,13 @@ final class ListCommentsTest extends TestCase {
 	public function test_lists_comments_with_pagination(): void {
 		$mock_comments = array(
 			(object) array(
-				'comment_ID'      => 1,
-				'comment_author'  => 'John Doe',
-				'comment_content' => 'Great post!',
-				'comment_date'    => '2026-01-21 10:00:00',
+				'comment_ID'           => 1,
+				'comment_post_ID'      => 10,
+				'comment_author'       => 'John Doe',
+				'comment_author_email' => 'john@example.com',
+				'comment_content'      => 'Great post!',
+				'comment_date'         => '2026-01-21 10:00:00',
+				'comment_approved'     => '1',
 			),
 		);
 
@@ -78,6 +81,10 @@ final class ListCommentsTest extends TestCase {
 		Functions\expect( 'wp_count_comments' )
 			->once()
 			->andReturn( (object) array( 'approved' => '10' ) );
+
+		Functions\expect( 'get_comment_link' )
+			->once()
+			->andReturn( 'https://example.com/post#comment-1' );
 
 		$ability = new ListComments();
 		$result  = $ability->do_execute( array( 'page' => 1, 'per_page' => 10 ) );

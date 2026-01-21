@@ -76,6 +76,10 @@ final class GetCommentTest extends TestCase {
 			->with( 42 )
 			->andReturn( $mock_comment );
 
+		Functions\expect( 'get_comment_link' )
+			->once()
+			->andReturn( 'https://example.com/post#comment-42' );
+
 		$ability = new GetComment();
 		$result  = $ability->do_execute( array( 'comment_id' => 42 ) );
 

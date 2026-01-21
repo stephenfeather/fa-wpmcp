@@ -72,6 +72,7 @@ final class Plugin {
 		// 1. Create AbilityRegistry and register abilities.
 		$ability_registry = new \FAWpmcp\Abilities\AbilityRegistry();
 		$this->register_post_abilities( $ability_registry );
+		$this->register_comment_abilities( $ability_registry );
 		$this->register_service( 'ability_registry', $ability_registry );
 
 		// Initialize Admin Settings Page.
@@ -131,6 +132,19 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Posts\ListPosts() );
 		$registry->register( new \FAWpmcp\Abilities\Posts\CreatePost() );
 		$registry->register( new \FAWpmcp\Abilities\Posts\UpdatePost() );
+	}
+
+	/**
+	 * Register Comment abilities with the registry.
+	 *
+	 * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private function register_comment_abilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Comments\GetComment() );
+		$registry->register( new \FAWpmcp\Abilities\Comments\ListComments() );
+		$registry->register( new \FAWpmcp\Abilities\Comments\CreateComment() );
+		$registry->register( new \FAWpmcp\Abilities\Comments\UpdateComment() );
 	}
 
 	/**
