@@ -23,16 +23,16 @@ final class CreateCommentTest extends TestCase {
 
 	public function test_ability_metadata(): void {
 		$ability = new CreateComment();
-		$this->assertEquals( 'fa-wpmcp/create-comment', $ability->get_name() );
-		$this->assertEquals( 'comments', $ability->get_category() );
-		$this->assertEquals( 'Create Comment', $ability->get_label() );
-		$this->assertStringContainsString( 'comment', strtolower( $ability->get_description() ) );
-		$this->assertEquals( 'edit_posts', $ability->get_required_capability() );
+		$this->assertEquals( 'fa-wpmcp/create-comment', $ability->getName() );
+		$this->assertEquals( 'comments', $ability->getCategory() );
+		$this->assertEquals( 'Create Comment', $ability->getLabel() );
+		$this->assertStringContainsString( 'comment', strtolower( $ability->getDescription() ) );
+		$this->assertEquals( 'edit_posts', $ability->getRequiredCapability() );
 	}
 
 	public function test_input_schema_requires_fields(): void {
 		$ability = new CreateComment();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'post_id', $schema['properties'] );
@@ -47,7 +47,7 @@ final class CreateCommentTest extends TestCase {
 
 	public function test_output_schema_structure(): void {
 		$ability = new CreateComment();
-		$schema  = $ability->get_output_schema();
+		$schema  = $ability->getOutputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'comment_id', $schema['properties'] );
@@ -67,7 +67,7 @@ final class CreateCommentTest extends TestCase {
 		Functions\expect( 'get_comment_link' )->once()->andReturn( 'https://example.com/post#comment-42' );
 
 		$ability = new CreateComment();
-		$result  = $ability->do_execute( array(
+		$result  = $ability->doExecute( array(
 			'post_id' => 10,
 			'author'  => 'John',
 			'email'   => 'john@example.com',
@@ -88,7 +88,7 @@ final class CreateCommentTest extends TestCase {
 		Functions\expect( 'get_comment_link' )->once()->andReturn( 'https://example.com/post#comment-77' );
 
 		$ability = new CreateComment();
-		$result  = $ability->do_execute( array(
+		$result  = $ability->doExecute( array(
 			'post_id' => 10,
 			'author'  => 'John',
 			'email'   => 'john@example.com',
@@ -106,7 +106,7 @@ final class CreateCommentTest extends TestCase {
 		Functions\expect( 'wp_insert_comment' )->once()->andReturn( 0 );
 
 		$ability = new CreateComment();
-		$ability->do_execute( array(
+		$ability->doExecute( array(
 			'post_id' => 10,
 			'author'  => 'John',
 			'email'   => 'john@example.com',

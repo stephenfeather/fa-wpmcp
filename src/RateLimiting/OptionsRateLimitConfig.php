@@ -44,7 +44,7 @@ final class OptionsRateLimitConfig implements RateLimitConfig {
      *
      * @return array<string, array<string, int>> Rate limit configuration.
      */
-    public function get_all(): array {
+    public function getAll(): array {
         $config = get_option( self::OPTION_NAME, array() );
 
         // Merge with defaults.
@@ -64,7 +64,7 @@ final class OptionsRateLimitConfig implements RateLimitConfig {
      * @return array{requests_per_minute: int, requests_per_hour: int} Rate limit settings.
      */
     public function get( string $ability ): array {
-        $all = $this->get_all();
+        $all = $this->getAll();
         return $all[ $ability ] ?? $all['default'];
     }
 
@@ -77,7 +77,7 @@ final class OptionsRateLimitConfig implements RateLimitConfig {
      * @return void
      */
     public function set( string $ability, int $requests_per_minute, int $requests_per_hour ): void {
-        $config = $this->get_all();
+        $config = $this->getAll();
         $config[ $ability ] = array(
             'requests_per_minute' => $requests_per_minute,
             'requests_per_hour'   => $requests_per_hour,

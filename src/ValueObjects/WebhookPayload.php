@@ -45,7 +45,7 @@ final class WebhookPayload {
      *
      * @return array<string, mixed>
      */
-    public function to_array(): array {
+    public function toArray(): array {
         return [
             'event'             => $this->event,
             'timestamp'         => $this->timestamp->format( 'c' ),
@@ -63,7 +63,7 @@ final class WebhookPayload {
      *
      * @return string JSON representation.
      */
-    public function to_json(): string {
-        return json_encode( $this->to_array(), JSON_THROW_ON_ERROR );
+    public function toJson(): string {
+        return json_encode( $this->toArray(), JSON_THROW_ON_ERROR );
     }
 }

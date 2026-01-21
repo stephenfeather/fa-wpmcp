@@ -60,10 +60,10 @@ class AbilityExecutorTest extends TestCase {
 		array $execute_return = [ 'result' => 'success' ]
 	): AbstractAbility {
 		$ability = Mockery::mock( AbstractAbility::class );
-		$ability->shouldReceive( 'get_name' )->andReturn( $name );
-		$ability->shouldReceive( 'get_category' )->andReturn( $category );
-		$ability->shouldReceive( 'get_operation_type' )->andReturn( $operation );
-		$ability->shouldReceive( 'do_execute' )->andReturn( $execute_return );
+		$ability->shouldReceive( 'getName' )->andReturn( $name );
+		$ability->shouldReceive( 'getCategory' )->andReturn( $category );
+		$ability->shouldReceive( 'getOperationType' )->andReturn( $operation );
+		$ability->shouldReceive( 'doExecute' )->andReturn( $execute_return );
 		$ability->shouldReceive( 'get_label' )->andReturn( 'Test Ability' );
 		$ability->shouldReceive( 'get_description' )->andReturn( 'Test ability description' );
 		$ability->shouldReceive( 'get_required_capability' )->andReturn( 'read' );
@@ -448,10 +448,10 @@ class AbilityExecutorTest extends TestCase {
 
 		// Create ability that throws exception.
 		$ability = Mockery::mock( AbstractAbility::class );
-		$ability->shouldReceive( 'get_name' )->andReturn( 'fa-wpmcp/failing-ability' );
-		$ability->shouldReceive( 'get_category' )->andReturn( 'test' );
-		$ability->shouldReceive( 'get_operation_type' )->andReturn( 'read' );
-		$ability->shouldReceive( 'do_execute' )
+		$ability->shouldReceive( 'getName' )->andReturn( 'fa-wpmcp/failing-ability' );
+		$ability->shouldReceive( 'getCategory' )->andReturn( 'test' );
+		$ability->shouldReceive( 'getOperationType' )->andReturn( 'read' );
+		$ability->shouldReceive( 'doExecute' )
 			->andThrow( new \RuntimeException( 'Something went wrong' ) );
 
 		$executor = new AbilityExecutor(
@@ -507,10 +507,10 @@ class AbilityExecutorTest extends TestCase {
 
 		// Create ability that throws exception.
 		$ability = Mockery::mock( AbstractAbility::class );
-		$ability->shouldReceive( 'get_name' )->andReturn( 'fa-wpmcp/failing-ability' );
-		$ability->shouldReceive( 'get_category' )->andReturn( 'test' );
-		$ability->shouldReceive( 'get_operation_type' )->andReturn( 'write' );
-		$ability->shouldReceive( 'do_execute' )
+		$ability->shouldReceive( 'getName' )->andReturn( 'fa-wpmcp/failing-ability' );
+		$ability->shouldReceive( 'getCategory' )->andReturn( 'test' );
+		$ability->shouldReceive( 'getOperationType' )->andReturn( 'write' );
+		$ability->shouldReceive( 'doExecute' )
 			->andThrow( new \RuntimeException( 'Database error' ) );
 
 		$executor = new AbilityExecutor(
@@ -551,10 +551,10 @@ class AbilityExecutorTest extends TestCase {
 
 		$received_input = null;
 		$ability        = Mockery::mock( AbstractAbility::class );
-		$ability->shouldReceive( 'get_name' )->andReturn( 'fa-wpmcp/test' );
-		$ability->shouldReceive( 'get_category' )->andReturn( 'test' );
-		$ability->shouldReceive( 'get_operation_type' )->andReturn( 'read' );
-		$ability->shouldReceive( 'do_execute' )
+		$ability->shouldReceive( 'getName' )->andReturn( 'fa-wpmcp/test' );
+		$ability->shouldReceive( 'getCategory' )->andReturn( 'test' );
+		$ability->shouldReceive( 'getOperationType' )->andReturn( 'read' );
+		$ability->shouldReceive( 'doExecute' )
 			->with(
 				Mockery::on(
 					function ( $input ) use ( &$received_input ) {

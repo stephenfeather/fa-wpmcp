@@ -27,7 +27,7 @@ abstract class AbstractAbility {
      *
      * @return string Ability name.
      */
-    abstract public function get_name(): string;
+    abstract public function getName(): string;
 
     /**
      * Get the ability category.
@@ -36,21 +36,21 @@ abstract class AbstractAbility {
      *
      * @return string Category name.
      */
-    abstract public function get_category(): string;
+    abstract public function getCategory(): string;
 
     /**
      * Get the human-readable label.
      *
      * @return string Ability label for display.
      */
-    abstract public function get_label(): string;
+    abstract public function getLabel(): string;
 
     /**
      * Get the ability description.
      *
      * @return string Description explaining what the ability does.
      */
-    abstract public function get_description(): string;
+    abstract public function getDescription(): string;
 
     /**
      * Get the input schema.
@@ -59,7 +59,7 @@ abstract class AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    abstract public function get_input_schema(): array;
+    abstract public function getInputSchema(): array;
 
     /**
      * Get the output schema.
@@ -68,14 +68,14 @@ abstract class AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    abstract public function get_output_schema(): array;
+    abstract public function getOutputSchema(): array;
 
     /**
      * Get the required WordPress capability.
      *
      * @return string WordPress capability name.
      */
-    abstract public function get_required_capability(): string;
+    abstract public function getRequiredCapability(): string;
 
     /**
      * Execute the ability.
@@ -87,7 +87,7 @@ abstract class AbstractAbility {
      * @return array<string, mixed> Output data.
      * @throws \Exception If execution fails.
      */
-    abstract public function do_execute( array $input ): array;
+    abstract public function doExecute( array $input ): array;
 
     /**
      * Get the operation type.
@@ -96,7 +96,7 @@ abstract class AbstractAbility {
      *
      * @return string 'read' or 'write'.
      */
-    public function get_operation_type(): string {
+    public function getOperationType(): string {
         return 'read';
     }
 
@@ -107,12 +107,12 @@ abstract class AbstractAbility {
      *
      * @return array<string, mixed> Annotations array.
      */
-    public function get_annotations(): array {
+    public function getAnnotations(): array {
         return [
-            'readonly'     => 'read' === $this->get_operation_type(),
+            'readonly'     => 'read' === $this->getOperationType(),
             'destructive'  => false,
             'idempotent'   => true,
-            'instructions' => $this->get_description(),
+            'instructions' => $this->getDescription(),
         ];
     }
 
@@ -123,17 +123,17 @@ abstract class AbstractAbility {
      *
      * @return array<string, mixed> Registration array.
      */
-    public function to_registration_array(): array {
+    public function toRegistrationArray(): array {
         return [
-            'name'               => $this->get_name(),
-            'category'           => $this->get_category(),
-            'label'              => $this->get_label(),
-            'description'        => $this->get_description(),
-            'inputSchema'        => $this->get_input_schema(),
-            'outputSchema'       => $this->get_output_schema(),
-            'requiredCapability' => $this->get_required_capability(),
-            'operationType'      => $this->get_operation_type(),
-            'annotations'        => $this->get_annotations(),
+            'name'               => $this->getName(),
+            'category'           => $this->getCategory(),
+            'label'              => $this->getLabel(),
+            'description'        => $this->getDescription(),
+            'inputSchema'        => $this->getInputSchema(),
+            'outputSchema'       => $this->getOutputSchema(),
+            'requiredCapability' => $this->getRequiredCapability(),
+            'operationType'      => $this->getOperationType(),
+            'annotations'        => $this->getAnnotations(),
         ];
     }
 }

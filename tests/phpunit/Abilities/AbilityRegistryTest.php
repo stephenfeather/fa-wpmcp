@@ -46,14 +46,14 @@ class AbilityRegistryTest extends TestCase {
 	 */
 	private function create_mock_ability( string $name, string $category = 'test-category' ): AbstractAbility {
 		$ability = Mockery::mock( AbstractAbility::class );
-		$ability->shouldReceive( 'get_name' )->andReturn( $name );
-		$ability->shouldReceive( 'get_category' )->andReturn( $category );
-		$ability->shouldReceive( 'get_label' )->andReturn( 'Test Ability' );
-		$ability->shouldReceive( 'get_description' )->andReturn( 'Test description' );
-		$ability->shouldReceive( 'get_operation_type' )->andReturn( 'read' );
-		$ability->shouldReceive( 'get_required_capability' )->andReturn( 'read' );
-		$ability->shouldReceive( 'get_input_schema' )->andReturn( [] );
-		$ability->shouldReceive( 'get_output_schema' )->andReturn( [] );
+		$ability->shouldReceive( 'getName' )->andReturn( $name );
+		$ability->shouldReceive( 'getCategory' )->andReturn( $category );
+		$ability->shouldReceive( 'getLabel' )->andReturn( 'Test Ability' );
+		$ability->shouldReceive( 'getDescription' )->andReturn( 'Test description' );
+		$ability->shouldReceive( 'getOperationType' )->andReturn( 'read' );
+		$ability->shouldReceive( 'getRequiredCapability' )->andReturn( 'read' );
+		$ability->shouldReceive( 'getInputSchema' )->andReturn( [] );
+		$ability->shouldReceive( 'getOutputSchema' )->andReturn( [] );
 		return $ability;
 	}
 
@@ -142,8 +142,8 @@ class AbilityRegistryTest extends TestCase {
 		$registry->register( $ability3 );
 		$registry->register( $ability4 );
 
-		$posts_abilities = $registry->by_category( 'posts-pages' );
-		$user_abilities  = $registry->by_category( 'users' );
+		$posts_abilities = $registry->byCategory( 'posts-pages' );
+		$user_abilities  = $registry->byCategory( 'users' );
 
 		$this->assertCount( 2, $posts_abilities );
 		$this->assertArrayHasKey( 'fa-wpmcp/list-posts', $posts_abilities );
@@ -165,7 +165,7 @@ class AbilityRegistryTest extends TestCase {
 		$ability = $this->create_mock_ability( 'fa-wpmcp/list-posts', 'posts-pages' );
 		$registry->register( $ability );
 
-		$result = $registry->by_category( 'non-existent' );
+		$result = $registry->byCategory( 'non-existent' );
 
 		$this->assertIsArray( $result );
 		$this->assertEmpty( $result );
@@ -377,20 +377,20 @@ class AbilityRegistryTest extends TestCase {
 		$registry = new AbilityRegistry();
 
 		$read_ability = Mockery::mock( AbstractAbility::class );
-		$read_ability->shouldReceive( 'get_name' )->andReturn( 'fa-wpmcp/list-posts' );
-		$read_ability->shouldReceive( 'get_category' )->andReturn( 'posts-pages' );
-		$read_ability->shouldReceive( 'get_operation_type' )->andReturn( 'read' );
+		$read_ability->shouldReceive( 'getName' )->andReturn( 'fa-wpmcp/list-posts' );
+		$read_ability->shouldReceive( 'getCategory' )->andReturn( 'posts-pages' );
+		$read_ability->shouldReceive( 'getOperationType' )->andReturn( 'read' );
 
 		$write_ability = Mockery::mock( AbstractAbility::class );
-		$write_ability->shouldReceive( 'get_name' )->andReturn( 'fa-wpmcp/create-post' );
-		$write_ability->shouldReceive( 'get_category' )->andReturn( 'posts-pages' );
-		$write_ability->shouldReceive( 'get_operation_type' )->andReturn( 'write' );
+		$write_ability->shouldReceive( 'getName' )->andReturn( 'fa-wpmcp/create-post' );
+		$write_ability->shouldReceive( 'getCategory' )->andReturn( 'posts-pages' );
+		$write_ability->shouldReceive( 'getOperationType' )->andReturn( 'write' );
 
 		$registry->register( $read_ability );
 		$registry->register( $write_ability );
 
-		$read_abilities  = $registry->by_operation( 'read' );
-		$write_abilities = $registry->by_operation( 'write' );
+		$read_abilities  = $registry->byOperation( 'read' );
+		$write_abilities = $registry->byOperation( 'write' );
 
 		$this->assertCount( 1, $read_abilities );
 		$this->assertArrayHasKey( 'fa-wpmcp/list-posts', $read_abilities );
@@ -408,9 +408,9 @@ class AbilityRegistryTest extends TestCase {
 		$registry = new AbilityRegistry();
 
 		$ability = Mockery::mock( AbstractAbility::class );
-		$ability->shouldReceive( 'get_name' )->andReturn( 'fa-wpmcp/list-posts' );
-		$ability->shouldReceive( 'get_category' )->andReturn( 'posts-pages' );
-		$ability->shouldReceive( 'to_registration_array' )->andReturn(
+		$ability->shouldReceive( 'getName' )->andReturn( 'fa-wpmcp/list-posts' );
+		$ability->shouldReceive( 'getCategory' )->andReturn( 'posts-pages' );
+		$ability->shouldReceive( 'toRegistrationArray' )->andReturn(
 			[
 				'name'        => 'fa-wpmcp/list-posts',
 				'category'    => 'posts-pages',
@@ -421,7 +421,7 @@ class AbilityRegistryTest extends TestCase {
 
 		$registry->register( $ability );
 
-		$arrays = $registry->to_array();
+		$arrays = $registry->toArray();
 
 		$this->assertCount( 1, $arrays );
 		$this->assertEquals( 'fa-wpmcp/list-posts', $arrays[0]['name'] );

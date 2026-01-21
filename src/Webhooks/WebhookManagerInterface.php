@@ -35,5 +35,5 @@ interface WebhookManagerInterface {
      *
      * @return void
      */
-    public function process_queue(): void;
+    public function processQueue(): void;
 }

@@ -59,7 +59,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_get_name(): void {
 		$ability = new UpdatePost();
-		$this->assertEquals( 'fa-wpmcp/update-post', $ability->get_name() );
+		$this->assertEquals( 'fa-wpmcp/update-post', $ability->getName() );
 	}
 
 	/**
@@ -69,7 +69,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_get_category(): void {
 		$ability = new UpdatePost();
-		$this->assertEquals( 'posts-pages', $ability->get_category() );
+		$this->assertEquals( 'posts-pages', $ability->getCategory() );
 	}
 
 	/**
@@ -79,7 +79,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_get_label(): void {
 		$ability = new UpdatePost();
-		$this->assertEquals( 'Update Post', $ability->get_label() );
+		$this->assertEquals( 'Update Post', $ability->getLabel() );
 	}
 
 	/**
@@ -89,7 +89,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_get_description(): void {
 		$ability = new UpdatePost();
-		$this->assertStringContainsString( 'update', strtolower( $ability->get_description() ) );
+		$this->assertStringContainsString( 'update', strtolower( $ability->getDescription() ) );
 	}
 
 	/**
@@ -99,7 +99,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_get_operation_type(): void {
 		$ability = new UpdatePost();
-		$this->assertEquals( 'write', $ability->get_operation_type() );
+		$this->assertEquals( 'write', $ability->getOperationType() );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_get_required_capability(): void {
 		$ability = new UpdatePost();
-		$this->assertEquals( 'edit_posts', $ability->get_required_capability() );
+		$this->assertEquals( 'edit_posts', $ability->getRequiredCapability() );
 	}
 
 	/**
@@ -119,7 +119,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_input_schema_requires_post_id(): void {
 		$ability = new UpdatePost();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'post_id', $schema['properties'] );
@@ -134,7 +134,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_input_schema_supports_updatable_fields(): void {
 		$ability = new UpdatePost();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'title', $schema['properties'] );
 		$this->assertArrayHasKey( 'content', $schema['properties'] );
@@ -151,7 +151,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_input_schema_supports_post_type(): void {
 		$ability = new UpdatePost();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'post_type', $schema['properties'] );
 		$this->assertEquals( 'string', $schema['properties']['post_type']['type'] );
@@ -165,7 +165,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_output_schema_structure(): void {
 		$ability = new UpdatePost();
-		$schema  = $ability->get_output_schema();
+		$schema  = $ability->getOutputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'post_id', $schema['properties'] );
@@ -189,7 +189,7 @@ class UpdatePostTest extends TestCase {
 		$this->expectExceptionMessage( 'Post not found' );
 
 		$ability = new UpdatePost();
-		$ability->do_execute(
+		$ability->doExecute(
 			array(
 				'post_id' => 999,
 				'title'   => 'Updated Title',
@@ -260,7 +260,7 @@ class UpdatePostTest extends TestCase {
 			->andReturn( 'https://example.com/wp-admin/post.php?post=42&action=edit' );
 
 		$ability = new UpdatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id' => 42,
 				'title'   => 'Updated Title',
@@ -310,7 +310,7 @@ class UpdatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new UpdatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id' => 1,
 				'title'   => 'New Title',
@@ -351,7 +351,7 @@ class UpdatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new UpdatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id' => 1,
 				'status'  => 'publish',
@@ -396,7 +396,7 @@ class UpdatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new UpdatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id' => 1,
 				'title'   => '<script>alert("xss")</script>Safe Title',
@@ -441,7 +441,7 @@ class UpdatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new UpdatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id' => 1,
 				'content' => '<script>evil()</script><p>Safe</p>',
@@ -482,7 +482,7 @@ class UpdatePostTest extends TestCase {
 		$this->expectExceptionMessage( 'Failed to update post' );
 
 		$ability = new UpdatePost();
-		$ability->do_execute(
+		$ability->doExecute(
 			array(
 				'post_id' => 1,
 				'title'   => 'Updated',
@@ -520,7 +520,7 @@ class UpdatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new UpdatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id'    => 1,
 				'categories' => array( 5, 10, 15 ),
@@ -560,7 +560,7 @@ class UpdatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new UpdatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id' => 1,
 				'tags'    => array( 'new-tag', 'updated' ),
@@ -605,7 +605,7 @@ class UpdatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new UpdatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id' => 1,
 				'excerpt' => 'New excerpt text',
@@ -631,7 +631,7 @@ class UpdatePostTest extends TestCase {
 		$ability = new UpdatePost();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_update_data' );
+		$method     = $reflection->getMethod( 'buildUpdateData' );
 
 		$input = array(
 			'post_id' => 1,
@@ -670,7 +670,7 @@ class UpdatePostTest extends TestCase {
 			->andReturn( 'https://example.com/wp-admin/post.php?post=50&action=edit' );
 
 		$ability = new UpdatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id' => 50,
 				'title'   => 'Updated',
@@ -713,7 +713,7 @@ class UpdatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new UpdatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id' => 1,
 				'status'  => 'invalid_status',
@@ -743,7 +743,7 @@ class UpdatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=10&action=edit' );
 
 		$ability = new UpdatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id'   => 10,
 				'title'     => 'Updated Page',
@@ -771,7 +771,7 @@ class UpdatePostTest extends TestCase {
 		$this->expectExceptionMessage( 'Post type mismatch' );
 
 		$ability = new UpdatePost();
-		$ability->do_execute(
+		$ability->doExecute(
 			array(
 				'post_id'   => 10,
 				'title'     => 'Updated',

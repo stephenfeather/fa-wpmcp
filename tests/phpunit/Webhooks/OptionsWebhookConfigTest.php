@@ -31,26 +31,26 @@ final class OptionsWebhookConfigTest extends TestCase {
 	}
 
 	/**
-	 * Test get_subscribed_urls returns empty when option invalid.
+	 * Test getSubscribedUrls returns empty when option invalid.
 	 *
 	 * @return void
 	 */
-	public function test_get_subscribed_urls_returns_empty_on_invalid_option(): void {
+	public function test_getSubscribedUrls_returns_empty_on_invalid_option(): void {
 		Functions\expect( 'get_option' )
 			->once()
 			->with( 'fa_wpmcp_webhook_urls', array() )
 			->andReturn( 'invalid' );
 
 		$config = new OptionsWebhookConfig();
-		$this->assertSame( array(), $config->get_subscribed_urls( 'event' ) );
+		$this->assertSame( array(), $config->getSubscribedUrls( 'event' ) );
 	}
 
 	/**
-	 * Test get_subscribed_urls returns event URLs.
+	 * Test getSubscribedUrls returns event URLs.
 	 *
 	 * @return void
 	 */
-	public function test_get_subscribed_urls_returns_event_urls(): void {
+	public function test_getSubscribedUrls_returns_event_urls(): void {
 		Functions\expect( 'get_option' )
 			->once()
 			->andReturn( array(
@@ -58,30 +58,30 @@ final class OptionsWebhookConfigTest extends TestCase {
 			) );
 
 		$config = new OptionsWebhookConfig();
-		$this->assertSame( array( 'https://a.test', 'https://b.test' ), $config->get_subscribed_urls( 'event' ) );
+		$this->assertSame( array( 'https://a.test', 'https://b.test' ), $config->getSubscribedUrls( 'event' ) );
 	}
 
 	/**
-	 * Test get_secret returns existing secret.
+	 * Test getSecret returns existing secret.
 	 *
 	 * @return void
 	 */
-	public function test_get_secret_returns_existing_secret(): void {
+	public function test_getSecret_returns_existing_secret(): void {
 		Functions\expect( 'get_option' )
 			->once()
 			->with( 'fa_wpmcp_webhook_secret' )
 			->andReturn( 'existing-secret' );
 
 		$config = new OptionsWebhookConfig();
-		$this->assertSame( 'existing-secret', $config->get_secret() );
+		$this->assertSame( 'existing-secret', $config->getSecret() );
 	}
 
 	/**
-	 * Test get_secret generates and stores new secret when missing.
+	 * Test getSecret generates and stores new secret when missing.
 	 *
 	 * @return void
 	 */
-	public function test_get_secret_generates_and_stores_when_missing(): void {
+	public function test_getSecret_generates_and_stores_when_missing(): void {
 		Functions\expect( 'get_option' )
 			->once()
 			->with( 'fa_wpmcp_webhook_secret' )
@@ -95,7 +95,7 @@ final class OptionsWebhookConfigTest extends TestCase {
 			->andReturn( true );
 
 		$config = new OptionsWebhookConfig();
-		$secret = $config->get_secret();
+		$secret = $config->getSecret();
 
 		$this->assertSame( 64, strlen( $secret ) );
 	}

@@ -57,7 +57,7 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_get_name(): void {
 		$ability = new GetPost();
-		$this->assertEquals( 'fa-wpmcp/get-post', $ability->get_name() );
+		$this->assertEquals( 'fa-wpmcp/get-post', $ability->getName() );
 	}
 
 	/**
@@ -67,7 +67,7 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_get_category(): void {
 		$ability = new GetPost();
-		$this->assertEquals( 'posts-pages', $ability->get_category() );
+		$this->assertEquals( 'posts-pages', $ability->getCategory() );
 	}
 
 	/**
@@ -77,7 +77,7 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_get_label(): void {
 		$ability = new GetPost();
-		$this->assertEquals( 'Get Post', $ability->get_label() );
+		$this->assertEquals( 'Get Post', $ability->getLabel() );
 	}
 
 	/**
@@ -87,7 +87,7 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_get_description(): void {
 		$ability = new GetPost();
-		$this->assertStringContainsString( 'post', strtolower( $ability->get_description() ) );
+		$this->assertStringContainsString( 'post', strtolower( $ability->getDescription() ) );
 	}
 
 	/**
@@ -97,7 +97,7 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_get_operation_type(): void {
 		$ability = new GetPost();
-		$this->assertEquals( 'read', $ability->get_operation_type() );
+		$this->assertEquals( 'read', $ability->getOperationType() );
 	}
 
 	/**
@@ -107,7 +107,7 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_get_required_capability(): void {
 		$ability = new GetPost();
-		$this->assertEquals( 'read', $ability->get_required_capability() );
+		$this->assertEquals( 'read', $ability->getRequiredCapability() );
 	}
 
 	/**
@@ -117,7 +117,7 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_input_schema_requires_post_id(): void {
 		$ability = new GetPost();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'post_id', $schema['properties'] );
@@ -132,7 +132,7 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_input_schema_supports_post_type(): void {
 		$ability = new GetPost();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'post_type', $schema['properties'] );
 		$this->assertEquals( 'string', $schema['properties']['post_type']['type'] );
@@ -146,7 +146,7 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_output_schema_structure(): void {
 		$ability = new GetPost();
-		$schema  = $ability->get_output_schema();
+		$schema  = $ability->getOutputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'post', $schema['properties'] );
@@ -228,7 +228,7 @@ class GetPostTest extends TestCase {
 			->andReturn( 'John Doe' );
 
 		$ability = new GetPost();
-		$result  = $ability->do_execute( array( 'post_id' => 42 ) );
+		$result  = $ability->doExecute( array( 'post_id' => 42 ) );
 
 		$this->assertArrayHasKey( 'post', $result );
 		$this->assertEquals( 42, $result['post']['id'] );
@@ -253,7 +253,7 @@ class GetPostTest extends TestCase {
 		$this->expectExceptionMessage( 'Post not found' );
 
 		$ability = new GetPost();
-		$ability->do_execute( array( 'post_id' => 9999 ) );
+		$ability->doExecute( array( 'post_id' => 9999 ) );
 	}
 
 	/**
@@ -302,7 +302,7 @@ class GetPostTest extends TestCase {
 		Functions\expect( 'wp_get_post_tags' )->andReturn( array() );
 
 		$ability = new GetPost();
-		$result  = $ability->do_execute( array( 'post_id' => 1 ) );
+		$result  = $ability->doExecute( array( 'post_id' => 1 ) );
 
 		$this->assertArrayHasKey( 'categories', $result['post'] );
 		$this->assertCount( 2, $result['post']['categories'] );
@@ -355,7 +355,7 @@ class GetPostTest extends TestCase {
 			);
 
 		$ability = new GetPost();
-		$result  = $ability->do_execute( array( 'post_id' => 1 ) );
+		$result  = $ability->doExecute( array( 'post_id' => 1 ) );
 
 		$this->assertArrayHasKey( 'tags', $result['post'] );
 		$this->assertCount( 2, $result['post']['tags'] );
@@ -396,7 +396,7 @@ class GetPostTest extends TestCase {
 			->andReturn( 'https://example.com/uploads/featured-image.jpg' );
 
 		$ability = new GetPost();
-		$result  = $ability->do_execute( array( 'post_id' => 1 ) );
+		$result  = $ability->doExecute( array( 'post_id' => 1 ) );
 
 		$this->assertEquals( 'https://example.com/uploads/featured-image.jpg', $result['post']['featured_image'] );
 	}
@@ -434,7 +434,7 @@ class GetPostTest extends TestCase {
 			->andReturn( 'Jane Smith' );
 
 		$ability = new GetPost();
-		$result  = $ability->do_execute( array( 'post_id' => 1 ) );
+		$result  = $ability->doExecute( array( 'post_id' => 1 ) );
 
 		$this->assertEquals( 5, $result['post']['author']['id'] );
 		$this->assertEquals( 'Jane Smith', $result['post']['author']['name'] );
@@ -469,7 +469,7 @@ class GetPostTest extends TestCase {
 		Functions\expect( 'get_the_author_meta' )->andReturn( 'Author' );
 
 		$ability = new GetPost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'post_id'   => 10,
 				'post_type' => 'page',
@@ -497,7 +497,7 @@ class GetPostTest extends TestCase {
 		$this->expectExceptionMessage( 'Post type mismatch' );
 
 		$ability = new GetPost();
-		$ability->do_execute(
+		$ability->doExecute(
 			array(
 				'post_id'   => 10,
 				'post_type' => 'post',

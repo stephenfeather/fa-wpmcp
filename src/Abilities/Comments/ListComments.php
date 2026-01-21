@@ -27,7 +27,7 @@ final class ListComments extends AbstractAbility {
      *
      * @return string Ability name.
      */
-    public function get_name(): string {
+    public function getName(): string {
         return 'fa-wpmcp/list-comments';
     }
 
@@ -36,7 +36,7 @@ final class ListComments extends AbstractAbility {
      *
      * @return string Category name.
      */
-    public function get_category(): string {
+    public function getCategory(): string {
         return 'comments';
     }
 
@@ -45,7 +45,7 @@ final class ListComments extends AbstractAbility {
      *
      * @return string Ability label.
      */
-    public function get_label(): string {
+    public function getLabel(): string {
         return 'List Comments';
     }
 
@@ -54,7 +54,7 @@ final class ListComments extends AbstractAbility {
      *
      * @return string Description.
      */
-    public function get_description(): string {
+    public function getDescription(): string {
         return 'Retrieve a paginated list of WordPress comments with optional filtering by post ID and status.';
     }
 
@@ -63,7 +63,7 @@ final class ListComments extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_input_schema(): array {
+    public function getInputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -99,7 +99,7 @@ final class ListComments extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_output_schema(): array {
+    public function getOutputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -140,7 +140,7 @@ final class ListComments extends AbstractAbility {
      *
      * @return string WordPress capability name.
      */
-    public function get_required_capability(): string {
+    public function getRequiredCapability(): string {
         return 'read';
     }
 
@@ -150,7 +150,7 @@ final class ListComments extends AbstractAbility {
      * @param array<string, mixed> $input Validated input data.
      * @return array<string, mixed> Comment list data.
      */
-    public function do_execute( array $input ): array {
+    public function doExecute( array $input ): array {
         $page     = $input['page'] ?? 1;
         $per_page = $input['per_page'] ?? 10;
         $post_id  = $input['post_id'] ?? null;
@@ -185,7 +185,7 @@ final class ListComments extends AbstractAbility {
         };
 
         return array(
-            'comments' => array_map( array( $this, 'format_comment' ), $comments ),
+            'comments' => array_map( array( $this, 'formatComment' ), $comments ),
             'total'    => $total,
             'page'     => $page,
             'per_page' => $per_page,
@@ -198,7 +198,7 @@ final class ListComments extends AbstractAbility {
      * @param \WP_Comment|object $comment The comment object.
      * @return array<string, mixed> Formatted comment data.
      */
-    private function format_comment( object $comment ): array {
+    private function formatComment( object $comment ): array {
         return array(
             'id'      => (int) $comment->comment_ID,
             'post_id' => (int) $comment->comment_post_ID,

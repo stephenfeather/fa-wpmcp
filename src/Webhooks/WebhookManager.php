@@ -66,7 +66,7 @@ final class WebhookManager implements WebhookManagerInterface {
         );
 
         // Get subscribed URLs (side effect: config read).
-        $urls = $this->config->get_subscribed_urls( $event );
+        $urls = $this->config->getSubscribedUrls( $event );
 
         // Queue webhooks (side effect: database writes).
         foreach ( $urls as $url ) {
@@ -79,12 +79,12 @@ final class WebhookManager implements WebhookManagerInterface {
      *
      * Retrieves up to 10 pending webhooks and attempts delivery.
      */
-    public function process_queue(): void {
+    public function processQueue(): void {
         // Get pending webhooks (side effect: database read).
-        $pending = $this->queue->get_pending( 10 );
+        $pending = $this->queue->getPending( 10 );
 
         foreach ( $pending as $webhook ) {
-            $this->process_webhook( $webhook );
+            $this->processWebhook( $webhook );
         }
     }
 
@@ -93,11 +93,11 @@ final class WebhookManager implements WebhookManagerInterface {
      *
      * @param array{id: int, url: string, payload: string, attempt_count: int} $webhook Webhook data.
      */
-    private function process_webhook( array $webhook ): void {
+    private function processWebhook( array $webhook ): void {
         // Generate signature (pure function).
         $signature = SignatureGenerator::generate(
             $webhook['payload'],
-            $this->config->get_secret()
+            $this->config->getSecret()
         );
 
         // Send HTTP request (side effect).
@@ -109,9 +109,9 @@ final class WebhookManager implements WebhookManagerInterface {
 
         // Update queue status (side effect).
         if ( $result->is_success ) {
-            $this->queue->mark_complete( $webhook['id'] );
+            $this->queue->markComplete( $webhook['id'] );
         } else {
-            $this->handle_failure( $webhook );
+            $this->handleFailure( $webhook );
         }
     }
 
@@ -122,16 +122,16 @@ final class WebhookManager implements WebhookManagerInterface {
      *
      * @param array{id: int, url: string, payload: string, attempt_count: int} $webhook Webhook data.
      */
-    private function handle_failure( array $webhook ): void {
+    private function handleFailure( array $webhook ): void {
         $attempts = $webhook['attempt_count'] + 1;
 
         // Max 3 attempts (0, 1, 2).
         if ( $attempts >= 3 ) {
-            $this->queue->mark_failed( $webhook['id'], 'Max retries exceeded' );
+            $this->queue->markFailed( $webhook['id'], 'Max retries exceeded' );
         } else {
             // Calculate next attempt (pure function).
-            $next_attempt = RetryCalculator::calculate_next_attempt( $attempts );
-            $this->queue->schedule_retry( $webhook['id'], $next_attempt );
+            $next_attempt = RetryCalculator::calculateNextAttempt( $attempts );
+            $this->queue->scheduleRetry( $webhook['id'], $next_attempt );
         }
     }
 }

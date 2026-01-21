@@ -37,7 +37,7 @@ final class Plugin {
      * Private constructor to prevent direct instantiation.
      */
     private function __construct() {
-        // Singleton - use get_instance().
+        // Singleton - use getInstance().
     }
 
     /**
@@ -45,7 +45,7 @@ final class Plugin {
      *
      * @return self
      */
-    public static function get_instance(): self {
+    public static function getInstance(): self {
         if ( null === self::$instance ) {
             self::$instance = new self();
         }
@@ -61,24 +61,24 @@ final class Plugin {
      * @return void
      */
     public function init(): void {
-        $this->register_hooks();
+        $this->registerHooks();
 
         // Initialize webhook system.
         $webhook_service = new \FAWpmcp\Webhooks\WebhookService();
         $webhook_service->init();
-        $this->register_service( 'webhook', $webhook_service );
+        $this->registerService( 'webhook', $webhook_service );
 
         // Initialize Ability Framework.
         // 1. Create AbilityRegistry and register abilities.
         $ability_registry = new \FAWpmcp\Abilities\AbilityRegistry();
-        $this->register_post_abilities( $ability_registry );
-        $this->register_comment_abilities( $ability_registry );
-        $this->register_service( 'ability_registry', $ability_registry );
+        $this->registerPostAbilities( $ability_registry );
+        $this->registerCommentAbilities( $ability_registry );
+        $this->registerService( 'ability_registry', $ability_registry );
 
         // Initialize Admin Settings Page.
         $settings_page = new \FAWpmcp\Admin\SettingsPage( $ability_registry );
         $settings_page->init();
-        $this->register_service( 'settings_page', $settings_page );
+        $this->registerService( 'settings_page', $settings_page );
 
         // 2. Create dependencies for AbilityExecutor.
         // Permission settings from WordPress options.
@@ -88,7 +88,7 @@ final class Plugin {
         $rate_limit_store  = new \FAWpmcp\RateLimiting\TransientRateLimitStore();
         $rate_limit_config = new \FAWpmcp\RateLimiting\OptionsRateLimitConfig();
         $rate_limiter      = new \FAWpmcp\RateLimiting\RateLimiter( $rate_limit_store, $rate_limit_config );
-        $this->register_service( 'rate_limiter', $rate_limiter );
+        $this->registerService( 'rate_limiter', $rate_limiter );
 
         // Activity logger with database repository.
         global $wpdb;
@@ -97,10 +97,10 @@ final class Plugin {
             $log_repository,
             fn() => wp_generate_uuid4()
         );
-        $this->register_service( 'activity_logger', $activity_logger );
+        $this->registerService( 'activity_logger', $activity_logger );
 
         // Webhook manager from webhook service.
-        $webhook_manager = $webhook_service->get_manager();
+        $webhook_manager = $webhook_service->getManager();
 
         // 3. Create AbilityExecutor with all dependencies.
         $ability_executor = new \FAWpmcp\Abilities\AbilityExecutor(
@@ -109,7 +109,7 @@ final class Plugin {
             $activity_logger,
             $webhook_manager
         );
-        $this->register_service( 'ability_executor', $ability_executor );
+        $this->registerService( 'ability_executor', $ability_executor );
     }
 
     /**
@@ -117,8 +117,8 @@ final class Plugin {
      *
      * @return void
      */
-    private function register_hooks(): void {
-        add_action( 'admin_init', array( $this, 'check_abilities_api_and_show_notice' ) );
+    private function registerHooks(): void {
+        add_action( 'admin_init', array( $this, 'checkAbilitiesApiAndShowNotice' ) );
     }
 
     /**
@@ -127,7 +127,7 @@ final class Plugin {
      * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
      * @return void
      */
-    private function register_post_abilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+    private function registerPostAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
         $registry->register( new \FAWpmcp\Abilities\Posts\GetPost() );
         $registry->register( new \FAWpmcp\Abilities\Posts\ListPosts() );
         $registry->register( new \FAWpmcp\Abilities\Posts\CreatePost() );
@@ -140,7 +140,7 @@ final class Plugin {
      * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
      * @return void
      */
-    private function register_comment_abilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+    private function registerCommentAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
         $registry->register( new \FAWpmcp\Abilities\Comments\GetComment() );
         $registry->register( new \FAWpmcp\Abilities\Comments\ListComments() );
         $registry->register( new \FAWpmcp\Abilities\Comments\CreateComment() );
@@ -154,7 +154,7 @@ final class Plugin {
      * @param object $service Service instance.
      * @return void
      */
-    public function register_service( string $name, object $service ): void {
+    public function registerService( string $name, object $service ): void {
         $this->services[ $name ] = $service;
     }
 
@@ -164,7 +164,7 @@ final class Plugin {
      * @param string $name Service name.
      * @return object|null Service instance or null if not found.
      */
-    public function get_service( string $name ): ?object {
+    public function getService( string $name ): ?object {
         return $this->services[ $name ] ?? null;
     }
 
@@ -173,7 +173,7 @@ final class Plugin {
      *
      * @return bool True if Abilities API is available.
      */
-    public function has_abilities_api(): bool {
+    public function hasAbilitiesApi(): bool {
         return function_exists( 'wp_register_ability' );
     }
 
@@ -182,8 +182,8 @@ final class Plugin {
      *
      * @return void
      */
-    public function check_abilities_api_and_show_notice(): void {
-        if ( ! $this->has_abilities_api() ) {
+    public function checkAbilitiesApiAndShowNotice(): void {
+        if ( ! $this->hasAbilitiesApi() ) {
             add_action(
                 'admin_notices',
                 function () {
@@ -214,7 +214,7 @@ final class Plugin {
      */
     public function deactivate(): void {
         // Clean up webhook system.
-        $webhook_service = $this->get_service( 'webhook' );
+        $webhook_service = $this->getService( 'webhook' );
         if ( $webhook_service instanceof \FAWpmcp\Webhooks\WebhookService ) {
             $webhook_service->deactivate();
         }

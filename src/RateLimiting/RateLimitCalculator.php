@@ -47,7 +47,7 @@ final class RateLimitCalculator {
 
         if ( $minute_exceeded || $hour_exceeded ) {
             $limit_type  = $minute_exceeded ? 'minute' : 'hour';
-            $retry_after = self::calculate_retry_after( $limit_type, time() );
+            $retry_after = self::calculateRetryAfter( $limit_type, time() );
             return RateLimitResult::denied( $retry_after, $limit_type );
         }
 
@@ -63,7 +63,7 @@ final class RateLimitCalculator {
      * @param int    $current_time Current Unix timestamp.
      * @return int Seconds until window resets.
      */
-    public static function calculate_retry_after( string $limit_type, int $current_time ): int {
+    public static function calculateRetryAfter( string $limit_type, int $current_time ): int {
         $remainder = match ( $limit_type ) {
             'minute' => $current_time % 60,
             'hour' => $current_time % 3600,
@@ -96,7 +96,7 @@ final class RateLimitCalculator {
      * @param string $window  Time window ('minute' or 'hour').
      * @return string Transient key.
      */
-    public static function build_key( int $user_id, string $ip, string $ability, string $window ): string {
+    public static function buildKey( int $user_id, string $ip, string $ability, string $window ): string {
         $ip_hash      = substr( md5( $ip ), 0, 8 );
         $ability_slug = str_replace( '/', '-', $ability );
         return "fa_wpmcp_ratelimit_{$user_id}_{$ip_hash}_{$ability_slug}_{$window}";
@@ -111,7 +111,7 @@ final class RateLimitCalculator {
      * @param array<string, array> $config  Configuration array keyed by ability name.
      * @return RateLimit Rate limit configuration for the ability.
      */
-    public static function get_limits_for_ability( string $ability, array $config ): RateLimit {
+    public static function getLimitsForAbility( string $ability, array $config ): RateLimit {
         $defaults       = array(
             'requests_per_minute' => 60,
             'requests_per_hour'   => 500,

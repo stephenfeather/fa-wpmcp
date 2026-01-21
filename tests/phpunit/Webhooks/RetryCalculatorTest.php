@@ -22,12 +22,12 @@ final class RetryCalculatorTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function test_calculate_next_attempt_uses_exponential_backoff(): void {
+	public function test_calculateNextAttempt_uses_exponential_backoff(): void {
 		$base = new DateTimeImmutable( '2026-01-21 00:00:00' );
 
-		$first  = RetryCalculator::calculate_next_attempt( 0, $base );
-		$second = RetryCalculator::calculate_next_attempt( 1, $base );
-		$third  = RetryCalculator::calculate_next_attempt( 2, $base );
+		$first  = RetryCalculator::calculateNextAttempt( 0, $base );
+		$second = RetryCalculator::calculateNextAttempt( 1, $base );
+		$third  = RetryCalculator::calculateNextAttempt( 2, $base );
 
 		$this->assertSame( '2026-01-21 00:01:00', $first->format( 'Y-m-d H:i:s' ) );
 		$this->assertSame( '2026-01-21 00:02:00', $second->format( 'Y-m-d H:i:s' ) );
@@ -35,15 +35,15 @@ final class RetryCalculatorTest extends TestCase {
 	}
 
 	/**
-	 * Test calculate_next_attempt is deterministic.
+	 * Test calculateNextAttempt is deterministic.
 	 *
 	 * @return void
 	 */
-	public function test_calculate_next_attempt_is_deterministic(): void {
+	public function test_calculateNextAttempt_is_deterministic(): void {
 		$base = new DateTimeImmutable( '2026-01-21 00:00:00' );
 
-		$one = RetryCalculator::calculate_next_attempt( 1, $base );
-		$two = RetryCalculator::calculate_next_attempt( 1, $base );
+		$one = RetryCalculator::calculateNextAttempt( 1, $base );
+		$two = RetryCalculator::calculateNextAttempt( 1, $base );
 
 		$this->assertEquals( $one, $two );
 	}

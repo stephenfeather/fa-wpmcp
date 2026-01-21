@@ -33,14 +33,14 @@ interface WebhookQueue {
      *
      * @return array<int, array{id: int, url: string, payload: string, attempt_count: int}>
      */
-    public function get_pending( int $limit ): array;
+    public function getPending( int $limit ): array;
 
     /**
      * Mark webhook as successfully delivered.
      *
      * @param int $id Webhook ID.
      */
-    public function mark_complete( int $id ): void;
+    public function markComplete( int $id ): void;
 
     /**
      * Mark webhook as failed after max retries.
@@ -48,7 +48,7 @@ interface WebhookQueue {
      * @param int    $id            Webhook ID.
      * @param string $error_message Error message.
      */
-    public function mark_failed( int $id, string $error_message ): void;
+    public function markFailed( int $id, string $error_message ): void;
 
     /**
      * Schedule webhook for retry.
@@ -56,5 +56,5 @@ interface WebhookQueue {
      * @param int               $id           Webhook ID.
      * @param DateTimeImmutable $next_attempt Next attempt time.
      */
-    public function schedule_retry( int $id, DateTimeImmutable $next_attempt ): void;
+    public function scheduleRetry( int $id, DateTimeImmutable $next_attempt ): void;
 }

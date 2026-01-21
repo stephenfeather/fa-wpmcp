@@ -72,7 +72,7 @@ class ResultTest extends TestCase {
 	public function test_flat_map_chains_success(): void {
 		$result = Result::success( 5 );
 
-		$flat_mapped = $result->flat_map( fn( $x ) => Result::success( $x * 2 ) );
+		$flat_mapped = $result->flatMap( fn( $x ) => Result::success( $x * 2 ) );
 
 		$this->assertTrue( $flat_mapped->is_success );
 		$this->assertSame( 10, $flat_mapped->value );
@@ -84,7 +84,7 @@ class ResultTest extends TestCase {
 	public function test_flat_map_preserves_failure(): void {
 		$result = Result::failure( 'ERROR', 'Failed' );
 
-		$flat_mapped = $result->flat_map( fn( $x ) => Result::success( $x * 2 ) );
+		$flat_mapped = $result->flatMap( fn( $x ) => Result::success( $x * 2 ) );
 
 		$this->assertFalse( $flat_mapped->is_success );
 		$this->assertSame( 'ERROR', $flat_mapped->error_code );
@@ -96,7 +96,7 @@ class ResultTest extends TestCase {
 	public function test_flat_map_chains_failure(): void {
 		$result = Result::success( 5 );
 
-		$flat_mapped = $result->flat_map( fn( $x ) => Result::failure( 'CHAINED_ERROR', 'Failed in chain' ) );
+		$flat_mapped = $result->flatMap( fn( $x ) => Result::failure( 'CHAINED_ERROR', 'Failed in chain' ) );
 
 		$this->assertFalse( $flat_mapped->is_success );
 		$this->assertSame( 'CHAINED_ERROR', $flat_mapped->error_code );
@@ -124,7 +124,7 @@ class ResultTest extends TestCase {
 			)
 		);
 
-		$response = $result->to_response( 'corr-123', 150 );
+		$response = $result->toResponse( 'corr-123', 150 );
 
 		$this->assertTrue( $response['success'] );
 		$this->assertArrayHasKey( 'data', $response );
@@ -138,7 +138,7 @@ class ResultTest extends TestCase {
 	public function test_failure_result_to_response_format(): void {
 		$result = Result::failure( ErrorCodes::NOT_FOUND, 'Post not found' );
 
-		$response = $result->to_response( 'corr-456', 50 );
+		$response = $result->toResponse( 'corr-456', 50 );
 
 		$this->assertFalse( $response['success'] );
 		$this->assertArrayHasKey( 'error', $response );
@@ -152,7 +152,7 @@ class ResultTest extends TestCase {
 	public function test_response_includes_correlation_id(): void {
 		$result = Result::success( array( 'status' => 'ok' ) );
 
-		$response = $result->to_response( 'unique-corr-id-789', 100 );
+		$response = $result->toResponse( 'unique-corr-id-789', 100 );
 
 		$this->assertArrayHasKey( 'meta', $response );
 		$this->assertSame( 'unique-corr-id-789', $response['meta']['correlation_id'] );
@@ -164,7 +164,7 @@ class ResultTest extends TestCase {
 	public function test_response_includes_execution_time(): void {
 		$result = Result::success( array( 'data' => 'test' ) );
 
-		$response = $result->to_response( 'corr-time-test', 250 );
+		$response = $result->toResponse( 'corr-time-test', 250 );
 
 		$this->assertArrayHasKey( 'meta', $response );
 		$this->assertSame( 250, $response['meta']['execution_time_ms'] );

@@ -23,46 +23,46 @@ final class AbstractAbilityTest extends TestCase {
 	 */
 	public function test_default_operation_type_and_annotations(): void {
 		$ability = new class() extends AbstractAbility {
-			public function get_name(): string {
+			public function getName(): string {
 				return 'fa-wpmcp/test-ability';
 			}
 
-			public function get_category(): string {
+			public function getCategory(): string {
 				return 'test';
 			}
 
-			public function get_label(): string {
+			public function getLabel(): string {
 				return 'Test Ability';
 			}
 
-			public function get_description(): string {
+			public function getDescription(): string {
 				return 'Test ability description.';
 			}
 
-			public function get_input_schema(): array {
+			public function getInputSchema(): array {
 				return array( 'type' => 'object' );
 			}
 
-			public function get_output_schema(): array {
+			public function getOutputSchema(): array {
 				return array( 'type' => 'object' );
 			}
 
-			public function get_required_capability(): string {
+			public function getRequiredCapability(): string {
 				return 'read';
 			}
 
-			public function do_execute( array $input ): array {
+			public function doExecute( array $input ): array {
 				return array();
 			}
 		};
 
-		$this->assertSame( 'read', $ability->get_operation_type() );
+		$this->assertSame( 'read', $ability->getOperationType() );
 
-		$annotations = $ability->get_annotations();
+		$annotations = $ability->getAnnotations();
 		$this->assertTrue( $annotations['readonly'] );
 		$this->assertFalse( $annotations['destructive'] );
 		$this->assertTrue( $annotations['idempotent'] );
-		$this->assertSame( $ability->get_description(), $annotations['instructions'] );
+		$this->assertSame( $ability->getDescription(), $annotations['instructions'] );
 	}
 
 	/**
@@ -72,40 +72,40 @@ final class AbstractAbilityTest extends TestCase {
 	 */
 	public function test_to_registration_array_builds_payload(): void {
 		$ability = new class() extends AbstractAbility {
-			public function get_name(): string {
+			public function getName(): string {
 				return 'fa-wpmcp/test-registration';
 			}
 
-			public function get_category(): string {
+			public function getCategory(): string {
 				return 'test';
 			}
 
-			public function get_label(): string {
+			public function getLabel(): string {
 				return 'Test Registration';
 			}
 
-			public function get_description(): string {
+			public function getDescription(): string {
 				return 'Registration description.';
 			}
 
-			public function get_input_schema(): array {
+			public function getInputSchema(): array {
 				return array( 'type' => 'object', 'properties' => array() );
 			}
 
-			public function get_output_schema(): array {
+			public function getOutputSchema(): array {
 				return array( 'type' => 'object', 'properties' => array() );
 			}
 
-			public function get_required_capability(): string {
+			public function getRequiredCapability(): string {
 				return 'read';
 			}
 
-			public function do_execute( array $input ): array {
+			public function doExecute( array $input ): array {
 				return array();
 			}
 		};
 
-		$payload = $ability->to_registration_array();
+		$payload = $ability->toRegistrationArray();
 
 		$this->assertSame( 'fa-wpmcp/test-registration', $payload['name'] );
 		$this->assertSame( 'test', $payload['category'] );

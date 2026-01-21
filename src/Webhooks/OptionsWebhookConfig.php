@@ -22,7 +22,7 @@ final class OptionsWebhookConfig implements WebhookConfig {
      *
      * @return array<int, string> Array of webhook URLs.
      */
-    public function get_subscribed_urls( string $event ): array {
+    public function getSubscribedUrls( string $event ): array {
         $all_urls = get_option( 'fa_wpmcp_webhook_urls', array() );
 
         // Validate we have proper structure: array -> event key exists -> event value is array.
@@ -40,7 +40,7 @@ final class OptionsWebhookConfig implements WebhookConfig {
      *
      * @return string Secret key.
      */
-    public function get_secret(): string {
+    public function getSecret(): string {
         $secret = get_option( 'fa_wpmcp_webhook_secret' );
 
         if ( $secret && is_string( $secret ) ) {

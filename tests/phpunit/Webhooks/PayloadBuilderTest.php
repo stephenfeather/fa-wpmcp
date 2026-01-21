@@ -97,7 +97,7 @@ class PayloadBuilderTest extends TestCase {
 		);
 
 		// Pure function: same inputs -> same outputs
-		$this->assertEquals( $payload1->to_json(), $payload2->to_json() );
+		$this->assertEquals( $payload1->toJson(), $payload2->toJson() );
 	}
 
 	public function test_handles_null_timestamp(): void {

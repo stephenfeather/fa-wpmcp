@@ -27,7 +27,7 @@ final class RetryCalculator {
      *
      * @return DateTimeImmutable Next attempt time.
      */
-    public static function calculate_next_attempt(
+    public static function calculateNextAttempt(
         int $attempt_count,
         ?DateTimeImmutable $now = null
     ): DateTimeImmutable {

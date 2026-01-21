@@ -55,7 +55,7 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_get_name(): void {
 		$ability = new ListPosts();
-		$this->assertEquals( 'fa-wpmcp/list-posts', $ability->get_name() );
+		$this->assertEquals( 'fa-wpmcp/list-posts', $ability->getName() );
 	}
 
 	/**
@@ -65,7 +65,7 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_get_category(): void {
 		$ability = new ListPosts();
-		$this->assertEquals( 'posts-pages', $ability->get_category() );
+		$this->assertEquals( 'posts-pages', $ability->getCategory() );
 	}
 
 	/**
@@ -75,7 +75,7 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_get_label(): void {
 		$ability = new ListPosts();
-		$this->assertEquals( 'List Posts', $ability->get_label() );
+		$this->assertEquals( 'List Posts', $ability->getLabel() );
 	}
 
 	/**
@@ -85,7 +85,7 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_get_description(): void {
 		$ability = new ListPosts();
-		$this->assertStringContainsString( 'posts', strtolower( $ability->get_description() ) );
+		$this->assertStringContainsString( 'posts', strtolower( $ability->getDescription() ) );
 	}
 
 	/**
@@ -95,7 +95,7 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_get_operation_type(): void {
 		$ability = new ListPosts();
-		$this->assertEquals( 'read', $ability->get_operation_type() );
+		$this->assertEquals( 'read', $ability->getOperationType() );
 	}
 
 	/**
@@ -105,7 +105,7 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_get_required_capability(): void {
 		$ability = new ListPosts();
-		$this->assertEquals( 'read', $ability->get_required_capability() );
+		$this->assertEquals( 'read', $ability->getRequiredCapability() );
 	}
 
 	/**
@@ -115,7 +115,7 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_input_schema_supports_pagination(): void {
 		$ability = new ListPosts();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'page', $schema['properties'] );
@@ -131,7 +131,7 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_input_schema_supports_filtering(): void {
 		$ability = new ListPosts();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'status', $schema['properties'] );
 		$this->assertArrayHasKey( 'author', $schema['properties'] );
@@ -146,7 +146,7 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_input_schema_supports_post_type(): void {
 		$ability = new ListPosts();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'post_type', $schema['properties'] );
 		$this->assertEquals( 'string', $schema['properties']['post_type']['type'] );
@@ -160,7 +160,7 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_output_schema_structure(): void {
 		$ability = new ListPosts();
-		$schema  = $ability->get_output_schema();
+		$schema  = $ability->getOutputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'posts', $schema['properties'] );
@@ -237,7 +237,7 @@ class ListPostsTest extends TestCase {
 
 		// We'll verify through the build_query_args pure function.
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_query_args' );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
 		$args = $method->invoke( $ability, $input );
 
@@ -253,7 +253,7 @@ class ListPostsTest extends TestCase {
 		$ability = new ListPosts();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_query_args' );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
 		$args = $method->invoke( $ability, array( 'status' => 'draft' ) );
 
@@ -269,7 +269,7 @@ class ListPostsTest extends TestCase {
 		$ability = new ListPosts();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_query_args' );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
 		$args = $method->invoke( $ability, array( 'author' => 5 ) );
 
@@ -285,7 +285,7 @@ class ListPostsTest extends TestCase {
 		$ability = new ListPosts();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_query_args' );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
 		$args = $method->invoke( $ability, array( 'category' => 3 ) );
 
@@ -301,7 +301,7 @@ class ListPostsTest extends TestCase {
 		$ability = new ListPosts();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_query_args' );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
 		$args = $method->invoke( $ability, array( 'search' => 'test query' ) );
 
@@ -363,7 +363,7 @@ class ListPostsTest extends TestCase {
 		$ability = new ListPosts();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'format_post_item' );
+		$method     = $reflection->getMethod( 'formatPostItem' );
 
 		// Call twice with same input.
 		$result1 = $method->invoke( $ability, $mock_post );
@@ -382,7 +382,7 @@ class ListPostsTest extends TestCase {
 		$ability = new ListPosts();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_query_args' );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
 		$input = array(
 			'page'     => 2,
@@ -407,7 +407,7 @@ class ListPostsTest extends TestCase {
 		$ability = new ListPosts();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_query_args' );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
 		$input = array(
 			'status'   => 'draft',
@@ -437,7 +437,7 @@ class ListPostsTest extends TestCase {
 		$ability = new ListPosts();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_query_args' );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
 		$input = array(
 			'orderby' => 'title',
@@ -459,7 +459,7 @@ class ListPostsTest extends TestCase {
 		$ability = new ListPosts();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_query_args' );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
 		$args = $method->invoke( $ability, array() );
 
@@ -475,7 +475,7 @@ class ListPostsTest extends TestCase {
 		$ability = new ListPosts();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_query_args' );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
 		$args = $method->invoke( $ability, array( 'post_type' => 'page' ) );
 
@@ -491,7 +491,7 @@ class ListPostsTest extends TestCase {
 		$ability = new ListPosts();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_query_args' );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
 		$args = $method->invoke( $ability, array( 'post_type' => 'custom_type' ) );
 
@@ -509,7 +509,7 @@ class ListPostsTest extends TestCase {
 	private function execute_with_mock_query( ListPosts $ability, array $input, object $mock_query ): array {
 		// Use reflection to call format_results directly with mock query.
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'format_results' );
+		$method     = $reflection->getMethod( 'formatResults' );
 
 		return $method->invoke( $ability, $mock_query, $input );
 	}

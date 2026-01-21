@@ -38,8 +38,8 @@ class PluginTest extends TestCase {
 	 * Test that get_instance returns a singleton.
 	 */
 	public function test_get_instance_returns_singleton(): void {
-		$instance1 = Plugin::get_instance();
-		$instance2 = Plugin::get_instance();
+		$instance1 = Plugin::getInstance();
+		$instance2 = Plugin::getInstance();
 
 		$this->assertSame( $instance1, $instance2 );
 	}
@@ -64,7 +64,7 @@ class PluginTest extends TestCase {
 		$GLOBALS['wpdb'] = \Mockery::mock( '\wpdb' );
 		$GLOBALS['wpdb']->prefix = 'wp_';
 
-		$plugin = Plugin::get_instance();
+		$plugin = Plugin::getInstance();
 		$plugin->init();
 
 		$this->assertTrue( true ); // Assert that we got here without errors.
@@ -74,12 +74,12 @@ class PluginTest extends TestCase {
 	 * Test service registration.
 	 */
 	public function test_register_service_stores_service(): void {
-		$plugin  = Plugin::get_instance();
+		$plugin  = Plugin::getInstance();
 		$service = new \stdClass();
 		$service->name = 'test';
 
-		$plugin->register_service( 'test_service', $service );
-		$retrieved = $plugin->get_service( 'test_service' );
+		$plugin->registerService( 'test_service', $service );
+		$retrieved = $plugin->getService( 'test_service' );
 
 		$this->assertSame( $service, $retrieved );
 	}
@@ -88,9 +88,9 @@ class PluginTest extends TestCase {
 	 * Test get_service returns null for non-existent service.
 	 */
 	public function test_get_service_returns_null_for_missing_service(): void {
-		$plugin = Plugin::get_instance();
+		$plugin = Plugin::getInstance();
 
-		$result = $plugin->get_service( 'non_existent' );
+		$result = $plugin->getService( 'non_existent' );
 
 		$this->assertNull( $result );
 	}
@@ -102,21 +102,21 @@ class PluginTest extends TestCase {
 	 * so we just verify the method exists and returns a boolean.
 	 */
 	public function test_has_abilities_api_returns_bool(): void {
-		$plugin = Plugin::get_instance();
-		$result = $plugin->has_abilities_api();
+		$plugin = Plugin::getInstance();
+		$result = $plugin->hasAbilitiesApi();
 
 		$this->assertIsBool( $result );
 	}
 
 	/**
-	 * Test check_abilities_api_and_show_notice method exists.
+	 * Test checkAbilitiesApiAndShowNotice method exists.
 	 *
 	 * We verify the method is callable and doesn't throw errors.
 	 */
 	public function test_check_abilities_api_method_exists(): void {
-		$plugin = Plugin::get_instance();
+		$plugin = Plugin::getInstance();
 
-		$this->assertTrue( method_exists( $plugin, 'check_abilities_api_and_show_notice' ) );
+		$this->assertTrue( method_exists( $plugin, 'checkAbilitiesApiAndShowNotice' ) );
 	}
 
 	/**
@@ -139,11 +139,11 @@ class PluginTest extends TestCase {
 		$GLOBALS['wpdb'] = \Mockery::mock( '\wpdb' );
 		$GLOBALS['wpdb']->prefix = 'wp_';
 
-		$plugin = Plugin::get_instance();
+		$plugin = Plugin::getInstance();
 		$plugin->init();
 
 		// Get the ability registry service.
-		$registry = $plugin->get_service( 'ability_registry' );
+		$registry = $plugin->getService( 'ability_registry' );
 
 		$this->assertInstanceOf( \FAWpmcp\Abilities\AbilityRegistry::class, $registry );
 
@@ -154,7 +154,7 @@ class PluginTest extends TestCase {
 		$this->assertTrue( $registry->has( 'fa-wpmcp/update-post' ), 'UpdatePost ability should be registered' );
 
 		// Verify they are in the correct category.
-		$post_abilities = $registry->by_category( 'posts-pages' );
+		$post_abilities = $registry->byCategory( 'posts-pages' );
 		$this->assertCount( 4, $post_abilities, 'Should have 4 abilities in posts-pages category' );
 	}
 }

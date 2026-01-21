@@ -31,7 +31,7 @@ final class CreateComment extends AbstractAbility {
      *
      * @return string Ability name.
      */
-    public function get_name(): string {
+    public function getName(): string {
         return 'fa-wpmcp/create-comment';
     }
 
@@ -40,7 +40,7 @@ final class CreateComment extends AbstractAbility {
      *
      * @return string Category name.
      */
-    public function get_category(): string {
+    public function getCategory(): string {
         return 'comments';
     }
 
@@ -49,7 +49,7 @@ final class CreateComment extends AbstractAbility {
      *
      * @return string Ability label.
      */
-    public function get_label(): string {
+    public function getLabel(): string {
         return 'Create Comment';
     }
 
@@ -58,7 +58,7 @@ final class CreateComment extends AbstractAbility {
      *
      * @return string Description.
      */
-    public function get_description(): string {
+    public function getDescription(): string {
         return 'Create a new WordPress comment on a post with author details and content.';
     }
 
@@ -67,7 +67,7 @@ final class CreateComment extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_input_schema(): array {
+    public function getInputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -106,7 +106,7 @@ final class CreateComment extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_output_schema(): array {
+    public function getOutputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -127,7 +127,7 @@ final class CreateComment extends AbstractAbility {
      *
      * @return string WordPress capability name.
      */
-    public function get_required_capability(): string {
+    public function getRequiredCapability(): string {
         return 'edit_posts';
     }
 
@@ -138,7 +138,7 @@ final class CreateComment extends AbstractAbility {
      * @return array<string, mixed> Created comment data.
      * @throws RuntimeException If comment creation fails.
      */
-    public function do_execute( array $input ): array {
+    public function doExecute( array $input ): array {
         $comment_data = array(
             'comment_post_ID'      => (int) $input['post_id'],
             'comment_author'       => (string) $input['author'],

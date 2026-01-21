@@ -34,7 +34,7 @@ class WebhookManagerTest extends TestCase {
 		$manager = new WebhookManager( $queue, $sender, $config );
 
 		// Config returns subscribed URLs
-		$config->shouldReceive( 'get_subscribed_urls' )
+		$config->shouldReceive( 'getSubscribedUrls' )
 			->with( 'ability.after_execute' )
 			->andReturn(
 				[
@@ -81,7 +81,7 @@ class WebhookManagerTest extends TestCase {
 		$manager = new WebhookManager( $queue, $sender, $config );
 
 		// No subscribed URLs
-		$config->shouldReceive( 'get_subscribed_urls' )
+		$config->shouldReceive( 'getSubscribedUrls' )
 			->with( 'ability.before_execute' )
 			->andReturn( [] );
 
@@ -121,11 +121,11 @@ class WebhookManagerTest extends TestCase {
 			'attempt_count' => 0,
 		];
 
-		$queue->shouldReceive( 'get_pending' )
+		$queue->shouldReceive( 'getPending' )
 			->with( 10 )
 			->andReturn( [ $pending_webhook ] );
 
-		$config->shouldReceive( 'get_secret' )
+		$config->shouldReceive( 'getSecret' )
 			->andReturn( 'test-secret' );
 
 		$sender->shouldReceive( 'send' )
@@ -146,11 +146,11 @@ class WebhookManagerTest extends TestCase {
 				)
 			);
 
-		$queue->shouldReceive( 'mark_complete' )
+		$queue->shouldReceive( 'markComplete' )
 			->once()
 			->with( 1 );
 
-		$manager->process_queue();
+		$manager->processQueue();
 
 		$this->assertTrue( true, 'Pending webhook processed successfully' );
 	}
@@ -169,11 +169,11 @@ class WebhookManagerTest extends TestCase {
 			'attempt_count' => 0,
 		];
 
-		$queue->shouldReceive( 'get_pending' )
+		$queue->shouldReceive( 'getPending' )
 			->with( 10 )
 			->andReturn( [ $pending_webhook ] );
 
-		$config->shouldReceive( 'get_secret' )
+		$config->shouldReceive( 'getSecret' )
 			->andReturn( 'test-secret' );
 
 		// Webhook send fails
@@ -189,7 +189,7 @@ class WebhookManagerTest extends TestCase {
 			);
 
 		// Should schedule retry (not mark failed yet - attempt_count is 0)
-		$queue->shouldReceive( 'schedule_retry' )
+		$queue->shouldReceive( 'scheduleRetry' )
 			->once()
 			->withArgs(
 				function ( $id, $next_attempt ) {
@@ -197,7 +197,7 @@ class WebhookManagerTest extends TestCase {
 				}
 			);
 
-		$manager->process_queue();
+		$manager->processQueue();
 
 		$this->assertTrue( true, 'Failed webhook scheduled for retry' );
 	}
@@ -217,11 +217,11 @@ class WebhookManagerTest extends TestCase {
 			'attempt_count' => 2,
 		];
 
-		$queue->shouldReceive( 'get_pending' )
+		$queue->shouldReceive( 'getPending' )
 			->with( 10 )
 			->andReturn( [ $pending_webhook ] );
 
-		$config->shouldReceive( 'get_secret' )
+		$config->shouldReceive( 'getSecret' )
 			->andReturn( 'test-secret' );
 
 		// Webhook send fails on final attempt
@@ -237,11 +237,11 @@ class WebhookManagerTest extends TestCase {
 			);
 
 		// Should mark as failed (max retries exceeded)
-		$queue->shouldReceive( 'mark_failed' )
+		$queue->shouldReceive( 'markFailed' )
 			->once()
 			->with( 3, 'Max retries exceeded' );
 
-		$manager->process_queue();
+		$manager->processQueue();
 
 		$this->assertTrue( true, 'Failed webhook marked after max retries' );
 	}
@@ -268,11 +268,11 @@ class WebhookManagerTest extends TestCase {
 			],
 		];
 
-		$queue->shouldReceive( 'get_pending' )
+		$queue->shouldReceive( 'getPending' )
 			->with( 10 )
 			->andReturn( $webhooks );
 
-		$config->shouldReceive( 'get_secret' )
+		$config->shouldReceive( 'getSecret' )
 			->andReturn( 'test-secret' );
 
 		// Both webhooks succeed
@@ -287,15 +287,15 @@ class WebhookManagerTest extends TestCase {
 				)
 			);
 
-		$queue->shouldReceive( 'mark_complete' )
+		$queue->shouldReceive( 'markComplete' )
 			->once()
 			->with( 1 );
 
-		$queue->shouldReceive( 'mark_complete' )
+		$queue->shouldReceive( 'markComplete' )
 			->once()
 			->with( 2 );
 
-		$manager->process_queue();
+		$manager->processQueue();
 
 		$this->assertTrue( true, 'Multiple webhooks processed' );
 	}
@@ -312,7 +312,7 @@ class WebhookManagerTest extends TestCase {
 
 		$manager = new WebhookManager( $queue, $sender, $config );
 
-		$config->shouldReceive( 'get_subscribed_urls' )
+		$config->shouldReceive( 'getSubscribedUrls' )
 			->with( 'ability.after_execute' )
 			->andReturn( [ 'https://example.com/webhook' ] );
 
@@ -362,7 +362,7 @@ class WebhookManagerTest extends TestCase {
 
 		$manager = new WebhookManager( $queue, $sender, $config );
 
-		$config->shouldReceive( 'get_subscribed_urls' )
+		$config->shouldReceive( 'getSubscribedUrls' )
 			->with( 'ability.after_execute' )
 			->andReturn( [ 'https://example.com/webhook' ] );
 
@@ -413,7 +413,7 @@ class WebhookManagerTest extends TestCase {
 
 		$manager = new WebhookManager( $queue, $sender, $config );
 
-		$config->shouldReceive( 'get_subscribed_urls' )
+		$config->shouldReceive( 'getSubscribedUrls' )
 			->with( 'ability.after_execute' )
 			->andReturn( [ 'https://example.com/webhook' ] );
 

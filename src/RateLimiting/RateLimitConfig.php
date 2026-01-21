@@ -31,7 +31,7 @@ interface RateLimitConfig {
      *
      * @return array<string, array{requests_per_minute?: int, requests_per_hour?: int}>
      */
-    public function get_all(): array;
+    public function getAll(): array;
 
     /**
      * Get rate limit configuration for a specific ability.

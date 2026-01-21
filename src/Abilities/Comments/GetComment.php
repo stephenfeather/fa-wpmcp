@@ -29,7 +29,7 @@ final class GetComment extends AbstractAbility {
      *
      * @return string Ability name.
      */
-    public function get_name(): string {
+    public function getName(): string {
         return 'fa-wpmcp/get-comment';
     }
 
@@ -38,7 +38,7 @@ final class GetComment extends AbstractAbility {
      *
      * @return string Category name.
      */
-    public function get_category(): string {
+    public function getCategory(): string {
         return 'comments';
     }
 
@@ -47,7 +47,7 @@ final class GetComment extends AbstractAbility {
      *
      * @return string Ability label.
      */
-    public function get_label(): string {
+    public function getLabel(): string {
         return 'Get Comment';
     }
 
@@ -56,7 +56,7 @@ final class GetComment extends AbstractAbility {
      *
      * @return string Description.
      */
-    public function get_description(): string {
+    public function getDescription(): string {
         return 'Retrieve a single WordPress comment by ID with full details including author, content, and status.';
     }
 
@@ -65,7 +65,7 @@ final class GetComment extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_input_schema(): array {
+    public function getInputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -84,7 +84,7 @@ final class GetComment extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_output_schema(): array {
+    public function getOutputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -110,7 +110,7 @@ final class GetComment extends AbstractAbility {
      *
      * @return string WordPress capability name.
      */
-    public function get_required_capability(): string {
+    public function getRequiredCapability(): string {
         return 'read';
     }
 
@@ -121,7 +121,7 @@ final class GetComment extends AbstractAbility {
      * @return array<string, mixed> Comment data.
      * @throws RuntimeException If comment not found.
      */
-    public function do_execute( array $input ): array {
+    public function doExecute( array $input ): array {
         $comment_id = (int) $input['comment_id'];
 
         // Fetch comment from database.
@@ -132,7 +132,7 @@ final class GetComment extends AbstractAbility {
         }
 
         return array(
-            'comment' => $this->format_comment( $comment ),
+            'comment' => $this->formatComment( $comment ),
         );
     }
 
@@ -142,7 +142,7 @@ final class GetComment extends AbstractAbility {
      * @param \WP_Comment|object $comment The comment object.
      * @return array<string, mixed> Formatted comment data.
      */
-    private function format_comment( object $comment ): array {
+    private function formatComment( object $comment ): array {
         return array(
             'id'      => (int) $comment->comment_ID,
             'post_id' => (int) $comment->comment_post_ID,

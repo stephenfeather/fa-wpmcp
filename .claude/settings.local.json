@@ -30,7 +30,10 @@
       "mcp__sonarqube__search_my_sonarqube_projects",
       "Bash(vendor/bin/phpunit:*)",
       "Skill(resume_handoff)",
-      "Bash(composer sonarqube-report:*)"
+      "Bash(composer sonarqube-report:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(git reset:*)"
     ]
   },
   "spinnerTipsEnabled": false

@@ -52,7 +52,7 @@ require_once $autoloader;
 add_action(
     'plugins_loaded',
     function () {
-        Plugin::get_instance()->init();
+        Plugin::getInstance()->init();
     }
 );
 
@@ -91,7 +91,7 @@ register_activation_hook(
         }
 
         // Run activation.
-        Plugin::get_instance()->activate();
+        Plugin::getInstance()->activate();
     }
 );
 
@@ -99,6 +99,6 @@ register_activation_hook(
 register_deactivation_hook(
     __FILE__,
     function () {
-        Plugin::get_instance()->deactivate();
+        Plugin::getInstance()->deactivate();
     }
 );

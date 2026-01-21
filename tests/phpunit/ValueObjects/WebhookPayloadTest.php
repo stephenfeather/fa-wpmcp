@@ -64,7 +64,7 @@ class WebhookPayloadTest extends TestCase {
 			execution_time_ms: 150,
 		);
 
-		$array = $payload->to_array();
+		$array = $payload->toArray();
 
 		$this->assertIsArray( $array );
 		$this->assertEquals( 'ability.after_execute', $array['event'] );
@@ -97,7 +97,7 @@ class WebhookPayloadTest extends TestCase {
 			execution_time_ms: 50,
 		);
 
-		$json = $payload->to_json();
+		$json = $payload->toJson();
 
 		$this->assertJson( $json );
 		$decoded = json_decode( $json, true );

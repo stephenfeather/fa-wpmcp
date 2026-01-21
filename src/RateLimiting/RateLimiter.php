@@ -44,11 +44,11 @@ class RateLimiter implements RateLimiterInterface {
      */
     public function check( string $ability, int $user_id, string $ip ): RateLimitResult {
         // Get configuration (pure).
-        $limit = RateLimitCalculator::get_limits_for_ability( $ability, $this->config->get_all() );
+        $limit = RateLimitCalculator::getLimitsForAbility( $ability, $this->config->getAll() );
 
         // Build keys (pure).
-        $minute_key = RateLimitCalculator::build_key( $user_id, $ip, $ability, 'minute' );
-        $hour_key   = RateLimitCalculator::build_key( $user_id, $ip, $ability, 'hour' );
+        $minute_key = RateLimitCalculator::buildKey( $user_id, $ip, $ability, 'minute' );
+        $hour_key   = RateLimitCalculator::buildKey( $user_id, $ip, $ability, 'hour' );
 
         // Get current counts (side effect: storage reads).
         $minute_count = $this->store->get( $minute_key );
@@ -70,8 +70,8 @@ class RateLimiter implements RateLimiterInterface {
      */
     public function record( string $ability, int $user_id, string $ip ): void {
         // Build keys (pure).
-        $minute_key = RateLimitCalculator::build_key( $user_id, $ip, $ability, 'minute' );
-        $hour_key   = RateLimitCalculator::build_key( $user_id, $ip, $ability, 'hour' );
+        $minute_key = RateLimitCalculator::buildKey( $user_id, $ip, $ability, 'minute' );
+        $hour_key   = RateLimitCalculator::buildKey( $user_id, $ip, $ability, 'hour' );
 
         // Increment counters (side effect: storage writes).
         $this->store->increment( $minute_key, 60 );

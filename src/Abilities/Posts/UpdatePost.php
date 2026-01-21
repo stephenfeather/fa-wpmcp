@@ -45,7 +45,7 @@ final class UpdatePost extends AbstractAbility {
      *
      * @return string Ability name.
      */
-    public function get_name(): string {
+    public function getName(): string {
         return 'fa-wpmcp/update-post';
     }
 
@@ -54,7 +54,7 @@ final class UpdatePost extends AbstractAbility {
      *
      * @return string Category name.
      */
-    public function get_category(): string {
+    public function getCategory(): string {
         return 'posts-pages';
     }
 
@@ -63,7 +63,7 @@ final class UpdatePost extends AbstractAbility {
      *
      * @return string Ability label.
      */
-    public function get_label(): string {
+    public function getLabel(): string {
         return 'Update Post';
     }
 
@@ -72,7 +72,7 @@ final class UpdatePost extends AbstractAbility {
      *
      * @return string Description.
      */
-    public function get_description(): string {
+    public function getDescription(): string {
         return 'Update an existing WordPress post, page, or custom post type. Only provided fields will be updated. Supports title, content, excerpt, status, categories, and tags. Optionally validate post type.';
     }
 
@@ -81,7 +81,7 @@ final class UpdatePost extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_input_schema(): array {
+    public function getInputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -131,7 +131,7 @@ final class UpdatePost extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_output_schema(): array {
+    public function getOutputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -164,7 +164,7 @@ final class UpdatePost extends AbstractAbility {
      *
      * @return string WordPress capability name.
      */
-    public function get_required_capability(): string {
+    public function getRequiredCapability(): string {
         return 'edit_posts';
     }
 
@@ -173,7 +173,7 @@ final class UpdatePost extends AbstractAbility {
      *
      * @return string 'write' for update operations.
      */
-    public function get_operation_type(): string {
+    public function getOperationType(): string {
         return 'write';
     }
 
@@ -184,7 +184,7 @@ final class UpdatePost extends AbstractAbility {
      * @return array<string, mixed> Updated post data.
      * @throws RuntimeException If post not found or update fails.
      */
-    public function do_execute( array $input ): array {
+    public function doExecute( array $input ): array {
         $post_id = (int) $input['post_id'];
 
         // Side effect: verify post exists.
@@ -200,7 +200,7 @@ final class UpdatePost extends AbstractAbility {
         }
 
         // Pure transformation: build update data with sanitization.
-        $update_data = $this->build_update_data( $input );
+        $update_data = $this->buildUpdateData( $input );
 
         // Side effect: update post in database.
         $result = wp_update_post( $update_data, true );
@@ -214,7 +214,7 @@ final class UpdatePost extends AbstractAbility {
         }
 
         // Pure transformation: format response.
-        return $this->format_response( $post_id );
+        return $this->formatResponse( $post_id );
     }
 
     /**
@@ -226,7 +226,7 @@ final class UpdatePost extends AbstractAbility {
      * @param array<string, mixed> $input Input parameters.
      * @return array<string, mixed> Sanitized update data.
      */
-    private function build_update_data( array $input ): array {
+    private function buildUpdateData( array $input ): array {
         $update_data = array(
             'ID' => (int) $input['post_id'],
         );
@@ -248,7 +248,7 @@ final class UpdatePost extends AbstractAbility {
 
         // Add status if provided and valid.
         if ( isset( $input['status'] ) ) {
-            $validated_status = $this->validate_status( $input['status'] );
+            $validated_status = $this->validateStatus( $input['status'] );
             if ( null !== $validated_status ) {
                 $update_data['post_status'] = $validated_status;
             }
@@ -275,7 +275,7 @@ final class UpdatePost extends AbstractAbility {
      * @param string $status Input status.
      * @return string|null Valid status or null.
      */
-    private function validate_status( string $status ): ?string {
+    private function validateStatus( string $status ): ?string {
         if ( in_array( $status, self::VALID_STATUSES, true ) ) {
             return $status;
         }
@@ -288,7 +288,7 @@ final class UpdatePost extends AbstractAbility {
      * @param int $post_id Updated post ID.
      * @return array<string, mixed> Response data.
      */
-    private function format_response( int $post_id ): array {
+    private function formatResponse( int $post_id ): array {
         return array(
             'post_id'   => $post_id,
             'permalink' => get_permalink( $post_id ),

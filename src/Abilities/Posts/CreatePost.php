@@ -42,7 +42,7 @@ final class CreatePost extends AbstractAbility {
      *
      * @return string Ability name.
      */
-    public function get_name(): string {
+    public function getName(): string {
         return 'fa-wpmcp/create-post';
     }
 
@@ -51,7 +51,7 @@ final class CreatePost extends AbstractAbility {
      *
      * @return string Category name.
      */
-    public function get_category(): string {
+    public function getCategory(): string {
         return 'posts-pages';
     }
 
@@ -60,7 +60,7 @@ final class CreatePost extends AbstractAbility {
      *
      * @return string Ability label.
      */
-    public function get_label(): string {
+    public function getLabel(): string {
         return 'Create Post';
     }
 
@@ -69,7 +69,7 @@ final class CreatePost extends AbstractAbility {
      *
      * @return string Description.
      */
-    public function get_description(): string {
+    public function getDescription(): string {
         return 'Create a new WordPress post, page, or custom post type with title, content, and optional settings like status, categories, and tags. Defaults to draft status for safety.';
     }
 
@@ -78,7 +78,7 @@ final class CreatePost extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_input_schema(): array {
+    public function getInputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -130,7 +130,7 @@ final class CreatePost extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_output_schema(): array {
+    public function getOutputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -159,7 +159,7 @@ final class CreatePost extends AbstractAbility {
      *
      * @return string WordPress capability name.
      */
-    public function get_required_capability(): string {
+    public function getRequiredCapability(): string {
         return 'publish_posts';
     }
 
@@ -168,7 +168,7 @@ final class CreatePost extends AbstractAbility {
      *
      * @return string 'write' for create operations.
      */
-    public function get_operation_type(): string {
+    public function getOperationType(): string {
         return 'write';
     }
 
@@ -179,9 +179,9 @@ final class CreatePost extends AbstractAbility {
      * @return array<string, mixed> Created post data.
      * @throws RuntimeException If post creation fails.
      */
-    public function do_execute( array $input ): array {
+    public function doExecute( array $input ): array {
         // Pure transformation: build post data with sanitization.
-        $post_data = $this->build_post_data( $input );
+        $post_data = $this->buildPostData( $input );
 
         // Side effect: insert post into database.
         $post_id = wp_insert_post( $post_data, true );
@@ -195,7 +195,7 @@ final class CreatePost extends AbstractAbility {
         }
 
         // Pure transformation: format response.
-        return $this->format_response( $post_id );
+        return $this->formatResponse( $post_id );
     }
 
     /**
@@ -206,10 +206,10 @@ final class CreatePost extends AbstractAbility {
      * @param array<string, mixed> $input Input parameters.
      * @return array<string, mixed> Sanitized post data.
      */
-    private function build_post_data( array $input ): array {
+    private function buildPostData( array $input ): array {
         $post_data = array(
             'post_title'  => sanitize_text_field( $input['title'] ),
-            'post_status' => $this->validate_status( $input['status'] ?? 'draft' ),
+            'post_status' => $this->validateStatus( $input['status'] ?? 'draft' ),
             'post_type'   => $input['post_type'] ?? 'post',
         );
 
@@ -249,7 +249,7 @@ final class CreatePost extends AbstractAbility {
      * @param string $status Input status.
      * @return string Valid status.
      */
-    private function validate_status( string $status ): string {
+    private function validateStatus( string $status ): string {
         if ( in_array( $status, self::VALID_STATUSES, true ) ) {
             return $status;
         }
@@ -262,7 +262,7 @@ final class CreatePost extends AbstractAbility {
      * @param int $post_id Created post ID.
      * @return array<string, mixed> Response data.
      */
-    private function format_response( int $post_id ): array {
+    private function formatResponse( int $post_id ): array {
         return array(
             'post_id'   => $post_id,
             'permalink' => get_permalink( $post_id ),

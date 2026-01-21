@@ -63,14 +63,14 @@ final class WebhookSchedulerTest extends TestCase {
 	}
 
 	/**
-	 * Test schedule_recurring_job uses WP-Cron when Action Scheduler unavailable.
+	 * Test scheduleRecurringJob uses WP-Cron when Action Scheduler unavailable.
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
 	 *
 	 * @return void
 	 */
-	public function test_schedule_recurring_job_uses_wp_cron_when_unavailable(): void {
+	public function test_scheduleRecurringJob_uses_wp_cron_when_unavailable(): void {
 		$manager = new WebhookManager(
 			Mockery::mock( WebhookQueue::class ),
 			Mockery::mock( WebhookSender::class ),
@@ -88,7 +88,7 @@ final class WebhookSchedulerTest extends TestCase {
 			->with( Mockery::type( 'int' ), 'five_minutes', 'fa_wpmcp_process_webhook_queue' )
 			->andReturn( true );
 
-		$scheduler->schedule_recurring_job();
+		$scheduler->scheduleRecurringJob();
 	}
 
 	/**
@@ -120,7 +120,7 @@ final class WebhookSchedulerTest extends TestCase {
 		);
 		$scheduler = new WebhookScheduler( $manager );
 
-		$scheduler->schedule_recurring_job();
+		$scheduler->scheduleRecurringJob();
 
 		$this->assertTrue( true, 'Action Scheduler scheduling invoked' );
 	}
@@ -144,17 +144,17 @@ final class WebhookSchedulerTest extends TestCase {
 		);
 		$scheduler = new WebhookScheduler( $manager );
 
-		$scheduler->schedule_recurring_job();
+		$scheduler->scheduleRecurringJob();
 
 		$this->assertTrue( true, 'No scheduling when already scheduled' );
 	}
 
 	/**
-	 * Test register_cron_interval adds missing schedule.
+	 * Test registerCronInterval adds missing schedule.
 	 *
 	 * @return void
 	 */
-	public function test_register_cron_interval_adds_schedule(): void {
+	public function test_registerCronInterval_adds_schedule(): void {
 		Functions\expect( '__' )
 			->once()
 			->with( 'Every 5 Minutes', 'fa-wpmcp' )
@@ -167,7 +167,7 @@ final class WebhookSchedulerTest extends TestCase {
 		);
 		$scheduler = new WebhookScheduler( $manager );
 
-		$result = $scheduler->register_cron_interval( array() );
+		$result = $scheduler->registerCronInterval( array() );
 
 		$this->assertArrayHasKey( 'five_minutes', $result );
 		$this->assertSame( 300, $result['five_minutes']['interval'] );

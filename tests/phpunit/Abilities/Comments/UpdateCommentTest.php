@@ -23,16 +23,16 @@ final class UpdateCommentTest extends TestCase {
 
 	public function test_ability_metadata(): void {
 		$ability = new UpdateComment();
-		$this->assertEquals( 'fa-wpmcp/update-comment', $ability->get_name() );
-		$this->assertEquals( 'comments', $ability->get_category() );
-		$this->assertEquals( 'Update Comment', $ability->get_label() );
-		$this->assertStringContainsString( 'comment', strtolower( $ability->get_description() ) );
-		$this->assertEquals( 'moderate_comments', $ability->get_required_capability() );
+		$this->assertEquals( 'fa-wpmcp/update-comment', $ability->getName() );
+		$this->assertEquals( 'comments', $ability->getCategory() );
+		$this->assertEquals( 'Update Comment', $ability->getLabel() );
+		$this->assertStringContainsString( 'comment', strtolower( $ability->getDescription() ) );
+		$this->assertEquals( 'moderate_comments', $ability->getRequiredCapability() );
 	}
 
 	public function test_input_schema_requires_fields(): void {
 		$ability = new UpdateComment();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'comment_id', $schema['properties'] );
@@ -44,7 +44,7 @@ final class UpdateCommentTest extends TestCase {
 
 	public function test_output_schema_structure(): void {
 		$ability = new UpdateComment();
-		$schema  = $ability->get_output_schema();
+		$schema  = $ability->getOutputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'comment_id', $schema['properties'] );
@@ -57,7 +57,7 @@ final class UpdateCommentTest extends TestCase {
 		Functions\expect( 'get_comment_link' )->once()->andReturn( 'https://example.com/post#comment-42' );
 
 		$ability = new UpdateComment();
-		$result  = $ability->do_execute( array(
+		$result  = $ability->doExecute( array(
 			'comment_id' => 42,
 			'status'     => 'approve',
 		) );
@@ -72,7 +72,7 @@ final class UpdateCommentTest extends TestCase {
 		Functions\expect( 'wp_set_comment_status' )->once()->andReturn( false );
 
 		$ability = new UpdateComment();
-		$ability->do_execute( array(
+		$ability->doExecute( array(
 			'comment_id' => 42,
 			'status'     => 'trash',
 		) );

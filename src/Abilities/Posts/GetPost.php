@@ -31,7 +31,7 @@ final class GetPost extends AbstractAbility {
      *
      * @return string Ability name.
      */
-    public function get_name(): string {
+    public function getName(): string {
         return 'fa-wpmcp/get-post';
     }
 
@@ -40,7 +40,7 @@ final class GetPost extends AbstractAbility {
      *
      * @return string Category name.
      */
-    public function get_category(): string {
+    public function getCategory(): string {
         return 'posts-pages';
     }
 
@@ -49,7 +49,7 @@ final class GetPost extends AbstractAbility {
      *
      * @return string Ability label.
      */
-    public function get_label(): string {
+    public function getLabel(): string {
         return 'Get Post';
     }
 
@@ -58,7 +58,7 @@ final class GetPost extends AbstractAbility {
      *
      * @return string Description.
      */
-    public function get_description(): string {
+    public function getDescription(): string {
         return 'Retrieve a single WordPress post, page, or custom post type by ID with full details including categories, tags, featured image, and author information. Optionally validate post type.';
     }
 
@@ -67,7 +67,7 @@ final class GetPost extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_input_schema(): array {
+    public function getInputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -90,7 +90,7 @@ final class GetPost extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_output_schema(): array {
+    public function getOutputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -150,7 +150,7 @@ final class GetPost extends AbstractAbility {
      *
      * @return string WordPress capability name.
      */
-    public function get_required_capability(): string {
+    public function getRequiredCapability(): string {
         return 'read';
     }
 
@@ -161,7 +161,7 @@ final class GetPost extends AbstractAbility {
      * @return array<string, mixed> Post data.
      * @throws RuntimeException If post not found.
      */
-    public function do_execute( array $input ): array {
+    public function doExecute( array $input ): array {
         $post_id = (int) $input['post_id'];
 
         // Side effect: fetch post from database.
@@ -178,7 +178,7 @@ final class GetPost extends AbstractAbility {
 
         // Pure transformation: format post data.
         return array(
-            'post' => $this->format_post( $post ),
+            'post' => $this->formatPost( $post ),
         );
     }
 
@@ -190,7 +190,7 @@ final class GetPost extends AbstractAbility {
      * @param \WP_Post $post The post object.
      * @return array<string, mixed> Formatted post data.
      */
-    private function format_post( \WP_Post $post ): array {
+    private function formatPost( \WP_Post $post ): array {
         $post_id = $post->ID;
 
         return array(
@@ -205,11 +205,11 @@ final class GetPost extends AbstractAbility {
             'edit_url'       => get_edit_post_link( $post_id, 'raw' ),
             'date'           => $post->post_date,
             'modified'       => $post->post_modified,
-            'featured_image' => $this->get_featured_image_url( $post_id ),
-            'author'         => $this->format_author( (int) $post->post_author ),
-            'categories'     => $this->format_categories( $post_id ),
-            'tags'           => $this->format_tags( $post_id ),
-            'meta'           => $this->get_post_meta( $post_id ),
+            'featured_image' => $this->getFeaturedImageUrl( $post_id ),
+            'author'         => $this->formatAuthor( (int) $post->post_author ),
+            'categories'     => $this->formatCategories( $post_id ),
+            'tags'           => $this->formatTags( $post_id ),
+            'meta'           => $this->getPostMeta( $post_id ),
         );
     }
 
@@ -219,7 +219,7 @@ final class GetPost extends AbstractAbility {
      * @param int $post_id Post ID.
      * @return string Featured image URL or empty string.
      */
-    private function get_featured_image_url( int $post_id ): string {
+    private function getFeaturedImageUrl( int $post_id ): string {
         $url = get_the_post_thumbnail_url( $post_id, 'full' );
         return is_string( $url ) ? $url : '';
     }
@@ -232,7 +232,7 @@ final class GetPost extends AbstractAbility {
      * @param int $author_id Author user ID.
      * @return array<string, mixed> Author data.
      */
-    private function format_author( int $author_id ): array {
+    private function formatAuthor( int $author_id ): array {
         return array(
             'id'   => $author_id,
             'name' => get_the_author_meta( 'display_name', $author_id ),
@@ -247,7 +247,7 @@ final class GetPost extends AbstractAbility {
      * @param int $post_id Post ID.
      * @return array<int, array<string, mixed>> Categories array.
      */
-    private function format_categories( int $post_id ): array {
+    private function formatCategories( int $post_id ): array {
         $categories = wp_get_post_categories( $post_id, array( 'fields' => 'all' ) );
 
         if ( ! is_array( $categories ) ) {
@@ -272,7 +272,7 @@ final class GetPost extends AbstractAbility {
      * @param int $post_id Post ID.
      * @return array<int, array<string, mixed>> Tags array.
      */
-    private function format_tags( int $post_id ): array {
+    private function formatTags( int $post_id ): array {
         $tags = wp_get_post_tags( $post_id, array( 'fields' => 'all' ) );
 
         if ( ! is_array( $tags ) ) {
@@ -297,7 +297,7 @@ final class GetPost extends AbstractAbility {
      * @param int $post_id Post ID.
      * @return array<string, mixed> Filtered meta data.
      */
-    private function get_post_meta( int $post_id ): array {
+    private function getPostMeta( int $post_id ): array {
         $meta = get_post_meta( $post_id, '', true );
 
         if ( ! is_array( $meta ) ) {

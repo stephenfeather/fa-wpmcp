@@ -38,7 +38,7 @@ final class AbilityRegistry {
      * @throws InvalidArgumentException If ability is already registered.
      */
     public function register( AbstractAbility $ability ): void {
-        $name = $ability->get_name();
+        $name = $ability->getName();
 
         if ( $this->has( $name ) ) {
             throw new InvalidArgumentException(
@@ -85,10 +85,10 @@ final class AbilityRegistry {
      * @param string $category Category name.
      * @return array<string, AbstractAbility> Abilities in category.
      */
-    public function by_category( string $category ): array {
+    public function byCategory( string $category ): array {
         return array_filter(
             $this->abilities,
-            fn( AbstractAbility $ability ) => $ability->get_category() === $category
+            fn( AbstractAbility $ability ) => $ability->getCategory() === $category
         );
     }
 
@@ -98,10 +98,10 @@ final class AbilityRegistry {
      * @param string $operation Operation type ('read' or 'write').
      * @return array<string, AbstractAbility> Abilities with operation type.
      */
-    public function by_operation( string $operation ): array {
+    public function byOperation( string $operation ): array {
         return array_filter(
             $this->abilities,
-            fn( AbstractAbility $ability ) => $ability->get_operation_type() === $operation
+            fn( AbstractAbility $ability ) => $ability->getOperationType() === $operation
         );
     }
 
@@ -127,7 +127,7 @@ final class AbilityRegistry {
      */
     public function categories(): array {
         $categories = array_map(
-            fn( AbstractAbility $ability ) => $ability->get_category(),
+            fn( AbstractAbility $ability ) => $ability->getCategory(),
             $this->abilities
         );
 
@@ -166,10 +166,10 @@ final class AbilityRegistry {
      *
      * @return array<array<string, mixed>> Array of registration arrays.
      */
-    public function to_array(): array {
+    public function toArray(): array {
         return array_values(
             array_map(
-                fn( AbstractAbility $ability ) => $ability->to_registration_array(),
+                fn( AbstractAbility $ability ) => $ability->toRegistrationArray(),
                 $this->abilities
             )
         );

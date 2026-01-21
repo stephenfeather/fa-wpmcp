@@ -37,13 +37,13 @@ final class WebhookScheduler {
      */
     public function init(): void {
         // Register action hook for queue processing.
-        add_action( self::ACTION_HOOK, array( $this, 'process_queue' ) );
+        add_action( self::ACTION_HOOK, array( $this, 'processQueue' ) );
 
         // Register custom cron interval.
-        add_filter( 'cron_schedules', array( $this, 'register_cron_interval' ) );
+        add_filter( 'cron_schedules', array( $this, 'registerCronInterval' ) );
 
         // Schedule recurring job.
-        add_action( 'init', array( $this, 'schedule_recurring_job' ) );
+        add_action( 'init', array( $this, 'scheduleRecurringJob' ) );
     }
 
     /**
@@ -51,8 +51,8 @@ final class WebhookScheduler {
      *
      * Called by Action Scheduler or WP-Cron.
      */
-    public function process_queue(): void {
-        $this->manager->process_queue();
+    public function processQueue(): void {
+        $this->manager->processQueue();
     }
 
     /**
@@ -60,11 +60,11 @@ final class WebhookScheduler {
      *
      * Uses Action Scheduler if available, WP-Cron otherwise.
      */
-    public function schedule_recurring_job(): void {
-        if ( $this->is_action_scheduler_available() ) {
-            $this->schedule_with_action_scheduler();
+    public function scheduleRecurringJob(): void {
+        if ( $this->isActionSchedulerAvailable() ) {
+            $this->scheduleWithActionScheduler();
         } else {
-            $this->schedule_with_wp_cron();
+            $this->scheduleWithWpCron();
         }
     }
 
@@ -73,7 +73,7 @@ final class WebhookScheduler {
      *
      * @return bool True if Action Scheduler is available.
      */
-    private function is_action_scheduler_available(): bool {
+    private function isActionSchedulerAvailable(): bool {
         return function_exists( 'as_has_scheduled_action' )
             && function_exists( 'as_schedule_recurring_action' );
     }
@@ -83,7 +83,7 @@ final class WebhookScheduler {
      *
      * Schedules recurring action every 5 minutes.
      */
-    private function schedule_with_action_scheduler(): void {
+    private function scheduleWithActionScheduler(): void {
         // Check if already scheduled.
         if ( as_has_scheduled_action( self::ACTION_HOOK, array(), self::ACTION_GROUP ) ) {
             return;
@@ -105,7 +105,7 @@ final class WebhookScheduler {
      *
      * Schedules WP-Cron event every 5 minutes.
      */
-    private function schedule_with_wp_cron(): void {
+    private function scheduleWithWpCron(): void {
         // Check if already scheduled.
         if ( wp_next_scheduled( self::ACTION_HOOK ) ) {
             return;
@@ -123,7 +123,7 @@ final class WebhookScheduler {
      * @param array<string, array<string, mixed>> $schedules Existing schedules.
      * @return array<string, array<string, mixed>> Modified schedules.
      */
-    public function register_cron_interval( array $schedules ): array {
+    public function registerCronInterval( array $schedules ): array {
         if ( ! isset( $schedules[ self::CRON_INTERVAL ] ) ) {
             $schedules[ self::CRON_INTERVAL ] = array(
                 'interval' => 300,
@@ -142,7 +142,7 @@ final class WebhookScheduler {
      */
     public function unschedule(): void {
         // Unschedule Action Scheduler actions.
-        if ( $this->is_action_scheduler_available() ) {
+        if ( $this->isActionSchedulerAvailable() ) {
             as_unschedule_all_actions( self::ACTION_HOOK, array(), self::ACTION_GROUP );
         }
 

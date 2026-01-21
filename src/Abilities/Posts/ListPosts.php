@@ -44,7 +44,7 @@ final class ListPosts extends AbstractAbility {
      *
      * @return string Ability name.
      */
-    public function get_name(): string {
+    public function getName(): string {
         return 'fa-wpmcp/list-posts';
     }
 
@@ -53,7 +53,7 @@ final class ListPosts extends AbstractAbility {
      *
      * @return string Category name.
      */
-    public function get_category(): string {
+    public function getCategory(): string {
         return 'posts-pages';
     }
 
@@ -62,7 +62,7 @@ final class ListPosts extends AbstractAbility {
      *
      * @return string Ability label.
      */
-    public function get_label(): string {
+    public function getLabel(): string {
         return 'List Posts';
     }
 
@@ -71,7 +71,7 @@ final class ListPosts extends AbstractAbility {
      *
      * @return string Description.
      */
-    public function get_description(): string {
+    public function getDescription(): string {
         return 'Retrieve a paginated list of WordPress posts, pages, or custom post types with optional filtering by post type, status, author, category, and search term.';
     }
 
@@ -80,7 +80,7 @@ final class ListPosts extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_input_schema(): array {
+    public function getInputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -143,7 +143,7 @@ final class ListPosts extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_output_schema(): array {
+    public function getOutputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -196,7 +196,7 @@ final class ListPosts extends AbstractAbility {
      *
      * @return string WordPress capability name.
      */
-    public function get_required_capability(): string {
+    public function getRequiredCapability(): string {
         return 'read';
     }
 
@@ -206,15 +206,15 @@ final class ListPosts extends AbstractAbility {
      * @param array<string, mixed> $input Validated input data.
      * @return array<string, mixed> Posts list with pagination.
      */
-    public function do_execute( array $input ): array {
+    public function doExecute( array $input ): array {
         // Pure transformation: build query args.
-        $query_args = $this->build_query_args( $input );
+        $query_args = $this->buildQueryArgs( $input );
 
         // Side effect: execute WP_Query.
         $query = new \WP_Query( $query_args );
 
         // Pure transformation: format results.
-        $result = $this->format_results( $query, $input );
+        $result = $this->formatResults( $query, $input );
 
         // Side effect: reset post data.
         wp_reset_postdata();
@@ -230,7 +230,7 @@ final class ListPosts extends AbstractAbility {
      * @param array<string, mixed> $input Input parameters.
      * @return array<string, mixed> WP_Query arguments.
      */
-    private function build_query_args( array $input ): array {
+    private function buildQueryArgs( array $input ): array {
         $per_page = isset( $input['per_page'] )
             ? min( (int) $input['per_page'], self::MAX_PER_PAGE )
             : self::DEFAULT_PER_PAGE;
@@ -269,11 +269,11 @@ final class ListPosts extends AbstractAbility {
      * @param array<string, mixed> $input Original input parameters.
      * @return array<string, mixed> Formatted results.
      */
-    private function format_results( \WP_Query $query, array $input ): array {
+    private function formatResults( \WP_Query $query, array $input ): array {
         $posts = array();
 
         foreach ( $query->posts as $post ) {
-            $posts[] = $this->format_post_item( $post );
+            $posts[] = $this->formatPostItem( $post );
         }
 
         $per_page = isset( $input['per_page'] )
@@ -297,7 +297,7 @@ final class ListPosts extends AbstractAbility {
      * @param \WP_Post $post Post object.
      * @return array<string, mixed> Formatted post data.
      */
-    private function format_post_item( \WP_Post $post ): array {
+    private function formatPostItem( \WP_Post $post ): array {
         return array(
             'id'        => $post->ID,
             'title'     => $post->post_title,

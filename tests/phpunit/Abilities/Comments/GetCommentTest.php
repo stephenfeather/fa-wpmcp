@@ -50,11 +50,11 @@ final class GetCommentTest extends TestCase {
 	public function test_ability_metadata(): void {
 		$ability = new GetComment();
 
-		$this->assertEquals( 'fa-wpmcp/get-comment', $ability->get_name() );
-		$this->assertEquals( 'comments', $ability->get_category() );
-		$this->assertEquals( 'Get Comment', $ability->get_label() );
-		$this->assertEquals( 'read', $ability->get_required_capability() );
-		$this->assertStringContainsString( 'comment', strtolower( $ability->get_description() ) );
+		$this->assertEquals( 'fa-wpmcp/get-comment', $ability->getName() );
+		$this->assertEquals( 'comments', $ability->getCategory() );
+		$this->assertEquals( 'Get Comment', $ability->getLabel() );
+		$this->assertEquals( 'read', $ability->getRequiredCapability() );
+		$this->assertStringContainsString( 'comment', strtolower( $ability->getDescription() ) );
 	}
 
 	/**
@@ -64,12 +64,12 @@ final class GetCommentTest extends TestCase {
 	 */
 	public function test_schema_structures(): void {
 		$ability      = new GetComment();
-		$input_schema = $ability->get_input_schema();
+		$input_schema = $ability->getInputSchema();
 		$this->assertEquals( 'object', $input_schema['type'] );
 		$this->assertArrayHasKey( 'comment_id', $input_schema['properties'] );
 		$this->assertContains( 'comment_id', $input_schema['required'] );
 
-		$output_schema = $ability->get_output_schema();
+		$output_schema = $ability->getOutputSchema();
 		$this->assertEquals( 'object', $output_schema['type'] );
 		$this->assertArrayHasKey( 'comment', $output_schema['properties'] );
 	}
@@ -100,7 +100,7 @@ final class GetCommentTest extends TestCase {
 			->andReturn( 'https://example.com/post#comment-42' );
 
 		$ability = new GetComment();
-		$result  = $ability->do_execute( array( 'comment_id' => 42 ) );
+		$result  = $ability->doExecute( array( 'comment_id' => 42 ) );
 
 		$this->assertArrayHasKey( 'comment', $result );
 		$this->assertEquals( 42, $result['comment']['id'] );
@@ -120,6 +120,6 @@ final class GetCommentTest extends TestCase {
 			->andReturn( null );
 
 		$ability = new GetComment();
-		$ability->do_execute( array( 'comment_id' => 999 ) );
+		$ability->doExecute( array( 'comment_id' => 999 ) );
 	}
 }

@@ -29,7 +29,7 @@ final class UpdateComment extends AbstractAbility {
      *
      * @return string Ability name.
      */
-    public function get_name(): string {
+    public function getName(): string {
         return 'fa-wpmcp/update-comment';
     }
 
@@ -38,7 +38,7 @@ final class UpdateComment extends AbstractAbility {
      *
      * @return string Category name.
      */
-    public function get_category(): string {
+    public function getCategory(): string {
         return 'comments';
     }
 
@@ -47,7 +47,7 @@ final class UpdateComment extends AbstractAbility {
      *
      * @return string Ability label.
      */
-    public function get_label(): string {
+    public function getLabel(): string {
         return 'Update Comment';
     }
 
@@ -56,7 +56,7 @@ final class UpdateComment extends AbstractAbility {
      *
      * @return string Description.
      */
-    public function get_description(): string {
+    public function getDescription(): string {
         return 'Update WordPress comment status for moderation (approve, hold, spam, trash).';
     }
 
@@ -65,7 +65,7 @@ final class UpdateComment extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_input_schema(): array {
+    public function getInputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -89,7 +89,7 @@ final class UpdateComment extends AbstractAbility {
      *
      * @return array<string, mixed> JSON Schema array.
      */
-    public function get_output_schema(): array {
+    public function getOutputSchema(): array {
         return array(
             'type'       => 'object',
             'properties' => array(
@@ -114,7 +114,7 @@ final class UpdateComment extends AbstractAbility {
      *
      * @return string WordPress capability name.
      */
-    public function get_required_capability(): string {
+    public function getRequiredCapability(): string {
         return 'moderate_comments';
     }
 
@@ -125,7 +125,7 @@ final class UpdateComment extends AbstractAbility {
      * @return array<string, mixed> Updated comment data.
      * @throws CommentUpdateException If comment update fails.
      */
-    public function do_execute( array $input ): array {
+    public function doExecute( array $input ): array {
         $comment_id = (int) $input['comment_id'];
         $status     = (string) $input['status'];
 

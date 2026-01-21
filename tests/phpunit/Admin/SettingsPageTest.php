@@ -103,7 +103,7 @@ class SettingsPageTest extends TestCase {
 			 *
 			 * @return string Ability name.
 			 */
-			public function get_name(): string {
+			public function getName(): string {
 				return $this->config['name'] ?? 'test-ability';
 			}
 
@@ -112,7 +112,7 @@ class SettingsPageTest extends TestCase {
 			 *
 			 * @return string Category.
 			 */
-			public function get_category(): string {
+			public function getCategory(): string {
 				return $this->config['category'] ?? 'test-category';
 			}
 
@@ -121,7 +121,7 @@ class SettingsPageTest extends TestCase {
 			 *
 			 * @return string Label.
 			 */
-			public function get_label(): string {
+			public function getLabel(): string {
 				return $this->config['label'] ?? 'Test Ability';
 			}
 
@@ -130,7 +130,7 @@ class SettingsPageTest extends TestCase {
 			 *
 			 * @return string Description.
 			 */
-			public function get_description(): string {
+			public function getDescription(): string {
 				return $this->config['description'] ?? 'Test description';
 			}
 
@@ -139,7 +139,7 @@ class SettingsPageTest extends TestCase {
 			 *
 			 * @return array<string, mixed> Schema.
 			 */
-			public function get_input_schema(): array {
+			public function getInputSchema(): array {
 				return $this->config['input_schema'] ?? array( 'type' => 'object' );
 			}
 
@@ -148,7 +148,7 @@ class SettingsPageTest extends TestCase {
 			 *
 			 * @return array<string, mixed> Schema.
 			 */
-			public function get_output_schema(): array {
+			public function getOutputSchema(): array {
 				return $this->config['output_schema'] ?? array( 'type' => 'object' );
 			}
 
@@ -157,7 +157,7 @@ class SettingsPageTest extends TestCase {
 			 *
 			 * @return string Capability.
 			 */
-			public function get_required_capability(): string {
+			public function getRequiredCapability(): string {
 				return $this->config['capability'] ?? 'read';
 			}
 
@@ -166,7 +166,7 @@ class SettingsPageTest extends TestCase {
 			 *
 			 * @return string Operation type.
 			 */
-			public function get_operation_type(): string {
+			public function getOperationType(): string {
 				return $this->config['operation'] ?? 'read';
 			}
 
@@ -176,7 +176,7 @@ class SettingsPageTest extends TestCase {
 			 * @param array<string, mixed> $input Input data.
 			 * @return array<string, mixed> Output data.
 			 */
-			public function do_execute( array $input ): array {
+			public function doExecute( array $input ): array {
 				return array();
 			}
 		};

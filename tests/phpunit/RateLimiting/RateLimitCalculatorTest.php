@@ -159,7 +159,7 @@ class RateLimitCalculatorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_retry_after_calculation_for_minute(): void {
-		$retry_after = RateLimitCalculator::calculate_retry_after( 'minute', 45 );
+		$retry_after = RateLimitCalculator::calculateRetryAfter( 'minute', 45 );
 
 		// Should be seconds remaining in current minute window.
 		$this->assertGreaterThan( 0, $retry_after );
@@ -172,7 +172,7 @@ class RateLimitCalculatorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_retry_after_calculation_for_hour(): void {
-		$retry_after = RateLimitCalculator::calculate_retry_after( 'hour', 1800 );
+		$retry_after = RateLimitCalculator::calculateRetryAfter( 'hour', 1800 );
 
 		// Should be seconds remaining in current hour window.
 		$this->assertGreaterThan( 0, $retry_after );
@@ -187,7 +187,7 @@ class RateLimitCalculatorTest extends TestCase {
 	public function test_retry_after_at_start_of_minute(): void {
 		// At exactly a minute boundary (e.g., 0 seconds).
 		$current_time = 1704067200; // A time with 0 seconds.
-		$retry_after  = RateLimitCalculator::calculate_retry_after( 'minute', $current_time );
+		$retry_after  = RateLimitCalculator::calculateRetryAfter( 'minute', $current_time );
 
 		$this->assertEquals( 60, $retry_after );
 	}
@@ -200,7 +200,7 @@ class RateLimitCalculatorTest extends TestCase {
 	public function test_retry_after_at_start_of_hour(): void {
 		// At exactly an hour boundary.
 		$current_time = 1704067200; // A time at hour boundary.
-		$retry_after  = RateLimitCalculator::calculate_retry_after( 'hour', $current_time );
+		$retry_after  = RateLimitCalculator::calculateRetryAfter( 'hour', $current_time );
 
 		$this->assertEquals( 3600, $retry_after );
 	}
@@ -211,7 +211,7 @@ class RateLimitCalculatorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_retry_after_unknown_type_defaults(): void {
-		$retry_after = RateLimitCalculator::calculate_retry_after( 'unknown', 100 );
+		$retry_after = RateLimitCalculator::calculateRetryAfter( 'unknown', 100 );
 
 		$this->assertEquals( 60, $retry_after );
 	}
@@ -221,9 +221,9 @@ class RateLimitCalculatorTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function test_build_key_produces_consistent_output(): void {
-		$key1 = RateLimitCalculator::build_key( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
-		$key2 = RateLimitCalculator::build_key( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+	public function test_buildKey_produces_consistent_output(): void {
+		$key1 = RateLimitCalculator::buildKey( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$key2 = RateLimitCalculator::buildKey( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
 
 		$this->assertEquals( $key1, $key2 );
 	}
@@ -234,7 +234,7 @@ class RateLimitCalculatorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_ip_is_hashed_for_privacy(): void {
-		$key = RateLimitCalculator::build_key( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$key = RateLimitCalculator::buildKey( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
 
 		$this->assertStringNotContainsString( '192.168.1.1', $key );
 	}
@@ -245,8 +245,8 @@ class RateLimitCalculatorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_different_users_produce_different_keys(): void {
-		$key1 = RateLimitCalculator::build_key( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
-		$key2 = RateLimitCalculator::build_key( 2, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$key1 = RateLimitCalculator::buildKey( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$key2 = RateLimitCalculator::buildKey( 2, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
 
 		$this->assertNotEquals( $key1, $key2 );
 	}
@@ -257,8 +257,8 @@ class RateLimitCalculatorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_different_ips_produce_different_keys(): void {
-		$key1 = RateLimitCalculator::build_key( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
-		$key2 = RateLimitCalculator::build_key( 1, '192.168.1.2', 'fa-wpmcp/list-posts', 'minute' );
+		$key1 = RateLimitCalculator::buildKey( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$key2 = RateLimitCalculator::buildKey( 1, '192.168.1.2', 'fa-wpmcp/list-posts', 'minute' );
 
 		$this->assertNotEquals( $key1, $key2 );
 	}
@@ -269,8 +269,8 @@ class RateLimitCalculatorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_different_abilities_produce_different_keys(): void {
-		$key1 = RateLimitCalculator::build_key( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
-		$key2 = RateLimitCalculator::build_key( 1, '192.168.1.1', 'fa-wpmcp/create-post', 'minute' );
+		$key1 = RateLimitCalculator::buildKey( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$key2 = RateLimitCalculator::buildKey( 1, '192.168.1.1', 'fa-wpmcp/create-post', 'minute' );
 
 		$this->assertNotEquals( $key1, $key2 );
 	}
@@ -281,8 +281,8 @@ class RateLimitCalculatorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_different_windows_produce_different_keys(): void {
-		$key1 = RateLimitCalculator::build_key( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
-		$key2 = RateLimitCalculator::build_key( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'hour' );
+		$key1 = RateLimitCalculator::buildKey( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$key2 = RateLimitCalculator::buildKey( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'hour' );
 
 		$this->assertNotEquals( $key1, $key2 );
 	}
@@ -293,7 +293,7 @@ class RateLimitCalculatorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_key_contains_expected_prefix(): void {
-		$key = RateLimitCalculator::build_key( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$key = RateLimitCalculator::buildKey( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
 
 		$this->assertStringStartsWith( 'fa_wpmcp_ratelimit_', $key );
 	}
@@ -304,7 +304,7 @@ class RateLimitCalculatorTest extends TestCase {
 	 * @return void
 	 */
 	public function test_ability_slug_sanitization(): void {
-		$key = RateLimitCalculator::build_key( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$key = RateLimitCalculator::buildKey( 1, '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
 
 		// Should replace / with - in ability name.
 		$this->assertStringContainsString( 'fa-wpmcp-list-posts', $key );
@@ -315,10 +315,10 @@ class RateLimitCalculatorTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function test_get_limits_for_ability_returns_defaults(): void {
+	public function test_getLimitsForAbility_returns_defaults(): void {
 		$config = array();
 
-		$limit = RateLimitCalculator::get_limits_for_ability( 'fa-wpmcp/list-posts', $config );
+		$limit = RateLimitCalculator::getLimitsForAbility( 'fa-wpmcp/list-posts', $config );
 
 		$this->assertEquals( 60, $limit->requests_per_minute );
 		$this->assertEquals( 500, $limit->requests_per_hour );
@@ -330,7 +330,7 @@ class RateLimitCalculatorTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function test_get_limits_for_ability_uses_custom_config(): void {
+	public function test_getLimitsForAbility_uses_custom_config(): void {
 		$config = array(
 			'fa-wpmcp/create-post' => array(
 				'requests_per_minute' => 10,
@@ -338,7 +338,7 @@ class RateLimitCalculatorTest extends TestCase {
 			),
 		);
 
-		$limit = RateLimitCalculator::get_limits_for_ability( 'fa-wpmcp/create-post', $config );
+		$limit = RateLimitCalculator::getLimitsForAbility( 'fa-wpmcp/create-post', $config );
 
 		$this->assertEquals( 10, $limit->requests_per_minute );
 		$this->assertEquals( 100, $limit->requests_per_hour );
@@ -350,7 +350,7 @@ class RateLimitCalculatorTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function test_get_limits_for_ability_falls_back_for_unknown(): void {
+	public function test_getLimitsForAbility_falls_back_for_unknown(): void {
 		$config = array(
 			'fa-wpmcp/create-post' => array(
 				'requests_per_minute' => 10,
@@ -358,7 +358,7 @@ class RateLimitCalculatorTest extends TestCase {
 			),
 		);
 
-		$limit = RateLimitCalculator::get_limits_for_ability( 'fa-wpmcp/unknown-ability', $config );
+		$limit = RateLimitCalculator::getLimitsForAbility( 'fa-wpmcp/unknown-ability', $config );
 
 		$this->assertEquals( 60, $limit->requests_per_minute );
 		$this->assertEquals( 500, $limit->requests_per_hour );

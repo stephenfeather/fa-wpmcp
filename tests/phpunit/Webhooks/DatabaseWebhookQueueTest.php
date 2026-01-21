@@ -63,7 +63,7 @@ final class DatabaseWebhookQueueTest extends TestCase {
 				Mockery::on( function( $data ) use ( $payload ) {
 					return 'https://example.com' === $data['url']
 						&& 'ability.executed' === $data['event_type']
-						&& $payload->to_json() === $data['payload']
+						&& $payload->toJson() === $data['payload']
 						&& 'pending' === $data['status']
 						&& is_string( $data['created_at'] )
 						&& '' !== $data['created_at'];
@@ -104,7 +104,7 @@ final class DatabaseWebhookQueueTest extends TestCase {
 		$GLOBALS['wpdb'] = $wpdb;
 
 		$queue  = new DatabaseWebhookQueue();
-		$result = $queue->get_pending( 10 );
+		$result = $queue->getPending( 10 );
 
 		$this->assertSame( 5, $result[0]['id'] );
 		$this->assertSame( 2, $result[0]['attempt_count'] );
@@ -129,7 +129,7 @@ final class DatabaseWebhookQueueTest extends TestCase {
 		$GLOBALS['wpdb'] = $wpdb;
 
 		$queue = new DatabaseWebhookQueue();
-		$this->assertSame( array(), $queue->get_pending( 10 ) );
+		$this->assertSame( array(), $queue->getPending( 10 ) );
 	}
 
 	/**
@@ -158,7 +158,7 @@ final class DatabaseWebhookQueueTest extends TestCase {
 		$GLOBALS['wpdb'] = $wpdb;
 
 		$queue = new DatabaseWebhookQueue();
-		$queue->mark_complete( 10 );
+		$queue->markComplete( 10 );
 	}
 
 	/**
@@ -186,7 +186,7 @@ final class DatabaseWebhookQueueTest extends TestCase {
 		$GLOBALS['wpdb'] = $wpdb;
 
 		$queue = new DatabaseWebhookQueue();
-		$queue->mark_failed( 12, 'bad' );
+		$queue->markFailed( 12, 'bad' );
 	}
 
 	/**
@@ -210,6 +210,6 @@ final class DatabaseWebhookQueueTest extends TestCase {
 		$GLOBALS['wpdb'] = $wpdb;
 
 		$queue = new DatabaseWebhookQueue();
-		$queue->schedule_retry( 99, $next );
+		$queue->scheduleRetry( 99, $next );
 	}
 }

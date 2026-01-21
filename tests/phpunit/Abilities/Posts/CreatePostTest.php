@@ -57,7 +57,7 @@ class CreatePostTest extends TestCase {
 	 */
 	public function test_get_name(): void {
 		$ability = new CreatePost();
-		$this->assertEquals( 'fa-wpmcp/create-post', $ability->get_name() );
+		$this->assertEquals( 'fa-wpmcp/create-post', $ability->getName() );
 	}
 
 	/**
@@ -67,7 +67,7 @@ class CreatePostTest extends TestCase {
 	 */
 	public function test_get_category(): void {
 		$ability = new CreatePost();
-		$this->assertEquals( 'posts-pages', $ability->get_category() );
+		$this->assertEquals( 'posts-pages', $ability->getCategory() );
 	}
 
 	/**
@@ -77,7 +77,7 @@ class CreatePostTest extends TestCase {
 	 */
 	public function test_get_label(): void {
 		$ability = new CreatePost();
-		$this->assertEquals( 'Create Post', $ability->get_label() );
+		$this->assertEquals( 'Create Post', $ability->getLabel() );
 	}
 
 	/**
@@ -87,7 +87,7 @@ class CreatePostTest extends TestCase {
 	 */
 	public function test_get_description(): void {
 		$ability = new CreatePost();
-		$this->assertStringContainsString( 'create', strtolower( $ability->get_description() ) );
+		$this->assertStringContainsString( 'create', strtolower( $ability->getDescription() ) );
 	}
 
 	/**
@@ -97,7 +97,7 @@ class CreatePostTest extends TestCase {
 	 */
 	public function test_get_operation_type(): void {
 		$ability = new CreatePost();
-		$this->assertEquals( 'write', $ability->get_operation_type() );
+		$this->assertEquals( 'write', $ability->getOperationType() );
 	}
 
 	/**
@@ -107,7 +107,7 @@ class CreatePostTest extends TestCase {
 	 */
 	public function test_get_required_capability(): void {
 		$ability = new CreatePost();
-		$this->assertEquals( 'publish_posts', $ability->get_required_capability() );
+		$this->assertEquals( 'publish_posts', $ability->getRequiredCapability() );
 	}
 
 	/**
@@ -117,7 +117,7 @@ class CreatePostTest extends TestCase {
 	 */
 	public function test_input_schema_requires_title(): void {
 		$ability = new CreatePost();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'title', $schema['properties'] );
@@ -131,7 +131,7 @@ class CreatePostTest extends TestCase {
 	 */
 	public function test_input_schema_supports_content(): void {
 		$ability = new CreatePost();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'content', $schema['properties'] );
 		$this->assertEquals( 'string', $schema['properties']['content']['type'] );
@@ -144,7 +144,7 @@ class CreatePostTest extends TestCase {
 	 */
 	public function test_input_schema_supports_optional_fields(): void {
 		$ability = new CreatePost();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'status', $schema['properties'] );
 		$this->assertArrayHasKey( 'author', $schema['properties'] );
@@ -160,7 +160,7 @@ class CreatePostTest extends TestCase {
 	 */
 	public function test_input_schema_supports_post_type(): void {
 		$ability = new CreatePost();
-		$schema  = $ability->get_input_schema();
+		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'post_type', $schema['properties'] );
 		$this->assertEquals( 'string', $schema['properties']['post_type']['type'] );
@@ -174,7 +174,7 @@ class CreatePostTest extends TestCase {
 	 */
 	public function test_output_schema_structure(): void {
 		$ability = new CreatePost();
-		$schema  = $ability->get_output_schema();
+		$schema  = $ability->getOutputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
 		$this->assertArrayHasKey( 'post_id', $schema['properties'] );
@@ -239,7 +239,7 @@ class CreatePostTest extends TestCase {
 			->andReturn( 'https://example.com/wp-admin/post.php?post=42&action=edit' );
 
 		$ability = new CreatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'title'   => 'Test Post Title',
 				'content' => '<p>Test content</p>',
@@ -279,7 +279,7 @@ class CreatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new CreatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'title' => 'Test',
 			)
@@ -314,7 +314,7 @@ class CreatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new CreatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'title'  => 'Test',
 				'status' => 'publish',
@@ -355,7 +355,7 @@ class CreatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new CreatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'title' => $dangerous_title,
 			)
@@ -397,7 +397,7 @@ class CreatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new CreatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'title'   => 'Test',
 				'content' => $dangerous_content,
@@ -433,7 +433,7 @@ class CreatePostTest extends TestCase {
 		$this->expectExceptionMessage( 'Failed to create post' );
 
 		$ability = new CreatePost();
-		$ability->do_execute(
+		$ability->doExecute(
 			array(
 				'title' => 'Test',
 			)
@@ -466,7 +466,7 @@ class CreatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new CreatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'title'  => 'Test',
 				'author' => 5,
@@ -502,7 +502,7 @@ class CreatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new CreatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'title'      => 'Test',
 				'categories' => array( 1, 2, 3 ),
@@ -538,7 +538,7 @@ class CreatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new CreatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'title' => 'Test',
 				'tags'  => array( 'wordpress', 'php', 'testing' ),
@@ -565,7 +565,7 @@ class CreatePostTest extends TestCase {
 		$ability = new CreatePost();
 
 		$reflection = new \ReflectionClass( $ability );
-		$method     = $reflection->getMethod( 'build_post_data' );
+		$method     = $reflection->getMethod( 'buildPostData' );
 
 		$input = array(
 			'title'   => 'Test',
@@ -599,7 +599,7 @@ class CreatePostTest extends TestCase {
 			->andReturn( 'https://example.com/wp-admin/post.php?post=123&action=edit' );
 
 		$ability = new CreatePost();
-		$result  = $ability->do_execute( array( 'title' => 'Test' ) );
+		$result  = $ability->doExecute( array( 'title' => 'Test' ) );
 
 		$this->assertEquals( 'https://example.com/wp-admin/post.php?post=123&action=edit', $result['edit_url'] );
 	}
@@ -631,7 +631,7 @@ class CreatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new CreatePost();
-		$result  = $ability->do_execute(
+		$result  = $ability->doExecute(
 			array(
 				'title'  => 'Test',
 				'status' => 'invalid_status',
@@ -667,7 +667,7 @@ class CreatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new CreatePost();
-		$ability->do_execute( array( 'title' => 'Test' ) );
+		$ability->doExecute( array( 'title' => 'Test' ) );
 	}
 
 	/**
@@ -696,7 +696,7 @@ class CreatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new CreatePost();
-		$ability->do_execute(
+		$ability->doExecute(
 			array(
 				'title'     => 'Test',
 				'post_type' => 'page',
@@ -730,7 +730,7 @@ class CreatePostTest extends TestCase {
 		Functions\expect( 'get_edit_post_link' )->andReturn( 'https://example.com/wp-admin/post.php?post=1&action=edit' );
 
 		$ability = new CreatePost();
-		$ability->do_execute(
+		$ability->doExecute(
 			array(
 				'title'     => 'Test',
 				'post_type' => 'custom_type',

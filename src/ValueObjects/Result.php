@@ -80,7 +80,7 @@ final readonly class Result {
      * @param callable $fn Chaining function: (mixed) => Result.
      * @return self
      */
-    public function flat_map( callable $fn ): self {
+    public function flatMap( callable $fn ): self {
         return $this->is_success ? $fn( $this->value ) : $this;
     }
 
@@ -93,7 +93,7 @@ final readonly class Result {
      * @param int    $execution_time_ms The execution time in milliseconds.
      * @return array<string, mixed> The formatted response array.
      */
-    public function to_response( string $correlation_id, int $execution_time_ms ): array {
+    public function toResponse( string $correlation_id, int $execution_time_ms ): array {
         if ( $this->is_success ) {
             // Ensure value is an array for ResponseFormatter.
             $data = is_array( $this->value ) ? $this->value : array();

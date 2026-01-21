@@ -22,12 +22,12 @@ interface WebhookConfig {
      *
      * @return array<int, string> Array of webhook URLs.
      */
-    public function get_subscribed_urls( string $event ): array;
+    public function getSubscribedUrls( string $event ): array;
 
     /**
      * Get webhook secret for HMAC signing.
      *
      * @return string Secret key
      */
-    public function get_secret(): string;
+    public function getSecret(): string;
 }

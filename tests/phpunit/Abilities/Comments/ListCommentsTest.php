@@ -50,11 +50,11 @@ final class ListCommentsTest extends TestCase {
 	public function test_ability_metadata(): void {
 		$ability = new ListComments();
 
-		$this->assertEquals( 'fa-wpmcp/list-comments', $ability->get_name() );
-		$this->assertEquals( 'comments', $ability->get_category() );
-		$this->assertEquals( 'List Comments', $ability->get_label() );
-		$this->assertEquals( 'read', $ability->get_required_capability() );
-		$this->assertStringContainsString( 'comment', strtolower( $ability->get_description() ) );
+		$this->assertEquals( 'fa-wpmcp/list-comments', $ability->getName() );
+		$this->assertEquals( 'comments', $ability->getCategory() );
+		$this->assertEquals( 'List Comments', $ability->getLabel() );
+		$this->assertEquals( 'read', $ability->getRequiredCapability() );
+		$this->assertStringContainsString( 'comment', strtolower( $ability->getDescription() ) );
 	}
 
 	/**
@@ -64,7 +64,7 @@ final class ListCommentsTest extends TestCase {
 	 */
 	public function test_schema_structures(): void {
 		$ability      = new ListComments();
-		$input_schema = $ability->get_input_schema();
+		$input_schema = $ability->getInputSchema();
 
 		$this->assertEquals( 'object', $input_schema['type'] );
 		$this->assertArrayHasKey( 'page', $input_schema['properties'] );
@@ -72,7 +72,7 @@ final class ListCommentsTest extends TestCase {
 		$this->assertArrayHasKey( 'post_id', $input_schema['properties'] );
 		$this->assertArrayHasKey( 'status', $input_schema['properties'] );
 
-		$output_schema = $ability->get_output_schema();
+		$output_schema = $ability->getOutputSchema();
 		$this->assertEquals( 'object', $output_schema['type'] );
 		$this->assertArrayHasKey( 'comments', $output_schema['properties'] );
 		$this->assertArrayHasKey( 'total', $output_schema['properties'] );
@@ -111,7 +111,7 @@ final class ListCommentsTest extends TestCase {
 			->andReturn( 'https://example.com/post#comment-1' );
 
 		$ability = new ListComments();
-		$result  = $ability->do_execute( array( 'page' => 1, 'per_page' => 10 ) );
+		$result  = $ability->doExecute( array( 'page' => 1, 'per_page' => 10 ) );
 
 		$this->assertArrayHasKey( 'comments', $result );
 		$this->assertArrayHasKey( 'total', $result );
@@ -136,7 +136,7 @@ final class ListCommentsTest extends TestCase {
 			->andReturn( (object) array( 'approved' => '0' ) );
 
 		$ability = new ListComments();
-		$ability->do_execute( array( 'post_id' => 42 ) );
+		$ability->doExecute( array( 'post_id' => 42 ) );
 
 		$this->assertTrue( true );
 	}
@@ -158,7 +158,7 @@ final class ListCommentsTest extends TestCase {
 			->andReturn( (object) array( 'moderated' => '5' ) );
 
 		$ability = new ListComments();
-		$result  = $ability->do_execute( array( 'status' => 'hold' ) );
+		$result  = $ability->doExecute( array( 'status' => 'hold' ) );
 
 		$this->assertEquals( 5, $result['total'] );
 	}
@@ -177,7 +177,7 @@ final class ListCommentsTest extends TestCase {
 			->andReturn( (object) array( 'total_comments' => '12' ) );
 
 		$ability = new ListComments();
-		$result  = $ability->do_execute( array( 'status' => 'all' ) );
+		$result  = $ability->doExecute( array( 'status' => 'all' ) );
 
 		$this->assertEquals( 12, $result['total'] );
 	}
@@ -196,7 +196,7 @@ final class ListCommentsTest extends TestCase {
 			->andReturn( (object) array( 'spam' => '3' ) );
 
 		$ability = new ListComments();
-		$result  = $ability->do_execute( array( 'status' => 'spam' ) );
+		$result  = $ability->doExecute( array( 'status' => 'spam' ) );
 
 		$this->assertEquals( 3, $result['total'] );
 	}
@@ -215,7 +215,7 @@ final class ListCommentsTest extends TestCase {
 			->andReturn( (object) array( 'trash' => '2' ) );
 
 		$ability = new ListComments();
-		$result  = $ability->do_execute( array( 'status' => 'trash' ) );
+		$result  = $ability->doExecute( array( 'status' => 'trash' ) );
 
 		$this->assertEquals( 2, $result['total'] );
 	}

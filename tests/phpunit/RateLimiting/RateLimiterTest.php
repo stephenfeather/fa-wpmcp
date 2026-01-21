@@ -43,7 +43,7 @@ class RateLimiterTest extends TestCase {
 			->andReturn( 10 ); // Low count.
 
 		$config = Mockery::mock( RateLimitConfig::class );
-		$config->shouldReceive( 'get_all' )
+		$config->shouldReceive( 'getAll' )
 			->andReturn( array() ); // Use defaults.
 
 		$limiter = new RateLimiter( $store, $config );
@@ -73,7 +73,7 @@ class RateLimiterTest extends TestCase {
 			);
 
 		$config = Mockery::mock( RateLimitConfig::class );
-		$config->shouldReceive( 'get_all' )
+		$config->shouldReceive( 'getAll' )
 			->andReturn( array() ); // Use defaults (60/min).
 
 		$limiter = new RateLimiter( $store, $config );
@@ -103,7 +103,7 @@ class RateLimiterTest extends TestCase {
 			);
 
 		$config = Mockery::mock( RateLimitConfig::class );
-		$config->shouldReceive( 'get_all' )
+		$config->shouldReceive( 'getAll' )
 			->andReturn( array() ); // Use defaults (500/hour).
 
 		$limiter = new RateLimiter( $store, $config );
@@ -125,7 +125,7 @@ class RateLimiterTest extends TestCase {
 			->andReturn( 5 ); // Under custom limit of 10.
 
 		$config = Mockery::mock( RateLimitConfig::class );
-		$config->shouldReceive( 'get_all' )
+		$config->shouldReceive( 'getAll' )
 			->andReturn(
 				array(
 					'fa-wpmcp/create-post' => array(
@@ -198,7 +198,7 @@ class RateLimiterTest extends TestCase {
 			->twice(); // Record increments both.
 
 		$config = Mockery::mock( RateLimitConfig::class );
-		$config->shouldReceive( 'get_all' )
+		$config->shouldReceive( 'getAll' )
 			->andReturn( array() );
 
 		$limiter = new RateLimiter( $store, $config );
@@ -224,7 +224,7 @@ class RateLimiterTest extends TestCase {
 			->andReturn( 10 );
 
 		$config = Mockery::mock( RateLimitConfig::class );
-		$config->shouldReceive( 'get_all' )
+		$config->shouldReceive( 'getAll' )
 			->andReturn( array() );
 
 		$limiter = new RateLimiter( $store, $config );
@@ -252,7 +252,7 @@ class RateLimiterTest extends TestCase {
 			);
 
 		$config = Mockery::mock( RateLimitConfig::class );
-		$config->shouldReceive( 'get_all' )
+		$config->shouldReceive( 'getAll' )
 			->andReturn( array() );
 
 		$limiter = new RateLimiter( $store, $config );

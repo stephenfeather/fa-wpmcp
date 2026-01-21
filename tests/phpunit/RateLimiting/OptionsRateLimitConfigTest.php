@@ -42,7 +42,7 @@ final class OptionsRateLimitConfigTest extends TestCase {
 			->andReturn( 'not-an-array' );
 
 		$config = new OptionsRateLimitConfig();
-		$result = $config->get_all();
+		$result = $config->getAll();
 
 		$this->assertArrayHasKey( 'default', $result );
 		$this->assertSame( 60, $result['default']['requests_per_minute'] );

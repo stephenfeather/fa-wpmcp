@@ -58,7 +58,7 @@ final class WebhookService {
         $this->scheduler->init();
 
         // Register ability lifecycle hooks.
-        $this->register_ability_hooks();
+        $this->registerAbilityHooks();
     }
 
     /**
@@ -66,11 +66,11 @@ final class WebhookService {
      *
      * Listens for ability events and triggers webhooks.
      */
-    private function register_ability_hooks(): void {
+    private function registerAbilityHooks(): void {
         // Trigger webhooks before ability execution.
         add_action(
             'fa_wpmcp_ability_before_execute',
-            array( $this, 'on_before_execute' ),
+            array( $this, 'onBeforeExecute' ),
             10,
             1
         );
@@ -78,7 +78,7 @@ final class WebhookService {
         // Trigger webhooks after successful ability execution.
         add_action(
             'fa_wpmcp_ability_after_execute',
-            array( $this, 'on_after_execute' ),
+            array( $this, 'onAfterExecute' ),
             10,
             1
         );
@@ -86,7 +86,7 @@ final class WebhookService {
         // Trigger webhooks after ability execution failure.
         add_action(
             'fa_wpmcp_ability_failed',
-            array( $this, 'on_failed' ),
+            array( $this, 'onFailed' ),
             10,
             1
         );
@@ -97,7 +97,7 @@ final class WebhookService {
      *
      * @param array<string, mixed> $context Event context.
      */
-    public function on_before_execute( array $context ): void {
+    public function onBeforeExecute( array $context ): void {
         $this->manager->trigger( 'ability.before_execute', $context );
     }
 
@@ -106,7 +106,7 @@ final class WebhookService {
      *
      * @param array<string, mixed> $context Event context.
      */
-    public function on_after_execute( array $context ): void {
+    public function onAfterExecute( array $context ): void {
         $this->manager->trigger( 'ability.after_execute', $context );
     }
 
@@ -115,7 +115,7 @@ final class WebhookService {
      *
      * @param array<string, mixed> $context Event context.
      */
-    public function on_failed( array $context ): void {
+    public function onFailed( array $context ): void {
         $this->manager->trigger( 'ability.failed', $context );
     }
 
@@ -135,7 +135,7 @@ final class WebhookService {
      *
      * @return WebhookManager Webhook manager instance.
      */
-    public function get_manager(): WebhookManager {
+    public function getManager(): WebhookManager {
         return $this->manager;
     }
 }
