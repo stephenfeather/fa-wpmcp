@@ -42,7 +42,10 @@ Default permissions:
 
 Configure via WordPress options or filters (see [Configuration](#configuration)).
 
-**For detailed MCP integration and API documentation, see [MCP Documentation](docs/MCP_DOCUMENTATION.md).**
+**Connect AI Assistants:**
+- **[Quick Start Guide](docs/QUICK_START.md)** - Get connected in 5 minutes
+- **[Client Configuration](docs/MCP_CLIENT_CONFIGURATION.md)** - Claude, GPT, Gemini setup examples
+- **[Full API Documentation](docs/MCP_DOCUMENTATION.md)** - Complete reference
 
 ## Features
 
