@@ -203,22 +203,20 @@ final class AbilityExecutor {
 		if ( isset( $this->permission_settings->category_settings[ $category ] ) ) {
 			$category_settings = $this->permission_settings->category_settings[ $category ];
 
-			if ( 'read' === $operation && isset( $category_settings['enable_read'] ) ) {
-				if ( false === $category_settings['enable_read'] ) {
-					return Result::failure(
-						'ability_disabled',
-						sprintf( 'Read operations in category "%s" are disabled.', $category )
-					);
-				}
+			// Check read operation permission.
+			if ( 'read' === $operation && isset( $category_settings['enable_read'] ) && false === $category_settings['enable_read'] ) {
+				return Result::failure(
+					'ability_disabled',
+					sprintf( 'Read operations in category "%s" are disabled.', $category )
+				);
 			}
 
-			if ( 'write' === $operation && isset( $category_settings['enable_write'] ) ) {
-				if ( false === $category_settings['enable_write'] ) {
-					return Result::failure(
-						'ability_disabled',
-						sprintf( 'Write operations in category "%s" are disabled.', $category )
-					);
-				}
+			// Check write operation permission.
+			if ( 'write' === $operation && isset( $category_settings['enable_write'] ) && false === $category_settings['enable_write'] ) {
+				return Result::failure(
+					'ability_disabled',
+					sprintf( 'Write operations in category "%s" are disabled.', $category )
+				);
 			}
 		}
 
