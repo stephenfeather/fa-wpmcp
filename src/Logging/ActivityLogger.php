@@ -17,7 +17,7 @@ namespace FAWpmcp\Logging;
  *
  * @package FAWpmcp\Logging
  */
-final class ActivityLogger {
+final class ActivityLogger implements ActivityLoggerInterface {
 	/**
 	 * UUID generator callable.
 	 *

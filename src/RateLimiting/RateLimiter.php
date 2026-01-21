@@ -19,7 +19,7 @@ use FAWpmcp\ValueObjects\RateLimitResult;
  *
  * @package FAWpmcp\RateLimiting
  */
-class RateLimiter {
+class RateLimiter implements RateLimiterInterface {
 	/**
 	 * Constructor.
 	 *

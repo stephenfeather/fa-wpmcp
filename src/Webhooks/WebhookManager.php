@@ -14,7 +14,7 @@ namespace FAWpmcp\Webhooks;
  *
  * Coordinates webhook triggering, queuing, and delivery.
  */
-final class WebhookManager {
+final class WebhookManager implements WebhookManagerInterface {
 	/**
 	 * Constructor.
 	 *
