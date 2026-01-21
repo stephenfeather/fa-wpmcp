@@ -73,6 +73,7 @@ final class Plugin {
         $ability_registry = new \FAWpmcp\Abilities\AbilityRegistry();
         $this->registerPostAbilities( $ability_registry );
         $this->registerCommentAbilities( $ability_registry );
+        $this->registerMediaAbilities( $ability_registry );
         $this->registerService( 'ability_registry', $ability_registry );
 
         // Initialize Admin Settings Page.
@@ -145,6 +146,19 @@ final class Plugin {
         $registry->register( new \FAWpmcp\Abilities\Comments\ListComments() );
         $registry->register( new \FAWpmcp\Abilities\Comments\CreateComment() );
         $registry->register( new \FAWpmcp\Abilities\Comments\UpdateComment() );
+    }
+
+    /**
+     * Register Media abilities with the registry.
+     *
+     * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private function registerMediaAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+        $registry->register( new \FAWpmcp\Abilities\Media\GetMedia() );
+        $registry->register( new \FAWpmcp\Abilities\Media\ListMedia() );
+        $registry->register( new \FAWpmcp\Abilities\Media\UploadMedia() );
+        $registry->register( new \FAWpmcp\Abilities\Media\UpdateMedia() );
     }
 
     /**
