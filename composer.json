@@ -10,7 +10,7 @@
 		}
 	],
 	"require": {
-		"php": ">=8.1",
+		"php": ">=8.2",
 		"wordpress/abilities-api": "^0.5",
 		"wordpress/mcp-adapter": "^0.4",
 		"woocommerce/action-scheduler": "^3.7"
