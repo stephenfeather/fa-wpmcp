@@ -69,8 +69,9 @@ final class Plugin {
 		$this->register_service( 'webhook', $webhook_service );
 
 		// Initialize Ability Framework.
-		// 1. Create AbilityRegistry.
+		// 1. Create AbilityRegistry and register abilities.
 		$ability_registry = new \FAWpmcp\Abilities\AbilityRegistry();
+		$this->register_post_abilities( $ability_registry );
 		$this->register_service( 'ability_registry', $ability_registry );
 
 		// 2. Create dependencies for AbilityExecutor.
@@ -112,6 +113,19 @@ final class Plugin {
 	 */
 	private function register_hooks(): void {
 		add_action( 'admin_init', array( $this, 'check_abilities_api_and_show_notice' ) );
+	}
+
+	/**
+	 * Register Post abilities with the registry.
+	 *
+	 * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private function register_post_abilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Posts\GetPost() );
+		$registry->register( new \FAWpmcp\Abilities\Posts\ListPosts() );
+		$registry->register( new \FAWpmcp\Abilities\Posts\CreatePost() );
+		$registry->register( new \FAWpmcp\Abilities\Posts\UpdatePost() );
 	}
 
 	/**

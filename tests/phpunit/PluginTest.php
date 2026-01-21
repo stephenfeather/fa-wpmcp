@@ -118,4 +118,43 @@ class PluginTest extends TestCase {
 
 		$this->assertTrue( method_exists( $plugin, 'check_abilities_api_and_show_notice' ) );
 	}
+
+	/**
+	 * Test that init registers Post abilities with AbilityRegistry.
+	 */
+	public function test_init_registers_post_abilities(): void {
+		// Mock WordPress functions called during init.
+		Functions\expect( 'add_action' )
+			->atLeast()
+			->once();
+
+		Functions\expect( 'get_option' )
+			->andReturn( array() );
+
+		Functions\expect( 'wp_generate_uuid4' )
+			->andReturn( 'test-uuid' );
+
+		// Set up mock $wpdb before init is called.
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Required for unit tests.
+		$GLOBALS['wpdb'] = \Mockery::mock( '\wpdb' );
+		$GLOBALS['wpdb']->prefix = 'wp_';
+
+		$plugin = Plugin::get_instance();
+		$plugin->init();
+
+		// Get the ability registry service.
+		$registry = $plugin->get_service( 'ability_registry' );
+
+		$this->assertInstanceOf( \FAWpmcp\Abilities\AbilityRegistry::class, $registry );
+
+		// Verify all 4 Post abilities are registered.
+		$this->assertTrue( $registry->has( 'fa-wpmcp/get-post' ), 'GetPost ability should be registered' );
+		$this->assertTrue( $registry->has( 'fa-wpmcp/list-posts' ), 'ListPosts ability should be registered' );
+		$this->assertTrue( $registry->has( 'fa-wpmcp/create-post' ), 'CreatePost ability should be registered' );
+		$this->assertTrue( $registry->has( 'fa-wpmcp/update-post' ), 'UpdatePost ability should be registered' );
+
+		// Verify they are in the correct category.
+		$post_abilities = $registry->by_category( 'posts-pages' );
+		$this->assertCount( 4, $post_abilities, 'Should have 4 abilities in posts-pages category' );
+	}
 }
