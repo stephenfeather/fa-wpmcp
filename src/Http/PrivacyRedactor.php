@@ -59,7 +59,7 @@ final class PrivacyRedactor {
             if ( is_array( $value ) ) {
                 // Recursively redact nested arrays.
                 $result[ $key ] = self::redact( $value );
-            } elseif ( self::is_sensitive_field( $key ) ) {
+            } elseif ( self::isSensitiveField( $key ) ) {
                 // Redact sensitive field values.
                 $result[ $key ] = self::REDACTED;
             } else {
@@ -79,7 +79,7 @@ final class PrivacyRedactor {
      * @param string|int $field_name The field name to check.
      * @return bool True if the field is sensitive.
      */
-    private static function is_sensitive_field( string|int $field_name ): bool {
+    private static function isSensitiveField( string|int $field_name ): bool {
         // Numeric keys are never sensitive field names.
         if ( is_int( $field_name ) ) {
             return false;

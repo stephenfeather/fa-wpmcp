@@ -67,7 +67,7 @@ class PermissionCheckerTest extends TestCase {
 			ability_settings: array(),
 		);
 
-		$result = PermissionChecker::check_category( $settings, 'posts-pages', 'write' );
+		$result = PermissionChecker::checkCategory( $settings, 'posts-pages', 'write' );
 
 		$this->assertFalse( $result->is_success );
 	}
@@ -90,7 +90,7 @@ class PermissionCheckerTest extends TestCase {
 			),
 		);
 
-		$result = PermissionChecker::check_ability( $settings, 'fa-wpmcp/create-post' );
+		$result = PermissionChecker::checkAbility( $settings, 'fa-wpmcp/create-post' );
 
 		$this->assertFalse( $result->is_success );
 	}
@@ -122,8 +122,8 @@ class PermissionCheckerTest extends TestCase {
 			ability_settings: array(),
 		);
 
-		$read_result  = PermissionChecker::check_global( $settings, 'read' );
-		$write_result = PermissionChecker::check_global( $settings, 'write' );
+		$read_result  = PermissionChecker::checkGlobal( $settings, 'read' );
+		$write_result = PermissionChecker::checkGlobal( $settings, 'write' );
 
 		$this->assertTrue( $read_result->is_success );
 		$this->assertTrue( $write_result->is_success );
@@ -140,8 +140,8 @@ class PermissionCheckerTest extends TestCase {
 			ability_settings: array(),
 		);
 
-		$read_result  = PermissionChecker::check_global( $settings, 'read' );
-		$write_result = PermissionChecker::check_global( $settings, 'write' );
+		$read_result  = PermissionChecker::checkGlobal( $settings, 'read' );
+		$write_result = PermissionChecker::checkGlobal( $settings, 'write' );
 
 		$this->assertFalse( $read_result->is_success );
 		$this->assertFalse( $write_result->is_success );
@@ -158,7 +158,7 @@ class PermissionCheckerTest extends TestCase {
 			ability_settings: array(),
 		);
 
-		$result = PermissionChecker::check_category( $settings, 'posts-pages', 'read' );
+		$result = PermissionChecker::checkCategory( $settings, 'posts-pages', 'read' );
 
 		$this->assertTrue( $result->is_success );
 	}
@@ -174,7 +174,7 @@ class PermissionCheckerTest extends TestCase {
 			ability_settings: array(),
 		);
 
-		$result = PermissionChecker::check_ability( $settings, 'fa-wpmcp/list-posts' );
+		$result = PermissionChecker::checkAbility( $settings, 'fa-wpmcp/list-posts' );
 
 		$this->assertTrue( $result->is_success );
 	}

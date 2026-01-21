@@ -41,7 +41,7 @@ final readonly class PermissionSettings {
      * @param bool $enabled New global read setting.
      * @return self New instance with updated setting.
      */
-    public function with_global_read( bool $enabled ): self {
+    public function withGlobalRead( bool $enabled ): self {
         return new self(
             $enabled,
             $this->global_write_enabled,
@@ -56,7 +56,7 @@ final readonly class PermissionSettings {
      * @param bool $enabled New global write setting.
      * @return self New instance with updated setting.
      */
-    public function with_global_write( bool $enabled ): self {
+    public function withGlobalWrite( bool $enabled ): self {
         return new self(
             $this->global_read_enabled,
             $enabled,

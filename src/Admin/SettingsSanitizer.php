@@ -38,7 +38,7 @@ final class SettingsSanitizer {
      * @param mixed $input Raw input data.
      * @return array<string, array<string, bool>> Sanitized settings.
      */
-    public function sanitize_category_settings( $input ): array {
+    public function sanitizeCategorySettings( $input ): array {
         if ( ! is_array( $input ) ) {
             return array();
         }
@@ -62,7 +62,7 @@ final class SettingsSanitizer {
      * @param mixed $input Raw input data.
      * @return array<string, array<string, bool>> Sanitized settings.
      */
-    public function sanitize_ability_settings( $input ): array {
+    public function sanitizeAbilitySettings( $input ): array {
         if ( ! is_array( $input ) ) {
             return array();
         }
@@ -85,7 +85,7 @@ final class SettingsSanitizer {
      * @param mixed $input Raw input data.
      * @return array<string, array<string, int>> Sanitized settings.
      */
-    public function sanitize_ability_rate_limits( $input ): array {
+    public function sanitizeAbilityRateLimits( $input ): array {
         if ( ! is_array( $input ) ) {
             return array();
         }
@@ -109,7 +109,7 @@ final class SettingsSanitizer {
      * @param mixed $input Raw input data.
      * @return array<array<string, mixed>> Sanitized endpoints.
      */
-    public function sanitize_webhook_endpoints( $input ): array {
+    public function sanitizeWebhookEndpoints( $input ): array {
         if ( ! is_array( $input ) ) {
             return array();
         }
@@ -117,7 +117,7 @@ final class SettingsSanitizer {
         $sanitized = array();
 
         foreach ( $input as $endpoint ) {
-            $sanitized_endpoint = $this->sanitize_single_endpoint( $endpoint );
+            $sanitized_endpoint = $this->sanitizeSingleEndpoint( $endpoint );
             if ( $sanitized_endpoint !== null ) {
                 $sanitized[] = $sanitized_endpoint;
             }
@@ -132,7 +132,7 @@ final class SettingsSanitizer {
      * @param mixed $endpoint Endpoint data.
      * @return array<string, mixed>|null Sanitized endpoint or null if invalid.
      */
-    private function sanitize_single_endpoint( $endpoint ): ?array {
+    private function sanitizeSingleEndpoint( $endpoint ): ?array {
         if ( ! is_array( $endpoint ) ) {
             return null;
         }
@@ -144,7 +144,7 @@ final class SettingsSanitizer {
 
         return array(
             'url'    => $url,
-            'events' => $this->sanitize_webhook_events( $endpoint['events'] ?? null ),
+            'events' => $this->sanitizeWebhookEvents( $endpoint['events'] ?? null ),
         );
     }
 
@@ -154,7 +154,7 @@ final class SettingsSanitizer {
      * @param mixed $events Raw events data.
      * @return array<string> Sanitized event names.
      */
-    private function sanitize_webhook_events( $events ): array {
+    private function sanitizeWebhookEvents( $events ): array {
         if ( ! is_array( $events ) ) {
             return array();
         }

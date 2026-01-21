@@ -26,14 +26,14 @@ class LogEntryBuilderTest extends TestCase {
 	 */
 	public function test_builds_complete_log_entry(): void {
 		$entry = LogEntryBuilder::create()
-			->with_correlation_id( 'uuid-123' )
-			->with_user( 1, 'admin' )
-			->with_ip_address( '192.168.1.1' )
-			->with_ability( 'fa-wpmcp/list-posts', 'posts-pages', 'read' )
-			->with_input( array( 'page' => 1 ) )
-			->with_output( array( 'posts' => array() ) )
-			->with_success( true )
-			->with_execution_time( 150 )
+			->withCorrelationId( 'uuid-123' )
+			->withUser( 1, 'admin' )
+			->withIpAddress( '192.168.1.1' )
+			->withAbility( 'fa-wpmcp/list-posts', 'posts-pages', 'read' )
+			->withInput( array( 'page' => 1 ) )
+			->withOutput( array( 'posts' => array() ) )
+			->withSuccess( true )
+			->withExecutionTime( 150 )
 			->build();
 
 		$this->assertInstanceOf( LogEntry::class, $entry );
@@ -56,14 +56,14 @@ class LogEntryBuilderTest extends TestCase {
 	 * @return void
 	 */
 	public function test_builder_is_immutable(): void {
-		$builder1 = LogEntryBuilder::create()->with_correlation_id( 'id-1' );
-		$builder2 = $builder1->with_correlation_id( 'id-2' );
+		$builder1 = LogEntryBuilder::create()->withCorrelationId( 'id-1' );
+		$builder2 = $builder1->withCorrelationId( 'id-2' );
 
 		// Original builder unchanged.
 		$this->assertNotSame( $builder1, $builder2 );
 
-		$entry1 = $builder1->with_user( 1, 'admin' )->with_ability( 'test', 'test', 'read' )->build();
-		$entry2 = $builder2->with_user( 1, 'admin' )->with_ability( 'test', 'test', 'read' )->build();
+		$entry1 = $builder1->withUser( 1, 'admin' )->withAbility( 'test', 'test', 'read' )->build();
+		$entry2 = $builder2->withUser( 1, 'admin' )->withAbility( 'test', 'test', 'read' )->build();
 
 		$this->assertEquals( 'id-1', $entry1->correlation_id );
 		$this->assertEquals( 'id-2', $entry2->correlation_id );
@@ -76,14 +76,14 @@ class LogEntryBuilderTest extends TestCase {
 	 */
 	public function test_builds_entry_with_error(): void {
 		$entry = LogEntryBuilder::create()
-			->with_correlation_id( 'error-123' )
-			->with_user( 1, 'admin' )
-			->with_ip_address( '127.0.0.1' )
-			->with_ability( 'fa-wpmcp/create-post', 'posts-pages', 'write' )
-			->with_input( array( 'title' => 'Test' ) )
-			->with_success( false )
-			->with_error( 'Validation failed' )
-			->with_execution_time( 75 )
+			->withCorrelationId( 'error-123' )
+			->withUser( 1, 'admin' )
+			->withIpAddress( '127.0.0.1' )
+			->withAbility( 'fa-wpmcp/create-post', 'posts-pages', 'write' )
+			->withInput( array( 'title' => 'Test' ) )
+			->withSuccess( false )
+			->withError( 'Validation failed' )
+			->withExecutionTime( 75 )
 			->build();
 
 		$this->assertFalse( $entry->success );
@@ -121,14 +121,14 @@ class LogEntryBuilderTest extends TestCase {
 	 */
 	public function test_method_chaining(): void {
 		$entry = LogEntryBuilder::create()
-			->with_correlation_id( 'chain-123' )
-			->with_user( 5, 'editor' )
-			->with_ip_address( '10.0.0.1' )
-			->with_ability( 'fa-wpmcp/update-post', 'posts-pages', 'write' )
-			->with_input( array( 'post_id' => 42 ) )
-			->with_output( array( 'updated' => true ) )
-			->with_success( true )
-			->with_execution_time( 200 )
+			->withCorrelationId( 'chain-123' )
+			->withUser( 5, 'editor' )
+			->withIpAddress( '10.0.0.1' )
+			->withAbility( 'fa-wpmcp/update-post', 'posts-pages', 'write' )
+			->withInput( array( 'post_id' => 42 ) )
+			->withOutput( array( 'updated' => true ) )
+			->withSuccess( true )
+			->withExecutionTime( 200 )
 			->build();
 
 		$this->assertEquals( 'chain-123', $entry->correlation_id );

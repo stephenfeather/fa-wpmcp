@@ -20,7 +20,7 @@ class SchemaTest extends TestCase {
 	 * Test activity log schema generation.
 	 */
 	public function test_get_activity_log_schema_returns_valid_sql(): void {
-		$sql = Schema::get_activity_log_schema( 'wp_' );
+		$sql = Schema::getActivityLogSchema( 'wp_' );
 
 		$this->assertStringContainsString( 'CREATE TABLE', $sql );
 		$this->assertStringContainsString( 'wp_fa_wpmcp_activity_log', $sql );
@@ -34,7 +34,7 @@ class SchemaTest extends TestCase {
 	 * Test webhook queue schema generation.
 	 */
 	public function test_get_webhook_queue_schema_returns_valid_sql(): void {
-		$sql = Schema::get_webhook_queue_schema( 'wp_' );
+		$sql = Schema::getWebhookQueueSchema( 'wp_' );
 
 		$this->assertStringContainsString( 'CREATE TABLE', $sql );
 		$this->assertStringContainsString( 'wp_fa_wpmcp_webhook_queue', $sql );
@@ -45,7 +45,7 @@ class SchemaTest extends TestCase {
 	 * Test schema uses provided prefix.
 	 */
 	public function test_schema_uses_provided_prefix(): void {
-		$sql = Schema::get_activity_log_schema( 'custom_prefix_' );
+		$sql = Schema::getActivityLogSchema( 'custom_prefix_' );
 
 		$this->assertStringContainsString( 'custom_prefix_fa_wpmcp_activity_log', $sql );
 		$this->assertStringNotContainsString( 'wp_fa_wpmcp_activity_log', $sql );
@@ -55,7 +55,7 @@ class SchemaTest extends TestCase {
 	 * Test get all schemas returns array.
 	 */
 	public function test_get_all_schemas_returns_array(): void {
-		$schemas = Schema::get_all_schemas( 'wp_' );
+		$schemas = Schema::getAllSchemas( 'wp_' );
 
 		$this->assertIsArray( $schemas );
 		$this->assertCount( 2, $schemas );
@@ -67,7 +67,7 @@ class SchemaTest extends TestCase {
 	 * Test activity log schema includes all required columns.
 	 */
 	public function test_activity_log_schema_includes_required_columns(): void {
-		$sql = Schema::get_activity_log_schema( 'wp_' );
+		$sql = Schema::getActivityLogSchema( 'wp_' );
 
 		$required_columns = array(
 			'id',
@@ -95,7 +95,7 @@ class SchemaTest extends TestCase {
 	 * Test activity log schema includes indexes.
 	 */
 	public function test_activity_log_schema_includes_indexes(): void {
-		$sql = Schema::get_activity_log_schema( 'wp_' );
+		$sql = Schema::getActivityLogSchema( 'wp_' );
 
 		$this->assertStringContainsString( 'INDEX', $sql );
 		$this->assertStringContainsString( 'idx_correlation_id', $sql );
@@ -107,7 +107,7 @@ class SchemaTest extends TestCase {
 	 * Test webhook queue schema includes required columns.
 	 */
 	public function test_webhook_queue_schema_includes_required_columns(): void {
-		$sql = Schema::get_webhook_queue_schema( 'wp_' );
+		$sql = Schema::getWebhookQueueSchema( 'wp_' );
 
 		$required_columns = array(
 			'id',
@@ -128,8 +128,8 @@ class SchemaTest extends TestCase {
 	 * Test schema is deterministic (pure function).
 	 */
 	public function test_schema_is_deterministic(): void {
-		$sql1 = Schema::get_activity_log_schema( 'wp_' );
-		$sql2 = Schema::get_activity_log_schema( 'wp_' );
+		$sql1 = Schema::getActivityLogSchema( 'wp_' );
+		$sql2 = Schema::getActivityLogSchema( 'wp_' );
 
 		$this->assertSame( $sql1, $sql2, 'Schema generation should be deterministic' );
 	}

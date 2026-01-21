@@ -28,7 +28,7 @@ class PermissionSettingsTest extends TestCase {
 		);
 
 		// Attempting to modify should create new instance.
-		$new_settings = $settings->with_global_read( false );
+		$new_settings = $settings->withGlobalRead( false );
 
 		$this->assertTrue( $settings->global_read_enabled );
 		$this->assertFalse( $new_settings->global_read_enabled );
@@ -46,7 +46,7 @@ class PermissionSettingsTest extends TestCase {
 			ability_settings: array(),
 		);
 
-		$new_settings = $settings->with_global_read( false );
+		$new_settings = $settings->withGlobalRead( false );
 
 		$this->assertFalse( $new_settings->global_read_enabled );
 		$this->assertTrue( $new_settings->global_write_enabled );
@@ -63,7 +63,7 @@ class PermissionSettingsTest extends TestCase {
 			ability_settings: array(),
 		);
 
-		$new_settings = $settings->with_global_write( false );
+		$new_settings = $settings->withGlobalWrite( false );
 
 		$this->assertTrue( $new_settings->global_read_enabled );
 		$this->assertFalse( $new_settings->global_write_enabled );

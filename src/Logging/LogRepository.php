@@ -99,7 +99,7 @@ class LogRepository {
      * @param array  $data           Data to update (keys: output_data, success, error_message, execution_time_ms).
      * @return int|false Number of rows updated or false on failure.
      */
-    public function update_by_correlation_id( string $correlation_id, array $data ): int|false {
+    public function updateByCorrelationId( string $correlation_id, array $data ): int|false {
         $update_data = array();
         $format      = array();
 
@@ -144,7 +144,7 @@ class LogRepository {
      * @param string $correlation_id Correlation ID.
      * @return object|null Database row object or null if not found.
      */
-    public function get_by_correlation_id( string $correlation_id ): ?object {
+    public function getByCorrelationId( string $correlation_id ): ?object {
         // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
         // Table name is a property set in constructor, not user input.
         $result = $this->wpdb->get_row(
@@ -166,7 +166,7 @@ class LogRepository {
      * @param int $days Number of days to retain.
      * @return int|false Number of rows deleted or false on failure.
      */
-    public function delete_older_than( int $days ): int|false {
+    public function deleteOlderThan( int $days ): int|false {
         // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
         // Table name is a property set in constructor, not user input.
         return $this->wpdb->query(

@@ -32,7 +32,7 @@ interface ActivityLoggerInterface {
      * @param array|null $input            Input data.
      * @return string Correlation ID.
      */
-    public function log_before_execute(
+    public function logBeforeExecute(
         string $ability_name,
         string $ability_category,
         string $operation_type,
@@ -48,14 +48,14 @@ interface ActivityLoggerInterface {
      * Updates existing log entry with output data and result.
      * Calculates execution time from start time.
      *
-     * @param string      $correlation_id Correlation ID from log_before_execute.
+     * @param string      $correlation_id Correlation ID from logBeforeExecute.
      * @param array|null  $output         Output data.
      * @param bool        $success        Whether execution succeeded.
      * @param string|null $error_message  Error message if failed.
      * @param float       $start_time     Start time from microtime(true).
      * @return void
      */
-    public function log_after_execute(
+    public function logAfterExecute(
         string $correlation_id,
         ?array $output,
         bool $success,

@@ -126,7 +126,7 @@ final class LogRepositoryTest extends TestCase {
 		$wpdb->prefix = 'wp_';
 
 		$repo = new LogRepository( $wpdb );
-		$this->assertFalse( $repo->update_by_correlation_id( 'corr-3', array() ) );
+		$this->assertFalse( $repo->updateByCorrelationId( 'corr-3', array() ) );
 	}
 
 	/**
@@ -158,7 +158,7 @@ final class LogRepositoryTest extends TestCase {
 			->andReturn( 1 );
 
 		$repo = new LogRepository( $wpdb );
-		$result = $repo->update_by_correlation_id(
+		$result = $repo->updateByCorrelationId(
 			'corr-4',
 			array(
 				'output_data'       => array( 'status' => 'ok' ),
@@ -189,7 +189,7 @@ final class LogRepositoryTest extends TestCase {
 			->andReturn( (object) array( 'correlation_id' => 'corr-5' ) );
 
 		$repo = new LogRepository( $wpdb );
-		$result = $repo->get_by_correlation_id( 'corr-5' );
+		$result = $repo->getByCorrelationId( 'corr-5' );
 
 		$this->assertNotNull( $result );
 	}
@@ -211,7 +211,7 @@ final class LogRepositoryTest extends TestCase {
 			->andReturn( false );
 
 		$repo = new LogRepository( $wpdb );
-		$this->assertNull( $repo->get_by_correlation_id( 'missing' ) );
+		$this->assertNull( $repo->getByCorrelationId( 'missing' ) );
 	}
 
 	/**
@@ -232,6 +232,6 @@ final class LogRepositoryTest extends TestCase {
 			->andReturn( 3 );
 
 		$repo = new LogRepository( $wpdb );
-		$this->assertSame( 3, $repo->delete_older_than( 7 ) );
+		$this->assertSame( 3, $repo->deleteOlderThan( 7 ) );
 	}
 }

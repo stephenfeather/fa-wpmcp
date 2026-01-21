@@ -67,7 +67,7 @@ final class LogEntryBuilder {
      * @param string $id Correlation ID.
      * @return self New builder instance.
      */
-    public function with_correlation_id( string $id ): self {
+    public function withCorrelationId( string $id ): self {
         return new self(
             $id,
             $this->user_id,
@@ -91,7 +91,7 @@ final class LogEntryBuilder {
      * @param string $login User login.
      * @return self New builder instance.
      */
-    public function with_user( int $id, string $login ): self {
+    public function withUser( int $id, string $login ): self {
         return new self(
             $this->correlation_id,
             $id,
@@ -114,7 +114,7 @@ final class LogEntryBuilder {
      * @param string $ip IP address.
      * @return self New builder instance.
      */
-    public function with_ip_address( string $ip ): self {
+    public function withIpAddress( string $ip ): self {
         return new self(
             $this->correlation_id,
             $this->user_id,
@@ -139,7 +139,7 @@ final class LogEntryBuilder {
      * @param string $operation Operation type ('read' or 'write').
      * @return self New builder instance.
      */
-    public function with_ability( string $name, string $category, string $operation ): self {
+    public function withAbility( string $name, string $category, string $operation ): self {
         return new self(
             $this->correlation_id,
             $this->user_id,
@@ -162,7 +162,7 @@ final class LogEntryBuilder {
      * @param array|null $input Input data.
      * @return self New builder instance.
      */
-    public function with_input( ?array $input ): self {
+    public function withInput( ?array $input ): self {
         return new self(
             $this->correlation_id,
             $this->user_id,
@@ -185,7 +185,7 @@ final class LogEntryBuilder {
      * @param array|null $output Output data.
      * @return self New builder instance.
      */
-    public function with_output( ?array $output ): self {
+    public function withOutput( ?array $output ): self {
         return new self(
             $this->correlation_id,
             $this->user_id,
@@ -208,7 +208,7 @@ final class LogEntryBuilder {
      * @param bool $success Success flag.
      * @return self New builder instance.
      */
-    public function with_success( bool $success ): self {
+    public function withSuccess( bool $success ): self {
         return new self(
             $this->correlation_id,
             $this->user_id,
@@ -231,7 +231,7 @@ final class LogEntryBuilder {
      * @param string|null $error Error message.
      * @return self New builder instance.
      */
-    public function with_error( ?string $error ): self {
+    public function withError( ?string $error ): self {
         return new self(
             $this->correlation_id,
             $this->user_id,
@@ -254,7 +254,7 @@ final class LogEntryBuilder {
      * @param int $time_ms Execution time in milliseconds.
      * @return self New builder instance.
      */
-    public function with_execution_time( int $time_ms ): self {
+    public function withExecutionTime( int $time_ms ): self {
         return new self(
             $this->correlation_id,
             $this->user_id,

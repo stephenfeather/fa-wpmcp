@@ -27,7 +27,7 @@ final class Schema {
      * @param string $prefix Database table prefix (e.g., 'wp_').
      * @return string SQL CREATE TABLE statement.
      */
-    public static function get_activity_log_schema( string $prefix ): string {
+    public static function getActivityLogSchema( string $prefix ): string {
         $table = "{$prefix}fa_wpmcp_activity_log";
 
         return "CREATE TABLE {$table} (
@@ -62,7 +62,7 @@ final class Schema {
      * @param string $prefix Database table prefix (e.g., 'wp_').
      * @return string SQL CREATE TABLE statement.
      */
-    public static function get_webhook_queue_schema( string $prefix ): string {
+    public static function getWebhookQueueSchema( string $prefix ): string {
         $table = "{$prefix}fa_wpmcp_webhook_queue";
 
         return "CREATE TABLE {$table} (
@@ -92,10 +92,10 @@ final class Schema {
      * @param string $prefix Database table prefix (e.g., 'wp_').
      * @return array<int, string> Array of CREATE TABLE statements.
      */
-    public static function get_all_schemas( string $prefix ): array {
+    public static function getAllSchemas( string $prefix ): array {
         return array(
-            self::get_activity_log_schema( $prefix ),
-            self::get_webhook_queue_schema( $prefix ),
+            self::getActivityLogSchema( $prefix ),
+            self::getWebhookQueueSchema( $prefix ),
         );
     }
 }

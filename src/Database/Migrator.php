@@ -27,7 +27,7 @@ final class Migrator {
      * @param string $target_version  Target database version.
      * @return bool True if migration is needed.
      */
-    public static function should_migrate( string $current_version, string $target_version ): bool {
+    public static function shouldMigrate( string $current_version, string $target_version ): bool {
         return version_compare( $current_version, $target_version, '<' );
     }
 
@@ -40,8 +40,8 @@ final class Migrator {
      * @param string $to_version   Target version (inclusive).
      * @return array<int, array<string, string>> Array of migrations to run.
      */
-    public static function get_migrations( string $from_version, string $to_version ): array {
-        $all_migrations = self::get_all_migrations();
+    public static function getMigrations( string $from_version, string $to_version ): array {
+        $all_migrations = self::getAllMigrations();
 
         return array_values(
             array_filter(
@@ -61,7 +61,7 @@ final class Migrator {
      *
      * @return array<int, array<string, string>> Array of all migrations.
      */
-    public static function get_all_migrations(): array {
+    public static function getAllMigrations(): array {
         return array(
             array(
                 'version'  => '1.0.0',

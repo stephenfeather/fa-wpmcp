@@ -128,12 +128,12 @@ final class SettingsPage {
      * @return void
      */
     public function init(): void {
-        add_action( 'admin_menu', array( $this, 'register_menu' ) );
-        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
-        add_action( 'admin_post_fa_wpmcp_save_settings', array( $this, 'handle_settings_save' ) );
-        add_action( 'admin_post_fa_wpmcp_save_permissions', array( $this, 'handle_permissions_save' ) );
-        add_action( 'admin_post_fa_wpmcp_save_rate_limits', array( $this, 'handle_rate_limits_save' ) );
-        add_action( 'admin_post_fa_wpmcp_save_webhooks', array( $this, 'handle_webhooks_save' ) );
+        add_action( 'admin_menu', array( $this, 'registerMenu' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAssets' ) );
+        add_action( 'admin_post_fa_wpmcp_save_settings', array( $this, 'handleSettingsSave' ) );
+        add_action( 'admin_post_fa_wpmcp_save_permissions', array( $this, 'handlePermissionsSave' ) );
+        add_action( 'admin_post_fa_wpmcp_save_rate_limits', array( $this, 'handleRateLimitsSave' ) );
+        add_action( 'admin_post_fa_wpmcp_save_webhooks', array( $this, 'handleWebhooksSave' ) );
     }
 
     /**
@@ -141,7 +141,7 @@ final class SettingsPage {
      *
      * @return string Menu slug.
      */
-    public function get_menu_slug(): string {
+    public function getMenuSlug(): string {
         return self::MENU_SLUG;
     }
 
@@ -150,7 +150,7 @@ final class SettingsPage {
      *
      * @return string Capability name.
      */
-    public function get_capability(): string {
+    public function getCapability(): string {
         return self::CAPABILITY;
     }
 
@@ -159,13 +159,13 @@ final class SettingsPage {
      *
      * @return void
      */
-    public function register_menu(): void {
+    public function registerMenu(): void {
         add_menu_page(
             'FA WPMCP',
             'FA WPMCP',
             self::CAPABILITY,
             self::MENU_SLUG,
-            array( $this, 'render_settings_page' ),
+            array( $this, 'renderSettingsPage' ),
             'dashicons-admin-generic',
             null
         );
@@ -176,7 +176,7 @@ final class SettingsPage {
             'Permissions',
             self::CAPABILITY,
             'fa-wpmcp-permissions',
-            array( $this, 'render_permissions_page' )
+            array( $this, 'renderPermissionsPage' )
         );
 
         add_submenu_page(
@@ -185,7 +185,7 @@ final class SettingsPage {
             'Rate Limits',
             self::CAPABILITY,
             'fa-wpmcp-rate-limits',
-            array( $this, 'render_rate_limits_page' )
+            array( $this, 'renderRateLimitsPage' )
         );
 
         add_submenu_page(
@@ -194,7 +194,7 @@ final class SettingsPage {
             'Webhooks',
             self::CAPABILITY,
             'fa-wpmcp-webhooks',
-            array( $this, 'render_webhooks_page' )
+            array( $this, 'renderWebhooksPage' )
         );
     }
 
@@ -206,7 +206,7 @@ final class SettingsPage {
      * @param string $hook_suffix Current admin page hook suffix.
      * @return void
      */
-    public function enqueue_assets( string $hook_suffix ): void {
+    public function enqueueAssets( string $hook_suffix ): void {
         $plugin_pages = array(
             'toplevel_page_fa-wpmcp',
             'fa-wpmcp_page_fa-wpmcp-permissions',
@@ -239,7 +239,7 @@ final class SettingsPage {
      *
      * @return string Rendered HTML.
      */
-    public function render_settings_page(): string {
+    public function renderSettingsPage(): string {
         if ( ! current_user_can( self::CAPABILITY ) ) {
             wp_die(
                 self::MSG_NO_ACCESS,
@@ -253,7 +253,7 @@ final class SettingsPage {
         $output .= '<h1>' . esc_html( 'FA WPMCP Settings' ) . '</h1>';
 
         // Success/error notices.
-        $output .= $this->render_notices();
+        $output .= $this->renderNotices();
 
         $output .= '<form method="post" action="' . esc_attr( admin_url( 'admin-post.php' ) ) . '">';
         $output .= '<input type="hidden" name="action" value="fa_wpmcp_save_settings" />';
@@ -276,7 +276,7 @@ final class SettingsPage {
      *
      * @return string Rendered HTML.
      */
-    public function render_permissions_page(): string {
+    public function renderPermissionsPage(): string {
         if ( ! current_user_can( self::CAPABILITY ) ) {
             wp_die(
                 self::MSG_NO_ACCESS,
@@ -286,7 +286,7 @@ final class SettingsPage {
             return '';
         }
 
-        $settings = $this->get_permissions_settings();
+        $settings = $this->getPermissionsSettings();
 
         $output = '<div class="wrap">';
         $output .= '<h1>' . esc_html( 'Permission Settings' ) . '</h1>';
@@ -393,7 +393,7 @@ final class SettingsPage {
      *
      * @return string Rendered HTML.
      */
-    public function render_rate_limits_page(): string {
+    public function renderRateLimitsPage(): string {
         if ( ! current_user_can( self::CAPABILITY ) ) {
             wp_die(
                 self::MSG_NO_ACCESS,
@@ -403,7 +403,7 @@ final class SettingsPage {
             return '';
         }
 
-        $settings = $this->get_rate_limits_settings();
+        $settings = $this->getRateLimitsSettings();
 
         $output = '<div class="wrap">';
         $output .= '<h1>' . esc_html( 'Rate Limit Settings' ) . '</h1>';
@@ -481,7 +481,7 @@ final class SettingsPage {
      *
      * @return string Rendered HTML.
      */
-    public function render_webhooks_page(): string {
+    public function renderWebhooksPage(): string {
         if ( ! current_user_can( self::CAPABILITY ) ) {
             wp_die(
                 self::MSG_NO_ACCESS,
@@ -491,7 +491,7 @@ final class SettingsPage {
             return '';
         }
 
-        $settings = $this->get_webhooks_settings();
+        $settings = $this->getWebhooksSettings();
 
         $output = '<div class="wrap">';
         $output .= '<h1>' . esc_html( 'Webhook Settings' ) . '</h1>';
@@ -524,13 +524,13 @@ final class SettingsPage {
 
         if ( ! empty( $endpoints ) ) {
             foreach ( $endpoints as $endpoint ) {
-                $output .= $this->render_webhook_endpoint_fields( $endpoint_index, $endpoint );
+                $output .= $this->renderWebhookEndpointFields( $endpoint_index, $endpoint );
                 ++$endpoint_index;
             }
         }
 
         // Empty endpoint for adding new.
-        $output .= $this->render_webhook_endpoint_fields( $endpoint_index, array() );
+        $output .= $this->renderWebhookEndpointFields( $endpoint_index, array() );
 
         $output .= '<p class="submit">';
         $output .= '<input type="submit" name="submit" class="button button-primary" value="' . esc_attr( 'Save Webhooks' ) . '" />';
@@ -549,7 +549,7 @@ final class SettingsPage {
      * @param array<string, mixed> $endpoint Endpoint data.
      * @return string Rendered HTML.
      */
-    private function render_webhook_endpoint_fields( int $index, array $endpoint ): string {
+    private function renderWebhookEndpointFields( int $index, array $endpoint ): string {
         $url = $endpoint['url'] ?? '';
         $events = $endpoint['events'] ?? array();
 
@@ -594,7 +594,7 @@ final class SettingsPage {
      *
      * @return string Rendered HTML.
      */
-    private function render_notices(): string {
+    private function renderNotices(): string {
         $output = '';
 
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just displaying notice, no data processing.
@@ -619,7 +619,7 @@ final class SettingsPage {
      *
      * @return void
      */
-    public function handle_settings_save(): void {
+    public function handleSettingsSave(): void {
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce is verified, not used for output.
         $nonce = isset( $_POST[ self::NONCE_NAME ] ) ? sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ) : '';
 
@@ -661,7 +661,7 @@ final class SettingsPage {
      *
      * @return void
      */
-    public function handle_permissions_save(): void {
+    public function handlePermissionsSave(): void {
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce is verified, not used for output.
         $nonce = isset( $_POST[ self::NONCE_NAME ] ) ? sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ) : '';
 
@@ -692,8 +692,8 @@ final class SettingsPage {
         $settings = array(
             'global_read_enabled'  => isset( $_POST['global_read_enabled'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['global_read_enabled'] ) ),
             'global_write_enabled' => isset( $_POST['global_write_enabled'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['global_write_enabled'] ) ),
-            'category_settings'    => $this->sanitizer->sanitize_category_settings( $category_settings ),
-            'ability_settings'     => $this->sanitizer->sanitize_ability_settings( $ability_settings ),
+            'category_settings'    => $this->sanitizer->sanitizeCategorySettings( $category_settings ),
+            'ability_settings'     => $this->sanitizer->sanitizeAbilitySettings( $ability_settings ),
         );
 
         update_option( 'fa_wpmcp_permissions', $settings );
@@ -711,7 +711,7 @@ final class SettingsPage {
      *
      * @return void
      */
-    public function handle_rate_limits_save(): void {
+    public function handleRateLimitsSave(): void {
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce is verified, not used for output.
         $nonce = isset( $_POST[ self::NONCE_NAME ] ) ? sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ) : '';
 
@@ -740,7 +740,7 @@ final class SettingsPage {
         $settings = array(
             'default_requests_per_minute' => isset( $_POST['default_requests_per_minute'] ) ? absint( wp_unslash( $_POST['default_requests_per_minute'] ) ) : 60,
             'default_requests_per_hour'   => isset( $_POST['default_requests_per_hour'] ) ? absint( wp_unslash( $_POST['default_requests_per_hour'] ) ) : 500,
-            'ability_rate_limits'         => $this->sanitizer->sanitize_ability_rate_limits( $ability_rate_limits ),
+            'ability_rate_limits'         => $this->sanitizer->sanitizeAbilityRateLimits( $ability_rate_limits ),
         );
 
         update_option( 'fa_wpmcp_rate_limits', $settings );
@@ -758,7 +758,7 @@ final class SettingsPage {
      *
      * @return void
      */
-    public function handle_webhooks_save(): void {
+    public function handleWebhooksSave(): void {
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce is verified, not used for output.
         $nonce = isset( $_POST[ self::NONCE_NAME ] ) ? sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ) : '';
 
@@ -787,7 +787,7 @@ final class SettingsPage {
 
         $settings = array(
             'webhook_secret'    => $webhook_secret,
-            'webhook_endpoints' => $this->sanitizer->sanitize_webhook_endpoints( $webhook_endpoints ),
+            'webhook_endpoints' => $this->sanitizer->sanitizeWebhookEndpoints( $webhook_endpoints ),
         );
 
         update_option( 'fa_wpmcp_webhooks', $settings );
@@ -805,7 +805,7 @@ final class SettingsPage {
      *
      * @return array<string, mixed> Settings array.
      */
-    private function get_permissions_settings(): array {
+    private function getPermissionsSettings(): array {
         $defaults = array(
             'global_read_enabled'  => true,
             'global_write_enabled' => false,
@@ -827,7 +827,7 @@ final class SettingsPage {
      *
      * @return array<string, mixed> Settings array.
      */
-    private function get_rate_limits_settings(): array {
+    private function getRateLimitsSettings(): array {
         $defaults = array(
             'default_requests_per_minute' => 60,
             'default_requests_per_hour'   => 500,
@@ -848,7 +848,7 @@ final class SettingsPage {
      *
      * @return array<string, mixed> Settings array.
      */
-    private function get_webhooks_settings(): array {
+    private function getWebhooksSettings(): array {
         $defaults = array(
             'webhook_secret'    => '',
             'webhook_endpoints' => array(),

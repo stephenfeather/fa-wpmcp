@@ -40,21 +40,21 @@ final class PermissionChecker {
         ?string $category = null
     ): Result {
         // 1. Check global settings.
-        $global_result = self::check_global( $settings, $operation_type );
+        $global_result = self::checkGlobal( $settings, $operation_type );
         if ( ! $global_result->is_success ) {
             return $global_result;
         }
 
         // 2. Check category settings (if category provided).
         if ( null !== $category ) {
-            $category_result = self::check_category( $settings, $category, $operation_type );
+            $category_result = self::checkCategory( $settings, $category, $operation_type );
             if ( ! $category_result->is_success ) {
                 return $category_result;
             }
         }
 
         // 3. Check ability-specific settings.
-        return self::check_ability( $settings, $ability_name );
+        return self::checkAbility( $settings, $ability_name );
     }
 
     /**
@@ -64,7 +64,7 @@ final class PermissionChecker {
      * @param string             $operation_type Operation type ('read' or 'write').
      * @return Result Success if allowed, failure if blocked.
      */
-    public static function check_global( PermissionSettings $settings, string $operation_type ): Result {
+    public static function checkGlobal( PermissionSettings $settings, string $operation_type ): Result {
         $enabled = match ( $operation_type ) {
             'read'  => $settings->global_read_enabled,
             'write' => $settings->global_write_enabled,
@@ -84,7 +84,7 @@ final class PermissionChecker {
      * @param string             $operation_type Operation type ('read' or 'write').
      * @return Result Success if allowed, failure if blocked.
      */
-    public static function check_category(
+    public static function checkCategory(
         PermissionSettings $settings,
         string $category,
         string $operation_type
@@ -111,7 +111,7 @@ final class PermissionChecker {
      * @param string             $ability_name Ability name.
      * @return Result Success if allowed, failure if blocked.
      */
-    public static function check_ability( PermissionSettings $settings, string $ability_name ): Result {
+    public static function checkAbility( PermissionSettings $settings, string $ability_name ): Result {
         $ability_settings = $settings->ability_settings[ $ability_name ] ?? null;
 
         if ( null === $ability_settings ) {

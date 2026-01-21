@@ -99,9 +99,9 @@ final class AbilityExecutor {
         // Build context for pipeline.
         $context = [
             'ability'      => $ability,
-            'ability_name' => $ability->get_name(),
-            'category'     => $ability->get_category(),
-            'operation'    => $ability->get_operation_type(),
+            'ability_name' => $ability->getName(),
+            'category'     => $ability->getCategory(),
+            'operation'    => $ability->getOperationType(),
             'input'        => $input,
             'user_id'      => $user_id,
             'user_login'   => $user_login,
@@ -110,26 +110,26 @@ final class AbilityExecutor {
         ];
 
         // Check permissions first.
-        $permission_result = $this->check_permissions( $context );
+        $permission_result = $this->checkPermissions( $context );
         if ( ! $permission_result->is_success ) {
             return $permission_result;
         }
 
         // Check rate limit.
-        $rate_limit_result = $this->check_rate_limit( $context );
+        $rate_limit_result = $this->checkRateLimit( $context );
         if ( ! $rate_limit_result->is_success ) {
             return $rate_limit_result;
         }
 
         // Log before execution.
-        $correlation_id              = $this->log_before_execute( $context );
+        $correlation_id              = $this->logBeforeExecute( $context );
         $context['correlation_id']   = $correlation_id;
 
         // Fire before webhook.
-        $this->fire_before_webhook( $context );
+        $this->fireBeforeWebhook( $context );
 
         // Execute the ability.
-        $execution_result = $this->execute_ability( $context );
+        $execution_result = $this->executeAbility( $context );
 
         // Calculate execution time.
         $execution_time_ms             = ( microtime( true ) - $start_time ) * 1000;
@@ -141,13 +141,13 @@ final class AbilityExecutor {
 
             // Record rate limit usage.
             $this->rate_limiter->record(
-                $ability->get_name(),
+                $ability->getName(),
                 $user_id,
                 $ip_address
             );
 
             // Log after execution.
-            $this->log_after_execute(
+            $this->logAfterExecute(
                 $correlation_id,
                 $execution_result->value,
                 true,
@@ -156,13 +156,13 @@ final class AbilityExecutor {
             );
 
             // Fire after webhook.
-            $this->fire_after_webhook( $context );
+            $this->fireAfterWebhook( $context );
         } else {
             $context['success']       = false;
             $context['error_message'] = $execution_result->error_message;
 
             // Log after execution with error.
-            $this->log_after_execute(
+            $this->logAfterExecute(
                 $correlation_id,
                 null,
                 false,
@@ -171,7 +171,7 @@ final class AbilityExecutor {
             );
 
             // Fire failed webhook.
-            $this->fire_failed_webhook( $context );
+            $this->fireFailedWebhook( $context );
         }
 
         return $execution_result;
@@ -183,15 +183,15 @@ final class AbilityExecutor {
      * @param array<string, mixed> $context Execution context.
      * @return Result Success if permitted, failure if denied.
      */
-    private function check_permissions( array $context ): Result {
+    private function checkPermissions( array $context ): Result {
         $ability_name = $context['ability_name'];
         $category     = $context['category'];
         $operation    = $context['operation'];
 
         // Check all permission levels (ability, category, global) - first failure wins.
-        $failure = $this->check_ability_permission( $ability_name )
-                ?? $this->check_category_permission( $category, $operation )
-                ?? $this->check_global_permission( $operation );
+        $failure = $this->checkAbilityPermission( $ability_name )
+                ?? $this->checkCategoryPermission( $category, $operation )
+                ?? $this->checkGlobalPermission( $operation );
 
         if ( $failure !== null ) {
             return $failure;
@@ -206,7 +206,7 @@ final class AbilityExecutor {
      * @param string $ability_name Ability name.
      * @return Result|null Failure result if denied, null if allowed.
      */
-    private function check_ability_permission( string $ability_name ): ?Result {
+    private function checkAbilityPermission( string $ability_name ): ?Result {
         if ( isset( $this->permission_settings->ability_settings[ $ability_name ] ) ) {
             $ability_settings = $this->permission_settings->ability_settings[ $ability_name ];
             if ( isset( $ability_settings['enabled'] ) && false === $ability_settings['enabled'] ) {
@@ -226,7 +226,7 @@ final class AbilityExecutor {
      * @param string $operation Operation type (read/write).
      * @return Result|null Failure result if denied, null if allowed.
      */
-    private function check_category_permission( string $category, string $operation ): ?Result {
+    private function checkCategoryPermission( string $category, string $operation ): ?Result {
         if ( ! isset( $this->permission_settings->category_settings[ $category ] ) ) {
             return null;
         }
@@ -253,7 +253,7 @@ final class AbilityExecutor {
      * @param string $operation Operation type (read/write).
      * @return Result|null Failure result if denied, null if allowed.
      */
-    private function check_global_permission( string $operation ): ?Result {
+    private function checkGlobalPermission( string $operation ): ?Result {
         if ( 'read' === $operation && ! $this->permission_settings->global_read_enabled ) {
             return Result::failure(
                 'ability_disabled',
@@ -277,7 +277,7 @@ final class AbilityExecutor {
      * @param array<string, mixed> $context Execution context.
      * @return Result Success if allowed, failure if rate limited.
      */
-    private function check_rate_limit( array $context ): Result {
+    private function checkRateLimit( array $context ): Result {
         $result = $this->rate_limiter->check(
             $context['ability_name'],
             $context['user_id'],
@@ -303,7 +303,7 @@ final class AbilityExecutor {
      * @param array<string, mixed> $context Execution context.
      * @return string Correlation ID.
      */
-    private function log_before_execute( array $context ): string {
+    private function logBeforeExecute( array $context ): string {
         return $this->logger->log_before_execute(
             $context['ability_name'],
             $context['category'],
@@ -325,7 +325,7 @@ final class AbilityExecutor {
      * @param float       $start_time     Start time.
      * @return void
      */
-    private function log_after_execute(
+    private function logAfterExecute(
         string $correlation_id,
         ?array $output,
         bool $success,
@@ -347,7 +347,7 @@ final class AbilityExecutor {
      * @param array<string, mixed> $context Execution context.
      * @return void
      */
-    private function fire_before_webhook( array $context ): void {
+    private function fireBeforeWebhook( array $context ): void {
         $this->webhook_manager->trigger(
             'ability.before_execute',
             [
@@ -367,7 +367,7 @@ final class AbilityExecutor {
      * @param array<string, mixed> $context Execution context.
      * @return void
      */
-    private function fire_after_webhook( array $context ): void {
+    private function fireAfterWebhook( array $context ): void {
         $this->webhook_manager->trigger(
             'ability.after_execute',
             [
@@ -386,7 +386,7 @@ final class AbilityExecutor {
      * @param array<string, mixed> $context Execution context.
      * @return void
      */
-    private function fire_failed_webhook( array $context ): void {
+    private function fireFailedWebhook( array $context ): void {
         $this->webhook_manager->trigger(
             'ability.failed',
             [
@@ -406,10 +406,10 @@ final class AbilityExecutor {
      * @param array<string, mixed> $context Execution context.
      * @return Result Execution result.
      */
-    private function execute_ability( array $context ): Result {
+    private function executeAbility( array $context ): Result {
         try {
             $ability = $context['ability'];
-            $output  = $ability->do_execute( $context['input'] );
+            $output  = $ability->doExecute( $context['input'] );
             return Result::success( $output );
         } catch ( RuntimeException $e ) {
             return Result::failure( 'internal_error', $e->getMessage() );

@@ -44,7 +44,7 @@ class ActivityLoggerTest extends TestCase {
 		$uuid_generator = fn() => 'mock-uuid-123';
 		$logger         = new ActivityLogger( $repository, $uuid_generator );
 
-		$correlation_id = $logger->log_before_execute(
+		$correlation_id = $logger->logBeforeExecute(
 			'fa-wpmcp/list-posts',
 			'posts-pages',
 			'read',
@@ -72,7 +72,7 @@ class ActivityLoggerTest extends TestCase {
 		$uuid_generator = fn() => 'test-uuid';
 		$logger         = new ActivityLogger( $repository, $uuid_generator );
 
-		$correlation_id = $logger->log_before_execute(
+		$correlation_id = $logger->logBeforeExecute(
 			'fa-wpmcp/create-post',
 			'posts-pages',
 			'write',
@@ -93,7 +93,7 @@ class ActivityLoggerTest extends TestCase {
 	public function test_log_after_execute_updates_entry(): void {
 		$repository = Mockery::mock( LogRepository::class );
 		$repository->shouldReceive( 'insert' )->once()->andReturn( 1 );
-		$repository->shouldReceive( 'update_by_correlation_id' )
+		$repository->shouldReceive( 'updateByCorrelationId' )
 			->once()
 			->with(
 				'mock-uuid',
@@ -105,7 +105,7 @@ class ActivityLoggerTest extends TestCase {
 		$logger         = new ActivityLogger( $repository, $uuid_generator );
 
 		$start_time     = microtime( true );
-		$correlation_id = $logger->log_before_execute(
+		$correlation_id = $logger->logBeforeExecute(
 			'fa-wpmcp/list-posts',
 			'posts-pages',
 			'read',
@@ -118,7 +118,7 @@ class ActivityLoggerTest extends TestCase {
 		// Simulate some execution time.
 		usleep( 1000 ); // 1ms.
 
-		$logger->log_after_execute(
+		$logger->logAfterExecute(
 			$correlation_id,
 			array( 'posts' => array() ),
 			true,
@@ -138,7 +138,7 @@ class ActivityLoggerTest extends TestCase {
 	public function test_log_after_execute_with_failure(): void {
 		$repository = Mockery::mock( LogRepository::class );
 		$repository->shouldReceive( 'insert' )->once()->andReturn( 1 );
-		$repository->shouldReceive( 'update_by_correlation_id' )
+		$repository->shouldReceive( 'updateByCorrelationId' )
 			->once()
 			->with(
 				'fail-uuid',
@@ -150,7 +150,7 @@ class ActivityLoggerTest extends TestCase {
 		$logger         = new ActivityLogger( $repository, $uuid_generator );
 
 		$start_time     = microtime( true );
-		$correlation_id = $logger->log_before_execute(
+		$correlation_id = $logger->logBeforeExecute(
 			'fa-wpmcp/delete-post',
 			'posts-pages',
 			'write',
@@ -160,7 +160,7 @@ class ActivityLoggerTest extends TestCase {
 			array( 'post_id' => 123 )
 		);
 
-		$logger->log_after_execute(
+		$logger->logAfterExecute(
 			$correlation_id,
 			null,
 			false,
@@ -180,7 +180,7 @@ class ActivityLoggerTest extends TestCase {
 	public function test_execution_time_measured(): void {
 		$repository = Mockery::mock( LogRepository::class );
 		$repository->shouldReceive( 'insert' )->once()->andReturn( 1 );
-		$repository->shouldReceive( 'update_by_correlation_id' )
+		$repository->shouldReceive( 'updateByCorrelationId' )
 			->once()
 			->with(
 				'time-uuid',
@@ -192,7 +192,7 @@ class ActivityLoggerTest extends TestCase {
 		$logger         = new ActivityLogger( $repository, $uuid_generator );
 
 		$start_time     = microtime( true );
-		$correlation_id = $logger->log_before_execute(
+		$correlation_id = $logger->logBeforeExecute(
 			'fa-wpmcp/list-posts',
 			'posts-pages',
 			'read',
@@ -205,7 +205,7 @@ class ActivityLoggerTest extends TestCase {
 		// Simulate 10ms execution.
 		usleep( 10000 );
 
-		$logger->log_after_execute(
+		$logger->logAfterExecute(
 			$correlation_id,
 			array( 'posts' => array() ),
 			true,
@@ -241,7 +241,7 @@ class ActivityLoggerTest extends TestCase {
 		$uuid_generator = fn() => 'redact-uuid';
 		$logger         = new ActivityLogger( $repository, $uuid_generator );
 
-		$correlation_id = $logger->log_before_execute(
+		$correlation_id = $logger->logBeforeExecute(
 			'fa-wpmcp/create-user',
 			'users',
 			'write',
@@ -265,7 +265,7 @@ class ActivityLoggerTest extends TestCase {
 	public function test_redacts_token_in_output_data(): void {
 		$repository = Mockery::mock( LogRepository::class );
 		$repository->shouldReceive( 'insert' )->once()->andReturn( 1 );
-		$repository->shouldReceive( 'update_by_correlation_id' )
+		$repository->shouldReceive( 'updateByCorrelationId' )
 			->once()
 			->with(
 				'token-uuid',
@@ -284,7 +284,7 @@ class ActivityLoggerTest extends TestCase {
 		$logger         = new ActivityLogger( $repository, $uuid_generator );
 
 		$start_time     = microtime( true );
-		$correlation_id = $logger->log_before_execute(
+		$correlation_id = $logger->logBeforeExecute(
 			'fa-wpmcp/login',
 			'auth',
 			'write',
@@ -294,7 +294,7 @@ class ActivityLoggerTest extends TestCase {
 			array()
 		);
 
-		$logger->log_after_execute(
+		$logger->logAfterExecute(
 			$correlation_id,
 			array(
 				'user_id' => 'user-123',
@@ -333,7 +333,7 @@ class ActivityLoggerTest extends TestCase {
 		$uuid_generator = fn() => 'preserve-uuid';
 		$logger         = new ActivityLogger( $repository, $uuid_generator );
 
-		$correlation_id = $logger->log_before_execute(
+		$correlation_id = $logger->logBeforeExecute(
 			'fa-wpmcp/create-post',
 			'posts-pages',
 			'write',
@@ -375,7 +375,7 @@ class ActivityLoggerTest extends TestCase {
 		$uuid_generator = fn() => 'nested-uuid';
 		$logger         = new ActivityLogger( $repository, $uuid_generator );
 
-		$correlation_id = $logger->log_before_execute(
+		$correlation_id = $logger->logBeforeExecute(
 			'fa-wpmcp/auth',
 			'auth',
 			'write',

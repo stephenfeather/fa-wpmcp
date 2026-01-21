@@ -96,10 +96,10 @@ class AbilityExecutorTest extends TestCase {
 
 		// Mock ActivityLogger.
 		$logger = Mockery::mock( ActivityLoggerInterface::class );
-		$logger->shouldReceive( 'log_before_execute' )
+		$logger->shouldReceive( 'logBeforeExecute' )
 			->once()
 			->andReturn( 'correlation-id-123' );
-		$logger->shouldReceive( 'log_after_execute' )
+		$logger->shouldReceive( 'logAfterExecute' )
 			->once()
 			->with(
 				'correlation-id-123',
@@ -231,7 +231,7 @@ class AbilityExecutorTest extends TestCase {
 		$rate_limiter->shouldReceive( 'record' );
 
 		$logger = Mockery::mock( ActivityLoggerInterface::class );
-		$logger->shouldReceive( 'log_before_execute' )
+		$logger->shouldReceive( 'logBeforeExecute' )
 			->once()
 			->with(
 				'fa-wpmcp/list-posts',
@@ -243,7 +243,7 @@ class AbilityExecutorTest extends TestCase {
 				[ 'limit' => 10 ]
 			)
 			->andReturn( 'correlation-123' );
-		$logger->shouldReceive( 'log_after_execute' );
+		$logger->shouldReceive( 'logAfterExecute' );
 
 		$webhook_manager = Mockery::mock( WebhookManagerInterface::class );
 		$webhook_manager->shouldReceive( 'trigger' );
@@ -281,9 +281,9 @@ class AbilityExecutorTest extends TestCase {
 		$rate_limiter->shouldReceive( 'record' );
 
 		$logger = Mockery::mock( ActivityLoggerInterface::class );
-		$logger->shouldReceive( 'log_before_execute' )
+		$logger->shouldReceive( 'logBeforeExecute' )
 			->andReturn( 'correlation-456' );
-		$logger->shouldReceive( 'log_after_execute' )
+		$logger->shouldReceive( 'logAfterExecute' )
 			->once()
 			->with(
 				'correlation-456',
@@ -325,8 +325,8 @@ class AbilityExecutorTest extends TestCase {
 		$rate_limiter->shouldReceive( 'record' );
 
 		$logger = Mockery::mock( ActivityLoggerInterface::class );
-		$logger->shouldReceive( 'log_before_execute' )->andReturn( 'corr-id' );
-		$logger->shouldReceive( 'log_after_execute' );
+		$logger->shouldReceive( 'logBeforeExecute' )->andReturn( 'corr-id' );
+		$logger->shouldReceive( 'logAfterExecute' );
 
 		$webhook_manager = Mockery::mock( WebhookManagerInterface::class );
 		$webhook_manager->shouldReceive( 'trigger' )
@@ -378,8 +378,8 @@ class AbilityExecutorTest extends TestCase {
 		$rate_limiter->shouldReceive( 'record' );
 
 		$logger = Mockery::mock( ActivityLoggerInterface::class );
-		$logger->shouldReceive( 'log_before_execute' )->andReturn( 'corr-id' );
-		$logger->shouldReceive( 'log_after_execute' );
+		$logger->shouldReceive( 'logBeforeExecute' )->andReturn( 'corr-id' );
+		$logger->shouldReceive( 'logAfterExecute' );
 
 		$webhook_manager = Mockery::mock( WebhookManagerInterface::class );
 		$webhook_manager->shouldReceive( 'trigger' )
@@ -429,8 +429,8 @@ class AbilityExecutorTest extends TestCase {
 		$rate_limiter->shouldReceive( 'record' );
 
 		$logger = Mockery::mock( ActivityLoggerInterface::class );
-		$logger->shouldReceive( 'log_before_execute' )->andReturn( 'corr-id' );
-		$logger->shouldReceive( 'log_after_execute' )
+		$logger->shouldReceive( 'logBeforeExecute' )->andReturn( 'corr-id' );
+		$logger->shouldReceive( 'logAfterExecute' )
 			->once()
 			->with(
 				'corr-id',
@@ -486,8 +486,8 @@ class AbilityExecutorTest extends TestCase {
 		$rate_limiter->shouldReceive( 'record' );
 
 		$logger = Mockery::mock( ActivityLoggerInterface::class );
-		$logger->shouldReceive( 'log_before_execute' )->andReturn( 'corr-id' );
-		$logger->shouldReceive( 'log_after_execute' );
+		$logger->shouldReceive( 'logBeforeExecute' )->andReturn( 'corr-id' );
+		$logger->shouldReceive( 'logAfterExecute' );
 
 		$webhook_manager = Mockery::mock( WebhookManagerInterface::class );
 		$webhook_manager->shouldReceive( 'trigger' )
@@ -543,8 +543,8 @@ class AbilityExecutorTest extends TestCase {
 		$rate_limiter->shouldReceive( 'record' );
 
 		$logger = Mockery::mock( ActivityLoggerInterface::class );
-		$logger->shouldReceive( 'log_before_execute' )->andReturn( 'corr-id' );
-		$logger->shouldReceive( 'log_after_execute' );
+		$logger->shouldReceive( 'logBeforeExecute' )->andReturn( 'corr-id' );
+		$logger->shouldReceive( 'logAfterExecute' );
 
 		$webhook_manager = Mockery::mock( WebhookManagerInterface::class );
 		$webhook_manager->shouldReceive( 'trigger' );
@@ -692,8 +692,8 @@ class AbilityExecutorTest extends TestCase {
 			->with( 'fa-wpmcp/test-ability', 42, '10.0.0.1' );
 
 		$logger = Mockery::mock( ActivityLoggerInterface::class );
-		$logger->shouldReceive( 'log_before_execute' )->andReturn( 'corr-id' );
-		$logger->shouldReceive( 'log_after_execute' );
+		$logger->shouldReceive( 'logBeforeExecute' )->andReturn( 'corr-id' );
+		$logger->shouldReceive( 'logAfterExecute' );
 
 		$webhook_manager = Mockery::mock( WebhookManagerInterface::class );
 		$webhook_manager->shouldReceive( 'trigger' );
@@ -727,8 +727,8 @@ class AbilityExecutorTest extends TestCase {
 		$rate_limiter->shouldReceive( 'record' );
 
 		$logger = Mockery::mock( ActivityLoggerInterface::class );
-		$logger->shouldReceive( 'log_before_execute' )->andReturn( 'corr-id' );
-		$logger->shouldReceive( 'log_after_execute' );
+		$logger->shouldReceive( 'logBeforeExecute' )->andReturn( 'corr-id' );
+		$logger->shouldReceive( 'logAfterExecute' );
 
 		$webhook_manager = Mockery::mock( WebhookManagerInterface::class );
 		$webhook_manager->shouldReceive( 'trigger' );

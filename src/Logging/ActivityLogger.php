@@ -55,7 +55,7 @@ final class ActivityLogger implements ActivityLoggerInterface {
      * @param array|null $input            Input data.
      * @return string Correlation ID.
      */
-    public function log_before_execute(
+    public function logBeforeExecute(
         string $ability_name,
         string $ability_category,
         string $operation_type,
@@ -70,11 +70,11 @@ final class ActivityLogger implements ActivityLoggerInterface {
         $redacted_input = null !== $input ? PrivacyRedactor::redact( $input ) : null;
 
         $entry = LogEntryBuilder::create()
-            ->with_correlation_id( $correlation_id )
-            ->with_user( $user_id, $user_login )
-            ->with_ip_address( $ip_address )
-            ->with_ability( $ability_name, $ability_category, $operation_type )
-            ->with_input( $redacted_input )
+            ->withCorrelationId( $correlation_id )
+            ->withUser( $user_id, $user_login )
+            ->withIpAddress( $ip_address )
+            ->withAbility( $ability_name, $ability_category, $operation_type )
+            ->withInput( $redacted_input )
             ->build();
 
         // Side effect: database write.
@@ -96,14 +96,14 @@ final class ActivityLogger implements ActivityLoggerInterface {
      * @param float       $start_time     Start time from microtime(true).
      * @return void
      */
-    public function log_after_execute(
+    public function logAfterExecute(
         string $correlation_id,
         ?array $output,
         bool $success,
         ?string $error_message = null,
         float $start_time = 0.0
     ): void {
-        $execution_time_ms = $this->calculate_execution_time( $start_time );
+        $execution_time_ms = $this->calculateExecutionTime( $start_time );
 
         // Redact sensitive fields from output before logging (pure function).
         $redacted_output = null !== $output ? PrivacyRedactor::redact( $output ) : null;
@@ -116,7 +116,7 @@ final class ActivityLogger implements ActivityLoggerInterface {
         );
 
         // Side effect: database write.
-        $this->repository->update_by_correlation_id( $correlation_id, $update_data );
+        $this->repository->updateByCorrelationId( $correlation_id, $update_data );
     }
 
     /**
@@ -127,7 +127,7 @@ final class ActivityLogger implements ActivityLoggerInterface {
      * @param float $start_time Start time from microtime(true).
      * @return int Execution time in milliseconds.
      */
-    private function calculate_execution_time( float $start_time ): int {
+    private function calculateExecutionTime( float $start_time ): int {
         if ( 0.0 === $start_time ) {
             return 0;
         }
