@@ -31,3 +31,7 @@ wp-config.php
 # Environment
 .env
 .env.local
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
