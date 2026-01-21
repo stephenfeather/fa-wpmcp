@@ -208,81 +208,29 @@ fa_wpmcp_webhook_queue:
 
 ## Configuration
 
-### WordPress Options
+The plugin can be configured through WordPress options, filters, and constants.
 
-The plugin stores configuration in WordPress options:
+**For complete configuration documentation, see [Configuration Guide](docs/CONFIGURATION.md).**
 
-#### Permission Settings
+### Quick Configuration
 
-```php
-// Option: fa_wpmcp_permissions
-[
-    'global_read' => true,   // Allow all read operations
-    'global_write' => false, // Deny all write operations
-    'categories' => [],      // Category-level overrides
-    'abilities' => []        // Ability-level overrides
-]
-```
+**WordPress Options:**
+- `fa_wpmcp_permissions` - Control global/category/ability-level access
+- `fa_wpmcp_rate_limits` - Configure rate limiting thresholds
+- `fa_wpmcp_webhooks` - Enable/configure webhook delivery
 
-#### Rate Limit Configuration
+**Useful Filters:**
+- `fa_wpmcp_permission_settings` - Modify permissions at runtime
+- `fa_wpmcp_rate_limit_config` - Adjust rate limits dynamically
+- `fa_wpmcp_webhook_payload` - Customize webhook payloads
 
-```php
-// Option: fa_wpmcp_rate_limits
-[
-    'default' => [
-        'per_minute' => 60,
-        'per_hour' => 1000,
-        'per_day' => 10000
-    ],
-    'abilities' => []  // Per-ability overrides
-]
-```
+**Constants (wp-config.php):**
+- `FA_WPMCP_DISABLE_RATE_LIMITING` - Disable rate limiting
+- `FA_WPMCP_DISABLE_WEBHOOKS` - Disable webhook delivery
+- `FA_WPMCP_LOG_RETENTION_DAYS` - Set log retention period
+- `FA_WPMCP_PRESERVE_DATA_ON_UNINSTALL` - Prevent data deletion on uninstall
 
-#### Webhook Configuration
-
-```php
-// Option: fa_wpmcp_webhooks
-[
-    'enabled' => true,
-    'secret' => 'your-webhook-secret',
-    'urls' => [
-        'https://example.com/webhook'
-    ]
-]
-```
-
-### Filters
-
-Customize behavior via WordPress filters:
-
-```php
-// Modify permission settings before checking
-add_filter('fa_wpmcp_permission_settings', function($settings) {
-    return $settings->with_global_write(true);
-});
-
-// Modify rate limits
-add_filter('fa_wpmcp_rate_limit_config', function($config) {
-    return array_merge($config, [
-        'default' => ['per_minute' => 120]
-    ]);
-});
-
-// Customize webhook payload
-add_filter('fa_wpmcp_webhook_payload', function($payload, $event) {
-    $payload['custom_field'] = 'value';
-    return $payload;
-}, 10, 2);
-```
-
-### Constants
-
-```php
-// Define in wp-config.php
-define('FA_WPMCP_DISABLE_RATE_LIMITING', true);
-define('FA_WPMCP_DISABLE_WEBHOOKS', true);
-define('FA_WPMCP_LOG_RETENTION_DAYS', 30);
-```
+See the [Configuration Guide](docs/CONFIGURATION.md) for detailed examples, best practices, and troubleshooting.
 
 ## Development
 
