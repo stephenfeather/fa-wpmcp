@@ -10,7 +10,8 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Posts;
 
 use FAWpmcp\Abilities\AbstractAbility;
-use RuntimeException;
+use FAWpmcp\Exceptions\PostNotFoundException;
+use FAWpmcp\Exceptions\PostTypeMismatchException;
 
 /**
  * Ability to retrieve a single WordPress post by ID.
@@ -167,12 +168,12 @@ final class GetPost extends AbstractAbility {
 		$post = get_post( $post_id );
 
 		if ( null === $post ) {
-			throw new RuntimeException( 'Post not found' );
+			throw new PostNotFoundException( 'Post not found' );
 		}
 
 		// Validate post_type if provided.
 		if ( isset( $input['post_type'] ) && $input['post_type'] !== $post->post_type ) {
-			throw new RuntimeException( 'Post type mismatch' );
+			throw new PostTypeMismatchException( 'Post type mismatch' );
 		}
 
 		// Pure transformation: format post data.

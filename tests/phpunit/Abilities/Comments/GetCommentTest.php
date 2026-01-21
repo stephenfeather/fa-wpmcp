@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Tests\Abilities\Comments;
 
 use FAWpmcp\Abilities\Comments\GetComment;
+use FAWpmcp\Exceptions\CommentNotFoundException;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
 
@@ -111,7 +112,7 @@ final class GetCommentTest extends TestCase {
 	 * @return void
 	 */
 	public function test_throws_exception_for_non_existent_comment(): void {
-		$this->expectException( \RuntimeException::class );
+		$this->expectException( CommentNotFoundException::class );
 		$this->expectExceptionMessage( 'Comment not found' );
 
 		Functions\expect( 'get_comment' )

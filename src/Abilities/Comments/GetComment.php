@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Comments;
 
 use FAWpmcp\Abilities\AbstractAbility;
-use RuntimeException;
+use FAWpmcp\Exceptions\CommentNotFoundException;
 
 /**
  * Ability to retrieve a single WordPress comment by ID.
@@ -128,7 +128,7 @@ final class GetComment extends AbstractAbility {
 		$comment = get_comment( $comment_id );
 
 		if ( null === $comment ) {
-			throw new RuntimeException( 'Comment not found' );
+			throw new CommentNotFoundException( 'Comment not found' );
 		}
 
 		return array(

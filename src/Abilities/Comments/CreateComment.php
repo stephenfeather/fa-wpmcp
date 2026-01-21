@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Comments;
 
 use FAWpmcp\Abilities\AbstractAbility;
-use RuntimeException;
+use FAWpmcp\Exceptions\CommentCreationException;
 
 /**
  * Ability to create a new WordPress comment.
@@ -155,7 +155,7 @@ final class CreateComment extends AbstractAbility {
 		$comment_id = wp_insert_comment( $comment_data );
 
 		if ( false === $comment_id || 0 === $comment_id ) {
-			throw new RuntimeException( 'Failed to create comment' );
+			throw new CommentCreationException( 'Failed to create comment' );
 		}
 
 		return array(

@@ -478,7 +478,7 @@ class UpdatePostTest extends TestCase {
 			->with( $wp_error )
 			->andReturn( true );
 
-		$this->expectException( \RuntimeException::class );
+		$this->expectException( PostUpdateException::class );
 		$this->expectExceptionMessage( 'Failed to update post' );
 
 		$ability = new UpdatePost();
@@ -767,7 +767,7 @@ class UpdatePostTest extends TestCase {
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
 
-		$this->expectException( \RuntimeException::class );
+		$this->expectException( PostTypeMismatchException::class );
 		$this->expectExceptionMessage( 'Post type mismatch' );
 
 		$ability = new UpdatePost();

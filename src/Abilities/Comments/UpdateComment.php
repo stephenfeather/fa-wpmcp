@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Comments;
 
 use FAWpmcp\Abilities\AbstractAbility;
-use RuntimeException;
+use FAWpmcp\Exceptions\CommentUpdateException;
 
 /**
  * Ability to update WordPress comment status.
@@ -123,7 +123,7 @@ final class UpdateComment extends AbstractAbility {
 	 *
 	 * @param array<string, mixed> $input Validated input data.
 	 * @return array<string, mixed> Updated comment data.
-	 * @throws RuntimeException If comment update fails.
+	 * @throws CommentUpdateException If comment update fails.
 	 */
 	public function do_execute( array $input ): array {
 		$comment_id = (int) $input['comment_id'];
@@ -133,7 +133,7 @@ final class UpdateComment extends AbstractAbility {
 		$result = wp_set_comment_status( $comment_id, $status );
 
 		if ( false === $result ) {
-			throw new RuntimeException( 'Failed to update comment status' );
+			throw new CommentUpdateException( 'Failed to update comment status' );
 		}
 
 		return array(

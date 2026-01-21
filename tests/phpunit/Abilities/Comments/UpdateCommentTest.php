@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Tests\Abilities\Comments;
 
 use FAWpmcp\Abilities\Comments\UpdateComment;
+use FAWpmcp\Exceptions\CommentUpdateException;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
 
@@ -65,7 +66,7 @@ final class UpdateCommentTest extends TestCase {
 	}
 
 	public function test_throws_exception_when_update_fails(): void {
-		$this->expectException( \RuntimeException::class );
+		$this->expectException( CommentUpdateException::class );
 		$this->expectExceptionMessage( 'Failed to update comment status' );
 
 		Functions\expect( 'wp_set_comment_status' )->once()->andReturn( false );

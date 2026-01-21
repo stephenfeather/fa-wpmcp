@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Posts;
 
 use FAWpmcp\Abilities\AbstractAbility;
-use RuntimeException;
+use FAWpmcp\Exceptions\PostCreationException;
 
 /**
  * Ability to create a new WordPress post.
@@ -188,7 +188,7 @@ final class CreatePost extends AbstractAbility {
 
 		// Error handling.
 		if ( is_wp_error( $post_id ) ) {
-			throw new RuntimeException(
+			throw new PostCreationException(
 				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message.
 				'Failed to create post: ' . $post_id->get_error_message()
 			);

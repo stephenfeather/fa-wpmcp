@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Tests\Abilities\Posts;
 
 use FAWpmcp\Abilities\Posts\CreatePost;
+use FAWpmcp\Exceptions\PostCreationException;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -428,7 +429,7 @@ class CreatePostTest extends TestCase {
 			->with( $wp_error )
 			->andReturn( true );
 
-		$this->expectException( \RuntimeException::class );
+		$this->expectException( PostCreationException::class );
 		$this->expectExceptionMessage( 'Failed to create post' );
 
 		$ability = new CreatePost();

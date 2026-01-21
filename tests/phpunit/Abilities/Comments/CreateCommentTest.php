@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Tests\Abilities\Comments;
 
 use FAWpmcp\Abilities\Comments\CreateComment;
+use FAWpmcp\Exceptions\CommentCreationException;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
 
@@ -99,7 +100,7 @@ final class CreateCommentTest extends TestCase {
 	}
 
 	public function test_throws_exception_when_comment_creation_fails(): void {
-		$this->expectException( \RuntimeException::class );
+		$this->expectException( CommentCreationException::class );
 		$this->expectExceptionMessage( 'Failed to create comment' );
 
 		Functions\expect( 'wp_insert_comment' )->once()->andReturn( 0 );

@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Posts;
 
 use FAWpmcp\Abilities\AbstractAbility;
-use RuntimeException;
+use FAWpmcp\Exceptions\PostNotFoundException;
+use FAWpmcp\Exceptions\PostTypeMismatchException;
+use FAWpmcp\Exceptions\PostUpdateException;
 
 /**
  * Ability to update an existing WordPress post.
@@ -189,12 +191,12 @@ final class UpdatePost extends AbstractAbility {
 		$post = get_post( $post_id );
 
 		if ( null === $post ) {
-			throw new RuntimeException( 'Post not found' );
+			throw new PostNotFoundException( 'Post not found' );
 		}
 
 		// Validate post_type if provided.
 		if ( isset( $input['post_type'] ) && $input['post_type'] !== $post->post_type ) {
-			throw new RuntimeException( 'Post type mismatch' );
+			throw new PostTypeMismatchException( 'Post type mismatch' );
 		}
 
 		// Pure transformation: build update data with sanitization.
@@ -205,7 +207,7 @@ final class UpdatePost extends AbstractAbility {
 
 		// Error handling.
 		if ( is_wp_error( $result ) ) {
-			throw new RuntimeException(
+			throw new PostUpdateException(
 				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message.
 				'Failed to update post: ' . $result->get_error_message()
 			);
