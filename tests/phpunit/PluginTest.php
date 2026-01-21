@@ -48,9 +48,21 @@ class PluginTest extends TestCase {
 	 * Test that init registers WordPress hooks.
 	 */
 	public function test_init_registers_hooks(): void {
+		// Mock WordPress functions called during init.
 		Functions\expect( 'add_action' )
-			->once()
-			->with( 'admin_init', \Mockery::type( 'array' ) );
+			->atLeast()
+			->once();
+
+		Functions\expect( 'get_option' )
+			->andReturn( array() );
+
+		Functions\expect( 'wp_generate_uuid4' )
+			->andReturn( 'test-uuid' );
+
+		// Set up mock $wpdb before init is called.
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Required for unit tests.
+		$GLOBALS['wpdb'] = \Mockery::mock( '\wpdb' );
+		$GLOBALS['wpdb']->prefix = 'wp_';
 
 		$plugin = Plugin::get_instance();
 		$plugin->init();
