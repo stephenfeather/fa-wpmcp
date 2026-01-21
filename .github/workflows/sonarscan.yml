@@ -25,3 +25,8 @@ jobs:
           args: >
             -Dsonar.projectKey=stephenfeather_fa-wpmcp
             -Dsonar.organization=stephenfeather
+            -Dsonar.php.coverage.reportPaths=coverage/clover.xml
+            -Dsonar.php.tests.reportPath=coverage/junit.xml
+            -Dsonar.language=php
+            -Dsonar.exclusions=vendor/**,node_modules/**,tests/**,.claude/**,.tldr/**,opc/**,thoughts/**
+            -Dsonar.tests=tests
