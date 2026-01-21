@@ -71,7 +71,7 @@ final class UpdatePost extends AbstractAbility {
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return 'Update an existing WordPress post. Only provided fields will be updated. Supports title, content, excerpt, status, categories, and tags.';
+		return 'Update an existing WordPress post, page, or custom post type. Only provided fields will be updated. Supports title, content, excerpt, status, categories, and tags. Optionally validate post type.';
 	}
 
 	/**
@@ -114,6 +114,10 @@ final class UpdatePost extends AbstractAbility {
 					'type'        => 'array',
 					'description' => 'Array of tag names or IDs to assign.',
 					'items'       => array( 'type' => 'string' ),
+				),
+				'post_type'  => array(
+					'type'        => 'string',
+					'description' => 'Optional post type to validate. If provided, will throw error if post type does not match.',
 				),
 			),
 			'required'   => array( 'post_id' ),
@@ -186,6 +190,11 @@ final class UpdatePost extends AbstractAbility {
 
 		if ( null === $post ) {
 			throw new RuntimeException( 'Post not found' );
+		}
+
+		// Validate post_type if provided.
+		if ( isset( $input['post_type'] ) && $input['post_type'] !== $post->post_type ) {
+			throw new RuntimeException( 'Post type mismatch' );
 		}
 
 		// Pure transformation: build update data with sanitization.

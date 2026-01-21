@@ -72,7 +72,7 @@ final class ListPosts extends AbstractAbility {
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return 'Retrieve a paginated list of WordPress posts with optional filtering by status, author, category, and search term.';
+		return 'Retrieve a paginated list of WordPress posts, pages, or custom post types with optional filtering by post type, status, author, category, and search term.';
 	}
 
 	/**
@@ -123,11 +123,16 @@ final class ListPosts extends AbstractAbility {
 					'enum'        => array( 'date', 'title', 'modified', 'ID', 'author', 'name' ),
 					'default'     => 'date',
 				),
-				'order'    => array(
+				'order'     => array(
 					'type'        => 'string',
 					'description' => 'Sort order.',
 					'enum'        => array( 'ASC', 'DESC' ),
 					'default'     => 'DESC',
+				),
+				'post_type' => array(
+					'type'        => 'string',
+					'description' => 'Post type to query (post, page, or custom post type).',
+					'default'     => 'post',
 				),
 			),
 		);
@@ -231,7 +236,7 @@ final class ListPosts extends AbstractAbility {
 			: self::DEFAULT_PER_PAGE;
 
 		$args = array(
-			'post_type'      => 'post',
+			'post_type'      => $input['post_type'] ?? 'post',
 			'post_status'    => $input['status'] ?? 'publish',
 			'paged'          => $input['page'] ?? 1,
 			'posts_per_page' => $per_page,

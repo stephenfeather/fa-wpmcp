@@ -70,7 +70,7 @@ final class CreatePost extends AbstractAbility {
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return 'Create a new WordPress post with title, content, and optional settings like status, categories, and tags. Defaults to draft status for safety.';
+		return 'Create a new WordPress post, page, or custom post type with title, content, and optional settings like status, categories, and tags. Defaults to draft status for safety.';
 	}
 
 	/**
@@ -114,6 +114,11 @@ final class CreatePost extends AbstractAbility {
 					'type'        => 'array',
 					'description' => 'Array of tag names or IDs.',
 					'items'       => array( 'type' => 'string' ),
+				),
+				'post_type'  => array(
+					'type'        => 'string',
+					'description' => 'Post type to create (post, page, or custom post type).',
+					'default'     => 'post',
 				),
 			),
 			'required'   => array( 'title' ),
@@ -205,7 +210,7 @@ final class CreatePost extends AbstractAbility {
 		$post_data = array(
 			'post_title'  => sanitize_text_field( $input['title'] ),
 			'post_status' => $this->validate_status( $input['status'] ?? 'draft' ),
-			'post_type'   => 'post',
+			'post_type'   => $input['post_type'] ?? 'post',
 		);
 
 		// Add content if provided.

@@ -58,7 +58,7 @@ final class GetPost extends AbstractAbility {
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return 'Retrieve a single WordPress post by ID with full details including categories, tags, featured image, and author information.';
+		return 'Retrieve a single WordPress post, page, or custom post type by ID with full details including categories, tags, featured image, and author information. Optionally validate post type.';
 	}
 
 	/**
@@ -70,10 +70,14 @@ final class GetPost extends AbstractAbility {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
-				'post_id' => array(
+				'post_id'   => array(
 					'type'        => 'integer',
 					'description' => 'The ID of the post to retrieve.',
 					'minimum'     => 1,
+				),
+				'post_type' => array(
+					'type'        => 'string',
+					'description' => 'Optional post type to validate (post, page, or custom post type). If provided, will throw error if post type does not match.',
 				),
 			),
 			'required'   => array( 'post_id' ),
@@ -164,6 +168,11 @@ final class GetPost extends AbstractAbility {
 
 		if ( null === $post ) {
 			throw new RuntimeException( 'Post not found' );
+		}
+
+		// Validate post_type if provided.
+		if ( isset( $input['post_type'] ) && $input['post_type'] !== $post->post_type ) {
+			throw new RuntimeException( 'Post type mismatch' );
 		}
 
 		// Pure transformation: format post data.
