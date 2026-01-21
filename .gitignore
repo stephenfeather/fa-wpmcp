@@ -2,6 +2,9 @@
 /vendor/
 composer.lock
 
+# continuous-claude
+opc/
+
 # PHPUnit
 /tests/coverage/
 .phpunit.result.cache
