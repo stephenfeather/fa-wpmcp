@@ -1,7 +1,6 @@
 {
   "name": "stephenfeather/fa-wpmcp",
   "description": "WordPress plugin that exposes WordPress functionality to AI agents via Abilities API and MCP Adapter",
-  "version": "1.0.0-alpha.2",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "authors": [
@@ -44,7 +43,5 @@
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
     }
-  },
-  "minimum-stability": "RC",
-  "prefer-stable": true
+  }
 }
