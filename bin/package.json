@@ -1,0 +1,28 @@
+{
+  "name": "fa-wpmcp-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server wrapper for FA WPMCP WordPress plugin",
+  "type": "module",
+  "main": "mcp-server.js",
+  "bin": {
+    "fa-wpmcp-mcp": "./mcp-server.js"
+  },
+  "scripts": {
+    "start": "node mcp-server.js"
+  },
+  "keywords": [
+    "mcp",
+    "wordpress",
+    "abilities",
+    "ai",
+    "claude"
+  ],
+  "author": "Feather Art",
+  "license": "GPL-2.0-or-later",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

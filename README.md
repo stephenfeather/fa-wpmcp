@@ -487,6 +487,11 @@ if (!hash_equals($expected, $signature)) {
 - [x] **Theme Abilities** - Plugin and theme management (complete)
 
 ### Future Enhancements
+- [ ] **Bundled MCP Server** - Production-ready stdio wrapper for Claude Desktop integration
+  - `bin/mcp-server.js` with auto-discovery of all abilities from WordPress API
+  - `bin/package.json` with `@modelcontextprotocol/sdk` dependency
+  - `bin/README.md` with installation and usage instructions
+  - Update `docs/QUICK_START.md` to reference bundled wrapper
 - [ ] **GDPR Compliance** - Data export/erasure hooks
 - [ ] **Uninstall Handler** - Clean database on plugin removal
 - [ ] **Integration Tests** - E2E testing with WordPress

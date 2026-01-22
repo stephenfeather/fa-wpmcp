@@ -45,9 +45,46 @@ Get your WordPress site connected to AI assistants in under 5 minutes.
 | **Windows** | `%APPDATA%\Claude\claude_desktop_config.json` |
 | **Linux** | `~/.config/Claude/claude_desktop_config.json` |
 
-### Create MCP Server Wrapper
+### Option A: Use Bundled MCP Server (Recommended)
 
-Since Claude Desktop requires an MCP server with stdio transport, create a Node.js wrapper to connect to your WordPress HTTP endpoint.
+The plugin includes a production-ready MCP server in the `bin/` directory with auto-discovery of all abilities.
+
+**1. Install dependencies:**
+```bash
+cd wp-content/plugins/fa-wpmcp/bin
+npm install
+```
+
+**2. Add to `claude_desktop_config.json`:**
+```json
+{
+  "mcpServers": {
+    "fa-wpmcp": {
+      "command": "node",
+      "args": ["/absolute/path/to/wp-content/plugins/fa-wpmcp/bin/mcp-server.js"],
+      "env": {
+        "WORDPRESS_BASE_URL": "https://your-site.com/wp-json/abilities/v1",
+        "WORDPRESS_USERNAME": "your-username",
+        "WORDPRESS_APP_PASSWORD": "your-app-password"
+      }
+    }
+  }
+}
+```
+
+**3. Replace values:**
+- `/absolute/path/to/wp-content/plugins/fa-wpmcp/bin/mcp-server.js` with your actual path
+- `your-site.com` with your WordPress domain
+- `your-username` with your WordPress username
+- `your-app-password` with the password from Step 2
+
+**4. Restart Claude Desktop**
+
+See [`bin/README.md`](../bin/README.md) for detailed documentation.
+
+### Option B: Create Custom MCP Server Wrapper (Advanced)
+
+Alternatively, create your own custom wrapper for learning or customization purposes.
 
 **Create `wordpress-mcp-server.js`:**
 
