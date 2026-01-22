@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define plugin constants manually for testing (instead of loading the plugin file which has hooks).
 if ( ! defined( 'FA_WPMCP_VERSION' ) ) {
-	define( 'FA_WPMCP_VERSION', '1.0.0' );
+	define( 'FA_WPMCP_VERSION', '1.0.0-alpha.2' );
 }
 
 if ( ! defined( 'FA_WPMCP_PATH' ) ) {
