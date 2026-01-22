@@ -325,7 +325,7 @@ final class UploadMedia extends AbstractAbility {
         }
 
         // Generate metadata.
-        require_once ABSPATH . 'wp-admin/includes/image.php';
+        $this->loadImageFunctions();
         $metadata = wp_generate_attachment_metadata( $attachment_id, $file_path );
         wp_update_attachment_metadata( $attachment_id, $metadata );
 
@@ -359,6 +359,19 @@ final class UploadMedia extends AbstractAbility {
     }
 
     /**
+     * Load WordPress image functions.
+     *
+     * Side effect function - loads WordPress admin functions.
+     *
+     * @return void
+     */
+    private function loadImageFunctions(): void {
+        if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/image.php';
+        }
+    }
+
+    /**
      * Get the general media type from MIME type.
      *
      * Pure function - extracts media type category from MIME type.
@@ -367,18 +380,35 @@ final class UploadMedia extends AbstractAbility {
      * @return string Media type (image, video, audio, document, other).
      */
     private function getMediaType( string $mime_type ): string {
-        if ( str_starts_with( $mime_type, 'image/' ) ) {
-            return 'image';
+        $type_map = array(
+            'image/' => 'image',
+            'video/' => 'video',
+            'audio/' => 'audio',
+        );
+
+        foreach ( $type_map as $prefix => $type ) {
+            if ( str_starts_with( $mime_type, $prefix ) ) {
+                return $type;
+            }
         }
-        if ( str_starts_with( $mime_type, 'video/' ) ) {
-            return 'video';
-        }
-        if ( str_starts_with( $mime_type, 'audio/' ) ) {
-            return 'audio';
-        }
-        if ( str_starts_with( $mime_type, 'application/pdf' ) || str_starts_with( $mime_type, 'application/msword' ) ) {
+
+        if ( $this->isDocumentType( $mime_type ) ) {
             return 'document';
         }
+
         return 'other';
+    }
+
+    /**
+     * Check if MIME type is a document.
+     *
+     * Pure function - determines if MIME type represents a document.
+     *
+     * @param string $mime_type MIME type string.
+     * @return bool True if document type.
+     */
+    private function isDocumentType( string $mime_type ): bool {
+        return str_starts_with( $mime_type, 'application/pdf' )
+            || str_starts_with( $mime_type, 'application/msword' );
     }
 }

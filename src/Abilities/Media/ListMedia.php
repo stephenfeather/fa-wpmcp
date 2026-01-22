@@ -323,18 +323,35 @@ final class ListMedia extends AbstractAbility {
      * @return string Media type (image, video, audio, document, other).
      */
     private function getMediaType( string $mime_type ): string {
-        if ( str_starts_with( $mime_type, 'image/' ) ) {
-            return 'image';
+        $type_map = array(
+            'image/' => 'image',
+            'video/' => 'video',
+            'audio/' => 'audio',
+        );
+
+        foreach ( $type_map as $prefix => $type ) {
+            if ( str_starts_with( $mime_type, $prefix ) ) {
+                return $type;
+            }
         }
-        if ( str_starts_with( $mime_type, 'video/' ) ) {
-            return 'video';
-        }
-        if ( str_starts_with( $mime_type, 'audio/' ) ) {
-            return 'audio';
-        }
-        if ( str_starts_with( $mime_type, 'application/pdf' ) || str_starts_with( $mime_type, 'application/msword' ) ) {
+
+        if ( $this->isDocumentType( $mime_type ) ) {
             return 'document';
         }
+
         return 'other';
+    }
+
+    /**
+     * Check if MIME type is a document.
+     *
+     * Pure function - determines if MIME type represents a document.
+     *
+     * @param string $mime_type MIME type string.
+     * @return bool True if document type.
+     */
+    private function isDocumentType( string $mime_type ): bool {
+        return str_starts_with( $mime_type, 'application/pdf' )
+            || str_starts_with( $mime_type, 'application/msword' );
     }
 }

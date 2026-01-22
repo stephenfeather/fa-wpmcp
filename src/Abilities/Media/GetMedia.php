@@ -219,19 +219,36 @@ final class GetMedia extends AbstractAbility {
      * @return string Media type (image, video, audio, document, other).
      */
     private function getMediaType( string $mime_type ): string {
-        if ( str_starts_with( $mime_type, 'image/' ) ) {
-            return 'image';
+        $type_map = array(
+            'image/' => 'image',
+            'video/' => 'video',
+            'audio/' => 'audio',
+        );
+
+        foreach ( $type_map as $prefix => $type ) {
+            if ( str_starts_with( $mime_type, $prefix ) ) {
+                return $type;
+            }
         }
-        if ( str_starts_with( $mime_type, 'video/' ) ) {
-            return 'video';
-        }
-        if ( str_starts_with( $mime_type, 'audio/' ) ) {
-            return 'audio';
-        }
-        if ( str_starts_with( $mime_type, 'application/pdf' ) || str_starts_with( $mime_type, 'application/msword' ) ) {
+
+        if ( $this->isDocumentType( $mime_type ) ) {
             return 'document';
         }
+
         return 'other';
+    }
+
+    /**
+     * Check if MIME type is a document.
+     *
+     * Pure function - determines if MIME type represents a document.
+     *
+     * @param string $mime_type MIME type string.
+     * @return bool True if document type.
+     */
+    private function isDocumentType( string $mime_type ): bool {
+        return str_starts_with( $mime_type, 'application/pdf' )
+            || str_starts_with( $mime_type, 'application/msword' );
     }
 
     /**
@@ -262,30 +279,86 @@ final class GetMedia extends AbstractAbility {
         $sizes = array();
 
         // Add full size.
-        $full_url = wp_get_attachment_url( $attachment_id );
-        if ( $full_url ) {
-            $sizes['full'] = array(
-                'url'    => $full_url,
-                'width'  => isset( $metadata['width'] ) ? (int) $metadata['width'] : 0,
-                'height' => isset( $metadata['height'] ) ? (int) $metadata['height'] : 0,
-            );
+        $full_size = $this->getFullSizeData( $attachment_id, $metadata );
+        if ( null !== $full_size ) {
+            $sizes['full'] = $full_size;
         }
 
         // Add intermediate sizes.
-        if ( isset( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
-            foreach ( $metadata['sizes'] as $size_name => $size_data ) {
-                $size_url = wp_get_attachment_image_src( $attachment_id, $size_name );
-                if ( $size_url && is_array( $size_url ) ) {
-                    $sizes[ $size_name ] = array(
-                        'url'    => $size_url[0],
-                        'width'  => isset( $size_data['width'] ) ? (int) $size_data['width'] : 0,
-                        'height' => isset( $size_data['height'] ) ? (int) $size_data['height'] : 0,
-                    );
-                }
+        $intermediate_sizes = $this->getIntermediateSizes( $attachment_id, $metadata );
+        $sizes              = array_merge( $sizes, $intermediate_sizes );
+
+        return $sizes;
+    }
+
+    /**
+     * Get full size image data.
+     *
+     * Pure function - extracts full size dimensions from metadata.
+     *
+     * @param int                  $attachment_id Attachment ID.
+     * @param array<string, mixed> $metadata      Attachment metadata.
+     * @return array<string, mixed>|null Full size data or null if not available.
+     */
+    private function getFullSizeData( int $attachment_id, array $metadata ): ?array {
+        $full_url = wp_get_attachment_url( $attachment_id );
+        if ( ! $full_url ) {
+            return null;
+        }
+
+        return array(
+            'url'    => $full_url,
+            'width'  => isset( $metadata['width'] ) ? (int) $metadata['width'] : 0,
+            'height' => isset( $metadata['height'] ) ? (int) $metadata['height'] : 0,
+        );
+    }
+
+    /**
+     * Get intermediate image sizes data.
+     *
+     * Pure function - extracts intermediate size information from metadata.
+     *
+     * @param int                  $attachment_id Attachment ID.
+     * @param array<string, mixed> $metadata      Attachment metadata.
+     * @return array<string, array<string, mixed>> Intermediate sizes array.
+     */
+    private function getIntermediateSizes( int $attachment_id, array $metadata ): array {
+        if ( ! isset( $metadata['sizes'] ) || ! is_array( $metadata['sizes'] ) ) {
+            return array();
+        }
+
+        $sizes = array();
+        foreach ( $metadata['sizes'] as $size_name => $size_data ) {
+            $size_info = $this->getSizeInfo( $attachment_id, $size_name, $size_data );
+            if ( null !== $size_info ) {
+                $sizes[ $size_name ] = $size_info;
             }
         }
 
         return $sizes;
+    }
+
+    /**
+     * Get individual size information.
+     *
+     * Pure function - extracts data for a specific image size.
+     *
+     * @param int                  $attachment_id Attachment ID.
+     * @param string               $size_name     Size name.
+     * @param array<string, mixed> $size_data     Size metadata.
+     * @return array<string, mixed>|null Size data or null if not available.
+     */
+    private function getSizeInfo( int $attachment_id, string $size_name, array $size_data ): ?array {
+        $size_url = wp_get_attachment_image_src( $attachment_id, $size_name );
+        if ( ! $size_url || ! is_array( $size_url ) ) {
+            return null;
+        }
+
+        return array(
+            'url'    => $size_url[0],
+            'width'  => isset( $size_data['width'] ) ? (int) $size_data['width'] : 0,
+            'height' => isset( $size_data['height'] ) ? (int) $size_data['height'] : 0,
+        );
     }
 
     /**
