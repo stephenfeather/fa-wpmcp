@@ -55,6 +55,11 @@ final class CreateCommentTest extends TestCase {
 	}
 
 	public function test_creates_comment(): void {
+		// Mock sanitization functions.
+		Functions\expect( 'sanitize_text_field' )->once()->with( 'John' )->andReturn( 'John' );
+		Functions\expect( 'sanitize_email' )->once()->with( 'john@example.com' )->andReturn( 'john@example.com' );
+		Functions\expect( 'wp_kses_post' )->once()->with( 'Great post!' )->andReturn( 'Great post!' );
+
 		Functions\expect( 'wp_insert_comment' )
 			->once()
 			->with( \Mockery::on( function( $args ) {
@@ -78,6 +83,12 @@ final class CreateCommentTest extends TestCase {
 	}
 
 	public function test_creates_comment_with_optional_url(): void {
+		// Mock sanitization functions.
+		Functions\expect( 'sanitize_text_field' )->once()->with( 'John' )->andReturn( 'John' );
+		Functions\expect( 'sanitize_email' )->once()->with( 'john@example.com' )->andReturn( 'john@example.com' );
+		Functions\expect( 'wp_kses_post' )->once()->with( 'Great post!' )->andReturn( 'Great post!' );
+		Functions\expect( 'esc_url_raw' )->once()->with( 'https://example.com' )->andReturn( 'https://example.com' );
+
 		Functions\expect( 'wp_insert_comment' )
 			->once()
 			->with( \Mockery::on( function( $args ) {
@@ -102,6 +113,11 @@ final class CreateCommentTest extends TestCase {
 	public function test_throws_exception_when_comment_creation_fails(): void {
 		$this->expectException( CommentCreationException::class );
 		$this->expectExceptionMessage( 'Failed to create comment' );
+
+		// Mock sanitization functions.
+		Functions\expect( 'sanitize_text_field' )->once()->with( 'John' )->andReturn( 'John' );
+		Functions\expect( 'sanitize_email' )->once()->with( 'john@example.com' )->andReturn( 'john@example.com' );
+		Functions\expect( 'wp_kses_post' )->once()->with( 'Great post!' )->andReturn( 'Great post!' );
 
 		Functions\expect( 'wp_insert_comment' )->once()->andReturn( 0 );
 

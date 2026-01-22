@@ -141,14 +141,14 @@ final class CreateComment extends AbstractAbility {
     public function doExecute( array $input ): array {
         $comment_data = array(
             'comment_post_ID'      => (int) $input['post_id'],
-            'comment_author'       => (string) $input['author'],
-            'comment_author_email' => (string) $input['email'],
-            'comment_content'      => (string) $input['content'],
+            'comment_author'       => sanitize_text_field( $input['author'] ),
+            'comment_author_email' => sanitize_email( $input['email'] ),
+            'comment_content'      => wp_kses_post( $input['content'] ),
         );
 
         // Add optional URL if provided.
         if ( isset( $input['url'] ) ) {
-            $comment_data['comment_author_url'] = (string) $input['url'];
+            $comment_data['comment_author_url'] = esc_url_raw( $input['url'] );
         }
 
         // Insert comment.

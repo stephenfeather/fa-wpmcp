@@ -508,9 +508,17 @@ final class SettingsPage {
         $output .= '<th scope="row"><label for="webhook_secret">' . esc_html( 'Secret Key' ) . '</label></th>';
         $output .= '<td>';
         $output .= '<input type="password" id="webhook_secret" name="webhook_secret" ';
-        $output .= 'value="' . esc_attr( $settings['webhook_secret'] ?? '' ) . '" ';
+        // Show placeholder instead of actual secret to prevent exposure in HTML source.
+        $has_secret = ! empty( $settings['webhook_secret'] );
+        $output .= 'placeholder="' . ( $has_secret ? esc_attr( '••••••••••••••••' ) : esc_attr( 'Enter new secret key' ) ) . '" ';
         $output .= 'class="regular-text" />';
-        $output .= '<p class="description">' . esc_html( 'Used to sign webhook payloads for verification.' ) . '</p>';
+        $output .= '<p class="description">';
+        if ( $has_secret ) {
+            $output .= esc_html( 'Leave blank to keep existing secret. Enter a new value to update.' );
+        } else {
+            $output .= esc_html( 'Used to sign webhook payloads for verification.' );
+        }
+        $output .= '</p>';
         $output .= '</td>';
         $output .= '</tr>';
 
@@ -784,6 +792,12 @@ final class SettingsPage {
         $webhook_secret = isset( $_POST['webhook_secret'] ) ? sanitize_text_field( wp_unslash( $_POST['webhook_secret'] ) ) : '';
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in helper method.
         $webhook_endpoints = isset( $_POST['webhook_endpoints'] ) ? wp_unslash( $_POST['webhook_endpoints'] ) : array();
+
+        // Preserve existing secret if field was left blank.
+        if ( empty( $webhook_secret ) ) {
+            $existing_settings = $this->getWebhooksSettings();
+            $webhook_secret = $existing_settings['webhook_secret'] ?? '';
+        }
 
         $settings = array(
             'webhook_secret'    => $webhook_secret,

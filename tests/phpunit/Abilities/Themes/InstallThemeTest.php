@@ -25,8 +25,10 @@ class InstallThemeTest extends TestCase {
 		$this->assertEquals( 'write', ( new InstallTheme() )->getOperationType() );
 	}
 
-	public function testExecuteReturnsSuccess(): void {
-		$result = ( new InstallTheme() )->doExecute( array( 'slug' => 'twentytwentyfour' ) );
-		$this->assertTrue( $result['success'] );
+	public function testExecuteThrowsNotImplementedException(): void {
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'Theme installation is not yet implemented' );
+
+		( new InstallTheme() )->doExecute( array( 'slug' => 'twentytwentyfour' ) );
 	}
 }

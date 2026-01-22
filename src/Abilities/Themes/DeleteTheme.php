@@ -52,7 +52,8 @@ final class DeleteTheme extends AbstractAbility {
 	}
 
 	public function doExecute( array $input ): array {
-		// Minimal implementation - full implementation would use delete_theme()
-		return array( 'success' => true );
+		throw new \RuntimeException(
+			'Theme deletion is not yet implemented. This ability requires WordPress delete_theme() integration.'
+		);
 	}
 }

@@ -25,8 +25,10 @@ class DeleteThemeTest extends TestCase {
 		$this->assertEquals( 'write', ( new DeleteTheme() )->getOperationType() );
 	}
 
-	public function testExecuteReturnsSuccess(): void {
-		$result = ( new DeleteTheme() )->doExecute( array( 'stylesheet' => 'twentytwentythree' ) );
-		$this->assertTrue( $result['success'] );
+	public function testExecuteThrowsNotImplementedException(): void {
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'Theme deletion is not yet implemented' );
+
+		( new DeleteTheme() )->doExecute( array( 'stylesheet' => 'twentytwentythree' ) );
 	}
 }

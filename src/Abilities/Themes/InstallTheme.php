@@ -52,7 +52,8 @@ final class InstallTheme extends AbstractAbility {
 	}
 
 	public function doExecute( array $input ): array {
-		// Minimal implementation - full implementation would use Theme_Upgrader
-		return array( 'success' => true );
+		throw new \RuntimeException(
+			'Theme installation is not yet implemented. This ability requires WordPress Theme_Upgrader integration.'
+		);
 	}
 }

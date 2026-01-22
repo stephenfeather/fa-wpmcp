@@ -43,9 +43,8 @@ final class InstallPlugin extends AbstractAbility {
 		return 'install_plugins';
 	}
 	public function doExecute( array $input ): array {
-		return array(
-			'slug'      => $input['slug'],
-			'installed' => true,
+		throw new \RuntimeException(
+			'Plugin installation is not yet implemented. This ability requires WordPress Plugin_Upgrader integration.'
 		);
 	}
 }

@@ -94,7 +94,8 @@ class PrivacyRedactorTest extends TestCase {
 
 		$this->assertEquals( 'admin', $redacted['user_login'] );
 		$this->assertEquals( '[REDACTED]', $redacted['user_pass'] );
-		$this->assertEquals( 'admin@example.com', $redacted['user_email'] );
+		// Email is now redacted for enhanced PII protection.
+		$this->assertEquals( '[REDACTED]', $redacted['user_email'] );
 	}
 
 	/**
@@ -123,7 +124,6 @@ class PrivacyRedactorTest extends TestCase {
 		$data = array(
 			'id'          => 42,
 			'username'    => 'testuser',
-			'email'       => 'test@example.com',
 			'first_name'  => 'John',
 			'last_name'   => 'Doe',
 			'post_title'  => 'My Post',

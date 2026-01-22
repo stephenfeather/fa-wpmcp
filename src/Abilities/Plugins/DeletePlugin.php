@@ -43,9 +43,8 @@ final class DeletePlugin extends AbstractAbility {
 		return 'delete_plugins';
 	}
 	public function doExecute( array $input ): array {
-		return array(
-			'plugin'  => $input['plugin'],
-			'deleted' => true,
+		throw new \RuntimeException(
+			'Plugin deletion is not yet implemented. This ability requires WordPress delete_plugins() integration.'
 		);
 	}
 }
