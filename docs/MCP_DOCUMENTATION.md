@@ -39,7 +39,7 @@ curl -u "username:xxxx xxxx xxxx xxxx xxxx xxxx" \
 
 ## Available Abilities
 
-FA WPMCP provides **21 WordPress abilities** across 5 categories:
+FA WPMCP provides **25 WordPress abilities** across 6 categories:
 
 | Category | Abilities | Operations |
 |----------|-----------|------------|
@@ -48,6 +48,7 @@ FA WPMCP provides **21 WordPress abilities** across 5 categories:
 | **Media** | List Media, Get Media, Update Media, Upload Media | Media library management with base64/URL uploads |
 | **Taxonomies** | List Terms, Get Term, Create Term, Update Term | Manage categories, tags, and custom taxonomies |
 | **Settings** | Get Option, Update Option, Delete Option, List Options | WordPress options management with search and pagination |
+| **Users** | List Users, Get User, Create User, Update User | User management with role filtering and profile updates |
 
 ### 1. List Posts
 
@@ -1080,6 +1081,223 @@ List WordPress options with search filtering and pagination.
 |-------|------|-------------|
 | `options` | array | Array of option objects with name and value |
 | `total` | integer | Total number of options matching the search |
+
+---
+
+### 22. List Users
+
+Retrieve a paginated list of WordPress users with filtering and search.
+
+**Ability Name:** `fa-wpmcp/list-users`
+**Category:** `users`
+**Operation Type:** `READ`
+**Required Capability:** `list_users`
+
+#### Input Schema
+
+```json
+{
+  "page": 1,
+  "per_page": 10,
+  "role": "administrator",
+  "search": "john",
+  "orderby": "user_registered",
+  "order": "DESC"
+}
+```
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `page` | integer | No | 1 | Page number for pagination |
+| `per_page` | integer | No | 10 | Users per page (max 100) |
+| `role` | string | No | - | Filter by user role (administrator, editor, author, contributor, subscriber, or custom role) |
+| `search` | string | No | - | Search term to filter by username, email, or display name |
+| `orderby` | string | No | `user_registered` | Order by: `ID`, `display_name`, `user_login`, `user_email`, `user_registered` |
+| `order` | string | No | `ASC` | Sort order: `ASC` or `DESC` |
+
+#### Output Schema
+
+```json
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "email": "admin@example.com",
+      "display_name": "Admin User",
+      "first_name": "Admin",
+      "last_name": "User",
+      "roles": ["administrator"],
+      "registered": "2026-01-01 00:00:00",
+      "avatar_url": "https://secure.gravatar.com/avatar/..."
+    }
+  ],
+  "total": 25,
+  "pages": 3,
+  "current_page": 1,
+  "per_page": 10
+}
+```
+
+---
+
+### 23. Get User
+
+Retrieve a single WordPress user by ID, username, or email address.
+
+**Ability Name:** `fa-wpmcp/get-user`
+**Category:** `users`
+**Operation Type:** `READ`
+**Required Capability:** `list_users`
+
+#### Input Schema
+
+```json
+{
+  "user_id": 1
+}
+```
+
+**OR**
+
+```json
+{
+  "username": "admin"
+}
+```
+
+**OR**
+
+```json
+{
+  "email": "admin@example.com"
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `user_id` | integer | No | User ID to retrieve (minimum: 1) |
+| `username` | string | No | Username (user_login) to retrieve |
+| `email` | string | No | Email address to retrieve |
+
+**Note:** At least one parameter is required. Priority: `user_id` > `username` > `email`.
+
+#### Output Schema
+
+```json
+{
+  "id": 1,
+  "username": "admin",
+  "email": "admin@example.com",
+  "display_name": "Admin User",
+  "first_name": "Admin",
+  "last_name": "User",
+  "nickname": "admin",
+  "description": "Site administrator",
+  "roles": ["administrator"],
+  "registered": "2026-01-01 00:00:00",
+  "avatar_url": "https://secure.gravatar.com/avatar/...",
+  "website": "https://example.com"
+}
+```
+
+---
+
+### 24. Create User
+
+Create a new WordPress user with username, email, and optional settings.
+
+**Ability Name:** `fa-wpmcp/create-user`
+**Category:** `users`
+**Operation Type:** `WRITE`
+**Required Capability:** `create_users`
+
+#### Input Schema
+
+```json
+{
+  "username": "johndoe",
+  "email": "john@example.com",
+  "password": "secure-password",
+  "role": "author",
+  "first_name": "John",
+  "last_name": "Doe",
+  "display_name": "John Doe",
+  "website": "https://johndoe.com",
+  "description": "Content author"
+}
+```
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `username` | string | **Yes** | - | The username (user_login) |
+| `email` | string | **Yes** | - | The user email address |
+| `password` | string | No | Auto-generated | The user password |
+| `role` | string | No | `subscriber` | User role: `administrator`, `editor`, `author`, `contributor`, `subscriber` |
+| `first_name` | string | No | - | User first name |
+| `last_name` | string | No | - | User last name |
+| `display_name` | string | No | username | Display name |
+| `website` | string | No | - | User website URL |
+| `description` | string | No | - | User biographical info |
+
+#### Output Schema
+
+```json
+{
+  "user_id": 42,
+  "username": "johndoe",
+  "email": "john@example.com",
+  "role": "author",
+  "edit_url": "https://example.com/wp-admin/user-edit.php?user_id=42"
+}
+```
+
+---
+
+### 25. Update User
+
+Update an existing WordPress user's profile information.
+
+**Ability Name:** `fa-wpmcp/update-user`
+**Category:** `users`
+**Operation Type:** `WRITE`
+**Required Capability:** `edit_users`
+
+#### Input Schema
+
+```json
+{
+  "user_id": 42,
+  "email": "newemail@example.com",
+  "role": "editor",
+  "first_name": "John",
+  "last_name": "Doe",
+  "display_name": "John Doe",
+  "website": "https://johndoe.com",
+  "description": "Senior editor"
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `user_id` | integer | **Yes** | User ID to update (minimum: 1) |
+| `email` | string | No | New email address |
+| `password` | string | No | New password |
+| `role` | string | No | New user role |
+| `first_name` | string | No | Updated first name |
+| `last_name` | string | No | Updated last name |
+| `display_name` | string | No | Updated display name |
+| `website` | string | No | Updated website URL |
+| `description` | string | No | Updated biographical info |
+
+#### Output Schema
+
+```json
+{
+  "user_id": 42,
+  "updated_fields": ["email", "role", "first_name", "last_name"]
+}
+```
 
 ---
 
