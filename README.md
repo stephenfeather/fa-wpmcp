@@ -553,6 +553,8 @@ add_action('fa_wpmcp_cleanup_logs', function() {
 
 ## Security
 
+**For complete security documentation, see [Security Guide](docs/SECURITY.md).**
+
 ### Reporting Vulnerabilities
 
 Please do NOT open public issues for security vulnerabilities.
@@ -566,6 +568,9 @@ Please do NOT open public issues for security vulnerabilities.
 - SQL injection protection (prepared statements)
 - XSS protection (escaped output)
 - CSRF protection (WordPress nonces where applicable)
+- PII redaction in activity logs (50+ sensitive fields)
+- Protected WordPress options (prevents modification of critical settings)
+- Comment content sanitization (XSS prevention)
 
 ## Contributing
 

@@ -4,6 +4,36 @@ namespace FAWpmcp\Abilities\Themes;
 
 use FAWpmcp\Abilities\AbstractAbility;
 
+/**
+ * Install Theme Ability (INTENTIONALLY UNIMPLEMENTED)
+ *
+ * This ability is marked as out-of-scope for the current release.
+ * It will throw a RuntimeException when called, clearly indicating to API consumers
+ * that this functionality is not yet available.
+ *
+ * @since 1.0.0-alpha-2
+ * @see https://developer.wordpress.org/reference/classes/theme_upgrader/
+ *
+ * SECURITY CONSIDERATIONS FOR FUTURE IMPLEMENTATION:
+ * - Must validate theme slug against WordPress.org API before installation
+ * - Should verify theme integrity (checksums, signatures)
+ * - Must prevent installation from arbitrary URLs (SSRF vulnerability)
+ * - Requires filesystem write permission validation
+ * - Should implement dry-run mode for testing
+ * - Must handle activation separately with explicit user consent
+ * - Should log all installation attempts for audit trail
+ * - Consider implementing theme allowlist/blocklist
+ * - Must prevent child theme installation without parent
+ * - Should validate theme compatibility with WordPress version
+ *
+ * IMPLEMENTATION REQUIREMENTS:
+ * - Integration with WordPress Theme_Upgrader class
+ * - Proper error handling for network failures
+ * - Support for updating existing themes vs fresh install
+ * - Handling of theme dependencies (parent themes)
+ * - Validation of theme structure and required files (style.css)
+ * - Must not auto-activate themes after installation
+ */
 final class InstallTheme extends AbstractAbility {
 	public function getName(): string {
 		return 'fa-wpmcp/install-theme';
