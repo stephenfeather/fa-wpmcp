@@ -99,6 +99,12 @@ The plugin provides comprehensive WordPress content management through the follo
   - Matches wp-cli theme command naming conventions
   - Full theme lifecycle management
 
+- **Privacy & GDPR:** Personal data management for compliance
+  - Create Export Request, Create Erasure Request operations
+  - List Privacy Requests, Get Privacy Request operations
+  - Full integration with WordPress privacy tools
+  - Email confirmation workflow for data requests
+
 ### Permission System
 
 - **Permission System:** Multi-level access control
@@ -136,7 +142,7 @@ The plugin provides comprehensive WordPress content management through the follo
   - HMAC-SHA256 webhook signing
   - Rate limiting protection
   - Activity audit trail
-  - *Note: Full GDPR compliance (data export/erasure hooks) planned for future release*
+  - GDPR compliance (data export/erasure via WordPress privacy API)
 
 - **Code Quality:** Professional-grade implementation
   - PSR-12 coding standards
@@ -251,7 +257,7 @@ composer test:coverage
 
 View report at `tests/coverage/index.html`.
 
-Current coverage: **76.87%** (672 tests, 1494 assertions)
+Current coverage: **74.33%** (703 tests, 1543 assertions)
 
 ### Creating New Abilities
 

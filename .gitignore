@@ -4,6 +4,7 @@ composer.lock
 
 # continuous-claude
 opc/
+thoughts/
 
 # PHPUnit
 /tests/coverage/
