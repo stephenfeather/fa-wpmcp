@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-beta.1] - 2026-01-22
+
+### Added
+- **Security Documentation** - Comprehensive `docs/SECURITY.md` with:
+  - Current security features (10 implemented protections)
+  - Intentionally unimplemented abilities with security considerations
+  - Future security enhancements roadmap
+  - Security audit history
+  - Best practices and configuration examples
+- PHPDoc security considerations for stub abilities (InstallPlugin, DeletePlugin, InstallTheme, DeleteTheme)
+- Option name validation with `sanitize_key()` and 191-character length limit
+- Destructive operation annotations for delete abilities (DeleteOption, DeletePlugin, DeleteTheme)
+
+### Security
+- **Risk Level Reduced: LOW** (down from MEDIUM in v1.0-alpha-2)
+- **HIGH Severity Issues (2 fixed in v1.0-alpha-2):**
+  - Missing per-ability capability enforcement in AbilityExecutor
+  - Settings abilities allow unrestricted option access
+- **MEDIUM Severity Issues (4 fixed in v1.0-alpha-2):**
+  - Comment content not sanitized (potential XSS)
+  - Incomplete PII redaction in activity logs (8 fields → 50+ fields)
+  - Webhook secret displayed in admin form
+  - Stub implementations return fake success
+- **LOW Severity Issues (2 of 3 fixed in v1.0-beta-1):**
+  - Option name format validation (✅ FIXED: sanitize_key + length validation)
+  - Destructive annotations missing (✅ FIXED: Added to all delete abilities)
+  - IP address anonymization (📋 PLANNED: v1.1.0 as admin option)
+- Security audit report: `.claude/cache/agents/aegis/output-20260122-security-audit-v1beta1.md`
+- All 707 tests passing with 1563 assertions, 74.19% code coverage
+
+### Changed
+- Updated README.md security section to reference comprehensive security documentation
+- Enhanced PrivacyRedactor with 50+ sensitive field patterns (auth, secrets, PII)
+- Settings abilities now validate option names before database operations
+
 ## [1.0.0-alpha.2] - 2026-01-22
 
 ### Added
@@ -58,6 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Settings page for configuration
 - Webhook scheduling with Action Scheduler
 
-[Unreleased]: https://github.com/featherart/fa-wpmcp/compare/v1.0-alpha-2...HEAD
+[Unreleased]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-beta.1...HEAD
+[1.0.0-beta.1]: https://github.com/featherart/fa-wpmcp/compare/v1.0-alpha-2...v1.0.0-beta.1
 [1.0.0-alpha.2]: https://github.com/featherart/fa-wpmcp/compare/v1.0-alpha-1...v1.0-alpha-2
 [1.0-alpha-1]: https://github.com/featherart/fa-wpmcp/releases/tag/v1.0-alpha-1
