@@ -39,7 +39,7 @@ curl -u "username:xxxx xxxx xxxx xxxx xxxx xxxx" \
 
 ## Available Abilities
 
-FA WPMCP provides **17 WordPress abilities** across 4 categories:
+FA WPMCP provides **21 WordPress abilities** across 5 categories:
 
 | Category | Abilities | Operations |
 |----------|-----------|------------|
@@ -47,6 +47,7 @@ FA WPMCP provides **17 WordPress abilities** across 4 categories:
 | **Comments** | List Comments, Get Comment, Create Comment, Update Comment, Delete Comment | Complete comment management |
 | **Media** | List Media, Get Media, Update Media, Upload Media | Media library management with base64/URL uploads |
 | **Taxonomies** | List Terms, Get Term, Create Term, Update Term | Manage categories, tags, and custom taxonomies |
+| **Settings** | Get Option, Update Option, Delete Option, List Options | WordPress options management with search and pagination |
 
 ### 1. List Posts
 
@@ -920,6 +921,165 @@ Update an existing taxonomy term's name, slug, description, or parent.
   }
 }
 ```
+
+---
+
+### 18. Get Option
+
+Retrieve a WordPress option by name with existence detection.
+
+**Ability Name:** `fa-wpmcp/get-option`
+**Category:** `settings`
+**Operation Type:** `READ`
+**Required Capability:** `manage_options`
+
+#### Input Schema
+
+```json
+{
+  "option_name": "blogname",
+  "default": "My Blog"
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `option_name` | string | **Yes** | The name of the option to retrieve |
+| `default` | mixed | No | Default value if option does not exist |
+
+#### Output Schema
+
+```json
+{
+  "option_name": "blogname",
+  "value": "My WordPress Site",
+  "exists": true
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `option_name` | string | The name of the option |
+| `value` | mixed | The option value or default value |
+| `exists` | boolean | Whether the option exists in the database |
+
+---
+
+### 19. Update Option
+
+Update or create a WordPress option with optional autoload setting.
+
+**Ability Name:** `fa-wpmcp/update-option`
+**Category:** `settings`
+**Operation Type:** `WRITE`
+**Required Capability:** `manage_options`
+
+#### Input Schema
+
+```json
+{
+  "option_name": "blogdescription",
+  "value": "Just another WordPress site",
+  "autoload": "yes"
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `option_name` | string | **Yes** | The name of the option to update |
+| `value` | mixed | **Yes** | The value to set for the option |
+| `autoload` | string | No | Whether to autoload the option: `yes` or `no` |
+
+#### Output Schema
+
+```json
+{
+  "option_name": "blogdescription",
+  "updated": true
+}
+```
+
+---
+
+### 20. Delete Option
+
+Permanently delete a WordPress option from the database.
+
+**Ability Name:** `fa-wpmcp/delete-option`
+**Category:** `settings`
+**Operation Type:** `WRITE`
+**Required Capability:** `manage_options`
+
+#### Input Schema
+
+```json
+{
+  "option_name": "custom_setting"
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `option_name` | string | **Yes** | The name of the option to delete |
+
+#### Output Schema
+
+```json
+{
+  "option_name": "custom_setting",
+  "deleted": true
+}
+```
+
+---
+
+### 21. List Options
+
+List WordPress options with search filtering and pagination.
+
+**Ability Name:** `fa-wpmcp/list-options`
+**Category:** `settings`
+**Operation Type:** `READ`
+**Required Capability:** `manage_options`
+
+#### Input Schema
+
+```json
+{
+  "search": "blog",
+  "limit": 100,
+  "offset": 0
+}
+```
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `search` | string | No | - | Search term to filter option names |
+| `limit` | integer | No | 100 | Maximum number of options to return (max 1000) |
+| `offset` | integer | No | 0 | Number of options to skip for pagination |
+
+#### Output Schema
+
+```json
+{
+  "options": [
+    {
+      "option_name": "blogname",
+      "option_value": "My WordPress Site"
+    },
+    {
+      "option_name": "blogdescription",
+      "option_value": "Just another WordPress site"
+    }
+  ],
+  "total": 150
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `options` | array | Array of option objects with name and value |
+| `total` | integer | Total number of options matching the search |
 
 ---
 
