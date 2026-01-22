@@ -168,6 +168,7 @@ final class UploadMedia extends AbstractAbility {
 	 * @param array<string, mixed> $input Validated input data.
 	 * @return array<string, mixed> Uploaded media data.
 	 * @throws MediaUploadException If upload fails.
+	 * @throws \Exception If an unexpected error occurs.
 	 */
 	public function doExecute( array $input ): array {
 		// Validate input.
