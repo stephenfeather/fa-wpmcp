@@ -45,16 +45,129 @@ Get your WordPress site connected to AI assistants in under 5 minutes.
 | **Windows** | `%APPDATA%\Claude\claude_desktop_config.json` |
 | **Linux** | `~/.config/Claude/claude_desktop_config.json` |
 
+### Create MCP Server Wrapper
+
+Since Claude Desktop requires an MCP server with stdio transport, create a Node.js wrapper to connect to your WordPress HTTP endpoint.
+
+**Create `wordpress-mcp-server.js`:**
+
+```javascript
+#!/usr/bin/env node
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+const WORDPRESS_URL = process.env.WORDPRESS_BASE_URL;
+const USERNAME = process.env.WORDPRESS_USERNAME;
+const APP_PASSWORD = process.env.WORDPRESS_APP_PASSWORD;
+
+const auth = Buffer.from(`${USERNAME}:${APP_PASSWORD}`).toString('base64');
+
+const server = new Server(
+  {
+    name: "wordpress-mcp",
+    version: "1.0.0",
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
+  }
+);
+
+// Fetch available tools from WordPress
+let availableTools = [];
+try {
+  const response = await fetch(WORDPRESS_URL, {
+    headers: { "Authorization": `Basic ${auth}` }
+  });
+  const data = await response.json();
+  if (data.success && data.data.abilities) {
+    availableTools = Object.entries(data.data.abilities).map(([name, ability]) => ({
+      name: name.replace('fa-wpmcp/', ''),
+      description: ability.description || ability.label,
+      inputSchema: ability.input_schema || { type: "object", properties: {} }
+    }));
+  }
+} catch (error) {
+  console.error("Failed to fetch WordPress abilities:", error.message);
+}
+
+// Register tool list
+server.setRequestHandler("tools/list", async () => {
+  return { tools: availableTools };
+});
+
+// Handle tool calls
+server.setRequestHandler("tools/call", async (request) => {
+  const { name, arguments: args } = request.params;
+  const abilityName = `fa-wpmcp/${name}`;
+  const url = `${WORDPRESS_URL}/execute/${abilityName}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Basic ${auth}`,
+      },
+      body: JSON.stringify(args),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error: ${data.error?.message || "Unknown error"}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(data.data, null, 2),
+        },
+      ],
+    };
+  } catch (error) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Error calling WordPress: ${error.message}`,
+        },
+      ],
+      isError: true,
+    };
+  }
+});
+
+const transport = new StdioServerTransport();
+server.connect(transport);
+```
+
+**Install dependencies:**
+```bash
+npm init -y
+npm install @modelcontextprotocol/sdk
+```
+
 ### Add Configuration
 
-Create or edit the file:
+Create or edit `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "wordpress": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "command": "node",
+      "args": ["/absolute/path/to/wordpress-mcp-server.js"],
       "env": {
         "WORDPRESS_BASE_URL": "https://your-site.com/wp-json/abilities/v1",
         "WORDPRESS_USERNAME": "your-username",
@@ -66,6 +179,7 @@ Create or edit the file:
 ```
 
 **Replace:**
+- `/absolute/path/to/wordpress-mcp-server.js` with the actual path to your server file
 - `your-site.com` with your WordPress domain
 - `your-username` with your WordPress username
 - `xxxx xxxx...` with the application password from Step 2

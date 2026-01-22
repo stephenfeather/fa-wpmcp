@@ -34,17 +34,16 @@ https://your-site.com/wp-json/abilities/v1/
 
 ### Example Configuration
 
-Create or edit `claude_desktop_config.json`:
+**Note:** Since Claude Desktop uses stdio transport and the WordPress plugin provides an HTTP endpoint, you need a custom MCP server wrapper. See the detailed implementation below in the "Alternative: HTTP REST MCP Server" section.
+
+Quick example using a custom wrapper (full code in section below):
 
 ```json
 {
   "mcpServers": {
     "wordpress": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-fetch"
-      ],
+      "command": "node",
+      "args": ["/path/to/wordpress-mcp-server.js"],
       "env": {
         "WORDPRESS_BASE_URL": "https://your-site.com/wp-json/abilities/v1",
         "WORDPRESS_USERNAME": "your-username",
@@ -60,7 +59,8 @@ Create or edit `claude_desktop_config.json`:
 | Field | Description |
 |-------|-------------|
 | `wordpress` | Unique identifier for this MCP server (can be any name) |
-| `command` | Uses `npx` to run MCP fetch server (auto-installs if needed) |
+| `command` | Uses `node` to run the custom MCP wrapper server |
+| `args` | Path to your custom MCP server JavaScript file |
 | `WORDPRESS_BASE_URL` | Your WordPress MCP endpoint |
 | `WORDPRESS_USERNAME` | Your WordPress username |
 | `WORDPRESS_APP_PASSWORD` | Generated application password (with spaces) |
