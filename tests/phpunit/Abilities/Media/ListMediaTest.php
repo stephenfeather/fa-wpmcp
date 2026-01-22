@@ -148,7 +148,6 @@ class ListMediaTest extends TestCase {
 		// Use reflection to inject mock query.
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'formatResults' );
-		$method->setAccessible( true );
 
 		$result = $method->invoke( $ability, $mock_query, array( 'page' => 1 ) );
 
@@ -168,7 +167,6 @@ class ListMediaTest extends TestCase {
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildQueryArgs' );
-		$method->setAccessible( true );
 
 		$args = $method->invoke(
 			$ability,

@@ -108,12 +108,11 @@ class ListOptionsTest extends TestCase {
 
 		$mock_wpdb->options = 'wp_options';
 		$mock_wpdb->shouldReceive( 'prepare' )
-			->once()
-			->with( Mockery::pattern( '/SELECT option_name, option_value.*LIMIT/' ), 100, 0 )
-			->andReturn( 'PREPARED_QUERY' );
+			->twice()
+			->andReturnUsing( fn( string $query, ...$args ) => $query );
 		$mock_wpdb->shouldReceive( 'get_results' )
 			->once()
-			->with( 'PREPARED_QUERY' )
+			->with( Mockery::pattern( '/SELECT option_name, option_value/' ) )
 			->andReturn(
 				array(
 					(object) array(
@@ -157,7 +156,7 @@ class ListOptionsTest extends TestCase {
 
 		$mock_wpdb->options = 'wp_options';
 		$mock_wpdb->shouldReceive( 'esc_like' )
-			->twice()
+			->once()
 			->with( 'test' )
 			->andReturn( 'test' );
 		$mock_wpdb->shouldReceive( 'prepare' )
@@ -200,14 +199,15 @@ class ListOptionsTest extends TestCase {
 
 		$mock_wpdb->options = 'wp_options';
 		$mock_wpdb->shouldReceive( 'prepare' )
-			->once()
-			->with( Mockery::pattern( '/LIMIT/' ), 10, 20 )
-			->andReturn( 'PREPARED_QUERY' );
+			->twice()
+			->andReturnUsing( fn( string $query, ...$args ) => $query );
 		$mock_wpdb->shouldReceive( 'get_results' )
 			->once()
+			->with( Mockery::pattern( '/SELECT option_name, option_value/' ) )
 			->andReturn( array() );
 		$mock_wpdb->shouldReceive( 'get_var' )
 			->once()
+			->with( Mockery::pattern( '/SELECT COUNT/' ) )
 			->andReturn( '100' );
 
 		$GLOBALS['wpdb'] = $mock_wpdb;

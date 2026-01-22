@@ -197,6 +197,11 @@ final class AbilityExecutor {
             return $failure;
         }
 
+        $capability_failure = $this->checkCapability( $context );
+        if ( $capability_failure !== null ) {
+            return $capability_failure;
+        }
+
         return Result::success( $context );
     }
 
@@ -265,6 +270,38 @@ final class AbilityExecutor {
             return Result::failure(
                 'ability_disabled',
                 'Global write operations are disabled.'
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * Check WordPress capability for this ability.
+     *
+     * @param array<string, mixed> $context Execution context.
+     * @return Result|null Failure result if denied, null if allowed or unavailable.
+     */
+    private function checkCapability( array $context ): ?Result {
+        $ability    = $context['ability'];
+        $capability = $ability->getRequiredCapability();
+
+        if ( '' === $capability ) {
+            return null;
+        }
+
+        if ( function_exists( 'user_can' ) ) {
+            $allowed = user_can( $context['user_id'], $capability );
+        } elseif ( function_exists( 'current_user_can' ) ) {
+            $allowed = current_user_can( $capability );
+        } else {
+            return null;
+        }
+
+        if ( ! $allowed ) {
+            return Result::failure(
+                'insufficient_capability',
+                sprintf( 'User lacks required capability: %s', $capability )
             );
         }
 

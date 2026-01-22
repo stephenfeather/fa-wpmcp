@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Settings;
 
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Abilities\Settings\OptionAccessPolicy;
 
 /**
  * Ability to delete a WordPress option.
@@ -120,6 +121,8 @@ final class DeleteOption extends AbstractAbility {
 	 */
 	public function doExecute( array $input ): array {
 		$option_name = $input['option_name'];
+
+		OptionAccessPolicy::assertAllowed( $option_name );
 		$deleted     = delete_option( $option_name );
 
 		return array(

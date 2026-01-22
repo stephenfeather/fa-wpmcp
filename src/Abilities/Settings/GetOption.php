@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Settings;
 
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Abilities\Settings\OptionAccessPolicy;
 
 /**
  * Ability to retrieve a WordPress option.
@@ -121,6 +122,8 @@ final class GetOption extends AbstractAbility {
 	public function doExecute( array $input ): array {
 		$option_name = $input['option_name'];
 		$default     = $input['default'] ?? false;
+
+		OptionAccessPolicy::assertAllowed( $option_name );
 
 		// Use a unique sentinel to detect if option exists.
 		$sentinel = new \stdClass();

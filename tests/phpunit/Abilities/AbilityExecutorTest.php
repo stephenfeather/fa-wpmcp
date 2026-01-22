@@ -57,16 +57,17 @@ class AbilityExecutorTest extends TestCase {
 		string $name = 'fa-wpmcp/test-ability',
 		string $category = 'test-category',
 		string $operation = 'read',
-		array $execute_return = [ 'result' => 'success' ]
+		array $execute_return = [ 'result' => 'success' ],
+		string $required_capability = 'read'
 	): AbstractAbility {
 		$ability = Mockery::mock( AbstractAbility::class );
 		$ability->shouldReceive( 'getName' )->andReturn( $name );
 		$ability->shouldReceive( 'getCategory' )->andReturn( $category );
 		$ability->shouldReceive( 'getOperationType' )->andReturn( $operation );
 		$ability->shouldReceive( 'doExecute' )->andReturn( $execute_return );
-		$ability->shouldReceive( 'get_label' )->andReturn( 'Test Ability' );
-		$ability->shouldReceive( 'get_description' )->andReturn( 'Test ability description' );
-		$ability->shouldReceive( 'get_required_capability' )->andReturn( 'read' );
+		$ability->shouldReceive( 'getLabel' )->andReturn( 'Test Ability' );
+		$ability->shouldReceive( 'getDescription' )->andReturn( 'Test ability description' );
+		$ability->shouldReceive( 'getRequiredCapability' )->andReturn( $required_capability );
 		return $ability;
 	}
 
@@ -165,6 +166,55 @@ class AbilityExecutorTest extends TestCase {
 
 		$this->assertFalse( $result->is_success );
 		$this->assertEquals( 'ability_disabled', $result->error_code );
+	}
+
+	/**
+	 * Test executor denies when capability is missing.
+	 *
+	 * @return void
+	 */
+	public function test_executor_denies_when_capability_missing(): void {
+		$permission_settings = new PermissionSettings(
+			global_read_enabled: true,
+			global_write_enabled: true,
+			category_settings: [],
+			ability_settings: [],
+		);
+
+		$GLOBALS['fa_wpmcp_user_can'] = array(
+			1 => array(
+				'manage_options' => false,
+			),
+		);
+
+		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
+		$rate_limiter->shouldNotReceive( 'check' );
+
+		$logger = Mockery::mock( ActivityLoggerInterface::class );
+		$logger->shouldNotReceive( 'logBeforeExecute' );
+
+		$webhook_manager = Mockery::mock( WebhookManagerInterface::class );
+		$webhook_manager->shouldNotReceive( 'trigger' );
+
+		$executor = new AbilityExecutor(
+			$permission_settings,
+			$rate_limiter,
+			$logger,
+			$webhook_manager,
+		);
+
+		$ability = $this->create_mock_ability(
+			name: 'fa-wpmcp/list-options',
+			category: 'settings',
+			operation: 'read',
+			required_capability: 'manage_options'
+		);
+		$result = $executor->execute( $ability, [], 1, 'editor', '127.0.0.1' );
+
+		unset( $GLOBALS['fa_wpmcp_user_can'] );
+
+		$this->assertFalse( $result->is_success );
+		$this->assertEquals( 'insufficient_capability', $result->error_code );
 	}
 
 	/**
@@ -451,6 +501,7 @@ class AbilityExecutorTest extends TestCase {
 		$ability->shouldReceive( 'getName' )->andReturn( 'fa-wpmcp/failing-ability' );
 		$ability->shouldReceive( 'getCategory' )->andReturn( 'test' );
 		$ability->shouldReceive( 'getOperationType' )->andReturn( 'read' );
+		$ability->shouldReceive( 'getRequiredCapability' )->andReturn( 'read' );
 		$ability->shouldReceive( 'doExecute' )
 			->andThrow( new \RuntimeException( 'Something went wrong' ) );
 
@@ -510,6 +561,7 @@ class AbilityExecutorTest extends TestCase {
 		$ability->shouldReceive( 'getName' )->andReturn( 'fa-wpmcp/failing-ability' );
 		$ability->shouldReceive( 'getCategory' )->andReturn( 'test' );
 		$ability->shouldReceive( 'getOperationType' )->andReturn( 'write' );
+		$ability->shouldReceive( 'getRequiredCapability' )->andReturn( 'read' );
 		$ability->shouldReceive( 'doExecute' )
 			->andThrow( new \RuntimeException( 'Database error' ) );
 
@@ -554,6 +606,7 @@ class AbilityExecutorTest extends TestCase {
 		$ability->shouldReceive( 'getName' )->andReturn( 'fa-wpmcp/test' );
 		$ability->shouldReceive( 'getCategory' )->andReturn( 'test' );
 		$ability->shouldReceive( 'getOperationType' )->andReturn( 'read' );
+		$ability->shouldReceive( 'getRequiredCapability' )->andReturn( 'read' );
 		$ability->shouldReceive( 'doExecute' )
 			->with(
 				Mockery::on(

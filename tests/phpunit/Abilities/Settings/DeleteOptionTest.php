@@ -133,4 +133,21 @@ class DeleteOptionTest extends TestCase {
 		$this->assertEquals( 'missing_option', $result['option_name'] );
 		$this->assertFalse( $result['deleted'] );
 	}
+
+	/**
+	 * Test execute blocks protected options.
+	 *
+	 * @return void
+	 */
+	public function testExecuteBlocksProtectedOption(): void {
+		$ability = new DeleteOption();
+
+		Functions\expect( 'delete_option' )
+			->never();
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'protected' );
+
+		$ability->doExecute( array( 'option_name' => 'admin_email' ) );
+	}
 }

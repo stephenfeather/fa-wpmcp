@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Settings;
 
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Abilities\Settings\OptionAccessPolicy;
 
 /**
  * Ability to list WordPress options.
@@ -134,25 +135,39 @@ final class ListOptions extends AbstractAbility {
 		$limit  = $input['limit'] ?? 100;
 		$offset = $input['offset'] ?? 0;
 
-		$where = '';
-		$args  = array();
+		$where_clauses = array();
+		$args          = array();
 
-		if ( $search ) {
-			$where  = 'WHERE option_name LIKE %s';
-			$args[] = '%' . $wpdb->esc_like( $search ) . '%';
+		$allowed_options   = OptionAccessPolicy::getAllowedOptions();
+		$protected_options = OptionAccessPolicy::getProtectedOptions();
+
+		if ( ! empty( $allowed_options ) ) {
+			$placeholders    = implode( ',', array_fill( 0, count( $allowed_options ), '%s' ) );
+			$where_clauses[] = "option_name IN ({$placeholders})";
+			$args            = array_merge( $args, $allowed_options );
+		} elseif ( ! empty( $protected_options ) ) {
+			$placeholders    = implode( ',', array_fill( 0, count( $protected_options ), '%s' ) );
+			$where_clauses[] = "option_name NOT IN ({$placeholders})";
+			$args            = array_merge( $args, $protected_options );
 		}
 
+		if ( $search ) {
+			$where_clauses[] = 'option_name LIKE %s';
+			$args[]          = '%' . $wpdb->esc_like( $search ) . '%';
+		}
+
+		$where = $where_clauses ? 'WHERE ' . implode( ' AND ', $where_clauses ) : '';
+
 		// Prepare and execute query for options.
-		$args[]  = $limit;
-		$args[]  = $offset;
-		$query   = "SELECT option_name, option_value FROM {$wpdb->options} {$where} ORDER BY option_name ASC LIMIT %d OFFSET %d";
-		$sql     = $wpdb->prepare( $query, ...$args ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$results = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$query       = "SELECT option_name, option_value FROM {$wpdb->options} {$where} ORDER BY option_name ASC LIMIT %d OFFSET %d";
+		$query_args  = array_merge( $args, array( $limit, $offset ) );
+		$sql         = $wpdb->prepare( $query, ...$query_args ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$results     = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 		// Get total count.
 		$count_query = "SELECT COUNT(*) FROM {$wpdb->options} {$where}";
-		if ( $search ) {
-			$count_sql = $wpdb->prepare( $count_query, '%' . $wpdb->esc_like( $search ) . '%' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		if ( ! empty( $args ) ) {
+			$count_sql = $wpdb->prepare( $count_query, ...$args ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		} else {
 			$count_sql = $count_query;
 		}

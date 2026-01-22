@@ -196,4 +196,26 @@ class UpdateOptionTest extends TestCase {
 
 		$this->assertTrue( $result['updated'] );
 	}
+
+	/**
+	 * Test execute blocks protected options.
+	 *
+	 * @return void
+	 */
+	public function testExecuteBlocksProtectedOption(): void {
+		$ability = new UpdateOption();
+
+		Functions\expect( 'update_option' )
+			->never();
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'protected' );
+
+		$ability->doExecute(
+			array(
+				'option_name' => 'admin_email',
+				'value'       => 'hacker@example.com',
+			)
+		);
+	}
 }

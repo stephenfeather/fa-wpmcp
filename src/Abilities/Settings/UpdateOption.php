@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Settings;
 
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Abilities\Settings\OptionAccessPolicy;
 
 /**
  * Ability to update or create a WordPress option.
@@ -131,6 +132,8 @@ final class UpdateOption extends AbstractAbility {
 		$option_name = $input['option_name'];
 		$value       = $input['value'];
 		$autoload    = $input['autoload'] ?? null;
+
+		OptionAccessPolicy::assertAllowed( $option_name );
 
 		$updated = update_option( $option_name, $value, $autoload );
 

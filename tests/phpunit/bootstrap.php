@@ -37,3 +37,21 @@ if ( ! defined( 'FA_WPMCP_URL' ) ) {
 if ( ! defined( 'FA_WPMCP_BASENAME' ) ) {
 	define( 'FA_WPMCP_BASENAME', 'fa-wpmcp/fa-wpmcp.php' );
 }
+
+if ( ! function_exists( 'user_can' ) ) {
+	/**
+	 * Test stub for user_can.
+	 *
+	 * @param int    $user_id    User ID.
+	 * @param string $capability Capability name.
+	 * @return bool
+	 */
+	function user_can( int $user_id, string $capability ): bool {
+		$overrides = $GLOBALS['fa_wpmcp_user_can'] ?? array();
+		if ( isset( $overrides[ $user_id ] ) && array_key_exists( $capability, $overrides[ $user_id ] ) ) {
+			return (bool) $overrides[ $user_id ][ $capability ];
+		}
+
+		return true;
+	}
+}

@@ -210,4 +210,18 @@ class GetOptionTest extends TestCase {
 		$this->assertEquals( $option_value, $result['value'] );
 		$this->assertTrue( $result['exists'] );
 	}
+
+	/**
+	 * Test execute blocks protected options.
+	 *
+	 * @return void
+	 */
+	public function testExecuteBlocksProtectedOption(): void {
+		$ability = new GetOption();
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'protected' );
+
+		$ability->doExecute( array( 'option_name' => 'admin_email' ) );
+	}
 }
