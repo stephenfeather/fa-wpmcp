@@ -38,35 +38,66 @@ if (!WORDPRESS_URL || !USERNAME || !APP_PASSWORD) {
 const auth = Buffer.from(`${USERNAME}:${APP_PASSWORD}`).toString("base64");
 
 /**
+ * Cache for ability metadata (used to determine HTTP method)
+ */
+const abilityMetadata = new Map();
+
+/**
  * Fetch abilities from WordPress REST API
  *
  * @returns {Promise<Array>} Array of MCP tool definitions
  */
 async function fetchAbilities() {
   try {
+    console.error(`Making request to: ${WORDPRESS_URL}`);
     const response = await fetch(WORDPRESS_URL, {
       headers: { Authorization: `Basic ${auth}` },
     });
 
+    console.error(`Response status: ${response.status} ${response.statusText}`);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Error response body: ${errorText.substring(0, 200)}`);
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
     const data = await response.json();
+    console.error(`Received data type: ${Array.isArray(data) ? 'array' : typeof data}`);
+    console.error(`Data length/keys: ${Array.isArray(data) ? data.length : Object.keys(data).length}`);
 
-    if (!data.success || !data.data || !data.data.abilities) {
-      throw new Error("Invalid response format from WordPress");
+    // WordPress REST API returns an array of abilities directly
+    if (!Array.isArray(data)) {
+      console.error(`Data structure: ${JSON.stringify(data).substring(0, 200)}`);
+      throw new Error("Invalid response format from WordPress - expected array of abilities");
     }
 
-    // Convert WordPress abilities to MCP tool format
-    return Object.entries(data.data.abilities).map(([name, ability]) => ({
-      name: name.replace("fa-wpmcp/", ""),
-      description: ability.description || ability.label || `Execute ${name}`,
-      inputSchema: ability.input_schema || {
-        type: "object",
-        properties: {},
-      },
-    }));
+    // Convert WordPress abilities to MCP tool format and cache metadata
+    return data.map((ability) => {
+      // Sanitize tool name: replace slashes with hyphens for MCP compatibility
+      const mcpToolName = ability.name.replace(/\//g, '-');
+
+      // Cache metadata for execution (use original name as key)
+      abilityMetadata.set(mcpToolName, {
+        wordpressName: ability.name,
+        readonly: ability.meta?.annotations?.readonly || false,
+      });
+
+      // Normalize input schema - MCP requires an object, not an array
+      let inputSchema = ability.input_schema;
+      if (Array.isArray(inputSchema) || !inputSchema || typeof inputSchema !== 'object') {
+        inputSchema = {
+          type: "object",
+          properties: {},
+        };
+      }
+
+      return {
+        name: mcpToolName,
+        description: ability.description || ability.label || `Execute ${ability.name}`,
+        inputSchema,
+      };
+    });
   } catch (error) {
     console.error("Failed to fetch WordPress abilities:", error.message);
     return [];
@@ -81,19 +112,32 @@ async function fetchAbilities() {
  * @returns {Promise<Object>} MCP tool response
  */
 async function executeAbility(name, args) {
-  const abilityName = `fa-wpmcp/${name}`;
-  const url = `${WORDPRESS_URL}/execute/${abilityName}`;
+  // Get metadata and original WordPress ability name
+  const metadata = abilityMetadata.get(name);
+  const wordpressName = metadata?.wordpressName || name;
+
+  // WordPress REST API endpoint: /wp-abilities/v1/abilities/{name}/run
+  const baseUrl = WORDPRESS_URL.replace(/\/abilities$/, '');
+  const url = `${baseUrl}/abilities/${wordpressName}/run`;
+
+  // Determine HTTP method based on ability metadata
+  const method = metadata?.readonly ? "GET" : "POST";
 
   try {
-    const response = await fetch(url, {
-      method: "POST",
+    const fetchOptions = {
+      method,
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Basic ${auth}`,
       },
-      body: JSON.stringify(args),
-    });
+    };
 
+    // Only add body for POST requests
+    if (method === "POST") {
+      fetchOptions.headers["Content-Type"] = "application/json";
+      fetchOptions.body = JSON.stringify({ input: args });
+    }
+
+    const response = await fetch(url, fetchOptions);
     const data = await response.json();
 
     if (!response.ok) {
@@ -101,7 +145,7 @@ async function executeAbility(name, args) {
         content: [
           {
             type: "text",
-            text: `Error: ${data.error?.message || "Unknown error"}`,
+            text: `Error: ${data.message || data.error?.message || "Unknown error"}`,
           },
         ],
         isError: true,
@@ -112,7 +156,7 @@ async function executeAbility(name, args) {
       content: [
         {
           type: "text",
-          text: JSON.stringify(data.data, null, 2),
+          text: JSON.stringify(data, null, 2),
         },
       ],
     };
@@ -147,10 +191,15 @@ async function main() {
   );
 
   // Fetch available abilities from WordPress
+  console.error(`Fetching abilities from: ${WORDPRESS_URL}`);
   const availableTools = await fetchAbilities();
 
   if (availableTools.length === 0) {
-    console.error("Warning: No abilities loaded from WordPress");
+    console.error("ERROR: No abilities loaded from WordPress");
+    console.error("Check that WordPress is accessible and the plugin is activated");
+  } else {
+    console.error(`Successfully loaded ${availableTools.length} abilities:`);
+    availableTools.forEach(tool => console.error(`  - ${tool.name}`));
   }
 
   // Register tool list handler
