@@ -120,6 +120,37 @@ class PluginTest extends TestCase {
 	}
 
 	/**
+	 * Test that a notice is registered when Abilities API is missing.
+	 */
+	public function test_check_abilities_api_adds_admin_notice_when_missing(): void {
+		Functions\expect( 'add_action' )
+			->once()
+			->with( 'admin_notices', \Mockery::type( 'callable' ) );
+
+		$plugin = Plugin::getInstance();
+		$plugin->checkAbilitiesApiAndShowNotice();
+
+		$this->assertTrue( true );
+	}
+
+	/**
+	 * Test that no notice is registered when Abilities API is available.
+	 *
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_check_abilities_api_does_not_add_notice_when_available(): void {
+		eval( 'namespace { function wp_register_ability() {} }' );
+
+		Functions\expect( 'add_action' )->never();
+
+		$plugin = Plugin::getInstance();
+		$plugin->checkAbilitiesApiAndShowNotice();
+
+		$this->assertTrue( true );
+	}
+
+	/**
 	 * Test that init registers Post abilities with AbilityRegistry.
 	 */
 	public function test_init_registers_post_abilities(): void {
