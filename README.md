@@ -94,6 +94,11 @@ The plugin provides comprehensive WordPress content management through the follo
   - Matches wp-cli plugin command naming conventions
   - Full plugin lifecycle management
 
+- **Theme Management:** WordPress theme administration
+  - List, Get, Activate, Status, Install, Delete, Update operations
+  - Matches wp-cli theme command naming conventions
+  - Full theme lifecycle management
+
 ### Permission System
 
 - **Permission System:** Multi-level access control
@@ -246,7 +251,7 @@ composer test:coverage
 
 View report at `tests/coverage/index.html`.
 
-Current coverage: **79.98%** (501 tests, 1179 assertions)
+Current coverage: **76.87%** (672 tests, 1494 assertions)
 
 ### Creating New Abilities
 
@@ -473,15 +478,12 @@ if (!hash_equals($expected, $signature)) {
   - List Plugins, Get Plugin, Install Plugin, Activate Plugin, Deactivate Plugin, Delete Plugin, Update Plugin
   - Follows wp-cli naming conventions
   - Full plugin lifecycle management
+- [x] **Theme Abilities** - Plugin and theme management (complete)
 
 ### Future Enhancements
-- [ ] **GDPR Compliance** - WordPress privacy hooks
-  - [ ] User data export (wp_privacy_personal_data_exporters)
-  - [ ] User data erasure (wp_privacy_personal_data_erasers)
-  - [ ] Activity log export/deletion for user requests
+- [ ] **GDPR Compliance** - Data export/erasure hooks
 - [ ] **Uninstall Handler** - Clean database on plugin removal
 - [ ] **Integration Tests** - E2E testing with WordPress
-- [ ] **Plugin/Theme Abilities** - Plugin and theme management
 - [ ] **Multisite Support** - Multi-site network compatibility
 - [ ] **GraphQL Endpoint** - Optional GraphQL API
 - [ ] **Delete Operations** - Delete abilities for posts, media, and taxonomies
