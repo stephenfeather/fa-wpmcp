@@ -89,6 +89,11 @@ The plugin provides comprehensive WordPress content management through the follo
   - Search filtering and pagination support
   - Safe option existence detection and serialization handling
 
+- **Plugin Management:** WordPress plugin administration
+  - List, Get, Install, Activate, Deactivate, Delete, Update operations
+  - Matches wp-cli plugin command naming conventions
+  - Full plugin lifecycle management
+
 ### Permission System
 
 - **Permission System:** Multi-level access control
@@ -131,7 +136,7 @@ The plugin provides comprehensive WordPress content management through the follo
 - **Code Quality:** Professional-grade implementation
   - PSR-12 coding standards
   - PHPStan level 8 static analysis
-  - 610 unit tests, 82.05% coverage
+  - 645 unit tests, 79.41% coverage
   - Type-safe with PHP 8.1 features
 
 ## Architecture
@@ -464,6 +469,10 @@ if (!hash_equals($expected, $signature)) {
   - Get Option, Update Option, Delete Option, List Options
   - Search filtering and pagination
   - Safe serialization handling and option existence detection
+- [x] **Plugin Abilities** - WordPress plugin management
+  - List Plugins, Get Plugin, Install Plugin, Activate Plugin, Deactivate Plugin, Delete Plugin, Update Plugin
+  - Follows wp-cli naming conventions
+  - Full plugin lifecycle management
 
 ### Future Enhancements
 - [ ] **GDPR Compliance** - WordPress privacy hooks
@@ -593,4 +602,4 @@ Email: stephen@feather.us
 
 ---
 
-**Version:** 1.0.0 ✅ | **25 Abilities Implemented** | Posts, Comments, Media, Taxonomy, User, and Settings management complete
+**Version:** 1.0.0 ✅ | **32 Abilities Implemented** | Posts, Comments, Media, Taxonomy, User, Settings, and Plugin management complete
