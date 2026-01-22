@@ -146,6 +146,8 @@ class GetOptionTest extends TestCase {
 	public function testExecuteRetrievesExistingOption(): void {
 		$ability = new GetOption();
 
+		Functions\when( 'sanitize_key' )->returnArg();
+
 		Functions\expect( 'get_option' )
 			->once()
 			->with( 'test_option', Mockery::type( 'stdClass' ) )
@@ -165,6 +167,8 @@ class GetOptionTest extends TestCase {
 	 */
 	public function testExecuteReturnsDefaultForNonExistentOption(): void {
 		$ability = new GetOption();
+
+		Functions\when( 'sanitize_key' )->returnArg();
 
 		Functions\expect( 'get_option' )
 			->once()
@@ -199,6 +203,8 @@ class GetOptionTest extends TestCase {
 			'key2' => 'value2',
 		);
 
+		Functions\when( 'sanitize_key' )->returnArg();
+
 		Functions\expect( 'get_option' )
 			->once()
 			->with( 'array_option', Mockery::type( 'stdClass' ) )
@@ -218,6 +224,8 @@ class GetOptionTest extends TestCase {
 	 */
 	public function testExecuteBlocksProtectedOption(): void {
 		$ability = new GetOption();
+
+		Functions\when( 'sanitize_key' )->returnArg();
 
 		$this->expectException( \RuntimeException::class );
 		$this->expectExceptionMessage( 'protected' );

@@ -72,6 +72,21 @@ final class DeletePlugin extends AbstractAbility {
 	public function getRequiredCapability(): string {
 		return 'delete_plugins';
 	}
+
+	/**
+	 * Get ability annotations.
+	 *
+	 * Marks this ability as destructive and non-idempotent.
+	 *
+	 * @return array<string, mixed> Annotations array.
+	 */
+	public function getAnnotations(): array {
+		$annotations                = parent::getAnnotations();
+		$annotations['destructive'] = true;
+		$annotations['idempotent']  = false;
+		return $annotations;
+	}
+
 	public function doExecute( array $input ): array {
 		throw new \RuntimeException(
 			'Plugin deletion is not yet implemented. This ability requires WordPress delete_plugins() integration.'

@@ -114,14 +114,48 @@ if (empty($webhook_secret) && !empty($current_settings['webhook_secret'])) {
 
 **Protection:** Prevents secret exposure in browser dev tools and HTML source.
 
-### 6. CSRF Protection
+### 6. Option Name Validation
+**Status:** ✅ Implemented (v1.0-beta-1)
+
+Option names in Settings abilities are validated for format and length:
+
+```php
+// GetOption.php, UpdateOption.php, DeleteOption.php
+$option_name = sanitize_key( $input['option_name'] );
+
+// Validate option name length (MySQL utf8mb4 index limit).
+if ( strlen( $option_name ) > 191 ) {
+    throw new \RuntimeException( 'Option name exceeds maximum length of 191 characters.' );
+}
+```
+
+**Protection:** Prevents malformed option names and potential database errors from excessively long option names.
+
+### 7. Destructive Operation Annotations
+**Status:** ✅ Implemented (v1.0-beta-1)
+
+Delete abilities properly annotate themselves as destructive and non-idempotent:
+
+```php
+// DeleteOption.php, DeletePlugin.php, DeleteTheme.php
+public function getAnnotations(): array {
+    $annotations                = parent::getAnnotations();
+    $annotations['destructive'] = true;
+    $annotations['idempotent']  = false;
+    return $annotations;
+}
+```
+
+**Protection:** Allows AI agents and UIs to warn users about destructive operations before execution.
+
+### 8. CSRF Protection
 **Status:** ✅ Implemented
 
 All admin forms use WordPress nonces:
 - `wp_nonce_field()` for form generation
 - `wp_verify_nonce()` for submission validation
 
-### 7. SQL Injection Prevention
+### 9. SQL Injection Prevention
 **Status:** ✅ Implemented
 
 All direct database queries use prepared statements:
@@ -129,7 +163,7 @@ All direct database queries use prepared statements:
 $wpdb->prepare("SELECT ...", $param1, $param2);
 ```
 
-### 8. Rate Limiting
+### 10. Rate Limiting
 **Status:** ✅ Implemented
 
 Default limits:
@@ -192,52 +226,19 @@ add_filter('fa_wpmcp_anonymize_ips', '__return_true');
 Settings → FA WPMCP → Privacy → [✓] Anonymize IP addresses in logs
 ```
 
-### 2. Option Name Validation
-**Status:** 📋 Planned
-**Priority:** LOW
-**Target Release:** v1.1.0
-
-**Description:** Validate option names for format and length in Settings abilities.
-
-**Implementation:**
-```php
-$option_name = sanitize_key($input['option_name']);
-if (strlen($option_name) > 191) {
-    throw new \RuntimeException('Option name exceeds maximum length.');
-}
-```
-
-### 3. Destructive Operation Annotations
-**Status:** 📋 Planned
-**Priority:** LOW
-**Target Release:** v1.1.0
-
-**Description:** Override `getAnnotations()` in destructive abilities to set `destructive=true` and `idempotent=false`.
-
-**Affects:**
-- `DeletePlugin`
-- `DeleteTheme`
-- `DeleteOption`
-- `DeletePost`
-- `DeleteMedia`
-- `DeleteComment`
-- `DeleteUser`
-
-**Purpose:** Allows AI agents and UI to warn users about destructive operations.
-
-### 4. Content Security Policy Headers
+### 2. Content Security Policy Headers
 **Status:** 🔮 Future Consideration
 **Priority:** LOW
 
 Add CSP headers to admin pages for additional XSS protection.
 
-### 5. Per-IP Rate Limiting
+### 3. Per-IP Rate Limiting
 **Status:** 🔮 Future Consideration
 **Priority:** LOW
 
 Currently rate limiting is per-user only. Consider adding per-IP limits to prevent abuse from unauthenticated endpoints.
 
-### 6. Audit Log Rotation
+### 4. Audit Log Rotation
 **Status:** 🔮 Future Consideration
 **Priority:** LOW
 
@@ -247,6 +248,27 @@ Implement automatic archival/deletion of old activity logs to prevent database b
 
 ## Security Audit History
 
+### v1.0-beta-1 Security Audit (2026-01-22)
+**Tool:** aegis agent
+**Report:** `.claude/cache/agents/aegis/output-20260122-security-audit-v1beta1.md`
+
+**Findings:**
+- 0 CRITICAL
+- 0 HIGH
+- 0 MEDIUM
+- 2 LOW
+- 2 INFORMATIONAL
+
+**Current Risk Level:** LOW (down from MEDIUM in v1.0-alpha-2)
+
+**Completed Fixes (this release):**
+1. ✅ LOW: Option name validation (sanitize_key + 191-char limit)
+2. ✅ LOW: Destructive annotations on delete abilities
+
+**Remaining Items:**
+- LOW: IP address anonymization (planned for v1.1.0 as admin option)
+- INFORMATIONAL: ListOptions edge case with empty filters (accepted risk)
+
 ### v1.0-alpha-2 Security Audit (2026-01-22)
 **Tool:** aegis agent
 **Report:** `.claude/cache/agents/aegis/output-20260122-security-audit-v1alpha2.md`
@@ -255,7 +277,7 @@ Implement automatic archival/deletion of old activity logs to prevent database b
 - 0 CRITICAL
 - 2 HIGH (both fixed in commit 7d3314b)
 - 4 MEDIUM (all fixed in commit 7057338)
-- 3 LOW (documented as future enhancements)
+- 3 LOW (2 fixed in commit [current], 1 planned for v1.1.0)
 
 **Current Risk Level:** LOW
 
@@ -266,11 +288,11 @@ Implement automatic archival/deletion of old activity logs to prevent database b
 4. ✅ PII redaction expanded to 50+ fields
 5. ✅ Webhook secret hidden in admin forms
 6. ✅ Stub implementations throw exceptions
+7. ✅ Option name validation (v1.0-beta-1)
+8. ✅ Destructive annotations (v1.0-beta-1)
 
 **Remaining Items:**
-- LOW: Option name validation
-- LOW: Destructive annotations
-- LOW: IP address anonymization (admin option)
+- LOW: IP address anonymization (admin option in v1.1.0)
 
 ---
 

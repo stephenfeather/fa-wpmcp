@@ -104,6 +104,8 @@ class DeleteOptionTest extends TestCase {
 	public function testExecuteDeletesOption(): void {
 		$ability = new DeleteOption();
 
+		Functions\when( 'sanitize_key' )->returnArg();
+
 		Functions\expect( 'delete_option' )
 			->once()
 			->with( 'test_option' )
@@ -123,6 +125,8 @@ class DeleteOptionTest extends TestCase {
 	public function testExecuteHandlesDeleteFailure(): void {
 		$ability = new DeleteOption();
 
+		Functions\when( 'sanitize_key' )->returnArg();
+
 		Functions\expect( 'delete_option' )
 			->once()
 			->with( 'missing_option' )
@@ -141,6 +145,8 @@ class DeleteOptionTest extends TestCase {
 	 */
 	public function testExecuteBlocksProtectedOption(): void {
 		$ability = new DeleteOption();
+
+		Functions\when( 'sanitize_key' )->returnArg();
 
 		Functions\expect( 'delete_option' )
 			->never();

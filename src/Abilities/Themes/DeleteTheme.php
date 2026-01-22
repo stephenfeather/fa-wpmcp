@@ -82,6 +82,20 @@ final class DeleteTheme extends AbstractAbility {
 		return 'write';
 	}
 
+	/**
+	 * Get ability annotations.
+	 *
+	 * Marks this ability as destructive and non-idempotent.
+	 *
+	 * @return array<string, mixed> Annotations array.
+	 */
+	public function getAnnotations(): array {
+		$annotations                = parent::getAnnotations();
+		$annotations['destructive'] = true;
+		$annotations['idempotent']  = false;
+		return $annotations;
+	}
+
 	public function doExecute( array $input ): array {
 		throw new \RuntimeException(
 			'Theme deletion is not yet implemented. This ability requires WordPress delete_theme() integration.'

@@ -129,9 +129,14 @@ final class UpdateOption extends AbstractAbility {
 	 * @return array<string, mixed> Update result.
 	 */
 	public function doExecute( array $input ): array {
-		$option_name = $input['option_name'];
+		$option_name = sanitize_key( $input['option_name'] );
 		$value       = $input['value'];
 		$autoload    = $input['autoload'] ?? null;
+
+		// Validate option name length (MySQL utf8mb4 index limit).
+		if ( strlen( $option_name ) > 191 ) {
+			throw new \RuntimeException( 'Option name exceeds maximum length of 191 characters.' );
+		}
 
 		OptionAccessPolicy::assertAllowed( $option_name );
 

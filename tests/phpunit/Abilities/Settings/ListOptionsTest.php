@@ -103,6 +103,8 @@ class ListOptionsTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteListsOptions(): void {
+		Functions\when( 'sanitize_key' )->returnArg();
+
 		$ability   = new ListOptions();
 		$mock_wpdb = Mockery::mock( 'wpdb' );
 
@@ -151,6 +153,8 @@ class ListOptionsTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteFiltersBySearch(): void {
+		Functions\when( 'sanitize_key' )->returnArg();
+
 		$ability   = new ListOptions();
 		$mock_wpdb = Mockery::mock( 'wpdb' );
 
@@ -194,6 +198,8 @@ class ListOptionsTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteHandlesPagination(): void {
+		Functions\when( 'sanitize_key' )->returnArg();
+
 		$ability   = new ListOptions();
 		$mock_wpdb = Mockery::mock( 'wpdb' );
 

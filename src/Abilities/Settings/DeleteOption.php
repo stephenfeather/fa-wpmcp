@@ -114,13 +114,32 @@ final class DeleteOption extends AbstractAbility {
 	}
 
 	/**
+	 * Get ability annotations.
+	 *
+	 * Marks this ability as destructive and non-idempotent.
+	 *
+	 * @return array<string, mixed> Annotations array.
+	 */
+	public function getAnnotations(): array {
+		$annotations                = parent::getAnnotations();
+		$annotations['destructive'] = true;
+		$annotations['idempotent']  = false;
+		return $annotations;
+	}
+
+	/**
 	 * Execute the ability.
 	 *
 	 * @param array<string, mixed> $input Validated input data.
 	 * @return array<string, mixed> Deletion result.
 	 */
 	public function doExecute( array $input ): array {
-		$option_name = $input['option_name'];
+		$option_name = sanitize_key( $input['option_name'] );
+
+		// Validate option name length (MySQL utf8mb4 index limit).
+		if ( strlen( $option_name ) > 191 ) {
+			throw new \RuntimeException( 'Option name exceeds maximum length of 191 characters.' );
+		}
 
 		OptionAccessPolicy::assertAllowed( $option_name );
 		$deleted     = delete_option( $option_name );

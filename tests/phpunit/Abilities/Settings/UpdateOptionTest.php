@@ -105,6 +105,8 @@ class UpdateOptionTest extends TestCase {
 	public function testExecuteUpdatesOption(): void {
 		$ability = new UpdateOption();
 
+		Functions\when( 'sanitize_key' )->returnArg();
+
 		Functions\expect( 'update_option' )
 			->once()
 			->with( 'test_option', 'new_value', null )
@@ -128,6 +130,8 @@ class UpdateOptionTest extends TestCase {
 	 */
 	public function testExecuteUpdatesOptionWithAutoload(): void {
 		$ability = new UpdateOption();
+
+		Functions\when( 'sanitize_key' )->returnArg();
 
 		Functions\expect( 'update_option' )
 			->once()
@@ -153,6 +157,8 @@ class UpdateOptionTest extends TestCase {
 	 */
 	public function testExecuteHandlesUpdateFailure(): void {
 		$ability = new UpdateOption();
+
+		Functions\when( 'sanitize_key' )->returnArg();
 
 		Functions\expect( 'update_option' )
 			->once()
@@ -182,6 +188,8 @@ class UpdateOptionTest extends TestCase {
 			'key2' => 'value2',
 		);
 
+		Functions\when( 'sanitize_key' )->returnArg();
+
 		Functions\expect( 'update_option' )
 			->once()
 			->with( 'test_option', $value, null )
@@ -204,6 +212,8 @@ class UpdateOptionTest extends TestCase {
 	 */
 	public function testExecuteBlocksProtectedOption(): void {
 		$ability = new UpdateOption();
+
+		Functions\when( 'sanitize_key' )->returnArg();
 
 		Functions\expect( 'update_option' )
 			->never();
