@@ -23,6 +23,23 @@ use PHPUnit\Framework\TestCase;
  */
 class UploadMediaTest extends TestCase {
 	/**
+	 * Ensure the WordPress image includes file exists for tests.
+	 *
+	 * @return void
+	 */
+	private function ensureImageIncludesFile(): void {
+		$path = ABSPATH . 'wp-admin/includes';
+		if ( ! is_dir( $path ) ) {
+			mkdir( $path, 0777, true );
+		}
+
+		$file = $path . '/image.php';
+		if ( ! file_exists( $file ) ) {
+			file_put_contents( $file, "<?php\n" );
+		}
+	}
+
+	/**
 	 * Set up Brain\Monkey before each test.
 	 *
 	 * @return void
@@ -95,6 +112,152 @@ class UploadMediaTest extends TestCase {
 		$this->expectExceptionMessage( 'Either file_data or url must be provided' );
 
 		$ability->doExecute( array( 'filename' => 'test.jpg' ) );
+	}
+
+	/**
+	 * Test execute throws exception for invalid base64 data.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionForInvalidBase64(): void {
+		$ability = new UploadMedia();
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'Invalid base64 data' );
+
+		$ability->doExecute(
+			array(
+				'filename'  => 'test.jpg',
+				'file_data' => 'not-base64',
+			)
+		);
+	}
+
+	/**
+	 * Test execute throws exception when fetched file exceeds size limit.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionForFileSizeLimit(): void {
+		$ability = new UploadMedia();
+
+		Functions\when( 'wp_remote_get' )->justReturn( array( 'response' => array( 'code' => 200 ) ) );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'wp_remote_retrieve_body' )->justReturn( str_repeat( 'a', 10485761 ) );
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'File size exceeds 10MB limit' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'https://example.com/file.jpg',
+			)
+		);
+	}
+
+	/**
+	 * Test execute throws exception when remote fetch fails.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenRemoteFetchFails(): void {
+		$ability = new UploadMedia();
+
+		$error = Mockery::mock();
+		$error->shouldReceive( 'get_error_message' )->andReturn( 'Request failed' );
+
+		Functions\when( 'wp_remote_get' )->justReturn( $error );
+		Functions\when( 'is_wp_error' )->justReturn( true );
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'Failed to fetch URL' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'https://example.com/file.jpg',
+			)
+		);
+	}
+
+	/**
+	 * Test execute throws exception when remote fetch body is empty.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenRemoteBodyEmpty(): void {
+		$ability = new UploadMedia();
+
+		Functions\when( 'wp_remote_get' )->justReturn( array( 'response' => array( 'code' => 200 ) ) );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'wp_remote_retrieve_body' )->justReturn( '' );
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'Empty response from URL' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'https://example.com/file.jpg',
+			)
+		);
+	}
+
+	/**
+	 * Test execute uploads from base64 data and formats response.
+	 *
+	 * @return void
+	 */
+	public function testExecuteUploadsFromBase64(): void {
+		$ability = new UploadMedia();
+
+		$this->ensureImageIncludesFile();
+
+		$upload_dir = sys_get_temp_dir() . '/fa-wpmcp-upload';
+		if ( ! is_dir( $upload_dir ) ) {
+			mkdir( $upload_dir, 0777, true );
+		}
+
+		$response_file = sys_get_temp_dir() . '/fa-wpmcp-response.jpg';
+		file_put_contents( $response_file, '12345' );
+
+		Functions\when( 'wp_upload_dir' )->justReturn( array( 'path' => $upload_dir ) );
+		Functions\when( 'wp_unique_filename' )->justReturn( 'test.jpg' );
+		Functions\when( 'wp_check_filetype' )->justReturn( array( 'type' => 'image/jpeg' ) );
+		Functions\when( 'sanitize_text_field' )->returnArg();
+		Functions\when( 'sanitize_textarea_field' )->returnArg();
+		Functions\when( 'sanitize_file_name' )->returnArg();
+		Functions\when( 'wp_insert_attachment' )->justReturn( 42 );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'wp_generate_attachment_metadata' )->justReturn( array( 'width' => 10 ) );
+		Functions\when( 'wp_update_attachment_metadata' )->justReturn( true );
+		Functions\when( 'update_post_meta' )->justReturn( true );
+		Functions\when( 'wp_delete_file' )->justReturn( true );
+		Functions\when( 'get_attached_file' )->justReturn( $response_file );
+		Functions\when( 'wp_get_attachment_url' )->justReturn( 'https://example.com/test.jpg' );
+		Functions\when( 'get_post' )->justReturn( (object) array( 'post_mime_type' => 'image/jpeg' ) );
+
+		$result = $ability->doExecute(
+			array(
+				'filename'  => 'test.jpg',
+				'file_data' => 'data:image/jpeg;base64,' . base64_encode( 'hello' ),
+				'title'     => 'Test Title',
+				'caption'   => 'Caption',
+				'alt_text'  => 'Alt',
+			)
+		);
+
+		$this->assertSame( 42, $result['media_id'] );
+		$this->assertSame( 'https://example.com/test.jpg', $result['url'] );
+		$this->assertSame( 'image/jpeg', $result['mime_type'] );
+		$this->assertSame( 'image', $result['type'] );
+
+		$temp_file = $upload_dir . '/test.jpg';
+		if ( file_exists( $temp_file ) ) {
+			unlink( $temp_file );
+		}
+		unlink( $response_file );
 	}
 
 	/**

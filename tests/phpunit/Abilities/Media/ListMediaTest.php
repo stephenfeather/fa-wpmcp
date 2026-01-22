@@ -159,6 +159,38 @@ class ListMediaTest extends TestCase {
 	}
 
 	/**
+	 * Test buildQueryArgs applies filters and caps per_page.
+	 *
+	 * @return void
+	 */
+	public function testBuildQueryArgsAppliesFiltersAndCapsPerPage(): void {
+		$ability = new ListMedia();
+
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
+		$method->setAccessible( true );
+
+		$args = $method->invoke(
+			$ability,
+			array(
+				'page'      => 3,
+				'per_page'  => 500,
+				'mime_type' => 'image/jpeg',
+				'search'    => 'logo',
+				'orderby'   => 'title',
+				'order'     => 'ASC',
+			)
+		);
+
+		$this->assertSame( 3, $args['paged'] );
+		$this->assertSame( 100, $args['posts_per_page'] );
+		$this->assertSame( 'image/jpeg', $args['post_mime_type'] );
+		$this->assertSame( 'logo', $args['s'] );
+		$this->assertSame( 'title', $args['orderby'] );
+		$this->assertSame( 'ASC', $args['order'] );
+	}
+
+	/**
 	 * Create a mock attachment post.
 	 *
 	 * @param int $id Attachment ID.

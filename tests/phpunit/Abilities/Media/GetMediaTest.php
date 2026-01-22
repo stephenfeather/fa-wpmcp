@@ -160,4 +160,63 @@ class GetMediaTest extends TestCase {
 		$this->assertEquals( 1, $result['media']['id'] );
 		$this->assertEquals( 'Test Image', $result['media']['title'] );
 	}
+
+	/**
+	 * Test execute formats sizes and filters meta data.
+	 *
+	 * @return void
+	 */
+	public function testExecuteFormatsSizesAndMeta(): void {
+		$ability = new GetMedia();
+
+		$temp_file = sys_get_temp_dir() . '/fa-wpmcp-get-media.tmp';
+		file_put_contents( $temp_file, 'data' );
+
+		$mock_post                   = Mockery::mock( \WP_Post::class );
+		$mock_post->ID               = 2;
+		$mock_post->post_type        = 'attachment';
+		$mock_post->post_title       = 'Doc';
+		$mock_post->post_mime_type   = 'application/pdf';
+		$mock_post->post_date        = '2024-01-01 00:00:00';
+		$mock_post->post_modified    = '2024-01-02 00:00:00';
+		$mock_post->post_author      = 5;
+		$mock_post->post_excerpt     = '';
+		$mock_post->post_content     = '';
+
+		Functions\when( 'get_post' )->justReturn( $mock_post );
+		Functions\when( 'wp_get_attachment_metadata' )->justReturn(
+			array(
+				'width'  => 1200,
+				'height' => 800,
+				'sizes'  => array(
+					'thumbnail' => array( 'width' => 150, 'height' => 150 ),
+				),
+			)
+		);
+		Functions\when( 'get_attached_file' )->justReturn( $temp_file );
+		Functions\when( 'wp_get_attachment_url' )->justReturn( 'https://example.com/file.pdf' );
+		Functions\when( 'wp_get_attachment_image_src' )->justReturn( array( 'https://example.com/thumb.jpg', 150, 150, true ) );
+		Functions\when( 'get_the_author_meta' )->justReturn( 'Doc Author' );
+		Functions\when( 'get_post_meta' )->alias(
+			static function ( int $post_id, string $key, bool $single ) {
+				if ( '_wp_attachment_image_alt' === $key ) {
+					return 'Alt';
+				}
+				return array(
+					'_internal' => array( 'skip' ),
+					'custom'    => array( 'keep' ),
+				);
+			}
+		);
+
+		$result = $ability->doExecute( array( 'media_id' => 2 ) );
+
+		$this->assertSame( 'document', $result['media']['type'] );
+		$this->assertSame( 'Alt', $result['media']['alt_text'] );
+		$this->assertArrayHasKey( 'full', $result['media']['sizes'] );
+		$this->assertArrayHasKey( 'thumbnail', $result['media']['sizes'] );
+		$this->assertSame( array( 'custom' => 'keep' ), $result['media']['meta'] );
+
+		unlink( $temp_file );
+	}
 }
