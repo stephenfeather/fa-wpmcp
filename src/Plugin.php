@@ -76,6 +76,10 @@ final class Plugin {
         $this->registerMediaAbilities( $ability_registry );
         $this->registerTaxonomyAbilities( $ability_registry );
         $this->registerUserAbilities( $ability_registry );
+        $this->registerSettingsAbilities( $ability_registry );
+        $this->registerPluginAbilities( $ability_registry );
+        $this->registerThemeAbilities( $ability_registry );
+        $this->registerPrivacyAbilities( $ability_registry );
         $this->registerService( 'ability_registry', $ability_registry );
 
         // Initialize Admin Settings Page.
@@ -187,6 +191,62 @@ final class Plugin {
         $registry->register( new \FAWpmcp\Abilities\Users\ListUsers() );
         $registry->register( new \FAWpmcp\Abilities\Users\CreateUser() );
         $registry->register( new \FAWpmcp\Abilities\Users\UpdateUser() );
+    }
+
+    /**
+     * Register Settings abilities with the registry.
+     *
+     * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private function registerSettingsAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+        $registry->register( new \FAWpmcp\Abilities\Settings\DeleteOption() );
+        $registry->register( new \FAWpmcp\Abilities\Settings\GetOption() );
+        $registry->register( new \FAWpmcp\Abilities\Settings\ListOptions() );
+        $registry->register( new \FAWpmcp\Abilities\Settings\UpdateOption() );
+    }
+
+    /**
+     * Register Plugin abilities with the registry.
+     *
+     * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private function registerPluginAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+        $registry->register( new \FAWpmcp\Abilities\Plugins\ActivatePlugin() );
+        $registry->register( new \FAWpmcp\Abilities\Plugins\DeactivatePlugin() );
+        $registry->register( new \FAWpmcp\Abilities\Plugins\GetPlugin() );
+        $registry->register( new \FAWpmcp\Abilities\Plugins\InstallPlugin() );
+        $registry->register( new \FAWpmcp\Abilities\Plugins\ListPlugins() );
+        $registry->register( new \FAWpmcp\Abilities\Plugins\UpdatePlugin() );
+    }
+
+    /**
+     * Register Theme abilities with the registry.
+     *
+     * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private function registerThemeAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+        $registry->register( new \FAWpmcp\Abilities\Themes\ActivateTheme() );
+        $registry->register( new \FAWpmcp\Abilities\Themes\GetTheme() );
+        $registry->register( new \FAWpmcp\Abilities\Themes\InstallTheme() );
+        $registry->register( new \FAWpmcp\Abilities\Themes\ListThemes() );
+        $registry->register( new \FAWpmcp\Abilities\Themes\StatusTheme() );
+        $registry->register( new \FAWpmcp\Abilities\Themes\UpdateTheme() );
+    }
+
+    /**
+     * Register Privacy abilities with the registry.
+     *
+     * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private function registerPrivacyAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+        $registry->register( new \FAWpmcp\Abilities\Privacy\CreateErasureRequest() );
+        $registry->register( new \FAWpmcp\Abilities\Privacy\CreateExportRequest() );
+        $registry->register( new \FAWpmcp\Abilities\Privacy\GetPrivacyRequest() );
+        $registry->register( new \FAWpmcp\Abilities\Privacy\ListPrivacyRequests() );
     }
 
     /**
