@@ -160,11 +160,8 @@ final class GetUser extends AbstractAbility {
 			return get_user_by( 'login', $input['username'] );
 		}
 
-		if ( isset( $input['email'] ) ) {
-			return get_user_by( 'email', $input['email'] );
-		}
-
-		return false;
+		// Check email or return false if no criteria provided.
+		return isset( $input['email'] ) ? get_user_by( 'email', $input['email'] ) : false;
 	}
 
 	/**
