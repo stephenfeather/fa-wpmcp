@@ -39,6 +39,15 @@ curl -u "username:xxxx xxxx xxxx xxxx xxxx xxxx" \
 
 ## Available Abilities
 
+FA WPMCP provides **17 WordPress abilities** across 4 categories:
+
+| Category | Abilities | Operations |
+|----------|-----------|------------|
+| **Posts & Pages** | List Posts, Get Post, Create Post, Update Post | CRUD for posts, pages, and custom post types (including WooCommerce products) |
+| **Comments** | List Comments, Get Comment, Create Comment, Update Comment, Delete Comment | Complete comment management |
+| **Media** | List Media, Get Media, Update Media, Upload Media | Media library management with base64/URL uploads |
+| **Taxonomies** | List Terms, Get Term, Create Term, Update Term | Manage categories, tags, and custom taxonomies |
+
 ### 1. List Posts
 
 Retrieve a paginated list of WordPress posts with filtering options.
@@ -263,6 +272,652 @@ Update an existing WordPress post. Only provided fields are modified.
   "status": "publish",
   "edit_url": "https://example.com/wp-admin/post.php?post=456&action=edit",
   "updated": true
+}
+```
+
+---
+
+### 5. List Comments
+
+Retrieve a paginated list of WordPress comments with filtering options.
+
+**Ability Name:** `fa-wpmcp/list-comments`
+**Category:** `comments`
+**Operation Type:** `READ`
+**Required Capability:** `read`
+
+#### Input Schema
+
+```json
+{
+  "page": 1,
+  "per_page": 10,
+  "post_id": 123,
+  "status": "approve"
+}
+```
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `page` | integer | No | 1 | Page number for pagination |
+| `per_page` | integer | No | 10 | Comments per page (max 100) |
+| `post_id` | integer | No | - | Filter by post ID |
+| `status` | string | No | - | Filter by status: `approve`, `hold`, `spam`, `trash`, `all` |
+
+#### Output Schema
+
+```json
+{
+  "comments": [
+    {
+      "id": 42,
+      "post_id": 123,
+      "author": "John Doe",
+      "email": "john@example.com",
+      "content": "Great article!",
+      "date": "2026-01-21 10:00:00",
+      "status": "approve",
+      "link": "https://example.com/post#comment-42"
+    }
+  ],
+  "total": 150,
+  "page": 1,
+  "per_page": 10
+}
+```
+
+---
+
+### 6. Get Comment
+
+Retrieve a single WordPress comment by ID with full details.
+
+**Ability Name:** `fa-wpmcp/get-comment`
+**Category:** `comments`
+**Operation Type:** `READ`
+**Required Capability:** `read`
+
+#### Input Schema
+
+```json
+{
+  "comment_id": 42
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `comment_id` | integer | **Yes** | The ID of the comment to retrieve (minimum: 1) |
+
+#### Output Schema
+
+```json
+{
+  "comment": {
+    "id": 42,
+    "post_id": 123,
+    "author": "John Doe",
+    "email": "john@example.com",
+    "content": "Great article!",
+    "date": "2026-01-21 10:00:00",
+    "status": "approve",
+    "link": "https://example.com/post#comment-42"
+  }
+}
+```
+
+---
+
+### 7. Create Comment
+
+Create a new WordPress comment on a post.
+
+**Ability Name:** `fa-wpmcp/create-comment`
+**Category:** `comments`
+**Operation Type:** `WRITE`
+**Required Capability:** `edit_posts`
+
+#### Input Schema
+
+```json
+{
+  "post_id": 123,
+  "content": "This is a great post!",
+  "author": "John Doe",
+  "author_email": "john@example.com",
+  "author_url": "https://johndoe.com",
+  "status": "approve"
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `post_id` | integer | **Yes** | The ID of the post to comment on |
+| `content` | string | **Yes** | Comment content |
+| `author` | string | No | Comment author name |
+| `author_email` | string | No | Comment author email |
+| `author_url` | string | No | Comment author URL |
+| `status` | string | No | Status: `approve`, `hold` (defaults to WordPress settings) |
+
+#### Output Schema
+
+```json
+{
+  "comment_id": 42,
+  "comment": {
+    "id": 42,
+    "post_id": 123,
+    "author": "John Doe",
+    "email": "john@example.com",
+    "content": "This is a great post!",
+    "date": "2026-01-21 10:00:00",
+    "status": "approve",
+    "link": "https://example.com/post#comment-42"
+  }
+}
+```
+
+---
+
+### 8. Update Comment
+
+Update an existing WordPress comment.
+
+**Ability Name:** `fa-wpmcp/update-comment`
+**Category:** `comments`
+**Operation Type:** `WRITE`
+**Required Capability:** `moderate_comments`
+
+#### Input Schema
+
+```json
+{
+  "comment_id": 42,
+  "content": "Updated comment text",
+  "status": "approve"
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `comment_id` | integer | **Yes** | The ID of the comment to update |
+| `content` | string | No | Updated comment content |
+| `status` | string | No | New status: `approve`, `hold`, `spam`, `trash` |
+
+#### Output Schema
+
+```json
+{
+  "comment_id": 42,
+  "comment": {
+    "id": 42,
+    "post_id": 123,
+    "author": "John Doe",
+    "email": "john@example.com",
+    "content": "Updated comment text",
+    "date": "2026-01-21 10:00:00",
+    "status": "approve",
+    "link": "https://example.com/post#comment-42"
+  }
+}
+```
+
+---
+
+### 9. Delete Comment
+
+Permanently delete a WordPress comment.
+
+**Ability Name:** `fa-wpmcp/delete-comment`
+**Category:** `comments`
+**Operation Type:** `DELETE`
+**Required Capability:** `moderate_comments`
+
+#### Input Schema
+
+```json
+{
+  "comment_id": 42
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `comment_id` | integer | **Yes** | The ID of the comment to delete (minimum: 1) |
+
+#### Output Schema
+
+```json
+{
+  "comment_id": 42,
+  "deleted": true
+}
+```
+
+---
+
+### 10. List Media
+
+Retrieve a paginated list of WordPress media library items with filtering.
+
+**Ability Name:** `fa-wpmcp/list-media`
+**Category:** `media`
+**Operation Type:** `READ`
+**Required Capability:** `upload_files`
+
+#### Input Schema
+
+```json
+{
+  "page": 1,
+  "per_page": 10,
+  "mime_type": "image/*",
+  "search": "logo",
+  "orderby": "date",
+  "order": "DESC"
+}
+```
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `page` | integer | No | 1 | Page number for pagination |
+| `per_page` | integer | No | 10 | Media items per page (max 100) |
+| `mime_type` | string | No | - | Filter by MIME type (e.g., `image/jpeg`, `image/*`, `video/mp4`) |
+| `search` | string | No | - | Search term for filename or title |
+| `orderby` | string | No | `date` | Order by: `date`, `title`, `modified`, `ID` |
+| `order` | string | No | `DESC` | Sort order: `ASC` or `DESC` |
+
+#### Output Schema
+
+```json
+{
+  "media": [
+    {
+      "id": 789,
+      "title": "Company Logo",
+      "filename": "logo.png",
+      "url": "https://example.com/uploads/2026/01/logo.png",
+      "mime_type": "image/png",
+      "file_size": 45678,
+      "width": 800,
+      "height": 600,
+      "date": "2026-01-21 10:00:00",
+      "author": {
+        "id": 1,
+        "name": "Admin User"
+      }
+    }
+  ],
+  "total": 250,
+  "pages": 25,
+  "current_page": 1,
+  "per_page": 10
+}
+```
+
+---
+
+### 11. Get Media
+
+Retrieve a single WordPress media item by ID with full metadata.
+
+**Ability Name:** `fa-wpmcp/get-media`
+**Category:** `media`
+**Operation Type:** `READ`
+**Required Capability:** `upload_files`
+
+#### Input Schema
+
+```json
+{
+  "media_id": 789
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `media_id` | integer | **Yes** | The ID of the media item to retrieve (minimum: 1) |
+
+#### Output Schema
+
+```json
+{
+  "media": {
+    "id": 789,
+    "title": "Company Logo",
+    "caption": "Our official company logo",
+    "description": "High-resolution logo for marketing materials",
+    "alt_text": "Company Logo",
+    "filename": "logo.png",
+    "url": "https://example.com/uploads/2026/01/logo.png",
+    "mime_type": "image/png",
+    "file_size": 45678,
+    "width": 800,
+    "height": 600,
+    "sizes": {
+      "thumbnail": {
+        "url": "https://example.com/uploads/2026/01/logo-150x150.png",
+        "width": 150,
+        "height": 150
+      },
+      "medium": {
+        "url": "https://example.com/uploads/2026/01/logo-300x225.png",
+        "width": 300,
+        "height": 225
+      }
+    },
+    "date": "2026-01-21 10:00:00",
+    "author": {
+      "id": 1,
+      "name": "Admin User"
+    }
+  }
+}
+```
+
+---
+
+### 12. Update Media
+
+Update WordPress media metadata (title, caption, description, alt text).
+
+**Ability Name:** `fa-wpmcp/update-media`
+**Category:** `media`
+**Operation Type:** `WRITE`
+**Required Capability:** `upload_files`
+
+#### Input Schema
+
+```json
+{
+  "media_id": 789,
+  "title": "Updated Company Logo",
+  "caption": "Our new official logo",
+  "description": "Updated high-resolution logo",
+  "alt_text": "Updated Company Logo"
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `media_id` | integer | **Yes** | The ID of the media item to update |
+| `title` | string | No | Updated title |
+| `caption` | string | No | Updated caption |
+| `description` | string | No | Updated description |
+| `alt_text` | string | No | Updated alt text (for images) |
+
+#### Output Schema
+
+```json
+{
+  "media_id": 789,
+  "updated": true
+}
+```
+
+---
+
+### 13. Upload Media
+
+Upload a new media file to the WordPress media library.
+
+**Ability Name:** `fa-wpmcp/upload-media`
+**Category:** `media`
+**Operation Type:** `WRITE`
+**Required Capability:** `upload_files`
+
+#### Input Schema
+
+```json
+{
+  "filename": "logo.png",
+  "data": "iVBORw0KGgoAAAANSUhEUgAA...",
+  "title": "Company Logo",
+  "caption": "Our official logo",
+  "alt_text": "Company Logo"
+}
+```
+
+**OR**
+
+```json
+{
+  "url": "https://example.com/remote-image.jpg",
+  "title": "Imported Image"
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `filename` | string | **Yes** (with `data`) | Filename for the uploaded file |
+| `data` | string | **Yes** (with `filename`) | Base64-encoded file data |
+| `url` | string | **Yes** (alternative) | URL to import file from |
+| `title` | string | No | Media title |
+| `caption` | string | No | Media caption |
+| `description` | string | No | Media description |
+| `alt_text` | string | No | Alt text (for images) |
+
+**Note:** Maximum file size is 10MB (configurable via `FA_WPMCP_MAX_UPLOAD_SIZE` constant).
+
+#### Output Schema
+
+```json
+{
+  "media_id": 789,
+  "url": "https://example.com/uploads/2026/01/logo.png",
+  "media": {
+    "id": 789,
+    "title": "Company Logo",
+    "filename": "logo.png",
+    "url": "https://example.com/uploads/2026/01/logo.png",
+    "mime_type": "image/png",
+    "file_size": 45678,
+    "width": 800,
+    "height": 600
+  }
+}
+```
+
+---
+
+### 14. List Terms
+
+Retrieve terms from WordPress taxonomies (categories, tags, or custom taxonomies).
+
+**Ability Name:** `fa-wpmcp/list-terms`
+**Category:** `taxonomies`
+**Operation Type:** `READ`
+**Required Capability:** `read`
+
+#### Input Schema
+
+```json
+{
+  "taxonomy": "category",
+  "page": 1,
+  "per_page": 10,
+  "hide_empty": false,
+  "parent": 0,
+  "search": "tech",
+  "orderby": "name",
+  "order": "ASC"
+}
+```
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `taxonomy` | string | No | `category` | Taxonomy name (`category`, `post_tag`, or custom taxonomy slug) |
+| `page` | integer | No | 1 | Page number for pagination |
+| `per_page` | integer | No | 10 | Terms per page (max 100) |
+| `hide_empty` | boolean | No | `false` | Hide terms with no posts assigned |
+| `parent` | integer | No | - | Filter by parent term ID (0 for root terms) |
+| `search` | string | No | - | Search terms by name |
+| `orderby` | string | No | `name` | Order by: `name`, `count`, `term_id`, `slug` |
+| `order` | string | No | `ASC` | Sort order: `ASC` or `DESC` |
+
+#### Output Schema
+
+```json
+{
+  "terms": [
+    {
+      "term_id": 5,
+      "name": "Technology",
+      "slug": "technology",
+      "description": "Posts about technology",
+      "count": 42,
+      "parent": 0,
+      "taxonomy": "category"
+    }
+  ],
+  "total": 25,
+  "pages": 3,
+  "current_page": 1,
+  "per_page": 10
+}
+```
+
+---
+
+### 15. Get Term
+
+Retrieve a single taxonomy term by ID with full details and metadata.
+
+**Ability Name:** `fa-wpmcp/get-term`
+**Category:** `taxonomies`
+**Operation Type:** `READ`
+**Required Capability:** `read`
+
+#### Input Schema
+
+```json
+{
+  "term_id": 5,
+  "taxonomy": "category"
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `term_id` | integer | **Yes** | The ID of the term to retrieve (minimum: 1) |
+| `taxonomy` | string | **Yes** | Taxonomy name (`category`, `post_tag`, or custom taxonomy slug) |
+
+#### Output Schema
+
+```json
+{
+  "term": {
+    "term_id": 5,
+    "name": "Technology",
+    "slug": "technology",
+    "description": "Posts about technology and innovation",
+    "count": 42,
+    "parent": 0,
+    "taxonomy": "category",
+    "meta": {
+      "custom_field": "value"
+    }
+  }
+}
+```
+
+---
+
+### 16. Create Term
+
+Create a new taxonomy term (category, tag, or custom taxonomy term).
+
+**Ability Name:** `fa-wpmcp/create-term`
+**Category:** `taxonomies`
+**Operation Type:** `WRITE`
+**Required Capability:** `manage_categories`
+
+#### Input Schema
+
+```json
+{
+  "taxonomy": "category",
+  "name": "New Category",
+  "slug": "new-category",
+  "description": "Description of the new category",
+  "parent": 5
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `taxonomy` | string | **Yes** | Taxonomy name (`category`, `post_tag`, or custom taxonomy slug) |
+| `name` | string | **Yes** | Term name |
+| `slug` | string | No | Term slug (auto-generated from name if not provided) |
+| `description` | string | No | Term description |
+| `parent` | integer | No | Parent term ID (for hierarchical taxonomies, 0 for root) |
+
+#### Output Schema
+
+```json
+{
+  "term_id": 25,
+  "term": {
+    "term_id": 25,
+    "name": "New Category",
+    "slug": "new-category",
+    "description": "Description of the new category",
+    "count": 0,
+    "parent": 5,
+    "taxonomy": "category",
+    "meta": {}
+  }
+}
+```
+
+---
+
+### 17. Update Term
+
+Update an existing taxonomy term's name, slug, description, or parent.
+
+**Ability Name:** `fa-wpmcp/update-term`
+**Category:** `taxonomies`
+**Operation Type:** `WRITE`
+**Required Capability:** `manage_categories`
+
+#### Input Schema
+
+```json
+{
+  "term_id": 25,
+  "taxonomy": "category",
+  "name": "Updated Category Name",
+  "slug": "updated-category",
+  "description": "Updated description",
+  "parent": 10
+}
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `term_id` | integer | **Yes** | The ID of the term to update |
+| `taxonomy` | string | **Yes** | Taxonomy name (`category`, `post_tag`, or custom taxonomy slug) |
+| `name` | string | No | Updated term name |
+| `slug` | string | No | Updated term slug |
+| `description` | string | No | Updated term description |
+| `parent` | integer | No | Updated parent term ID (for hierarchical taxonomies) |
+
+#### Output Schema
+
+```json
+{
+  "term_id": 25,
+  "term": {
+    "term_id": 25,
+    "name": "Updated Category Name",
+    "slug": "updated-category",
+    "description": "Updated description",
+    "count": 12,
+    "parent": 10,
+    "taxonomy": "category",
+    "meta": {}
+  }
 }
 ```
 
