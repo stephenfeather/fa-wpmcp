@@ -171,4 +171,101 @@ class UpdateTermTest extends TestCase {
 		$this->assertArrayHasKey( 'updated', $result );
 		$this->assertTrue( $result['updated'] );
 	}
+
+	/**
+	 * Test execute updates term with sanitized fields.
+	 *
+	 * @return void
+	 */
+	public function testExecuteBuildsSanitizedUpdateData(): void {
+		$ability = new UpdateTerm();
+
+		$mock_term = Mockery::mock( \WP_Term::class );
+		$mock_term->term_id  = 2;
+		$mock_term->name     = 'After Update';
+		$mock_term->slug     = 'after-update';
+		$mock_term->taxonomy = 'category';
+
+		Functions\expect( 'sanitize_text_field' )
+			->once()
+			->with( ' New Name ' )
+			->andReturn( 'New Name' );
+		Functions\expect( 'sanitize_title' )
+			->once()
+			->with( ' New Slug ' )
+			->andReturn( 'new-slug' );
+		Functions\expect( 'sanitize_textarea_field' )
+			->once()
+			->with( ' New description ' )
+			->andReturn( 'New description' );
+		Functions\expect( 'wp_update_term' )
+			->once()
+			->with(
+				2,
+				'category',
+				array(
+					'name'        => 'New Name',
+					'slug'        => 'new-slug',
+					'description' => 'New description',
+					'parent'      => 3,
+				)
+			)
+			->andReturn( array( 'term_id' => 2 ) );
+		Functions\when( 'get_term' )->justReturn( $mock_term );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'get_term_link' )->justReturn( 'https://example.com/category/after-update' );
+
+		$result = $ability->doExecute(
+			array(
+				'term_id'     => 2,
+				'taxonomy'    => 'category',
+				'name'        => ' New Name ',
+				'slug'        => ' New Slug ',
+				'description' => ' New description ',
+				'parent'      => 3,
+			)
+		);
+
+		$this->assertEquals( 2, $result['term_id'] );
+		$this->assertEquals( 'after-update', $result['slug'] );
+	}
+
+	/**
+	 * Test execute returns fallback response when term lookup fails after update.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsFallbackWhenTermLookupFails(): void {
+		$ability = new UpdateTerm();
+
+		$existing_term = Mockery::mock( \WP_Term::class );
+		$existing_term->term_id = 7;
+
+		Functions\when( 'get_term' )->alias(
+			function () use ( $existing_term ) {
+				static $call_count = 0;
+				++$call_count;
+				return 1 === $call_count ? $existing_term : null;
+			}
+		);
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'sanitize_text_field' )->returnArg();
+		Functions\when( 'sanitize_title' )->returnArg();
+		Functions\when( 'sanitize_textarea_field' )->returnArg();
+		Functions\when( 'wp_update_term' )->justReturn( array( 'term_id' => 7 ) );
+
+		$result = $ability->doExecute(
+			array(
+				'term_id'  => 7,
+				'taxonomy' => 'category',
+				'name'     => 'Updated',
+			)
+		);
+
+		$this->assertEquals( 7, $result['term_id'] );
+		$this->assertSame( '', $result['name'] );
+		$this->assertSame( '', $result['slug'] );
+		$this->assertSame( '', $result['link'] );
+		$this->assertTrue( $result['updated'] );
+	}
 }

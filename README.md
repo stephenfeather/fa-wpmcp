@@ -57,6 +57,40 @@ Configure via WordPress options or filters (see [Configuration](#configuration))
   - JSON Schema validation for inputs/outputs
   - Pipeline orchestration with middleware
 
+### WordPress Abilities
+
+The plugin provides comprehensive WordPress content management through the following ability categories:
+
+- **Posts & Pages:** Full CRUD operations for posts, pages, and custom post types
+  - Universal `post_type` parameter supports WordPress pages, WooCommerce products, and any custom post type
+  - List, Get, Create, Update operations with filtering, pagination, and search
+  
+- **Comments:** Complete comment management system
+  - List, Get, Create, Update, Delete operations
+  - Support for comment moderation, threading, and metadata
+  
+- **Media Library:** Upload and manage media files
+  - List, Get, Update, Upload operations
+  - Base64 and URL upload support with automatic thumbnail generation
+  - MIME type filtering and file size limits (10MB default)
+  
+- **Taxonomies:** Manage categories, tags, and custom taxonomies
+  - List Terms, Get Term, Create Term, Update Term
+  - Works with any taxonomy including hierarchical parent/child relationships
+  - Full metadata support
+
+- **User Management:** Complete user administration
+  - List, Get, Create, Update operations
+  - Role filtering, search, and flexible user lookup (ID, username, email)
+  - Avatar URLs and profile metadata
+
+- **Settings:** WordPress options management
+  - Get, Update, Delete, List operations
+  - Search filtering and pagination support
+  - Safe option existence detection and serialization handling
+
+### Permission System
+
 - **Permission System:** Multi-level access control
   - Global permissions (read/write)
   - Category-level permissions (posts, pages, users)
@@ -97,7 +131,7 @@ Configure via WordPress options or filters (see [Configuration](#configuration))
 - **Code Quality:** Professional-grade implementation
   - PSR-12 coding standards
   - PHPStan level 8 static analysis
-  - 494 unit tests, 78.21% coverage
+  - 610 unit tests, 82.05% coverage
   - Type-safe with PHP 8.1 features
 
 ## Architecture
@@ -207,7 +241,7 @@ composer test:coverage
 
 View report at `tests/coverage/index.html`.
 
-Current coverage: **78.21%** (494 tests, 1172 assertions)
+Current coverage: **79.98%** (501 tests, 1179 assertions)
 
 ### Creating New Abilities
 
@@ -412,10 +446,24 @@ if (!hash_equals($expected, $signature)) {
 - [x] Privacy redaction system (PrivacyRedactor)
 - [x] HTTP response formatting utilities
 - [x] Database schema and migrations
-- [x] **Post Abilities** - Complete CRUD operations for posts
+- [x] **Post Abilities** - Complete CRUD operations for posts, pages, and custom post types
+  - Supports any post type via `post_type` parameter (posts, pages, WooCommerce products, etc.)
+  - List, Get, Create, Update operations
 - [x] **Comment Abilities** - Complete CRUD operations for comments
-- [x] **Media Abilities** - Media library management (list, get, update, upload)
-- [x] **Taxonomy Abilities** - Taxonomy management (list terms, get, create, update)
+  - List, Get, Create, Update, Delete operations
+- [x] **Media Abilities** - Media library management
+  - List, Get, Update, Upload operations
+  - Support for base64 and URL uploads
+- [x] **Taxonomy Abilities** - Taxonomy and term management
+  - List Terms, Get Term, Create Term, Update Term
+  - Works with any taxonomy (categories, tags, custom taxonomies)
+- [x] **User Abilities** - Complete user management system
+  - List, Get, Create, Update operations
+  - Role filtering, search, and flexible user lookup (ID, username, email)
+- [x] **Settings Abilities** - WordPress options management
+  - Get Option, Update Option, Delete Option, List Options
+  - Search filtering and pagination
+  - Safe serialization handling and option existence detection
 
 ### Future Enhancements
 - [ ] **GDPR Compliance** - WordPress privacy hooks
@@ -424,12 +472,10 @@ if (!hash_equals($expected, $signature)) {
   - [ ] Activity log export/deletion for user requests
 - [ ] **Uninstall Handler** - Clean database on plugin removal
 - [ ] **Integration Tests** - E2E testing with WordPress
-- [ ] **User Management Abilities** - User CRUD operations
-- [ ] **Page Abilities** - Page-specific operations
 - [ ] **Plugin/Theme Abilities** - Plugin and theme management
 - [ ] **Multisite Support** - Multi-site network compatibility
 - [ ] **GraphQL Endpoint** - Optional GraphQL API
-- [ ] **Delete Operations** - Delete abilities for media and taxonomies
+- [ ] **Delete Operations** - Delete abilities for posts, media, and taxonomies
 - [ ] **Bulk Operations** - Bulk operations for terms and media
 
 ## Troubleshooting
@@ -547,4 +593,4 @@ Email: stephen@feather.us
 
 ---
 
-**Version:** 1.0.0 ✅ | Framework Complete | Core infrastructure with Posts, Comments, Media, and Taxonomy abilities
+**Version:** 1.0.0 ✅ | **25 Abilities Implemented** | Posts, Comments, Media, Taxonomy, User, and Settings management complete

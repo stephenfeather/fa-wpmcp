@@ -133,4 +133,73 @@ class GetTermTest extends TestCase {
 		$this->assertEquals( 1, $result['term']['term_id'] );
 		$this->assertEquals( 'Test Category', $result['term']['name'] );
 	}
+
+	/**
+	 * Test execute returns filtered meta data.
+	 *
+	 * @return void
+	 */
+	public function testExecuteFiltersTermMeta(): void {
+		$ability = new GetTerm();
+
+		$mock_term = Mockery::mock( \WP_Term::class );
+		$mock_term->term_id     = 22;
+		$mock_term->name        = 'Meta Term';
+		$mock_term->slug        = 'meta-term';
+		$mock_term->description = '';
+		$mock_term->parent      = 0;
+		$mock_term->count       = 0;
+		$mock_term->taxonomy    = 'category';
+
+		Functions\when( 'get_term' )->justReturn( $mock_term );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'get_term_link' )->justReturn( 'https://example.com/category/meta' );
+		Functions\expect( 'get_term_meta' )
+			->once()
+			->with( 22 )
+			->andReturn(
+				array(
+					'_edit_lock' => array( '123' ),
+					'color'      => array( 'blue' ),
+					'sizes'      => array( 's', 'm' ),
+				)
+			);
+
+		$result = $ability->doExecute( array( 'term_id' => 22 ) );
+
+		$this->assertEquals(
+			array(
+				'color' => 'blue',
+				'sizes' => array( 's', 'm' ),
+			),
+			$result['term']['meta']
+		);
+	}
+
+	/**
+	 * Test execute handles non-array meta responses.
+	 *
+	 * @return void
+	 */
+	public function testExecuteHandlesNonArrayMeta(): void {
+		$ability = new GetTerm();
+
+		$mock_term = Mockery::mock( \WP_Term::class );
+		$mock_term->term_id     = 33;
+		$mock_term->name        = 'Empty Meta Term';
+		$mock_term->slug        = 'empty-meta-term';
+		$mock_term->description = '';
+		$mock_term->parent      = 0;
+		$mock_term->count       = 0;
+		$mock_term->taxonomy    = 'category';
+
+		Functions\when( 'get_term' )->justReturn( $mock_term );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'get_term_link' )->justReturn( 'https://example.com/category/empty' );
+		Functions\when( 'get_term_meta' )->justReturn( 'not-an-array' );
+
+		$result = $ability->doExecute( array( 'term_id' => 33 ) );
+
+		$this->assertSame( array(), $result['term']['meta'] );
+	}
 }

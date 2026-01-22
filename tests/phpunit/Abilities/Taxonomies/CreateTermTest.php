@@ -143,4 +143,84 @@ class CreateTermTest extends TestCase {
 		$this->assertArrayHasKey( 'created', $result );
 		$this->assertTrue( $result['created'] );
 	}
+
+	/**
+	 * Test execute builds sanitized term data with optional fields.
+	 *
+	 * @return void
+	 */
+	public function testExecuteBuildsSanitizedTermData(): void {
+		$ability = new CreateTerm();
+
+		$mock_term = Mockery::mock( \WP_Term::class );
+		$mock_term->term_id  = 10;
+		$mock_term->name     = 'Clean Name';
+		$mock_term->slug     = 'clean-slug';
+		$mock_term->taxonomy = 'category';
+
+		Functions\expect( 'sanitize_title' )
+			->once()
+			->with( 'Raw Slug' )
+			->andReturn( 'clean-slug' );
+		Functions\expect( 'sanitize_textarea_field' )
+			->once()
+			->with( ' Raw description ' )
+			->andReturn( 'Raw description' );
+		Functions\expect( 'wp_insert_term' )
+			->once()
+			->with(
+				'Clean Name',
+				'category',
+				array(
+					'slug'        => 'clean-slug',
+					'description' => 'Raw description',
+					'parent'      => 12,
+				)
+			)
+			->andReturn( array( 'term_id' => 10, 'term_taxonomy_id' => 10 ) );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'get_term' )->justReturn( $mock_term );
+		Functions\when( 'get_term_link' )->justReturn( 'https://example.com/category/clean' );
+
+		$result = $ability->doExecute(
+			array(
+				'taxonomy'    => 'category',
+				'name'        => 'Clean Name',
+				'slug'        => 'Raw Slug',
+				'description' => ' Raw description ',
+				'parent'      => 12,
+			)
+		);
+
+		$this->assertEquals( 10, $result['term_id'] );
+		$this->assertEquals( 'clean-slug', $result['slug'] );
+	}
+
+	/**
+	 * Test execute returns fallback response when term lookup fails.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsFallbackWhenTermLookupFails(): void {
+		$ability = new CreateTerm();
+
+		Functions\when( 'sanitize_title' )->returnArg();
+		Functions\when( 'sanitize_textarea_field' )->returnArg();
+		Functions\when( 'wp_insert_term' )->justReturn( array( 'term_id' => 5, 'term_taxonomy_id' => 5 ) );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'get_term' )->justReturn( null );
+
+		$result = $ability->doExecute(
+			array(
+				'taxonomy' => 'category',
+				'name'     => 'Fallback Term',
+			)
+		);
+
+		$this->assertEquals( 5, $result['term_id'] );
+		$this->assertSame( '', $result['name'] );
+		$this->assertSame( '', $result['slug'] );
+		$this->assertSame( '', $result['link'] );
+		$this->assertTrue( $result['created'] );
+	}
 }
