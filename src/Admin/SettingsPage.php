@@ -237,16 +237,16 @@ final class SettingsPage {
     /**
      * Render the main settings page.
      *
-     * @return string Rendered HTML.
+     * @return void
      */
-    public function renderSettingsPage(): string {
+    public function renderSettingsPage(): void {
         if ( ! current_user_can( self::CAPABILITY ) ) {
             wp_die(
                 self::MSG_NO_ACCESS,
                 self::MSG_PERMISSION_DENIED,
                 array( 'response' => 403 )
             );
-            return '';
+            return;
         }
 
         $output = '<div class="wrap">';
@@ -268,22 +268,22 @@ final class SettingsPage {
         $output .= '</form>';
         $output .= '</div>';
 
-        return $output;
+        echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped above.
     }
 
     /**
      * Render the permissions settings page.
      *
-     * @return string Rendered HTML.
+     * @return void
      */
-    public function renderPermissionsPage(): string {
+    public function renderPermissionsPage(): void {
         if ( ! current_user_can( self::CAPABILITY ) ) {
             wp_die(
                 self::MSG_NO_ACCESS,
                 self::MSG_PERMISSION_DENIED,
                 array( 'response' => 403 )
             );
-            return '';
+            return;
         }
 
         $settings = $this->getPermissionsSettings();
@@ -385,22 +385,22 @@ final class SettingsPage {
         $output .= '</form>';
         $output .= '</div>';
 
-        return $output;
+        echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped above.
     }
 
     /**
      * Render the rate limits settings page.
      *
-     * @return string Rendered HTML.
+     * @return void
      */
-    public function renderRateLimitsPage(): string {
+    public function renderRateLimitsPage(): void {
         if ( ! current_user_can( self::CAPABILITY ) ) {
             wp_die(
                 self::MSG_NO_ACCESS,
                 self::MSG_PERMISSION_DENIED,
                 array( 'response' => 403 )
             );
-            return '';
+            return;
         }
 
         $settings = $this->getRateLimitsSettings();
@@ -473,22 +473,22 @@ final class SettingsPage {
         $output .= '</form>';
         $output .= '</div>';
 
-        return $output;
+        echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped above.
     }
 
     /**
      * Render the webhooks settings page.
      *
-     * @return string Rendered HTML.
+     * @return void
      */
-    public function renderWebhooksPage(): string {
+    public function renderWebhooksPage(): void {
         if ( ! current_user_can( self::CAPABILITY ) ) {
             wp_die(
                 self::MSG_NO_ACCESS,
                 self::MSG_PERMISSION_DENIED,
                 array( 'response' => 403 )
             );
-            return '';
+            return;
         }
 
         $settings = $this->getWebhooksSettings();
@@ -547,7 +547,7 @@ final class SettingsPage {
         $output .= '</form>';
         $output .= '</div>';
 
-        return $output;
+        echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped above.
     }
 
     /**
