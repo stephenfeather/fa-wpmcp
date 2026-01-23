@@ -58,7 +58,7 @@ final class SettingsPage {
     private const WEBHOOK_EVENTS = array(
         'ability.before_execute',
         'ability.after_execute',
-        'ability.error',
+        'ability.failed',
     );
 
     /**

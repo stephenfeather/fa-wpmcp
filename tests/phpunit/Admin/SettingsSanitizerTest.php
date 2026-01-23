@@ -150,7 +150,7 @@ final class SettingsSanitizerTest extends TestCase {
 		$input = array(
 			array(
 				'url'    => 'https://example.com/webhook',
-				'events' => array( 'ability.before_execute', 'bad.event', ' ability.error ' ),
+				'events' => array( 'ability.before_execute', 'bad.event', ' ability.failed ' ),
 			),
 			array(
 				'url'    => 'not-a-url',
@@ -166,7 +166,7 @@ final class SettingsSanitizerTest extends TestCase {
 		$expected = array(
 			array(
 				'url'    => 'https://example.com/webhook',
-				'events' => array( 'ability.before_execute', 'ability.error' ),
+				'events' => array( 'ability.before_execute', 'ability.failed' ),
 			),
 			array(
 				'url'    => 'https://example.com/empty',
