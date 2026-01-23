@@ -119,7 +119,9 @@ final class Plugin {
 		$this->registerService( 'ability_executor', $ability_executor );
 
 		// 4. Register all abilities with WordPress Abilities API.
-		$this->registerAbilitiesWithWordPress( $ability_registry, $ability_executor );
+		add_action( 'wp_abilities_api_init', function() use ( $ability_registry, $ability_executor ) {
+			$this->registerAbilitiesWithWordPress( $ability_registry, $ability_executor );
+		} );
 	}
 
 	/**
