@@ -268,6 +268,7 @@ final class Plugin {
 	private function registerPluginAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
 		$registry->register( new \FAWpmcp\Abilities\Plugins\ActivatePlugin() );
 		$registry->register( new \FAWpmcp\Abilities\Plugins\DeactivatePlugin() );
+		$registry->register( new \FAWpmcp\Abilities\Plugins\DeletePlugin() );
 		$registry->register( new \FAWpmcp\Abilities\Plugins\GetPlugin() );
 		$registry->register( new \FAWpmcp\Abilities\Plugins\InstallPlugin() );
 		$registry->register( new \FAWpmcp\Abilities\Plugins\ListPlugins() );
@@ -282,6 +283,7 @@ final class Plugin {
 	 */
 	private function registerThemeAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
 		$registry->register( new \FAWpmcp\Abilities\Themes\ActivateTheme() );
+		$registry->register( new \FAWpmcp\Abilities\Themes\DeleteTheme() );
 		$registry->register( new \FAWpmcp\Abilities\Themes\GetTheme() );
 		$registry->register( new \FAWpmcp\Abilities\Themes\InstallTheme() );
 		$registry->register( new \FAWpmcp\Abilities\Themes\ListThemes() );
