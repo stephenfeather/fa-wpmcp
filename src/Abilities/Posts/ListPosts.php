@@ -72,7 +72,7 @@ final class ListPosts extends AbstractAbility {
      * @return string Description.
      */
     public function getDescription(): string {
-        return 'Retrieve a paginated list of WordPress posts, pages, or custom post types with optional filtering by post type, status, author, category, and search term.';
+        return 'List WordPress posts with pagination. Defaults: page=1, per_page=10 (max 100), status=publish, orderby=date, order=DESC. Filters: post_type, status, author, category, search. Returns: posts (id, title, excerpt, status, type, slug, permalink, date, modified, author), total, pages, current_page, per_page.';
     }
 
     /**

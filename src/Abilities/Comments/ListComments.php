@@ -55,7 +55,7 @@ final class ListComments extends AbstractAbility {
      * @return string Description.
      */
     public function getDescription(): string {
-        return 'Retrieve a paginated list of WordPress comments with optional filtering by post ID and status.';
+        return 'List WordPress comments with pagination. Defaults: page=1, per_page=10 (max 100), status=approve. Filters: post_id, status (approve, hold, spam, trash, all). Returns: comments (id, post_id, author, email, content, date, status, link), total, page, per_page.';
     }
 
     /**

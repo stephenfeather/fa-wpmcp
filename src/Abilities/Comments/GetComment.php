@@ -57,7 +57,7 @@ final class GetComment extends AbstractAbility {
      * @return string Description.
      */
     public function getDescription(): string {
-        return 'Retrieve a single WordPress comment by ID with full details including author, content, and status.';
+        return 'Retrieve a WordPress comment by ID. Returns: id, post_id, author, email, content, date, status, link.';
     }
 
     /**

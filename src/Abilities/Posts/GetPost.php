@@ -59,7 +59,7 @@ final class GetPost extends AbstractAbility {
      * @return string Description.
      */
     public function getDescription(): string {
-        return 'Retrieve a single WordPress post, page, or custom post type by ID with full details including categories, tags, featured image, and author information. Optionally validate post type.';
+        return 'Retrieve a WordPress post/page by ID. Returns: id, title, content, excerpt, status, type, slug, permalink, edit_url, date, modified, featured_image, author (id, name), categories, tags, meta. Optionally validate post_type.';
     }
 
     /**

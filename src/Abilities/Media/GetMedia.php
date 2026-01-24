@@ -58,7 +58,7 @@ final class GetMedia extends AbstractAbility {
      * @return string Description.
      */
     public function getDescription(): string {
-        return 'Retrieve a single WordPress media library item by ID with full details including file information, metadata, dimensions, available sizes, and author information.';
+        return 'Retrieve a WordPress media item by ID. Returns: id, title, filename, url, mime_type, type, date, modified, filesize, width, height, alt_text, caption, description, author (id, name), sizes (by name with url, width, height), meta.';
     }
 
     /**
