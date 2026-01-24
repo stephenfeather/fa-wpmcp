@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha.3] - 2026-01-23
+
+### Summary
+Alpha 3 release focusing on core functionality stabilization and production-ready webhook system.
+
+### Fixed
+- Removed debug logging from ability registration system for production use
+- Webhook event naming consistency (ability.error renamed to ability.failed)
+
+### Changed
+- **BREAKING**: Webhook event `ability.error` renamed to `ability.failed` for consistency
+  - **Migration**: Update any webhook consumers listening for `ability.error` to use `ability.failed` instead
+  - Applies to: ability execution errors, validation failures, permission denials
+  - See documentation: `docs/WEBHOOKS.md` for event specifications
+
+### Security
+- **Status: MEDIUM Risk** - 4 MEDIUM severity issues identified for beta resolution:
+  - Remaining issues documented and planned for v1.0.0-beta release
+  - Production deployment should await beta with full security fixes
+  - See: `.claude/cache/agents/aegis/` for detailed audit reports
+
+### Testing
+- **Test Coverage: 94.2%** (670/711 tests passing)
+- Core ability registration and execution fully validated
+- Webhook system integration tested with Action Scheduler
+- WordPress 6.9 Abilities API compliance verified
+
+### Developer Documentation
+- Comprehensive developer guides added to `docs/` directory
+- Architecture documentation for ability framework
+- MCP integration examples and configuration guides
+
 ## [1.0.0-beta.1] - 2026-01-22
 
 ### Added
@@ -93,7 +125,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Settings page for configuration
 - Webhook scheduling with Action Scheduler
 
-[Unreleased]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-beta.1...HEAD
+[Unreleased]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.3...HEAD
+[1.0.0-alpha.3]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-beta.1...v1.0.0-alpha.3
 [1.0.0-beta.1]: https://github.com/featherart/fa-wpmcp/compare/v1.0-alpha-2...v1.0.0-beta.1
 [1.0.0-alpha.2]: https://github.com/featherart/fa-wpmcp/compare/v1.0-alpha-1...v1.0-alpha-2
 [1.0-alpha-1]: https://github.com/featherart/fa-wpmcp/releases/tag/v1.0-alpha-1

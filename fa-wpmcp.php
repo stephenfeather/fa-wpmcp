@@ -3,7 +3,7 @@
  * Plugin Name: FA WPMCP
  * Plugin URI: https://github.com/featherart/fa-wpmcp
  * Description: Exposes WordPress functionality to AI agents via Abilities API and MCP Adapter
- * Version: 1.0-alpha-2
+ * Version: 1.0.0-alpha.3
  * Requires at least: 6.9
  * Requires PHP: 8.1
  * Author: Feather Art
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants.
-define( 'FA_WPMCP_VERSION', '1.0.0-alpha.2' );
+define( 'FA_WPMCP_VERSION', '1.0.0-alpha.3' );
 define( 'FA_WPMCP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'FA_WPMCP_URL', plugin_dir_url( __FILE__ ) );
 define( 'FA_WPMCP_BASENAME', plugin_basename( __FILE__ ) );
@@ -48,12 +48,13 @@ if ( ! file_exists( $autoloader ) ) {
 
 require_once $autoloader;
 
-// Initialize plugin.
+// Initialize plugin early to hook into wp_abilities_api_init before it fires.
 add_action(
     'plugins_loaded',
     function () {
         Plugin::getInstance()->init();
-    }
+    },
+    1  // Early priority to ensure we hook into wp_abilities_api_init before it fires
 );
 
 // Activation hook.
