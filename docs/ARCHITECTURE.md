@@ -501,6 +501,98 @@ verify(string $payload, string $signature, string $secret): bool
 }
 ```
 
+#### SecretEncryption Interface
+
+**Purpose:** Webhook secret encryption at rest
+
+**Added:** v1.0.0-alpha.4
+
+**Implementations:**
+- `SodiumSecretEncryption` - XChaCha20-Poly1305 AEAD (preferred)
+- `OpenSslSecretEncryption` - AES-256-GCM AEAD (fallback)
+
+**Responsibilities:**
+- Encrypt plaintext secrets before storage
+- Decrypt encrypted secrets for use
+- Detect if a value is encrypted
+- Derive encryption keys from WordPress salts
+
+**Key Methods:**
+```php
+encrypt(string $plaintext): string
+decrypt(string $ciphertext): string
+isEncrypted(string $value): bool
+```
+
+**Encryption Flow:**
+```
+User enters secret in admin UI
+   ↓
+SettingsPage saves to fa_wpmcp_webhook_secret
+   ↓
+OptionsWebhookConfig reads secret
+   ↓
+   ├─ If plaintext → encrypt and re-save (lazy migration)
+   ├─ If encrypted → decrypt for use
+   └─ Return decrypted secret to WebhookService
+```
+
+**Key Derivation:**
+```
+WordPress Salts (SECURE_AUTH_KEY + LOGGED_IN_KEY + NONCE_SALT)
+   ↓
+HKDF-SHA256 with context "fa-wpmcp-webhook-secret-encryption-v1"
+   ↓
+256-bit encryption key
+```
+
+**Encryption Formats:**
+
+**Sodium (XChaCha20-Poly1305):**
+- 192-bit random nonce
+- 256-bit key from HKDF
+- Format: `sodium:v1:base64(nonce||ciphertext||tag)`
+
+**OpenSSL (AES-256-GCM):**
+- 96-bit random IV
+- 128-bit authentication tag
+- Format: `openssl:v1:base64(iv||tag||ciphertext)`
+
+**Security Properties:**
+- AEAD: Both confidentiality and integrity protection
+- Non-deterministic: Random nonces/IVs prevent pattern detection
+- Tamper-evident: Authentication tags detect modification
+- Forward secrecy: Changing WordPress salts invalidates old ciphertexts
+
+#### SecretStorageMigration
+
+**Purpose:** Consolidate dual storage locations
+
+**Added:** v1.0.0-alpha.4
+
+**Background:** Prior to v1.0.0-alpha.4, secrets were stored in two locations:
+- `fa_wpmcp_webhook_secret` (runtime reads)
+- `fa_wpmcp_webhooks['webhook_secret']` (admin UI writes)
+
+This could cause secrets to drift out of sync.
+
+**Responsibilities:**
+- Consolidate to canonical location (`fa_wpmcp_webhook_secret`)
+- Remove from webhooks array to prevent future drift
+- Run once on plugin activation (tracked by `fa_wpmcp_secret_migration_v1` flag)
+
+**Migration Logic:**
+```php
+1. Check if already migrated (fa_wpmcp_secret_migration_v1 flag)
+2. Read from both locations:
+   - Canonical: fa_wpmcp_webhook_secret
+   - Legacy: fa_wpmcp_webhooks['webhook_secret']
+3. Prefer canonical source (runtime reads this)
+4. Save to canonical location
+5. Remove from webhooks array
+6. Set migration flag
+```
+
 ## Database Schema
 
 ### Activity Logs Table

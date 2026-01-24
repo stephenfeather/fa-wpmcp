@@ -95,8 +95,9 @@ private const SENSITIVE_FIELDS = [
 **Protection:** Prevents PII exposure in activity logs for GDPR compliance.
 
 ### 5. Webhook Secret Protection
-**Status:** ✅ Implemented (v1.0-alpha-2)
+**Status:** ✅ Implemented (v1.0.0-alpha.4)
 
+**UI Protection (v1.0.0-alpha.2):**
 Webhook secrets are never displayed in admin forms after initial entry:
 
 ```php
@@ -113,6 +114,34 @@ if (empty($webhook_secret) && !empty($current_settings['webhook_secret'])) {
 ```
 
 **Protection:** Prevents secret exposure in browser dev tools and HTML source.
+
+**Encryption at Rest (v1.0.0-alpha.4):**
+Webhook secrets are automatically encrypted in the database using authenticated encryption (AEAD):
+
+**Encryption Methods:**
+- **Preferred:** libsodium XChaCha20-Poly1305 AEAD (when `php-sodium` extension available)
+- **Fallback:** OpenSSL AES-256-GCM AEAD (when only OpenSSL available)
+- **Key Derivation:** HKDF-SHA256 from WordPress authentication salts (SECURE_AUTH_KEY + LOGGED_IN_KEY + NONCE_SALT)
+
+**Security Properties:**
+- **Confidentiality:** Secrets encrypted with 256-bit keys
+- **Integrity:** Authentication tags detect tampering
+- **Non-deterministic:** Random nonces/IVs prevent pattern analysis
+- **Memory safety:** `sodium_memzero()` clears keys from memory (libsodium only)
+- **Backward compatible:** Plaintext secrets automatically encrypt on first read (lazy migration)
+
+**Storage Format:**
+```
+sodium:v1:base64(nonce||ciphertext||tag)
+openssl:v1:base64(iv||tag||ciphertext)
+```
+
+**Protection:** Prevents secret exposure even if database is compromised (attacker needs WordPress salts to decrypt).
+
+**Limitations:**
+- Encryption key derived from WordPress salts - if salts are compromised, secrets can be decrypted
+- Changing WordPress salts will invalidate existing encrypted secrets
+- Requires properly configured salts (not default "put your unique phrase here" values)
 
 ### 6. Option Name Validation
 **Status:** ✅ Implemented (v1.0-beta-1)

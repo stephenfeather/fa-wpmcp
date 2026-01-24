@@ -157,6 +157,50 @@ update_option('fa_wpmcp_webhooks', [
 ]);
 ```
 
+### Webhook Secret Encryption
+
+**Status:** ✅ Implemented (v1.0.0-alpha.4)
+
+Webhook secrets are automatically encrypted at rest using authenticated encryption (AEAD) for both confidentiality and integrity protection.
+
+**Encryption Method:**
+- **Preferred:** libsodium XChaCha20-Poly1305 (when `sodium` extension available)
+- **Fallback:** OpenSSL AES-256-GCM (when only OpenSSL available)
+- **Key Derivation:** HKDF-SHA256 from WordPress authentication salts
+
+**Automatic Migration:**
+Existing plaintext secrets are automatically encrypted on first read (lazy migration). No manual intervention required.
+
+**Storage Format:**
+```
+sodium:v1:base64(nonce||ciphertext||tag)
+openssl:v1:base64(iv||tag||ciphertext)
+```
+
+**Example - Check if encryption is working:**
+```php
+$secret = get_option('fa_wpmcp_webhook_secret');
+
+// Encrypted secrets have prefix
+if (str_starts_with($secret, 'sodium:v1:') || str_starts_with($secret, 'openssl:v1:')) {
+    echo 'Secret is encrypted';
+} else {
+    echo 'Secret is plaintext (will auto-encrypt on next webhook delivery)';
+}
+```
+
+**Requirements:**
+- WordPress authentication salts must be properly configured in `wp-config.php`
+- Salts must not be default "put your unique phrase here" values
+- Recommended: Use libsodium for better security (install `php-sodium` package)
+
+**Security Features:**
+- AEAD encryption (confidentiality + integrity)
+- Random nonces/IVs prevent deterministic encryption
+- HKDF key derivation ensures proper key separation
+- Tamper detection via Poly1305/GCM authentication tags
+- Memory safety with `sodium_memzero()` (when using libsodium)
+
 ## Filters
 
 Customize plugin behavior at runtime using WordPress filters.

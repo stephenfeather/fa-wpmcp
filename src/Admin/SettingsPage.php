@@ -516,7 +516,7 @@ final class SettingsPage {
         if ( $has_secret ) {
             $output .= esc_html( 'Leave blank to keep existing secret. Enter a new value to update.' );
         } else {
-            $output .= esc_html( 'Used to sign webhook payloads for verification.' );
+            $output .= esc_html( 'Used to sign webhook payloads for verification. Secrets are encrypted at rest.' );
         }
         $output .= '</p>';
         $output .= '</td>';
