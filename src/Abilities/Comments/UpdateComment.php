@@ -57,7 +57,7 @@ final class UpdateComment extends AbstractAbility {
      * @return string Description.
      */
     public function getDescription(): string {
-        return 'Update WordPress comment status for moderation (approve, hold, spam, trash).';
+        return 'Update WordPress comment status for moderation. Status options: approve, hold, spam, trash. WARNING: Setting status to "trash" will move the comment to trash.';
     }
 
     /**
@@ -116,6 +116,19 @@ final class UpdateComment extends AbstractAbility {
      */
     public function getRequiredCapability(): string {
         return 'moderate_comments';
+    }
+
+    /**
+     * Get ability annotations.
+     *
+     * Update operations that can trash content are marked as destructive.
+     *
+     * @return array<string, mixed> Annotations array.
+     */
+    public function getAnnotations(): array {
+        $annotations                 = parent::getAnnotations();
+        $annotations['destructive']  = true;
+        return $annotations;
     }
 
     /**

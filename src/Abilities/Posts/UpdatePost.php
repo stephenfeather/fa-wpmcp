@@ -73,7 +73,7 @@ final class UpdatePost extends AbstractAbility {
      * @return string Description.
      */
     public function getDescription(): string {
-        return 'Update an existing WordPress post, page, or custom post type. Only provided fields will be updated. Supports title, content, excerpt, status, categories, and tags. Optionally validate post type.';
+        return 'Update an existing WordPress post, page, or custom post type. Supports partial updates: only provided fields are updated. Fields: title, content, excerpt, status, categories, tags. WARNING: Setting status to "trash" will move the post to trash.';
     }
 
     /**
@@ -175,6 +175,19 @@ final class UpdatePost extends AbstractAbility {
      */
     public function getOperationType(): string {
         return 'write';
+    }
+
+    /**
+     * Get ability annotations.
+     *
+     * Update operations that can trash content are marked as destructive.
+     *
+     * @return array<string, mixed> Annotations array.
+     */
+    public function getAnnotations(): array {
+        $annotations                 = parent::getAnnotations();
+        $annotations['destructive']  = true;
+        return $annotations;
     }
 
     /**
