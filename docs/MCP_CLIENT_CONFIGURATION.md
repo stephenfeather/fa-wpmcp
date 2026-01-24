@@ -32,49 +32,80 @@ https://your-site.com/wp-json/abilities/v1/
 | **Windows** | `%APPDATA%\Claude\claude_desktop_config.json` |
 | **Linux** | `~/.config/Claude/claude_desktop_config.json` |
 
-### Example Configuration
+### Recommended: Using @automattic/mcp-wordpress-remote
 
-**Note:** Since Claude Desktop uses stdio transport and the WordPress plugin provides an HTTP endpoint, you need a custom MCP server wrapper. See the detailed implementation below in the "Alternative: HTTP REST MCP Server" section.
-
-Quick example using a custom wrapper (full code in section below):
+The official WordPress MCP Remote package from Automattic provides the best integration experience with support for OAuth 2.1, Application Passwords, and JWT authentication.
 
 ```json
 {
   "mcpServers": {
     "wordpress": {
-      "command": "node",
-      "args": ["/path/to/wordpress-mcp-server.js"],
+      "command": "npx",
+      "args": ["-y", "@automattic/mcp-wordpress-remote"],
       "env": {
-        "WORDPRESS_BASE_URL": "https://your-site.com/wp-json/abilities/v1",
-        "WORDPRESS_USERNAME": "your-username",
-        "WORDPRESS_APP_PASSWORD": "xxxx xxxx xxxx xxxx xxxx xxxx"
+        "WP_API_URL": "https://your-site.com",
+        "WP_API_USERNAME": "your-username",
+        "WP_API_PASSWORD": "xxxx xxxx xxxx xxxx xxxx xxxx",
+        "OAUTH_ENABLED": "false"
       }
     }
   }
 }
 ```
 
-### Configuration Breakdown
+### Configuration Options
 
 | Field | Description |
 |-------|-------------|
 | `wordpress` | Unique identifier for this MCP server (can be any name) |
-| `command` | Uses `node` to run the custom MCP wrapper server |
-| `args` | Path to your custom MCP server JavaScript file |
-| `WORDPRESS_BASE_URL` | Your WordPress MCP endpoint |
-| `WORDPRESS_USERNAME` | Your WordPress username |
-| `WORDPRESS_APP_PASSWORD` | Generated application password (with spaces) |
+| `command` | Uses `npx` to run the WordPress Remote MCP package |
+| `args` | `-y` flag auto-confirms installation, package name |
+| `WP_API_URL` | Your WordPress site URL (without `/wp-json` path) |
+| `WP_API_USERNAME` | Your WordPress username |
+| `WP_API_PASSWORD` | Generated application password (with spaces) |
+| `OAUTH_ENABLED` | Set to `"false"` to use Application Passwords instead of OAuth |
+
+### Authentication Methods
+
+**Option 1: Application Passwords (Recommended for self-hosted)**
+```json
+{
+  "env": {
+    "WP_API_URL": "https://your-site.com",
+    "WP_API_USERNAME": "your-username",
+    "WP_API_PASSWORD": "xxxx xxxx xxxx xxxx xxxx xxxx",
+    "OAUTH_ENABLED": "false"
+  }
+}
+```
+
+**Option 2: OAuth 2.1 (Interactive)**
+```json
+{
+  "env": {
+    "WP_API_URL": "https://your-site.com",
+    "OAUTH_ENABLED": "true"
+  }
+}
+```
+OAuth will prompt you to authorize access via a browser window on first use.
+
+**Option 3: JWT Token**
+```json
+{
+  "env": {
+    "WP_API_URL": "https://your-site.com",
+    "JWT_TOKEN": "your-jwt-token-here"
+  }
+}
+```
 
 ### Verify Connection
 
 1. **Restart Claude Desktop** after saving configuration
 2. **Start new conversation**
 3. **Look for MCP icon** (🔌) in bottom-left corner
-4. **Click MCP icon** to see available tools:
-   - `fa-wpmcp/list-posts`
-   - `fa-wpmcp/get-post`
-   - `fa-wpmcp/create-post`
-   - `fa-wpmcp/update-post`
+4. **Click MCP icon** to see available tools from your WordPress site
 
 ### Example Usage in Claude
 
@@ -84,7 +115,7 @@ Once connected, you can use natural language:
 User: "List the 5 most recent published posts on my WordPress site"
 
 Claude: I'll query your WordPress site for recent posts.
-[Uses fa-wpmcp/list-posts tool]
+[Uses WordPress abilities via MCP]
 
 Here are your 5 most recent published posts:
 1. "Getting Started with MCP" (Jan 21, 2026)
@@ -94,9 +125,17 @@ Here are your 5 most recent published posts:
 
 ---
 
-## Alternative: HTTP REST MCP Server
+## Alternative: Bundled MCP Server
 
-If you prefer not to use the fetch server, you can create a custom MCP server wrapper.
+For advanced use cases or custom configurations, the FA WPMCP plugin includes a bundled Node.js MCP server in the `bin/` directory.
+
+See the main [Quick Start Guide](./QUICK_START.md#option-b-use-bundled-mcp-server-advanced) for installation instructions.
+
+---
+
+## Alternative: Custom HTTP REST MCP Server
+
+If you prefer to create your own custom wrapper for learning purposes, you can build a custom MCP server wrapper.
 
 ### Node.js MCP Server Example
 

@@ -1,5 +1,13 @@
 # FA WPMCP MCP Server
 
+> **📌 Note:** For most users, we recommend using `@automattic/mcp-wordpress-remote` instead of this bundled server. The Automattic package provides automatic OAuth support, better authentication handling, and seamless integration. See the [Quick Start Guide](../docs/QUICK_START.md) for instructions.
+>
+> **Use this bundled server if you need:**
+> - Custom MCP server modifications
+> - Specific environment configurations
+> - Learning how MCP servers work
+> - Advanced debugging capabilities
+
 Production-ready MCP server wrapper for the FA WPMCP WordPress plugin. This server bridges WordPress Abilities API to Claude Desktop's stdio transport using the Model Context Protocol (MCP).
 
 ## Features

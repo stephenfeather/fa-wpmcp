@@ -52,7 +52,7 @@ Configure via WordPress options or filters (see [Configuration](#configuration))
 
 ## MCP Server Integration
 
-The plugin includes a bundled **MCP (Model Context Protocol) server** that automatically exposes all WordPress abilities to AI assistants like Claude Desktop.
+Connect AI assistants like Claude Desktop to your WordPress site using the **Model Context Protocol (MCP)**. We recommend using the official `@automattic/mcp-wordpress-remote` package, which provides automatic OAuth authentication and seamless integration.
 
 ### Prerequisites
 
@@ -61,59 +61,65 @@ The plugin includes a bundled **MCP (Model Context Protocol) server** that autom
    - Scroll to **Application Passwords**
    - Create a new application password (save it securely)
 
-2. **Node.js** (v18 or higher)
+2. **Claude Desktop** (or other MCP-compatible client)
 
-### Installation
+### Recommended: Using @automattic/mcp-wordpress-remote
 
-1. **Install MCP server dependencies:**
-   ```bash
-   cd bin/
-   npm install
-   ```
+The official WordPress MCP Remote package from Automattic provides the best experience with support for OAuth 2.1, Application Passwords, and JWT authentication.
 
-2. **Configure Claude Desktop:**
+**Configure Claude Desktop:**
 
-   Edit `~/.claude.json` (create if doesn't exist):
-   ```json
-   {
-     "mcpServers": {
-       "fa-wpmcp": {
-         "command": "node",
-         "args": ["/absolute/path/to/fa-wpmcp/bin/mcp-server.js"],
-         "env": {
-           "WORDPRESS_BASE_URL": "http://localhost/wp-json/wp-abilities/v1/abilities",
-           "WORDPRESS_USERNAME": "your_wordpress_username",
-           "WORDPRESS_APP_PASSWORD": "xxxx xxxx xxxx xxxx xxxx xxxx"
-         }
-       }
-     }
-   }
-   ```
+Edit your Claude Desktop config file:
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux:** `~/.config/Claude/claude_desktop_config.json`
 
-3. **Restart Claude Desktop**
+```json
+{
+  "mcpServers": {
+    "fa-wpmcp": {
+      "command": "npx",
+      "args": ["-y", "@automattic/mcp-wordpress-remote"],
+      "env": {
+        "WP_API_URL": "https://your-site.com",
+        "WP_API_USERNAME": "your_wordpress_username",
+        "WP_API_PASSWORD": "xxxx xxxx xxxx xxxx xxxx xxxx",
+        "OAUTH_ENABLED": "false"
+      }
+    }
+  }
+}
+```
+
+**Configuration Options:**
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `WP_API_URL` | Yes | Your WordPress site URL |
+| `WP_API_USERNAME` | Yes* | WordPress username |
+| `WP_API_PASSWORD` | Yes* | Application password from WordPress |
+| `OAUTH_ENABLED` | No | Set to `"false"` to use Application Passwords (default: `"true"` for OAuth) |
+
+*Required when using Application Password authentication
+
+**Restart Claude Desktop** after saving the configuration.
+
+### Alternative: Bundled MCP Server
+
+For advanced use cases or custom configurations, the plugin includes a bundled Node.js MCP server in the `bin/` directory.
+
+See [`bin/README.md`](bin/README.md) for installation and configuration instructions.
 
 ### Verification
 
-Check that the MCP server is connected:
+After restarting Claude Desktop, start a new conversation and look for the MCP icon (🔌) in the interface. Your WordPress abilities should be available as tools.
 
-```bash
-# In Claude Desktop terminal
-claude mcp list
+Test with a prompt:
+```
+"List my WordPress site information"
 ```
 
-You should see:
-```
-✓ fa-wpmcp - Connected
-```
-
-Test the tools:
-```bash
-# List available WordPress abilities
-mcp__fa-wpmcp__core-get-site-info
-
-# Get environment details
-mcp__fa-wpmcp__core-get-environment-info
-```
+Claude should connect to your WordPress site and return site details!
 
 ### Available Tools
 
@@ -123,58 +129,33 @@ Once connected, all registered WordPress abilities become available as MCP tools
 |-----------|-------------|
 | `core-get-site-info` | Get WordPress site information (name, URL, version) |
 | `core-get-environment-info` | Get environment details (PHP, DB, WP versions) |
-| *(more tools as abilities are registered)* | Auto-discovered from WordPress API |
+| `posts-list-posts` | List WordPress posts with filtering |
+| `posts-get-post` | Get a specific post by ID |
+| *(32+ more abilities)* | Auto-discovered from WordPress API |
 
-Tool names are automatically sanitized (e.g., `core/get-site-info` → `core-get-site-info`).
-
-### Configuration Options
-
-The MCP server reads from environment variables:
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `WORDPRESS_BASE_URL` | Yes | Full URL to abilities API endpoint |
-| `WORDPRESS_USERNAME` | Yes | WordPress username for authentication |
-| `WORDPRESS_APP_PASSWORD` | Yes | Application password from WordPress |
-
-### Debugging
-
-Enable debug logging:
-
-```bash
-# Use the debug wrapper
-node bin/mcp-server-wrapper.sh
-```
-
-View logs:
-```bash
-tail -f /tmp/mcp-server-debug.log
-```
+Tool names are automatically sanitized based on ability names.
 
 ### Architecture
 
 ```
 Claude Desktop
     ↓ (stdio via MCP SDK)
-bin/mcp-server.js
-    ↓ (HTTP + Basic Auth)
+@automattic/mcp-wordpress-remote
+    ↓ (HTTP + Auth)
 WordPress REST API
-    ↓ (wp-json/wp-abilities/v1/abilities)
+    ↓ (wp-json/wp-abilities/v1/)
 FA-WPMCP Plugin
     ↓ (Ability Framework)
 WordPress Core
 ```
 
 **How It Works:**
-1. MCP server fetches all abilities from WordPress REST API on startup
-2. Each ability is exposed as an MCP tool (with sanitized names)
-3. When Claude calls a tool, the server sends HTTP request to WordPress
-4. WordPress executes the ability and returns JSON response
-5. MCP server returns result to Claude
-
-**Method Selection:**
-- Abilities marked `readonly: true` → HTTP GET
-- All other abilities → HTTP POST
+1. MCP server authenticates with WordPress (OAuth or Application Password)
+2. Discovers all abilities from WordPress Abilities API
+3. Exposes each ability as an MCP tool
+4. When Claude calls a tool, the server sends HTTP request to WordPress
+5. WordPress executes the ability and returns JSON response
+6. MCP server returns result to Claude
 
 ## Features
 
@@ -639,12 +620,12 @@ if (!hash_equals($expected, $signature)) {
 - [x] **Theme Abilities** - Plugin and theme management (complete)
 
 ### Future Enhancements
-- [ ] **Bundled MCP Server** - Production-ready stdio wrapper for Claude Desktop integration
-  - `bin/mcp-server.js` with auto-discovery of all abilities from WordPress API
-  - `bin/package.json` with `@modelcontextprotocol/sdk` dependency
-  - `bin/README.md` with installation and usage instructions
-  - Update `docs/QUICK_START.md` to reference bundled wrapper
-- [ ] **GDPR Compliance** - Data export/erasure hooks
+- [x] **MCP Server Integration** - Complete support for Model Context Protocol
+  - ✅ Bundled MCP server (`bin/mcp-server.js`) with auto-discovery
+  - ✅ Documentation updated to recommend `@automattic/mcp-wordpress-remote`
+  - ✅ Application Password authentication support
+  - ✅ OAuth 2.1 support via Automattic package
+- [ ] **GDPR Compliance** - Data export/erasure hooks (Privacy abilities implemented)
 - [ ] **Uninstall Handler** - Clean database on plugin removal
 - [ ] **Integration Tests** - E2E testing with WordPress
 - [ ] **Multisite Support** - Multi-site network compatibility

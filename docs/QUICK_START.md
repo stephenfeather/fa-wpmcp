@@ -45,9 +45,40 @@ Get your WordPress site connected to AI assistants in under 5 minutes.
 | **Windows** | `%APPDATA%\Claude\claude_desktop_config.json` |
 | **Linux** | `~/.config/Claude/claude_desktop_config.json` |
 
-### Option A: Use Bundled MCP Server (Recommended)
+### Option A: Use @automattic/mcp-wordpress-remote (Recommended)
 
-The plugin includes a production-ready MCP server in the `bin/` directory with auto-discovery of all abilities.
+The official WordPress MCP Remote package from Automattic provides the best experience with automatic OAuth support and seamless integration.
+
+**Add to `claude_desktop_config.json`:**
+```json
+{
+  "mcpServers": {
+    "fa-wpmcp": {
+      "command": "npx",
+      "args": ["-y", "@automattic/mcp-wordpress-remote"],
+      "env": {
+        "WP_API_URL": "https://your-site.com",
+        "WP_API_USERNAME": "your-username",
+        "WP_API_PASSWORD": "your-app-password",
+        "OAUTH_ENABLED": "false"
+      }
+    }
+  }
+}
+```
+
+**Replace values:**
+- `your-site.com` with your WordPress domain
+- `your-username` with your WordPress username
+- `your-app-password` with the password from Step 2
+
+**Restart Claude Desktop**
+
+**No installation required!** The `npx -y` command automatically downloads and runs the package.
+
+### Option B: Use Bundled MCP Server (Advanced)
+
+For advanced use cases or custom configurations, the plugin includes a bundled Node.js MCP server in the `bin/` directory.
 
 **1. Install dependencies:**
 ```bash
@@ -82,7 +113,7 @@ npm install
 
 See [`bin/README.md`](../bin/README.md) for detailed documentation.
 
-### Option B: Create Custom MCP Server Wrapper (Advanced)
+### Option C: Create Custom MCP Server Wrapper (Learning)
 
 Alternatively, create your own custom wrapper for learning or customization purposes.
 
