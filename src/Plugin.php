@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace FAWpmcp;
 
+use WP\MCP\Core\McpAdapter;
+
 /**
  * Main plugin orchestration class.
  *
@@ -61,6 +63,7 @@ final class Plugin {
 	 * @return void
 	 */
 	public function init(): void {
+		error_log( 'FA WPMCP: Plugin::init() called' );
 		$this->registerHooks();
 
 		// Initialize webhook system.
@@ -118,10 +121,53 @@ final class Plugin {
 		);
 		$this->registerService( 'ability_executor', $ability_executor );
 
-		// 4. Register all abilities with WordPress Abilities API.
-		add_action( 'wp_abilities_api_init', function() use ( $ability_registry, $ability_executor ) {
-			$this->registerAbilitiesWithWordPress( $ability_registry, $ability_executor );
-		} );
+		// 4. Register ability categories BEFORE registering abilities.
+		add_action(
+			'wp_abilities_api_categories_init',
+			function () {
+				error_log( 'FA WPMCP: wp_abilities_api_categories_init hook fired' );
+				error_log( 'FA WPMCP: wp_register_ability_category function exists: ' . ( function_exists( 'wp_register_ability_category' ) ? 'yes' : 'no' ) );
+				$this->registerAbilityCategories();
+				error_log( 'FA WPMCP: Finished registering 9 categories' );
+
+				// Verify categories were registered.
+				$categories_registry = \WP_Ability_Categories_Registry::get_instance();
+				if ( $categories_registry && method_exists( $categories_registry, 'is_registered' ) ) {
+					error_log( 'FA WPMCP: Verifying category registration:' );
+					error_log( 'FA WPMCP: - privacy: ' . ( $categories_registry->is_registered( 'privacy' ) ? 'YES' : 'NO' ) );
+					error_log( 'FA WPMCP: - posts-pages: ' . ( $categories_registry->is_registered( 'posts-pages' ) ? 'YES' : 'NO' ) );
+				}
+			},
+			5  // Priority 5 to run before McpAdapter's default priority 10.
+		);
+
+		// 5. Register all abilities with WordPress Abilities API.
+		error_log( 'FA WPMCP: About to add wp_abilities_api_init hook. Registry has ' . count( $ability_registry->all() ) . ' abilities ready' );
+		add_action(
+			'wp_abilities_api_init',
+			function () use ( $ability_registry, $ability_executor ) {
+				error_log( 'FA WPMCP: wp_abilities_api_init hook fired. Registry has ' . count( $ability_registry->all() ) . ' abilities' );
+				error_log( 'FA WPMCP: wp_register_ability function exists: ' . ( function_exists( 'wp_register_ability' ) ? 'yes' : 'no' ) );
+				error_log( 'FA WPMCP: doing_action wp_abilities_api_init: ' . ( doing_action( 'wp_abilities_api_init' ) ? 'yes' : 'no' ) );
+
+				// Verify categories are still registered before registering abilities.
+				$categories_registry = \WP_Ability_Categories_Registry::get_instance();
+				if ( $categories_registry && method_exists( $categories_registry, 'is_registered' ) ) {
+					error_log( 'FA WPMCP: Before ability registration, checking categories:' );
+					error_log( 'FA WPMCP: - privacy: ' . ( $categories_registry->is_registered( 'privacy' ) ? 'YES' : 'NO' ) );
+				}
+
+				$this->registerAbilitiesWithWordPress( $ability_registry, $ability_executor );
+				error_log( 'FA WPMCP: Finished registering abilities with WordPress' );
+			},
+			15  // Priority 15 to run after other plugins (McpAdapter uses default 10).
+		);
+
+		// 6. Initialize MCP Adapter AFTER registering the hooks.
+		// This ensures our categories and abilities are registered before the adapter fires the hooks.
+		error_log( 'FA WPMCP: About to call McpAdapter::instance()' );
+		McpAdapter::instance();
+		error_log( 'FA WPMCP: McpAdapter::instance() completed' );
 	}
 
 	/**
@@ -131,6 +177,63 @@ final class Plugin {
 	 */
 	private function registerHooks(): void {
 		add_action( 'admin_init', array( $this, 'checkAbilitiesApiAndShowNotice' ) );
+	}
+
+	/**
+	 * Register ability categories with WordPress Abilities API.
+	 *
+	 * Categories must be registered before abilities can use them.
+	 * This method is called on the 'wp_abilities_api_categories_init' hook.
+	 *
+	 * @return void
+	 */
+	private function registerAbilityCategories(): void {
+		if ( ! function_exists( 'wp_register_ability_category' ) ) {
+			return;
+		}
+
+		$categories = array(
+			'posts-pages' => array(
+				'label'       => __( 'Posts & Pages', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress posts, pages, and custom post types', 'fa-wpmcp' ),
+			),
+			'comments' => array(
+				'label'       => __( 'Comments', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress comments and comment moderation', 'fa-wpmcp' ),
+			),
+			'media' => array(
+				'label'       => __( 'Media Library', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress media files and attachments', 'fa-wpmcp' ),
+			),
+			'taxonomies' => array(
+				'label'       => __( 'Taxonomies', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress terms, categories, and tags', 'fa-wpmcp' ),
+			),
+			'users' => array(
+				'label'       => __( 'Users', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress user accounts and profiles', 'fa-wpmcp' ),
+			),
+			'settings' => array(
+				'label'       => __( 'Settings', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress options and site configuration', 'fa-wpmcp' ),
+			),
+			'plugins' => array(
+				'label'       => __( 'Plugins', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress plugin installation, activation, and updates', 'fa-wpmcp' ),
+			),
+			'themes' => array(
+				'label'       => __( 'Themes', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress theme installation, activation, and updates', 'fa-wpmcp' ),
+			),
+			'privacy' => array(
+				'label'       => __( 'Privacy', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress privacy requests (GDPR data export and erasure)', 'fa-wpmcp' ),
+			),
+		);
+
+		foreach ( $categories as $slug => $args ) {
+			wp_register_ability_category( $slug, $args );
+		}
 	}
 
 	/**
@@ -154,15 +257,20 @@ final class Plugin {
 			wp_register_ability(
 				$registration['name'],
 				array(
-					'label'       => $registration['label'],
-					'description' => $registration['description'],
-					'category'    => $registration['category'],
-					'meta'        => array(
+					'label'         => $registration['label'],
+					'description'   => $registration['description'],
+					'category'      => $registration['category'],
+					'show_in_rest'  => true,
+					'meta'          => array(
 						'input_schema'  => $registration['inputSchema'],
 						'output_schema' => $registration['outputSchema'],
 						'annotations'   => $registration['annotations'],
+						'mcp'           => array(
+							'public' => true,
+							'type'   => 'tool',
+						),
 					),
-					'capability'  => $registration['requiredCapability'],
+					'capability'    => $registration['requiredCapability'],
 					'callback'    => function ( array $input ) use ( $ability, $executor ) {
 						$result = $executor->execute( $ability->getName(), $input );
 
