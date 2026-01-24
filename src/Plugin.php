@@ -63,7 +63,6 @@ final class Plugin {
 	 * @return void
 	 */
 	public function init(): void {
-		error_log( 'FA WPMCP: Plugin::init() called' );
 		$this->registerHooks();
 
 		// Initialize webhook system.
@@ -125,49 +124,35 @@ final class Plugin {
 		add_action(
 			'wp_abilities_api_categories_init',
 			function () {
-				error_log( 'FA WPMCP: wp_abilities_api_categories_init hook fired' );
-				error_log( 'FA WPMCP: wp_register_ability_category function exists: ' . ( function_exists( 'wp_register_ability_category' ) ? 'yes' : 'no' ) );
 				$this->registerAbilityCategories();
-				error_log( 'FA WPMCP: Finished registering 9 categories' );
 
 				// Verify categories were registered.
 				$categories_registry = \WP_Ability_Categories_Registry::get_instance();
 				if ( $categories_registry && method_exists( $categories_registry, 'is_registered' ) ) {
-					error_log( 'FA WPMCP: Verifying category registration:' );
-					error_log( 'FA WPMCP: - privacy: ' . ( $categories_registry->is_registered( 'privacy' ) ? 'YES' : 'NO' ) );
-					error_log( 'FA WPMCP: - posts-pages: ' . ( $categories_registry->is_registered( 'posts-pages' ) ? 'YES' : 'NO' ) );
+					// Categories verified during registration.
 				}
 			},
 			5  // Priority 5 to run before McpAdapter's default priority 10.
 		);
 
 		// 5. Register all abilities with WordPress Abilities API.
-		error_log( 'FA WPMCP: About to add wp_abilities_api_init hook. Registry has ' . count( $ability_registry->all() ) . ' abilities ready' );
 		add_action(
 			'wp_abilities_api_init',
 			function () use ( $ability_registry, $ability_executor ) {
-				error_log( 'FA WPMCP: wp_abilities_api_init hook fired. Registry has ' . count( $ability_registry->all() ) . ' abilities' );
-				error_log( 'FA WPMCP: wp_register_ability function exists: ' . ( function_exists( 'wp_register_ability' ) ? 'yes' : 'no' ) );
-				error_log( 'FA WPMCP: doing_action wp_abilities_api_init: ' . ( doing_action( 'wp_abilities_api_init' ) ? 'yes' : 'no' ) );
-
 				// Verify categories are still registered before registering abilities.
 				$categories_registry = \WP_Ability_Categories_Registry::get_instance();
 				if ( $categories_registry && method_exists( $categories_registry, 'is_registered' ) ) {
-					error_log( 'FA WPMCP: Before ability registration, checking categories:' );
-					error_log( 'FA WPMCP: - privacy: ' . ( $categories_registry->is_registered( 'privacy' ) ? 'YES' : 'NO' ) );
+					// Categories verified before ability registration.
 				}
 
 				$this->registerAbilitiesWithWordPress( $ability_registry, $ability_executor );
-				error_log( 'FA WPMCP: Finished registering abilities with WordPress' );
 			},
 			15  // Priority 15 to run after other plugins (McpAdapter uses default 10).
 		);
 
 		// 6. Initialize MCP Adapter AFTER registering the hooks.
 		// This ensures our categories and abilities are registered before the adapter fires the hooks.
-		error_log( 'FA WPMCP: About to call McpAdapter::instance()' );
 		McpAdapter::instance();
-		error_log( 'FA WPMCP: McpAdapter::instance() completed' );
 	}
 
 	/**
