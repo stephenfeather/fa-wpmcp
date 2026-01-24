@@ -769,7 +769,13 @@ class SettingsPageTest extends TestCase {
 			->with( 'manage_options' )
 			->andReturn( true );
 
+		// Mock separate get_option calls for webhook secret and settings.
 		Functions\expect( 'get_option' )
+			->with( 'fa_wpmcp_webhook_secret', '' )
+			->andReturn( 'test-secret-key' );
+
+		Functions\expect( 'get_option' )
+			->with( 'fa_wpmcp_webhooks', array() )
 			->andReturn(
 				array(
 					'webhook_endpoints' => array(
@@ -778,7 +784,6 @@ class SettingsPageTest extends TestCase {
 							'events' => array( 'ability.after_execute' ),
 						),
 					),
-					'webhook_secret'    => 'test-secret-key',
 				)
 			);
 
@@ -824,11 +829,16 @@ class SettingsPageTest extends TestCase {
 			->with( 'manage_options' )
 			->andReturn( true );
 
+		// Mock separate get_option calls for webhook secret and settings.
 		Functions\expect( 'get_option' )
+			->with( 'fa_wpmcp_webhook_secret', '' )
+			->andReturn( 'existing-secret-key' );
+
+		Functions\expect( 'get_option' )
+			->with( 'fa_wpmcp_webhooks', array() )
 			->andReturn(
 				array(
 					'webhook_endpoints' => array(),
-					'webhook_secret'    => 'existing-secret-key',
 				)
 			);
 
@@ -873,7 +883,13 @@ class SettingsPageTest extends TestCase {
 			->with( 'manage_options' )
 			->andReturn( true );
 
+		// Mock separate get_option calls for webhook secret and settings.
 		Functions\expect( 'get_option' )
+			->with( 'fa_wpmcp_webhook_secret', '' )
+			->andReturn( 'test-secret' );
+
+		Functions\expect( 'get_option' )
+			->with( 'fa_wpmcp_webhooks', array() )
 			->andReturn(
 				array(
 					'webhook_endpoints' => array(
@@ -882,7 +898,6 @@ class SettingsPageTest extends TestCase {
 							'events' => array( 'ability.before_execute', 'ability.after_execute' ),
 						),
 					),
-					'webhook_secret'    => 'test-secret',
 				)
 			);
 
@@ -1442,6 +1457,12 @@ class SettingsPageTest extends TestCase {
 		Functions\expect( 'sanitize_text_field' )
 			->andReturnFirstArg();
 
+		// Expect secret to be saved separately.
+		Functions\expect( 'update_option' )
+			->once()
+			->with( 'fa_wpmcp_webhook_secret', 'my-secret-key' );
+
+		// Expect endpoints to be saved (without secret).
 		Functions\expect( 'update_option' )
 			->once()
 			->with( 'fa_wpmcp_webhooks', Mockery::type( 'array' ) );

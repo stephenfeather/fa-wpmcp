@@ -11,6 +11,7 @@ namespace FAWpmcp\Tests\Webhooks;
 
 use Brain\Monkey\Functions;
 use FAWpmcp\Webhooks\OptionsWebhookConfig;
+use FAWpmcp\Webhooks\SecretEncryption;
 use PHPUnit\Framework\TestCase;
 use Mockery;
 
@@ -31,6 +32,17 @@ final class OptionsWebhookConfigTest extends TestCase {
 	}
 
 	/**
+	 * Create mock encryption for testing
+	 *
+	 * @return SecretEncryption
+	 */
+	private function createMockEncryption(): SecretEncryption {
+		$encryption = Mockery::mock( SecretEncryption::class );
+		$encryption->shouldReceive( 'isEncrypted' )->andReturn( false )->byDefault();
+		return $encryption;
+	}
+
+	/**
 	 * Test getSubscribedUrls returns empty when option invalid.
 	 *
 	 * @return void
@@ -41,7 +53,7 @@ final class OptionsWebhookConfigTest extends TestCase {
 			->with( 'fa_wpmcp_webhook_urls', array() )
 			->andReturn( 'invalid' );
 
-		$config = new OptionsWebhookConfig();
+		$config = new OptionsWebhookConfig( $this->createMockEncryption() );
 		$this->assertSame( array(), $config->getSubscribedUrls( 'event' ) );
 	}
 
@@ -57,31 +69,81 @@ final class OptionsWebhookConfigTest extends TestCase {
 				'event' => array( 'https://a.test', 'https://b.test' ),
 			) );
 
-		$config = new OptionsWebhookConfig();
+		$config = new OptionsWebhookConfig( $this->createMockEncryption() );
 		$this->assertSame( array( 'https://a.test', 'https://b.test' ), $config->getSubscribedUrls( 'event' ) );
 	}
 
 	/**
-	 * Test getSecret returns existing secret.
+	 * Test getSecret decrypts encrypted secret.
 	 *
 	 * @return void
 	 */
-	public function test_getSecret_returns_existing_secret(): void {
+	public function test_getSecret_decrypts_encrypted_secret(): void {
+		$encryption = Mockery::mock( SecretEncryption::class );
+		$encryption->shouldReceive( 'isEncrypted' )
+			->once()
+			->with( 'sodium:v1:encrypted-data' )
+			->andReturn( true );
+		$encryption->shouldReceive( 'decrypt' )
+			->once()
+			->with( 'sodium:v1:encrypted-data' )
+			->andReturn( 'decrypted-secret' );
+
 		Functions\expect( 'get_option' )
 			->once()
 			->with( 'fa_wpmcp_webhook_secret' )
-			->andReturn( 'existing-secret' );
+			->andReturn( 'sodium:v1:encrypted-data' );
 
-		$config = new OptionsWebhookConfig();
-		$this->assertSame( 'existing-secret', $config->getSecret() );
+		$config = new OptionsWebhookConfig( $encryption );
+		$this->assertSame( 'decrypted-secret', $config->getSecret() );
 	}
 
 	/**
-	 * Test getSecret generates and stores new secret when missing.
+	 * Test getSecret performs lazy migration on plain text secret.
 	 *
 	 * @return void
 	 */
-	public function test_getSecret_generates_and_stores_when_missing(): void {
+	public function test_getSecret_encrypts_plain_text_secret(): void {
+		$encryption = Mockery::mock( SecretEncryption::class );
+		$encryption->shouldReceive( 'isEncrypted' )
+			->once()
+			->with( 'plain-text-secret' )
+			->andReturn( false );
+		$encryption->shouldReceive( 'encrypt' )
+			->once()
+			->with( 'plain-text-secret' )
+			->andReturn( 'sodium:v1:encrypted' );
+
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'fa_wpmcp_webhook_secret' )
+			->andReturn( 'plain-text-secret' );
+
+		Functions\expect( 'update_option' )
+			->once()
+			->with( 'fa_wpmcp_webhook_secret', 'sodium:v1:encrypted' )
+			->andReturn( true );
+
+		$config = new OptionsWebhookConfig( $encryption );
+		$secret = $config->getSecret();
+
+		$this->assertSame( 'plain-text-secret', $secret );
+	}
+
+	/**
+	 * Test getSecret generates and stores encrypted secret when missing.
+	 *
+	 * @return void
+	 */
+	public function test_getSecret_generates_and_stores_encrypted_when_missing(): void {
+		$encryption = Mockery::mock( SecretEncryption::class );
+		$encryption->shouldReceive( 'encrypt' )
+			->once()
+			->with( Mockery::on( function( $secret ) {
+				return is_string( $secret ) && 64 === strlen( $secret );
+			} ) )
+			->andReturn( 'sodium:v1:encrypted-new-secret' );
+
 		Functions\expect( 'get_option' )
 			->once()
 			->with( 'fa_wpmcp_webhook_secret' )
@@ -89,12 +151,10 @@ final class OptionsWebhookConfigTest extends TestCase {
 
 		Functions\expect( 'update_option' )
 			->once()
-			->with( 'fa_wpmcp_webhook_secret', Mockery::on( function( $secret ) {
-				return is_string( $secret ) && 64 === strlen( $secret );
-			} ) )
+			->with( 'fa_wpmcp_webhook_secret', 'sodium:v1:encrypted-new-secret' )
 			->andReturn( true );
 
-		$config = new OptionsWebhookConfig();
+		$config = new OptionsWebhookConfig( $encryption );
 		$secret = $config->getSecret();
 
 		$this->assertSame( 64, strlen( $secret ) );

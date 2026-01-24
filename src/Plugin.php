@@ -456,7 +456,8 @@ final class Plugin {
 	 * @return void
 	 */
 	public function activate(): void {
-		// Activation logic will be added in later phases.
+		// Migrate webhook secrets from dual storage to canonical location.
+		\FAWpmcp\Database\SecretStorageMigration::migrate();
 	}
 
 	/**

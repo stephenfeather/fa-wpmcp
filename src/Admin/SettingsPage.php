@@ -793,14 +793,14 @@ final class SettingsPage {
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in helper method.
         $webhook_endpoints = isset( $_POST['webhook_endpoints'] ) ? wp_unslash( $_POST['webhook_endpoints'] ) : array();
 
-        // Preserve existing secret if field was left blank.
-        if ( empty( $webhook_secret ) ) {
-            $existing_settings = $this->getWebhooksSettings();
-            $webhook_secret = $existing_settings['webhook_secret'] ?? '';
+        // Save secret to canonical location (separate from webhooks array).
+        // Only update if new secret provided.
+        if ( ! empty( $webhook_secret ) ) {
+            update_option( 'fa_wpmcp_webhook_secret', $webhook_secret );
         }
 
+        // Save endpoints only (no secret in this array).
         $settings = array(
-            'webhook_secret'    => $webhook_secret,
             'webhook_endpoints' => $this->sanitizer->sanitizeWebhookEndpoints( $webhook_endpoints ),
         );
 
@@ -863,17 +863,15 @@ final class SettingsPage {
      * @return array<string, mixed> Settings array.
      */
     private function getWebhooksSettings(): array {
-        $defaults = array(
-            'webhook_secret'    => '',
-            'webhook_endpoints' => array(),
+        // Read secret from canonical location.
+        $webhook_secret = get_option( 'fa_wpmcp_webhook_secret', '' );
+
+        // Read endpoints from webhooks array.
+        $webhooks = get_option( 'fa_wpmcp_webhooks', array() );
+
+        return array(
+            'webhook_secret'    => is_string( $webhook_secret ) ? $webhook_secret : '',
+            'webhook_endpoints' => is_array( $webhooks ) ? ( $webhooks['webhook_endpoints'] ?? array() ) : array(),
         );
-
-        $settings = get_option( 'fa_wpmcp_webhooks', $defaults );
-
-        if ( ! is_array( $settings ) ) {
-            return $defaults;
-        }
-
-        return array_merge( $defaults, $settings );
     }
 }

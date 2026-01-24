@@ -37,9 +37,10 @@ final class WebhookService {
      */
     public function __construct() {
         // Instantiate concrete implementations.
-        $queue  = new DatabaseWebhookQueue();
-        $sender = new WpHttpWebhookSender();
-        $config = new OptionsWebhookConfig();
+        $queue      = new DatabaseWebhookQueue();
+        $sender     = new WpHttpWebhookSender();
+        $encryption = SecretEncryptionFactory::create();
+        $config     = new OptionsWebhookConfig( $encryption );
 
         // Create manager.
         $this->manager = new WebhookManager( $queue, $sender, $config );
