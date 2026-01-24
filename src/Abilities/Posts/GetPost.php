@@ -146,6 +146,17 @@ final class GetPost extends AbstractAbility {
     }
 
     /**
+     * Get ability annotations.
+     *
+     * @return array<string, mixed> Annotations array.
+     */
+    public function getAnnotations(): array {
+        $annotations = parent::getAnnotations();
+        $annotations['mcp.public'] = true;
+        return $annotations;
+    }
+
+    /**
      * Get the required WordPress capability.
      *
      * @return string WordPress capability name.

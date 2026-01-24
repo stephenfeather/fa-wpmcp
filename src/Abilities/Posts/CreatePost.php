@@ -182,6 +182,7 @@ final class CreatePost extends AbstractAbility {
     public function getAnnotations(): array {
         $annotations                = parent::getAnnotations();
         $annotations['idempotent']  = false;
+        $annotations['mcp.public']  = true;
         return $annotations;
     }
 
