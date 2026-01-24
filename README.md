@@ -47,6 +47,9 @@ Configure via WordPress options or filters (see [Configuration](#configuration))
 - **[Client Configuration](docs/MCP_CLIENT_CONFIGURATION.md)** - Claude, GPT, Gemini setup examples
 - **[Full API Documentation](docs/MCP_DOCUMENTATION.md)** - Complete reference
 
+**API Reference:**
+- **[REST API Endpoints](docs/REST_API_ENDPOINTS.md)** - Complete reference for all 87 REST endpoints
+
 ## MCP Server Integration
 
 The plugin includes a bundled **MCP (Model Context Protocol) server** that automatically exposes all WordPress abilities to AI assistants like Claude Desktop.
@@ -332,6 +335,15 @@ See the [Configuration Guide](docs/CONFIGURATION.md) for detailed examples, best
 
 ## Development
 
+**For comprehensive development documentation, see [Development Guide](docs/DEVELOPMENT.md).**
+
+This guide includes:
+- WordPress 6.9 Abilities API requirements (critical ordering constraints)
+- Step-by-step guide for adding new abilities
+- Category management and registration workflow
+- Testing patterns and debugging techniques
+- Best practices and code standards
+
 ### Project Structure
 
 ```
@@ -347,6 +359,11 @@ fa-wpmcp/
 │   └── Plugin.php          # Main plugin class
 ├── tests/
 │   └── phpunit/            # Unit tests
+├── docs/
+│   ├── DEVELOPMENT.md      # Comprehensive developer guide
+│   ├── ARCHITECTURE.md     # System architecture
+│   ├── CONFIGURATION.md    # Configuration options
+│   └── SECURITY.md         # Security guidelines
 ├── .phpcs.xml              # Code standards config
 ├── phpstan.neon            # Static analysis config
 ├── phpunit.xml             # Test configuration
@@ -387,7 +404,9 @@ Current coverage: **74.33%** (703 tests, 1543 assertions)
 
 ### Creating New Abilities
 
-Extend `AbstractAbility` to create custom abilities:
+**For detailed instructions, see [Development Guide](docs/DEVELOPMENT.md#adding-new-abilities).**
+
+Quick example - extend `AbstractAbility` to create custom abilities:
 
 ```php
 <?php
@@ -470,6 +489,13 @@ Register in `Plugin::init()`:
 ```php
 $ability_registry->register(new GetPostAbility());
 ```
+
+**Important:** When creating abilities, you must:
+1. Ensure the category is registered in `Plugin::registerAbilityCategories()`
+2. Use proper hook priorities (categories at priority 5, abilities at priority 15)
+3. Follow WordPress 6.9 Abilities API requirements
+
+See [Development Guide](docs/DEVELOPMENT.md) for complete details on category registration, hook priorities, and WordPress 6.9 API requirements.
 
 ### Testing Patterns
 
