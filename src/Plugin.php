@@ -257,21 +257,23 @@ final class Plugin {
 			wp_register_ability(
 				$registration['name'],
 				array(
-					'label'         => $registration['label'],
-					'description'   => $registration['description'],
-					'category'      => $registration['category'],
-					'show_in_rest'  => true,
-					'meta'          => array(
-						'input_schema'  => $registration['inputSchema'],
-						'output_schema' => $registration['outputSchema'],
+					'label'               => $registration['label'],
+					'description'         => $registration['description'],
+					'category'            => $registration['category'],
+					'input_schema'        => $registration['inputSchema'],
+					'output_schema'       => $registration['outputSchema'],
+					'meta'                => array(
 						'annotations'   => $registration['annotations'],
+						'show_in_rest'  => true,
 						'mcp'           => array(
 							'public' => true,
 							'type'   => 'tool',
 						),
 					),
-					'capability'    => $registration['requiredCapability'],
-					'callback'    => function ( array $input ) use ( $ability, $executor ) {
+					'permission_callback' => function () use ( $registration ) {
+						return current_user_can( $registration['requiredCapability'] );
+					},
+					'execute_callback'    => function ( array $input ) use ( $ability, $executor ) {
 						$result = $executor->execute( $ability->getName(), $input );
 
 						if ( ! $result->isSuccess() ) {
