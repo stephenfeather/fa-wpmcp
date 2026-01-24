@@ -437,6 +437,20 @@ curl -s http://localhost/wp-json/wp/v2/abilities \
 curl -s http://localhost/wp-json/wp/v2/abilities \
   --user username:app_password | \
   jq -r '.[].category' | sort | uniq -c
+
+# List all registered ability categories
+curl -s http://localhost/wp-json/wp-abilities/v1/categories \
+  --user username:app_password | \
+  jq '.[] | {slug, label, description}'
+
+# Check specific category details
+curl -s http://localhost/wp-json/wp-abilities/v1/categories/posts-pages \
+  --user username:app_password | jq '.'
+
+# Verify all plugin categories are registered
+curl -s http://localhost/wp-json/wp-abilities/v1/categories \
+  --user username:app_password | \
+  jq -r '.[].slug' | grep -E '^(posts-pages|comments|media|taxonomies|users|settings|plugins|themes|privacy)$'
 ```
 
 ## Best Practices
