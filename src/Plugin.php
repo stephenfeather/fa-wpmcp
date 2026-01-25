@@ -504,6 +504,32 @@ final class Plugin {
 
 		// Migrate webhook secrets from dual storage to canonical location.
 		\FAWpmcp\Database\SecretStorageMigration::migrate();
+
+		// Initialize default permission settings if not already set.
+		$this->initializePermissionSettings();
+	}
+
+	/**
+	 * Initialize default permission settings.
+	 *
+	 * Creates the fa_wpmcp_permissions option with safe defaults if it doesn't exist.
+	 * Defaults: global_read_enabled=true, global_write_enabled=false (safe by default).
+	 *
+	 * @return void
+	 */
+	private function initializePermissionSettings(): void {
+		$option_name = 'fa_wpmcp_permissions';
+
+		// Only create if option doesn't exist.
+		if ( false === get_option( $option_name ) ) {
+			$defaults = array(
+				'global_read_enabled'  => true,
+				'global_write_enabled' => false,
+				'category_settings'    => array(),
+				'ability_settings'     => array(),
+			);
+			add_option( $option_name, $defaults );
+		}
 	}
 
 	/**

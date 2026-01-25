@@ -262,14 +262,14 @@ final class AbilityExecutor {
         if ( 'read' === $operation && ! $this->permissionSettings->global_read_enabled ) {
             return Result::failure(
                 'ability_disabled',
-                'Global read operations are disabled.'
+                'Global read operations are disabled. Enable via WP Admin > Settings > FA WPMCP, or run: wp option update fa_wpmcp_permissions \'{"global_read_enabled":true,"global_write_enabled":false}\' --format=json'
             );
         }
 
         if ( 'write' === $operation && ! $this->permissionSettings->global_write_enabled ) {
             return Result::failure(
                 'ability_disabled',
-                'Global write operations are disabled.'
+                'Global write operations are disabled. Enable via WP Admin > Settings > FA WPMCP, or run: wp option update fa_wpmcp_permissions \'{"global_read_enabled":true,"global_write_enabled":true}\' --format=json'
             );
         }
 
