@@ -83,6 +83,7 @@ final class Plugin {
 		$this->registerThemeAbilities( $ability_registry );
 		$this->registerPrivacyAbilities( $ability_registry );
 		$this->registerCacheAbilities( $ability_registry );
+		$this->registerMaintenanceAbilities( $ability_registry );
 		$this->registerService( 'ability_registry', $ability_registry );
 
 		// Initialize Admin Settings Page.
@@ -458,6 +459,18 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Cache\FlushCache() );
 		$registry->register( new \FAWpmcp\Abilities\Cache\GetCacheStatus() );
 		$registry->register( new \FAWpmcp\Abilities\Cache\GetCacheType() );
+	}
+
+	/**
+	 * Register maintenance abilities.
+	 *
+	 * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private function registerMaintenanceAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Maintenance\ActivateMaintenanceMode() );
+		$registry->register( new \FAWpmcp\Abilities\Maintenance\DeactivateMaintenanceMode() );
+		$registry->register( new \FAWpmcp\Abilities\Maintenance\GetMaintenanceModeStatus() );
 	}
 
 	/**
