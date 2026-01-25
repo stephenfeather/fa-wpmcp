@@ -171,6 +171,8 @@ final class Plugin {
 					'plugins',
 					'themes',
 					'privacy',
+					'cache',
+					'maintenance',
 					'site',
 				);
 
@@ -251,6 +253,14 @@ final class Plugin {
 			'privacy' => array(
 				'label'       => __( 'Privacy', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress privacy requests (GDPR data export and erasure)', 'fa-wpmcp' ),
+			),
+			'cache' => array(
+				'label'       => __( 'Cache', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress object cache operations', 'fa-wpmcp' ),
+			),
+			'maintenance' => array(
+				'label'       => __( 'Maintenance', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress maintenance mode', 'fa-wpmcp' ),
 			),
 		);
 
@@ -375,6 +385,8 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Taxonomies\CreateTerm() );
 		$registry->register( new \FAWpmcp\Abilities\Taxonomies\UpdateTerm() );
 		$registry->register( new \FAWpmcp\Abilities\Taxonomies\DeleteTerm() );
+		$registry->register( new \FAWpmcp\Abilities\Taxonomies\ListTaxonomies() );
+		$registry->register( new \FAWpmcp\Abilities\Taxonomies\GetTaxonomy() );
 	}
 
 	/**
