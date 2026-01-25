@@ -53,6 +53,8 @@ class LogRepository {
      * @return int|false Insert ID or false on failure.
      */
     public function insert( LogEntry $entry ): int|false {
+        $ip_address = $this->maybeAnonymizeIp( $entry->ip_address );
+
         $result = $this->wpdb->insert(
             $this->tableName,
             array(
@@ -60,7 +62,7 @@ class LogRepository {
                 'timestamp'         => current_time( 'mysql' ),
                 'user_id'           => $entry->user_id,
                 'user_login'        => $entry->user_login,
-                'ip_address'        => $entry->ip_address,
+                'ip_address'        => $ip_address,
                 'ability_name'      => $entry->ability_name,
                 'ability_category'  => $entry->ability_category,
                 'operation_type'    => $entry->operation_type,
@@ -176,5 +178,91 @@ class LogRepository {
             )
         );
         // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+    }
+
+    /**
+     * Anonymize IP address if option is enabled.
+     *
+     * @param string $ip_address IP address to potentially anonymize.
+     * @return string Original or anonymized IP address.
+     */
+    private function maybeAnonymizeIp( string $ip_address ): string {
+        $should_anonymize = get_option( 'fa_wpmcp_anonymize_ip', true );
+
+        if ( ! $should_anonymize ) {
+            return $ip_address;
+        }
+
+        return $this->anonymizeIp( $ip_address );
+    }
+
+    /**
+     * Anonymize IP address for GDPR compliance.
+     *
+     * IPv4: Mask last octet (192.168.1.100 → 192.168.1.0)
+     * IPv6: Mask last 80 bits (2001:db8::1 → 2001:db8::)
+     *
+     * @param string $ip_address IP address to anonymize.
+     * @return string Anonymized IP address.
+     */
+    private function anonymizeIp( string $ip_address ): string {
+        // Handle empty or invalid input.
+        if ( empty( $ip_address ) ) {
+            return $ip_address;
+        }
+
+        // Check if IPv6.
+        if ( false !== strpos( $ip_address, ':' ) ) {
+            return $this->anonymizeIpv6( $ip_address );
+        }
+
+        // Assume IPv4.
+        return $this->anonymizeIpv4( $ip_address );
+    }
+
+    /**
+     * Anonymize IPv4 address by masking last octet.
+     *
+     * @param string $ip IPv4 address.
+     * @return string Anonymized IPv4 address.
+     */
+    private function anonymizeIpv4( string $ip ): string {
+        $binary = @inet_pton( $ip );
+
+        if ( false === $binary || 4 !== strlen( $binary ) ) {
+            // Invalid IPv4, return as-is.
+            return $ip;
+        }
+
+        // Mask last octet (set to 0).
+        $binary[3] = "\0";
+
+        $anonymized = inet_ntop( $binary );
+
+        return false !== $anonymized ? $anonymized : $ip;
+    }
+
+    /**
+     * Anonymize IPv6 address by masking last 80 bits (keep /48 prefix).
+     *
+     * @param string $ip IPv6 address.
+     * @return string Anonymized IPv6 address.
+     */
+    private function anonymizeIpv6( string $ip ): string {
+        $binary = @inet_pton( $ip );
+
+        if ( false === $binary || 16 !== strlen( $binary ) ) {
+            // Invalid IPv6, return as-is.
+            return $ip;
+        }
+
+        // Keep first 48 bits (6 bytes), zero out last 80 bits (10 bytes).
+        for ( $i = 6; $i < 16; $i++ ) {
+            $binary[ $i ] = "\0";
+        }
+
+        $anonymized = inet_ntop( $binary );
+
+        return false !== $anonymized ? $anonymized : $ip;
     }
 }
