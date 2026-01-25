@@ -41,8 +41,9 @@ final class WebhookManager implements WebhookManagerInterface {
      */
     public function trigger( string $event, array $context ): void {
         // Redact sensitive fields from input/output before building payload (pure functions).
-        $redacted_input  = PrivacyRedactor::redact( $context['input'] );
-        $redacted_output = PrivacyRedactor::redact( $context['output'] );
+        // Use empty arrays for missing values (e.g., 'output' isn't available in before_execute).
+        $redacted_input  = PrivacyRedactor::redact( $context['input'] ?? [] );
+        $redacted_output = isset( $context['output'] ) ? PrivacyRedactor::redact( $context['output'] ) : [];
 
         // Build payload (pure function).
         $payload = PayloadBuilder::build(
@@ -53,15 +54,15 @@ final class WebhookManager implements WebhookManagerInterface {
                 'operation' => $context['operation'],
             ],
             user: [
-                'user_id'    => $context['user_id'],
-                'user_login' => $context['user_login'],
-                'ip'         => $context['ip'],
+                'user_id'    => $context['user_id'] ?? 0,
+                'user_login' => $context['user_login'] ?? '',
+                'ip'         => $context['ip'] ?? '',
             ],
             execution: [
                 'input'             => $redacted_input,
                 'output'            => $redacted_output,
-                'success'           => $context['success'],
-                'execution_time_ms' => $context['execution_time_ms'],
+                'success'           => $context['success'] ?? false,
+                'execution_time_ms' => (int) ( $context['execution_time_ms'] ?? 0 ),
             ],
         );
 

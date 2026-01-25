@@ -153,6 +153,42 @@ final class Plugin {
 		// 6. Initialize MCP Adapter AFTER registering the hooks.
 		// This ensures our categories and abilities are registered before the adapter fires the hooks.
 		McpAdapter::instance();
+
+		// 7. Hook into MCP adapter server config to add FA-WPMCP abilities as tools.
+		// The MCP adapter only auto-discovers resources/prompts, not tools, so we must explicitly add them.
+		add_filter(
+			'mcp_adapter_default_server_config',
+			function ( $config ) {
+				$fa_wpmcp_categories = array(
+					'posts-pages',
+					'comments',
+					'media',
+					'taxonomies',
+					'users',
+					'settings',
+					'plugins',
+					'themes',
+					'privacy',
+					'site',
+				);
+
+				$fa_abilities = array();
+				foreach ( wp_get_abilities() as $ability ) {
+					$category = $ability->get_category();
+					if ( in_array( $category, $fa_wpmcp_categories, true ) ) {
+						$fa_abilities[] = $ability->get_name();
+					}
+				}
+
+				// Merge FA-WPMCP abilities with existing tools.
+				if ( ! empty( $fa_abilities ) ) {
+					$config['tools'] = array_merge( $config['tools'] ?? array(), $fa_abilities );
+				}
+
+				return $config;
+			},
+			10
+		);
 	}
 
 	/**
@@ -259,17 +295,24 @@ final class Plugin {
 						return current_user_can( $registration['requiredCapability'] );
 					},
 					'execute_callback'    => function ( array $input ) use ( $ability, $executor ) {
-						$result = $executor->execute( $ability->getName(), $input );
+						$current_user = wp_get_current_user();
+						$result       = $executor->execute(
+							$ability,
+							$input,
+							$current_user->ID,
+							$current_user->user_login ?? '',
+							$_SERVER['REMOTE_ADDR'] ?? '127.0.0.1'
+						);
 
-						if ( ! $result->isSuccess() ) {
+						if ( ! $result->is_success ) {
 							return new \WP_Error(
 								'ability_execution_failed',
-								$result->getErrorMessage(),
-								array( 'status' => $result->getHttpStatus() )
+								$result->error_message ?? 'Ability execution failed',
+								array( 'status' => 500 )
 							);
 						}
 
-						return $result->getData();
+						return $result->value;
 					},
 				)
 			);
@@ -456,8 +499,28 @@ final class Plugin {
 	 * @return void
 	 */
 	public function activate(): void {
+		// Create database tables.
+		$this->createDatabaseTables();
+
 		// Migrate webhook secrets from dual storage to canonical location.
 		\FAWpmcp\Database\SecretStorageMigration::migrate();
+	}
+
+	/**
+	 * Create database tables using dbDelta.
+	 *
+	 * @return void
+	 */
+	private function createDatabaseTables(): void {
+		global $wpdb;
+
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+		$schemas = \FAWpmcp\Database\Schema::getAllSchemas( $wpdb->prefix );
+
+		foreach ( $schemas as $sql ) {
+			dbDelta( $sql );
+		}
 	}
 
 	/**
