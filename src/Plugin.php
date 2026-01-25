@@ -330,6 +330,7 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Posts\ListPosts() );
 		$registry->register( new \FAWpmcp\Abilities\Posts\CreatePost() );
 		$registry->register( new \FAWpmcp\Abilities\Posts\UpdatePost() );
+		$registry->register( new \FAWpmcp\Abilities\Posts\DeletePost() );
 	}
 
 	/**
