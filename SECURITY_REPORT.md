@@ -41,7 +41,7 @@
 ### New Findings (aegis audit 2026-01-24)
 
 7. ✅ ~~**Debug Logging in Production**~~ - FIXED 2026-01-23 (removed 16 error_log statements)
-8. 🟠 **Webhook Secret Plain Text Storage** - MEDIUM severity
+8. ✅ ~~**Webhook Secret Plain Text Storage**~~ - FIXED 2026-01-25 (encrypt on save)
 9. 🟠 **IP Address Logged Without Anonymization** - GDPR concern
 10. ✅ ~~**SSRF Potential in Media URL Import**~~ - FIXED 2026-01-25 (added URL validation)
 11. 🟠 **Rate Limit Bypass via Multiple IPs** - MEDIUM severity
@@ -273,26 +273,30 @@ Added `validateUrlForSsrf()` method with comprehensive protection:
 
 ---
 
-### 2.5.2 Webhook Secret Stored in Plain Text (MEDIUM)
+### 2.5.2 Webhook Secret Stored in Plain Text (MEDIUM) ✅ FIXED
 
-**Location:** `src/Admin/SettingsPage.php:792-807`
+**Location:** `src/Admin/SettingsPage.php:797-802`
 **Vulnerability:** Sensitive Data Exposure
-**Risk:** Webhook secrets are stored directly in wp_options without encryption. Database access would expose the secret.
+**Status:** ✅ **FIXED 2026-01-25**
 
-**Evidence:**
+**Fix Applied:**
+Webhook secrets are now encrypted before storage using `SecretEncryptionFactory::create()->encrypt()`:
+- Uses XChaCha20-Poly1305 (libsodium) when available
+- Falls back to AES-256-GCM (OpenSSL) if sodium not available
+- Encrypted secrets use versioned prefix (`sodium:v1:` or `openssl:v1:`)
+- Decryption happens transparently when reading the secret for webhook delivery
+
+**Code Change:**
 ```php
-$settings = array(
-    'webhook_secret'    => $webhook_secret,  // Plain text
-    'webhook_endpoints' => $this->sanitizer->sanitizeWebhookEndpoints( $webhook_endpoints ),
-);
-update_option( 'fa_wpmcp_webhooks', $settings );
+// Before: Plain text storage
+update_option( 'fa_wpmcp_webhook_secret', $webhook_secret );
+
+// After: Encrypted storage
+$encryption = SecretEncryptionFactory::create();
+update_option( 'fa_wpmcp_webhook_secret', $encryption->encrypt( $webhook_secret ) );
 ```
 
-**Remediation:**
-1. Consider encrypting the webhook secret before storage using WordPress's built-in encryption functions or a custom encryption key
-2. Alternatively, use WordPress's secure options API if available in WP 6.9+
-
-**Priority:** 🟠 MEDIUM - Consider for v1.1
+**Priority:** ✅ RESOLVED
 
 ---
 
@@ -858,6 +862,7 @@ The aegis security audit (2026-01-24) identified these positive security impleme
 | ListUsers type error | 2026-01-25 | bfd8ef6 |
 | SSRF in Media URL Import | 2026-01-25 | Added `validateUrlForSsrf()` + 11 tests |
 | HTTPS Enforcement for Webhooks | 2026-01-25 | Enforce prod, warn dev/staging + 6 tests |
+| Webhook Secret Plain Text Storage | 2026-01-25 | Encrypt on save via SecretEncryptionFactory |
 
 ### Immediate Action Checklist
 

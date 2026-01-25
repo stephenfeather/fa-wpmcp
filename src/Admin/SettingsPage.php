@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Admin;
 
 use FAWpmcp\Abilities\AbilityRegistry;
+use FAWpmcp\Webhooks\SecretEncryptionFactory;
 
 /**
  * Admin settings page for managing plugin configuration.
@@ -794,9 +795,10 @@ final class SettingsPage {
         $webhook_endpoints = isset( $_POST['webhook_endpoints'] ) ? wp_unslash( $_POST['webhook_endpoints'] ) : array();
 
         // Save secret to canonical location (separate from webhooks array).
-        // Only update if new secret provided.
+        // Only update if new secret provided. Encrypt before storage.
         if ( ! empty( $webhook_secret ) ) {
-            update_option( 'fa_wpmcp_webhook_secret', $webhook_secret );
+            $encryption = SecretEncryptionFactory::create();
+            update_option( 'fa_wpmcp_webhook_secret', $encryption->encrypt( $webhook_secret ) );
         }
 
         // Save endpoints only (no secret in this array).

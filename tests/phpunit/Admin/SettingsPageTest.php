@@ -1427,6 +1427,17 @@ class SettingsPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_sanitizes_webhook_url_on_save(): void {
+		// Define WordPress salt constants if not already defined (required for encryption).
+		if ( ! defined( 'SECURE_AUTH_KEY' ) ) {
+			define( 'SECURE_AUTH_KEY', 'test-secure-auth-key-for-phpunit-testing-purposes-only' );
+		}
+		if ( ! defined( 'LOGGED_IN_KEY' ) ) {
+			define( 'LOGGED_IN_KEY', 'test-logged-in-key-for-phpunit-testing-purposes-only' );
+		}
+		if ( ! defined( 'NONCE_SALT' ) ) {
+			define( 'NONCE_SALT', 'test-nonce-salt-for-phpunit-testing-purposes-only' );
+		}
+
 		$_POST['fa_wpmcp_nonce']     = 'valid-nonce';
 		$_POST['action']             = 'fa_wpmcp_save_webhooks';
 		$_POST['webhook_endpoints']  = array(
@@ -1457,10 +1468,18 @@ class SettingsPageTest extends TestCase {
 		Functions\expect( 'sanitize_text_field' )
 			->andReturnFirstArg();
 
-		// Expect secret to be saved separately.
+		// Expect secret to be saved separately (encrypted).
 		Functions\expect( 'update_option' )
 			->once()
-			->with( 'fa_wpmcp_webhook_secret', 'my-secret-key' );
+			->with(
+				'fa_wpmcp_webhook_secret',
+				Mockery::on( function ( $value ) {
+					// Should be encrypted (sodium:v1: or openssl:v1: prefix).
+					return is_string( $value ) &&
+						   ( str_starts_with( $value, 'sodium:v1:' ) ||
+							 str_starts_with( $value, 'openssl:v1:' ) );
+				})
+			);
 
 		// Expect endpoints to be saved (without secret).
 		Functions\expect( 'update_option' )
