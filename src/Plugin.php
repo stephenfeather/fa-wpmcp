@@ -77,6 +77,7 @@ final class Plugin {
 		$this->registerCommentAbilities( $ability_registry );
 		$this->registerMediaAbilities( $ability_registry );
 		$this->registerTaxonomyAbilities( $ability_registry );
+		$this->registerPostTypeAbilities( $ability_registry );
 		$this->registerUserAbilities( $ability_registry );
 		$this->registerSettingsAbilities( $ability_registry );
 		$this->registerPluginAbilities( $ability_registry );
@@ -234,6 +235,10 @@ final class Plugin {
 				'label'       => __( 'Taxonomies', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress terms, categories, and tags', 'fa-wpmcp' ),
 			),
+			'post-types' => array(
+				'label'       => __( 'Post Types', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for inspecting registered WordPress post type definitions', 'fa-wpmcp' ),
+			),
 			'users' => array(
 				'label'       => __( 'Users', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress user accounts and profiles', 'fa-wpmcp' ),
@@ -387,6 +392,17 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Taxonomies\DeleteTerm() );
 		$registry->register( new \FAWpmcp\Abilities\Taxonomies\ListTaxonomies() );
 		$registry->register( new \FAWpmcp\Abilities\Taxonomies\GetTaxonomy() );
+	}
+
+	/**
+	 * Register Post Type abilities with the registry.
+	 *
+	 * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private function registerPostTypeAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\PostTypes\ListPostTypes() );
+		$registry->register( new \FAWpmcp\Abilities\PostTypes\GetPostType() );
 	}
 
 	/**

@@ -178,14 +178,15 @@ class PluginTest extends TestCase {
 
 		$this->assertInstanceOf( \FAWpmcp\Abilities\AbilityRegistry::class, $registry );
 
-		// Verify all 4 Post abilities are registered.
+		// Verify all 5 Post abilities are registered.
 		$this->assertTrue( $registry->has( 'fa-wpmcp/get-post' ), 'GetPost ability should be registered' );
 		$this->assertTrue( $registry->has( 'fa-wpmcp/list-posts' ), 'ListPosts ability should be registered' );
 		$this->assertTrue( $registry->has( 'fa-wpmcp/create-post' ), 'CreatePost ability should be registered' );
 		$this->assertTrue( $registry->has( 'fa-wpmcp/update-post' ), 'UpdatePost ability should be registered' );
+		$this->assertTrue( $registry->has( 'fa-wpmcp/delete-post' ), 'DeletePost ability should be registered' );
 
 		// Verify they are in the correct category.
 		$post_abilities = $registry->byCategory( 'posts-pages' );
-		$this->assertCount( 4, $post_abilities, 'Should have 4 abilities in posts-pages category' );
+		$this->assertCount( 5, $post_abilities, 'Should have 5 abilities in posts-pages category' );
 	}
 }
