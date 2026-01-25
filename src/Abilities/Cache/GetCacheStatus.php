@@ -148,9 +148,10 @@ final class GetCacheStatus extends AbstractAbility {
 		);
 
 		// Get global groups if available.
+		// Note: global_groups is an associative array where values are the group names.
 		$global_groups = array();
 		if ( isset( $wp_object_cache ) && isset( $wp_object_cache->global_groups ) ) {
-			$global_groups = array_keys( (array) $wp_object_cache->global_groups );
+			$global_groups = array_values( (array) $wp_object_cache->global_groups );
 		}
 
 		// Get non-persistent groups if available.
