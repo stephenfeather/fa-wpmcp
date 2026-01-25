@@ -85,6 +85,7 @@ final class Plugin {
 		$this->registerPrivacyAbilities( $ability_registry );
 		$this->registerCacheAbilities( $ability_registry );
 		$this->registerMaintenanceAbilities( $ability_registry );
+		$this->registerTransientAbilities( $ability_registry );
 		$this->registerService( 'ability_registry', $ability_registry );
 
 		// Initialize Admin Settings Page.
@@ -174,6 +175,7 @@ final class Plugin {
 					'privacy',
 					'cache',
 					'maintenance',
+					'transients',
 					'site',
 				);
 
@@ -266,6 +268,10 @@ final class Plugin {
 			'maintenance' => array(
 				'label'       => __( 'Maintenance', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress maintenance mode', 'fa-wpmcp' ),
+			),
+			'transients' => array(
+				'label'       => __( 'Transients', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress transient cache entries', 'fa-wpmcp' ),
 			),
 		);
 
@@ -499,6 +505,19 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Maintenance\ActivateMaintenanceMode() );
 		$registry->register( new \FAWpmcp\Abilities\Maintenance\DeactivateMaintenanceMode() );
 		$registry->register( new \FAWpmcp\Abilities\Maintenance\GetMaintenanceModeStatus() );
+	}
+
+	/**
+	 * Register transient abilities.
+	 *
+	 * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private function registerTransientAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Transients\GetTransient() );
+		$registry->register( new \FAWpmcp\Abilities\Transients\ListTransients() );
+		$registry->register( new \FAWpmcp\Abilities\Transients\SetTransient() );
+		$registry->register( new \FAWpmcp\Abilities\Transients\DeleteTransient() );
 	}
 
 	/**
