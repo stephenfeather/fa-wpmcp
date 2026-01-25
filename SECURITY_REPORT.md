@@ -45,7 +45,7 @@
 9. 🟠 **IP Address Logged Without Anonymization** - GDPR concern
 10. ✅ ~~**SSRF Potential in Media URL Import**~~ - FIXED 2026-01-25 (added URL validation)
 11. 🟠 **Rate Limit Bypass via Multiple IPs** - MEDIUM severity
-12. 🟡 **Missing HTTPS Enforcement for Webhooks** - LOW severity
+12. ✅ ~~**Missing HTTPS Enforcement for Webhooks**~~ - FIXED 2026-01-25
 13. 🟡 **Weak Password Acceptance** - LOW severity
 14. 🟡 **Admin Role Assignable via API** - LOW severity
 
@@ -342,9 +342,9 @@ $result = $this->rateLimiter->check(
 
 ### 2.5.5 Low-Severity Findings
 
-| Finding | Location | Risk | Recommendation |
-|---------|----------|------|----------------|
-| Missing HTTPS Enforcement | `src/Admin/SettingsSanitizer.php:140` | Webhook data exposed over HTTP | Warn users when HTTP URLs configured |
+| Finding | Location | Risk | Status |
+|---------|----------|------|--------|
+| ~~Missing HTTPS Enforcement~~ | `src/Admin/SettingsSanitizer.php` | ~~Webhook data exposed over HTTP~~ | ✅ FIXED - Enforced in production, warned in dev/staging |
 | Weak Password Acceptance | `src/Abilities/Users/CreateUser.php:222` | No strength validation | Document that WP core handles policy |
 | Admin Role via API | `src/Abilities/Users/CreateUser.php:31` | High-privilege role assignable | Add config option to limit max role |
 | Plugin Install Stubs | `src/Abilities/Plugins/InstallPlugin.php` | Future risk | Consider not registering until implemented |
@@ -857,6 +857,7 @@ The aegis security audit (2026-01-24) identified these positive security impleme
 | Comment getOperationType() | 2026-01-25 | c599b4b |
 | ListUsers type error | 2026-01-25 | bfd8ef6 |
 | SSRF in Media URL Import | 2026-01-25 | Added `validateUrlForSsrf()` + 11 tests |
+| HTTPS Enforcement for Webhooks | 2026-01-25 | Enforce prod, warn dev/staging + 6 tests |
 
 ### Immediate Action Checklist
 
