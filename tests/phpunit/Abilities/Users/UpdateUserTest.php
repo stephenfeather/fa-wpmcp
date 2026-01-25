@@ -37,6 +37,18 @@ class UpdateUserTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Monkey\setUp();
+
+		// Default mock for RolePolicy's get_option call.
+		// Tests can override this as needed.
+		Functions\when( 'get_option' )
+			->alias(
+				function ( $option, $default = false ) {
+					if ( 'fa_wpmcp_max_api_role' === $option ) {
+						return 'editor'; // Default max role for tests.
+					}
+					return $default;
+				}
+			);
 	}
 
 	/**
@@ -227,7 +239,9 @@ class UpdateUserTest extends TestCase {
 	}
 
 	/**
-	 * Test validate role with valid role.
+	 * Test validate role with valid role within max allowed.
+	 *
+	 * With default max role of 'editor', roles like editor, author, etc. should be allowed.
 	 *
 	 * @return void
 	 */
@@ -237,9 +251,10 @@ class UpdateUserTest extends TestCase {
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'validateRole' );
 
-		$result = $method->invoke( $ability, 'administrator' );
+		// Editor is within the default max role limit.
+		$result = $method->invoke( $ability, 'editor' );
 
-		$this->assertEquals( 'administrator', $result );
+		$this->assertEquals( 'editor', $result );
 	}
 
 	/**

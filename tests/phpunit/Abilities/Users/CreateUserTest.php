@@ -35,6 +35,18 @@ class CreateUserTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Monkey\setUp();
+
+		// Default mock for RolePolicy's get_option call.
+		// Tests can override this as needed.
+		Functions\when( 'get_option' )
+			->alias(
+				function ( $option, $default = false ) {
+					if ( 'fa_wpmcp_max_api_role' === $option ) {
+						return 'editor'; // Default max role for tests.
+					}
+					return $default;
+				}
+			);
 	}
 
 	/**

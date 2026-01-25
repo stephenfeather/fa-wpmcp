@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Users;
 
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Exceptions\RoleNotAllowedException;
 use FAWpmcp\Exceptions\UserCreationException;
 
 /**
@@ -24,17 +25,20 @@ use FAWpmcp\Exceptions\UserCreationException;
  */
 final class CreateUser extends AbstractAbility {
 	/**
-	 * Valid user roles.
+	 * Role policy for validating role assignments.
 	 *
-	 * @var array<string>
+	 * @var RolePolicy
 	 */
-	private const VALID_ROLES = array(
-		'administrator',
-		'editor',
-		'author',
-		'contributor',
-		'subscriber',
-	);
+	private RolePolicy $role_policy;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param RolePolicy|null $role_policy Optional role policy instance.
+	 */
+	public function __construct( ?RolePolicy $role_policy = null ) {
+		$this->role_policy = $role_policy ?? new RolePolicy();
+	}
 
 	/**
 	 * Get the unique ability name.
@@ -96,8 +100,11 @@ final class CreateUser extends AbstractAbility {
 				),
 				'role'         => array(
 					'type'        => 'string',
-					'description' => 'User role (defaults to subscriber).',
-					'enum'        => self::VALID_ROLES,
+					'description' => sprintf(
+						'User role (defaults to subscriber). Maximum assignable role: %s.',
+						$this->role_policy->getMaxRole()
+					),
+					'enum'        => array_values( $this->role_policy->getAllowedRoles() ),
 					'default'     => 'subscriber',
 				),
 				'first_name'   => array(
@@ -195,6 +202,7 @@ final class CreateUser extends AbstractAbility {
 	 *
 	 * @param array<string, mixed> $input Validated input data.
 	 * @return array<string, mixed> Created user data.
+	 * @throws RoleNotAllowedException If role exceeds max allowed.
 	 * @throws UserCreationException If user creation fails.
 	 */
 	public function doExecute( array $input ): array {
@@ -267,17 +275,24 @@ final class CreateUser extends AbstractAbility {
 	}
 
 	/**
-	 * Validate user role.
+	 * Validate user role against policy.
 	 *
-	 * Pure function - returns valid role or default.
+	 * Validates that the role is allowed per the max API role configuration.
+	 * Falls back to subscriber for unknown roles.
 	 *
 	 * @param string $role Input role.
 	 * @return string Valid role.
+	 * @throws RoleNotAllowedException If role exceeds max allowed.
 	 */
 	private function validateRole( string $role ): string {
-		if ( in_array( $role, self::VALID_ROLES, true ) ) {
+		// First check if it's a standard role that exceeds max allowed.
+		$this->role_policy->validateRole( $role );
+
+		// For standard roles, return as-is. For unknown roles, default to subscriber.
+		if ( $this->role_policy->isStandardRole( $role ) ) {
 			return $role;
 		}
+
 		return 'subscriber';
 	}
 

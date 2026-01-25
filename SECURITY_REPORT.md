@@ -22,7 +22,7 @@
 ### Overall Security Posture
 
 - **Security Rating:** ✅ **A** (Excellent)
-- **Risk Level:** MEDIUM (0 critical, 1 high, 4 medium, 5 low)
+- **Risk Level:** LOW (0 critical, 1 high, 2 medium, 5 low)
 - **Vulnerabilities:** ✅ **0** detected
 - **Security Hotspots:** ⚠️ **1** requires manual review
 - **Open Issues:** **13** medium-high severity (75 total including closed/low)
@@ -42,9 +42,9 @@
 
 7. ✅ ~~**Debug Logging in Production**~~ - FIXED 2026-01-23 (removed 16 error_log statements)
 8. ✅ ~~**Webhook Secret Plain Text Storage**~~ - FIXED 2026-01-25 (encrypt on save)
-9. 🟠 **IP Address Logged Without Anonymization** - GDPR concern
+9. ✅ ~~**IP Address Logged Without Anonymization**~~ - FIXED 2026-01-25 (opt-out anonymization)
 10. ✅ ~~**SSRF Potential in Media URL Import**~~ - FIXED 2026-01-25 (added URL validation)
-11. 🟠 **Rate Limit Bypass via Multiple IPs** - MEDIUM severity
+11. ✅ ~~**Rate Limit Bypass via Multiple IPs**~~ - FIXED 2026-01-25 (user-based rate limiting)
 12. ✅ ~~**Missing HTTPS Enforcement for Webhooks**~~ - FIXED 2026-01-25
 13. 🟡 **Weak Password Acceptance** - LOW severity
 14. 🟡 **Admin Role Assignable via API** - LOW severity
@@ -300,47 +300,53 @@ update_option( 'fa_wpmcp_webhook_secret', $encryption->encrypt( $webhook_secret 
 
 ---
 
-### 2.5.3 IP Address Logged Without Anonymization (MEDIUM)
+### 2.5.3 IP Address Logged Without Anonymization (MEDIUM) ✅ FIXED
 
 **Location:** `src/Logging/LogRepository.php:63`
 **Vulnerability:** Privacy/GDPR Concern
-**Risk:** Full IP addresses are stored in activity logs, which may violate GDPR requirements in some jurisdictions.
+**Status:** ✅ **FIXED 2026-01-25**
 
-**Evidence:**
-```php
-'ip_address' => $entry->ip_address,  // Full IP stored
-```
+**Fix Applied:**
+Added IP anonymization with opt-out option `fa_wpmcp_anonymize_ip` (defaults to TRUE):
+1. ✅ IPv4: Masks last octet (e.g., `192.168.1.100` → `192.168.1.0`)
+2. ✅ IPv6: Masks last 80 bits, keeps /48 prefix (e.g., `2001:db8::1` → `2001:db8::`)
+3. ✅ Uses `inet_pton()`/`inet_ntop()` for proper binary IP handling
+4. ✅ Invalid IPs preserved as-is to avoid data loss
 
-**Remediation:**
-1. Add an option to anonymize IP addresses (mask last octet for IPv4, last 80 bits for IPv6)
-2. Document data retention policy for activity logs
-3. Implement automatic log purging (note: `deleteOlderThan()` exists but needs scheduled execution)
+**Tests Added:** 7 new test cases covering IPv4, IPv6, edge cases, and option toggle.
 
-**Priority:** 🟠 MEDIUM - Document for GDPR-conscious deployments
+**Remaining (documentation):**
+- Document data retention policy for activity logs
+- Schedule automatic log purging via `deleteOlderThan()`
+
+**Priority:** ✅ RESOLVED
 
 ---
 
-### 2.5.4 Rate Limit Bypass via Multiple IP Addresses (MEDIUM)
+### 2.5.4 Rate Limit Bypass via Multiple IP Addresses (MEDIUM) ✅ FIXED
 
 **Location:** `src/Abilities/AbilityExecutor.php:317-334`
 **Vulnerability:** Rate Limiting Bypass
-**Risk:** Rate limiting is per-IP and per-ability, allowing distributed attacks from multiple IPs.
+**Status:** ✅ **FIXED 2026-01-25**
 
-**Evidence:**
-```php
-$result = $this->rateLimiter->check(
-    $context['ability_name'],
-    $context['user_id'],
-    $context['ip_address']  // Rate limit keyed on IP
-);
-```
+**Fix Applied:**
+Rate limiter now checks BOTH IP-based AND user-based limits:
+1. ✅ Requests denied if EITHER limit is exceeded
+2. ✅ Anonymous users (user_id=0) skip user-based checks
+3. ✅ `record()` increments both IP and user counters
+4. ✅ Separate key builders: `buildIpKey()` and `buildUserKey()`
 
-**Remediation:**
-1. Implement user-based rate limiting in addition to IP-based
-2. Consider global rate limits across all abilities
-3. Add burst protection for sudden spikes
+**Security Improvement:**
+- **Before:** Distributed attacks from one account across multiple IPs bypassed limits
+- **After:** User-based limits prevent abuse regardless of IP rotation
 
-**Priority:** 🟡 LOW - Hardening for v1.1+
+**Tests Added:** 14 new test cases (6 in RateLimiterTest, 8 in RateLimitCalculatorTest)
+
+**Remaining (future hardening):**
+- Consider global rate limits across all abilities
+- Add burst protection for sudden spikes
+
+**Priority:** ✅ RESOLVED
 
 ---
 
@@ -350,7 +356,7 @@ $result = $this->rateLimiter->check(
 |---------|----------|------|--------|
 | ~~Missing HTTPS Enforcement~~ | `src/Admin/SettingsSanitizer.php` | ~~Webhook data exposed over HTTP~~ | ✅ FIXED - Enforced in production, warned in dev/staging |
 | Weak Password Acceptance | `src/Abilities/Users/CreateUser.php:222` | No strength validation | Document that WP core handles policy |
-| Admin Role via API | `src/Abilities/Users/CreateUser.php:31` | High-privilege role assignable | Add config option to limit max role |
+| ~~Admin Role via API~~ | `src/Abilities/Users/CreateUser.php:31` | ~~High-privilege role assignable~~ | ✅ FIXED - `fa_wpmcp_max_api_role` option (default: editor) |
 | Plugin Install Stubs | `src/Abilities/Plugins/InstallPlugin.php` | Future risk | Consider not registering until implemented |
 
 ---
@@ -863,6 +869,9 @@ The aegis security audit (2026-01-24) identified these positive security impleme
 | SSRF in Media URL Import | 2026-01-25 | Added `validateUrlForSsrf()` + 11 tests |
 | HTTPS Enforcement for Webhooks | 2026-01-25 | Enforce prod, warn dev/staging + 6 tests |
 | Webhook Secret Plain Text Storage | 2026-01-25 | Encrypt on save via SecretEncryptionFactory |
+| IP Address Anonymization | 2026-01-25 | Opt-out anonymization + 7 tests |
+| Rate Limit Bypass | 2026-01-25 | User-based rate limiting + 14 tests |
+| Admin Role via API | 2026-01-25 | RolePolicy with `fa_wpmcp_max_api_role` option + 17 tests |
 
 ### Immediate Action Checklist
 
