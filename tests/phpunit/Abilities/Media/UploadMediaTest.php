@@ -293,4 +293,195 @@ class UploadMediaTest extends TestCase {
 		$this->assertArrayHasKey( 'url', $schema['properties'] );
 		$this->assertArrayHasKey( 'mime_type', $schema['properties'] );
 	}
+
+	/**
+	 * Test SSRF protection blocks invalid URL format.
+	 *
+	 * @return void
+	 */
+	public function testSsrfProtectionBlocksInvalidUrlFormat(): void {
+		$ability = new UploadMedia();
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'Invalid URL format' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'not-a-valid-url',
+			)
+		);
+	}
+
+	/**
+	 * Test SSRF protection blocks non-http schemes.
+	 *
+	 * @return void
+	 */
+	public function testSsrfProtectionBlocksNonHttpSchemes(): void {
+		$ability = new UploadMedia();
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'URL scheme must be http or https' );
+
+		// Use gopher scheme with a host to test scheme validation.
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'gopher://example.com/file.jpg',
+			)
+		);
+	}
+
+	/**
+	 * Test SSRF protection blocks ftp scheme.
+	 *
+	 * @return void
+	 */
+	public function testSsrfProtectionBlocksFtpScheme(): void {
+		$ability = new UploadMedia();
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'URL scheme must be http or https' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'ftp://example.com/file.jpg',
+			)
+		);
+	}
+
+	/**
+	 * Test SSRF protection blocks localhost.
+	 *
+	 * @return void
+	 */
+	public function testSsrfProtectionBlocksLocalhost(): void {
+		$ability = new UploadMedia();
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'URLs pointing to localhost are not allowed' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'http://localhost/file.jpg',
+			)
+		);
+	}
+
+	/**
+	 * Test SSRF protection blocks 127.0.0.1.
+	 *
+	 * @return void
+	 */
+	public function testSsrfProtectionBlocksLoopbackIp(): void {
+		$ability = new UploadMedia();
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'URLs pointing to localhost are not allowed' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'http://127.0.0.1/file.jpg',
+			)
+		);
+	}
+
+	/**
+	 * Test SSRF protection blocks 0.0.0.0.
+	 *
+	 * @return void
+	 */
+	public function testSsrfProtectionBlocksZeroIp(): void {
+		$ability = new UploadMedia();
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'URLs pointing to localhost are not allowed' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'http://0.0.0.0/file.jpg',
+			)
+		);
+	}
+
+	/**
+	 * Test SSRF protection blocks private IP range 10.x.x.x.
+	 *
+	 * @return void
+	 */
+	public function testSsrfProtectionBlocksPrivateIpRange10(): void {
+		$ability = new UploadMedia();
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'URLs pointing to private or reserved IP ranges are not allowed' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'http://10.0.0.1/file.jpg',
+			)
+		);
+	}
+
+	/**
+	 * Test SSRF protection blocks private IP range 172.16.x.x.
+	 *
+	 * @return void
+	 */
+	public function testSsrfProtectionBlocksPrivateIpRange172(): void {
+		$ability = new UploadMedia();
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'URLs pointing to private or reserved IP ranges are not allowed' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'http://172.16.0.1/file.jpg',
+			)
+		);
+	}
+
+	/**
+	 * Test SSRF protection blocks private IP range 192.168.x.x.
+	 *
+	 * @return void
+	 */
+	public function testSsrfProtectionBlocksPrivateIpRange192(): void {
+		$ability = new UploadMedia();
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'URLs pointing to private or reserved IP ranges are not allowed' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'http://192.168.1.1/file.jpg',
+			)
+		);
+	}
+
+	/**
+	 * Test SSRF protection blocks IPv6 localhost.
+	 *
+	 * @return void
+	 */
+	public function testSsrfProtectionBlocksIpv6Localhost(): void {
+		$ability = new UploadMedia();
+
+		$this->expectException( MediaUploadException::class );
+		$this->expectExceptionMessage( 'URLs pointing to localhost are not allowed' );
+
+		$ability->doExecute(
+			array(
+				'filename' => 'test.jpg',
+				'url'      => 'http://[::1]/file.jpg',
+			)
+		);
+	}
 }

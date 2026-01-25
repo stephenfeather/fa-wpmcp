@@ -235,12 +235,16 @@ final class UploadMedia extends AbstractAbility {
 	 * Fetch file data from URL.
 	 *
 	 * Side effect function - makes HTTP request.
+	 * Includes SSRF protection to prevent requests to internal networks.
 	 *
 	 * @param string $url URL to fetch from.
 	 * @return string File data.
-	 * @throws MediaUploadException If fetch fails.
+	 * @throws MediaUploadException If fetch fails or URL is invalid.
 	 */
 	private function fetchFromUrl( string $url ): string {
+		// Validate URL for SSRF protection.
+		$this->validateUrlForSsrf( $url );
+
 		$response = wp_remote_get( $url, array( 'timeout' => 30 ) );
 
 		if ( is_wp_error( $response ) ) {
@@ -257,6 +261,76 @@ final class UploadMedia extends AbstractAbility {
 		}
 
 		return $body;
+	}
+
+	/**
+	 * Validate URL to prevent SSRF attacks.
+	 *
+	 * Checks that the URL uses a safe scheme and does not point to
+	 * internal/private network addresses.
+	 *
+	 * @param string $url URL to validate.
+	 * @return void
+	 * @throws MediaUploadException If URL fails validation.
+	 */
+	private function validateUrlForSsrf( string $url ): void {
+		// Parse the URL using native PHP function.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- Using native for testability; wp_parse_url is just a wrapper.
+		$parsed = parse_url( $url );
+
+		if ( false === $parsed || ! isset( $parsed['scheme'], $parsed['host'] ) ) {
+			throw new MediaUploadException( 'Invalid URL format' );
+		}
+
+		// Only allow http and https schemes.
+		$scheme = strtolower( $parsed['scheme'] );
+		if ( ! in_array( $scheme, array( 'http', 'https' ), true ) ) {
+			throw new MediaUploadException( 'URL scheme must be http or https' );
+		}
+
+		$host = strtolower( $parsed['host'] );
+
+		// Block localhost variations.
+		$blocked_hosts = array(
+			'localhost',
+			'127.0.0.1',
+			'::1',
+			'0.0.0.0',
+			'[::1]',
+		);
+
+		if ( in_array( $host, $blocked_hosts, true ) ) {
+			throw new MediaUploadException( 'URLs pointing to localhost are not allowed' );
+		}
+
+		// Resolve hostname to IP address for further validation.
+		$ip = gethostbyname( $host );
+
+		// If gethostbyname returns the hostname, it couldn't resolve.
+		if ( $ip === $host && ! filter_var( $host, FILTER_VALIDATE_IP ) ) {
+			throw new MediaUploadException( 'Could not resolve hostname' );
+		}
+
+		// Validate the resolved IP is not in a private/reserved range.
+		if ( ! $this->isPublicIp( $ip ) ) {
+			throw new MediaUploadException( 'URLs pointing to private or reserved IP ranges are not allowed' );
+		}
+	}
+
+	/**
+	 * Check if an IP address is public (not private or reserved).
+	 *
+	 * Pure function - validates IP against private/reserved ranges.
+	 *
+	 * @param string $ip IP address to check.
+	 * @return bool True if IP is public, false if private/reserved.
+	 */
+	private function isPublicIp( string $ip ): bool {
+		// Use PHP's filter_var with appropriate flags.
+		// This checks against RFC 1918 private ranges, loopback, link-local, etc.
+		$flags = FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
+
+		return false !== filter_var( $ip, FILTER_VALIDATE_IP, $flags );
 	}
 
 	/**
