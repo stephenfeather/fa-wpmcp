@@ -343,6 +343,7 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Comments\ListComments() );
 		$registry->register( new \FAWpmcp\Abilities\Comments\CreateComment() );
 		$registry->register( new \FAWpmcp\Abilities\Comments\UpdateComment() );
+		$registry->register( new \FAWpmcp\Abilities\Comments\DeleteComment() );
 	}
 
 	/**
