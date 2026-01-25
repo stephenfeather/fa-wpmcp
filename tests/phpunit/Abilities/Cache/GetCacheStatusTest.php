@@ -93,7 +93,8 @@ final class GetCacheStatusTest extends TestCase {
 	public function test_returns_global_groups_when_available(): void {
 		global $wp_object_cache;
 		$wp_object_cache = new \stdClass();
-		$wp_object_cache->global_groups = array( 'users' => true, 'site-options' => true );
+		// WordPress stores global_groups as numerically-indexed array with group names as values.
+		$wp_object_cache->global_groups = array( 'users', 'site-options' );
 
 		Functions\expect( 'wp_using_ext_object_cache' )->once()->andReturn( true );
 		Functions\expect( 'wp_cache_supports' )->times( 6 )->andReturn( false );
