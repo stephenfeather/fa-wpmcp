@@ -64,7 +64,7 @@ final class DeactivateMaintenanceMode extends AbstractAbility {
 	public function getInputSchema(): array {
 		return array(
 			'type'       => 'object',
-			'properties' => array(),
+			'properties' => new \stdClass(),
 		);
 	}
 
@@ -118,6 +118,7 @@ final class DeactivateMaintenanceMode extends AbstractAbility {
 	 */
 	public function getAnnotations(): array {
 		$annotations               = parent::getAnnotations();
+		$annotations['mcp.public'] = true;
 		$annotations['idempotent'] = true;
 		return $annotations;
 	}

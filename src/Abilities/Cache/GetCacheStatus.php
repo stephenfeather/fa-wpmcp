@@ -64,7 +64,7 @@ final class GetCacheStatus extends AbstractAbility {
 	public function getInputSchema(): array {
 		return array(
 			'type'       => 'object',
-			'properties' => array(),
+			'properties' => new \stdClass(),
 		);
 	}
 
@@ -105,6 +105,17 @@ final class GetCacheStatus extends AbstractAbility {
 				),
 			),
 		);
+	}
+
+	/**
+	 * Get ability annotations.
+	 *
+	 * @return array<string, mixed> Annotations array.
+	 */
+	public function getAnnotations(): array {
+		$annotations               = parent::getAnnotations();
+		$annotations['mcp.public'] = true;
+		return $annotations;
 	}
 
 	/**

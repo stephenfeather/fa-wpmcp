@@ -141,6 +141,7 @@ final class ActivateMaintenanceMode extends AbstractAbility {
 	 */
 	public function getAnnotations(): array {
 		$annotations               = parent::getAnnotations();
+		$annotations['mcp.public'] = true;
 		$annotations['idempotent'] = true;
 		return $annotations;
 	}
