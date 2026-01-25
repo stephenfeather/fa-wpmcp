@@ -413,4 +413,89 @@ class RateLimitCalculatorTest extends TestCase {
 		$this->assertEquals( $result1->allowed, $result2->allowed );
 		$this->assertEquals( $result1->limit_type, $result2->limit_type );
 	}
+
+	/**
+	 * Test buildIpKey produces consistent output.
+	 *
+	 * @return void
+	 */
+	public function test_buildIpKey_produces_consistent_output(): void {
+		$key1 = RateLimitCalculator::buildIpKey( '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$key2 = RateLimitCalculator::buildIpKey( '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+
+		$this->assertEquals( $key1, $key2 );
+	}
+
+	/**
+	 * Test buildIpKey hashes IP for privacy.
+	 *
+	 * @return void
+	 */
+	public function test_buildIpKey_hashes_ip(): void {
+		$key = RateLimitCalculator::buildIpKey( '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+
+		$this->assertStringNotContainsString( '192.168.1.1', $key );
+		$this->assertStringContainsString( '_ip_', $key );
+	}
+
+	/**
+	 * Test buildIpKey different IPs produce different keys.
+	 *
+	 * @return void
+	 */
+	public function test_buildIpKey_different_ips_different_keys(): void {
+		$key1 = RateLimitCalculator::buildIpKey( '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$key2 = RateLimitCalculator::buildIpKey( '192.168.1.2', 'fa-wpmcp/list-posts', 'minute' );
+
+		$this->assertNotEquals( $key1, $key2 );
+	}
+
+	/**
+	 * Test buildUserKey produces consistent output.
+	 *
+	 * @return void
+	 */
+	public function test_buildUserKey_produces_consistent_output(): void {
+		$key1 = RateLimitCalculator::buildUserKey( 1, 'fa-wpmcp/list-posts', 'minute' );
+		$key2 = RateLimitCalculator::buildUserKey( 1, 'fa-wpmcp/list-posts', 'minute' );
+
+		$this->assertEquals( $key1, $key2 );
+	}
+
+	/**
+	 * Test buildUserKey includes user ID.
+	 *
+	 * @return void
+	 */
+	public function test_buildUserKey_includes_user_id(): void {
+		$key = RateLimitCalculator::buildUserKey( 123, 'fa-wpmcp/list-posts', 'minute' );
+
+		$this->assertStringContainsString( '_user_123_', $key );
+	}
+
+	/**
+	 * Test buildUserKey different users produce different keys.
+	 *
+	 * @return void
+	 */
+	public function test_buildUserKey_different_users_different_keys(): void {
+		$key1 = RateLimitCalculator::buildUserKey( 1, 'fa-wpmcp/list-posts', 'minute' );
+		$key2 = RateLimitCalculator::buildUserKey( 2, 'fa-wpmcp/list-posts', 'minute' );
+
+		$this->assertNotEquals( $key1, $key2 );
+	}
+
+	/**
+	 * Test buildIpKey and buildUserKey produce different keys.
+	 *
+	 * @return void
+	 */
+	public function test_ip_and_user_keys_are_different(): void {
+		$ip_key   = RateLimitCalculator::buildIpKey( '192.168.1.1', 'fa-wpmcp/list-posts', 'minute' );
+		$user_key = RateLimitCalculator::buildUserKey( 1, 'fa-wpmcp/list-posts', 'minute' );
+
+		$this->assertNotEquals( $ip_key, $user_key );
+		$this->assertStringContainsString( '_ip_', $ip_key );
+		$this->assertStringContainsString( '_user_', $user_key );
+	}
 }

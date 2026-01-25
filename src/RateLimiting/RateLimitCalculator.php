@@ -85,11 +85,44 @@ final class RateLimitCalculator {
     }
 
     /**
-     * Build transient key for rate limit tracking.
+     * Build transient key for IP-based rate limit tracking.
      *
      * Pure function: same inputs produce same key.
      * IP is hashed for privacy.
      *
+     * @param string $ip      IP address.
+     * @param string $ability Ability name.
+     * @param string $window  Time window ('minute' or 'hour').
+     * @return string Transient key.
+     */
+    public static function buildIpKey( string $ip, string $ability, string $window ): string {
+        $ip_hash      = substr( md5( $ip ), 0, 8 );
+        $ability_slug = str_replace( '/', '-', $ability );
+        return "fa_wpmcp_ratelimit_ip_{$ip_hash}_{$ability_slug}_{$window}";
+    }
+
+    /**
+     * Build transient key for user-based rate limit tracking.
+     *
+     * Pure function: same inputs produce same key.
+     *
+     * @param int    $user_id User ID.
+     * @param string $ability Ability name.
+     * @param string $window  Time window ('minute' or 'hour').
+     * @return string Transient key.
+     */
+    public static function buildUserKey( int $user_id, string $ability, string $window ): string {
+        $ability_slug = str_replace( '/', '-', $ability );
+        return "fa_wpmcp_ratelimit_user_{$user_id}_{$ability_slug}_{$window}";
+    }
+
+    /**
+     * Build transient key for rate limit tracking (DEPRECATED).
+     *
+     * Pure function: same inputs produce same key.
+     * IP is hashed for privacy.
+     *
+     * @deprecated Use buildIpKey() or buildUserKey() instead.
      * @param int    $user_id User ID (0 for anonymous).
      * @param string $ip      IP address.
      * @param string $ability Ability name.
