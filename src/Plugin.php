@@ -358,6 +358,7 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Media\ListMedia() );
 		$registry->register( new \FAWpmcp\Abilities\Media\UploadMedia() );
 		$registry->register( new \FAWpmcp\Abilities\Media\UpdateMedia() );
+		$registry->register( new \FAWpmcp\Abilities\Media\DeleteMedia() );
 	}
 
 	/**
@@ -371,6 +372,7 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Taxonomies\ListTerms() );
 		$registry->register( new \FAWpmcp\Abilities\Taxonomies\CreateTerm() );
 		$registry->register( new \FAWpmcp\Abilities\Taxonomies\UpdateTerm() );
+		$registry->register( new \FAWpmcp\Abilities\Taxonomies\DeleteTerm() );
 	}
 
 	/**
@@ -384,6 +386,7 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Users\ListUsers() );
 		$registry->register( new \FAWpmcp\Abilities\Users\CreateUser() );
 		$registry->register( new \FAWpmcp\Abilities\Users\UpdateUser() );
+		$registry->register( new \FAWpmcp\Abilities\Users\DeleteUser() );
 	}
 
 	/**
