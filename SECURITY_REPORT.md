@@ -1,6 +1,6 @@
 # Security Analysis Report: fa-wpmcp
 
-**Generated:** 2026-01-21
+**Generated:** 2026-01-25 (Updated from aegis audit 2026-01-24)
 **Project:** stephenfeather_fa-wpmcp
 **SonarQube Dashboard:** https://sonarcloud.io/project/overview?id=stephenfeather_fa-wpmcp
 
@@ -22,6 +22,7 @@
 ### Overall Security Posture
 
 - **Security Rating:** ✅ **A** (Excellent)
+- **Risk Level:** MEDIUM (0 critical, 1 high, 4 medium, 5 low)
 - **Vulnerabilities:** ✅ **0** detected
 - **Security Hotspots:** ⚠️ **1** requires manual review
 - **Open Issues:** **13** medium-high severity (75 total including closed/low)
@@ -36,6 +37,17 @@
 4. 🟡 **Insecure Code Loading** (1 location) - require_once pattern
 5. ⚠️ **Test Coverage Gap** - 67.9% vs 80% target
 6. ⚠️ **Code Duplication** - 9.9% vs 3% target
+
+### New Findings (aegis audit 2026-01-24)
+
+7. ✅ ~~**Debug Logging in Production**~~ - FIXED 2026-01-23 (removed 16 error_log statements)
+8. 🟠 **Webhook Secret Plain Text Storage** - MEDIUM severity
+9. 🟠 **IP Address Logged Without Anonymization** - GDPR concern
+10. ✅ ~~**SSRF Potential in Media URL Import**~~ - FIXED 2026-01-25 (added URL validation)
+11. 🟠 **Rate Limit Bypass via Multiple IPs** - MEDIUM severity
+12. 🟡 **Missing HTTPS Enforcement for Webhooks** - LOW severity
+13. 🟡 **Weak Password Acceptance** - LOW severity
+14. 🟡 **Admin Role Assignable via API** - LOW severity
 
 ---
 
@@ -232,6 +244,110 @@ public function calculate_limit(string $ability): int {
 ```
 
 **Priority:** 🟡 MEDIUM - Address in Week 2
+
+---
+
+## 2.5 New Security Findings (aegis audit 2026-01-24)
+
+### 2.5.1 SSRF Potential in Media URL Import (MEDIUM) ✅ FIXED
+
+**Location:** `src/Abilities/Media/UploadMedia.php:243-333`
+**Vulnerability:** Server-Side Request Forgery (SSRF)
+**Status:** ✅ **FIXED 2026-01-25**
+
+**Fix Applied:**
+Added `validateUrlForSsrf()` method with comprehensive protection:
+1. ✅ Validates URL scheme is http or https only
+2. ✅ Blocks localhost variations (localhost, 127.0.0.1, ::1, 0.0.0.0)
+3. ✅ Resolves hostnames and validates resolved IP
+4. ✅ Blocks private IP ranges using `FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE`
+
+**Tests Added:** 11 new test cases covering:
+- Invalid URL format
+- Non-http/https schemes (gopher, ftp)
+- Localhost and loopback addresses
+- Private IP ranges (10.x, 172.16.x, 192.168.x)
+- IPv6 localhost
+
+**Priority:** ✅ RESOLVED
+
+---
+
+### 2.5.2 Webhook Secret Stored in Plain Text (MEDIUM)
+
+**Location:** `src/Admin/SettingsPage.php:792-807`
+**Vulnerability:** Sensitive Data Exposure
+**Risk:** Webhook secrets are stored directly in wp_options without encryption. Database access would expose the secret.
+
+**Evidence:**
+```php
+$settings = array(
+    'webhook_secret'    => $webhook_secret,  // Plain text
+    'webhook_endpoints' => $this->sanitizer->sanitizeWebhookEndpoints( $webhook_endpoints ),
+);
+update_option( 'fa_wpmcp_webhooks', $settings );
+```
+
+**Remediation:**
+1. Consider encrypting the webhook secret before storage using WordPress's built-in encryption functions or a custom encryption key
+2. Alternatively, use WordPress's secure options API if available in WP 6.9+
+
+**Priority:** 🟠 MEDIUM - Consider for v1.1
+
+---
+
+### 2.5.3 IP Address Logged Without Anonymization (MEDIUM)
+
+**Location:** `src/Logging/LogRepository.php:63`
+**Vulnerability:** Privacy/GDPR Concern
+**Risk:** Full IP addresses are stored in activity logs, which may violate GDPR requirements in some jurisdictions.
+
+**Evidence:**
+```php
+'ip_address' => $entry->ip_address,  // Full IP stored
+```
+
+**Remediation:**
+1. Add an option to anonymize IP addresses (mask last octet for IPv4, last 80 bits for IPv6)
+2. Document data retention policy for activity logs
+3. Implement automatic log purging (note: `deleteOlderThan()` exists but needs scheduled execution)
+
+**Priority:** 🟠 MEDIUM - Document for GDPR-conscious deployments
+
+---
+
+### 2.5.4 Rate Limit Bypass via Multiple IP Addresses (MEDIUM)
+
+**Location:** `src/Abilities/AbilityExecutor.php:317-334`
+**Vulnerability:** Rate Limiting Bypass
+**Risk:** Rate limiting is per-IP and per-ability, allowing distributed attacks from multiple IPs.
+
+**Evidence:**
+```php
+$result = $this->rateLimiter->check(
+    $context['ability_name'],
+    $context['user_id'],
+    $context['ip_address']  // Rate limit keyed on IP
+);
+```
+
+**Remediation:**
+1. Implement user-based rate limiting in addition to IP-based
+2. Consider global rate limits across all abilities
+3. Add burst protection for sudden spikes
+
+**Priority:** 🟡 LOW - Hardening for v1.1+
+
+---
+
+### 2.5.5 Low-Severity Findings
+
+| Finding | Location | Risk | Recommendation |
+|---------|----------|------|----------------|
+| Missing HTTPS Enforcement | `src/Admin/SettingsSanitizer.php:140` | Webhook data exposed over HTTP | Warn users when HTTP URLs configured |
+| Weak Password Acceptance | `src/Abilities/Users/CreateUser.php:222` | No strength validation | Document that WP core handles policy |
+| Admin Role via API | `src/Abilities/Users/CreateUser.php:31` | High-privilege role assignable | Add config option to limit max role |
+| Plugin Install Stubs | `src/Abilities/Plugins/InstallPlugin.php` | Future risk | Consider not registering until implemented |
 
 ---
 
@@ -681,11 +797,43 @@ try {
 | A07: Authentication Failures | ✅ WordPress authentication, session management |
 | A08: Data Integrity Failures | ✅ Webhook signatures via SignatureGenerator |
 | A09: Logging Failures | ✅ ActivityLogger, structured logging |
-| A10: SSRF | ⚠️ Review webhook URL validation |
+| A10: SSRF | ✅ **Media URL import validated** (fixed 2.5.1) |
 
 ---
 
-## 9. Resources & Next Steps
+## 9. Security Strengths Identified ✅
+
+The aegis security audit (2026-01-24) identified these positive security implementations:
+
+1. **Proper Nonce Verification:** All admin form handlers verify nonces (CSRF protection)
+2. **Capability Checks:** All abilities require appropriate WordPress capabilities
+3. **Input Sanitization:** Comprehensive use of WordPress sanitization functions
+4. **Output Escaping:** Admin UI properly escapes all output with `esc_html`, `esc_attr`, `esc_url`
+5. **Prepared Statements:** All database queries use `$wpdb->prepare()` correctly
+6. **Protected Options:** OptionAccessPolicy protects sensitive options (auth keys, salts)
+7. **HMAC Signature Verification:** Uses `hash_equals()` for timing-safe comparison
+8. **Privacy Redaction:** Sensitive fields are redacted in webhook payloads
+9. **Rate Limiting:** Built-in rate limiting per ability
+10. **Activity Logging:** Comprehensive audit trail of all ability executions
+
+### Dependency Security
+
+| Package | Version | CVE | Severity | Fixed In |
+|---------|---------|-----|----------|----------|
+| N/A | N/A | N/A | N/A | N/A |
+
+**Composer Audit Result:** ✅ No security vulnerability advisories found.
+
+### Secrets Exposure Check
+
+- `.env` files: In .gitignore ✅
+- `credentials.json`: Not present ✅
+- Hardcoded secrets: Only test secrets in test files ✅
+- Secret management: Webhook secret stored in wp_options (see finding 2.5.2)
+
+---
+
+## 10. Resources & Next Steps
 
 ### SonarQube Resources
 
@@ -701,9 +849,20 @@ try {
 - **SonarQube PHP Rules:** https://rules.sonarsource.com/php/
 - **WordPress Coding Standards:** https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/
 
+### Recent Fixes ✅
+
+| Issue | Fixed Date | Commit |
+|-------|------------|--------|
+| Debug Logging in Production | 2026-01-23 | Removed 16 `error_log()` statements |
+| Comment getOperationType() | 2026-01-25 | c599b4b |
+| ListUsers type error | 2026-01-25 | bfd8ef6 |
+| SSRF in Media URL Import | 2026-01-25 | Added `validateUrlForSsrf()` + 11 tests |
+
 ### Immediate Action Checklist
 
-- [ ] Review the 1 security hotspot in SonarCloud
+- [x] ~~Review the 1 security hotspot in SonarCloud~~ (100% reviewed)
+- [x] ~~Remove debug logging from production~~ (Fixed 2026-01-23)
+- [x] ~~Add SSRF protection to media URL import~~ (Fixed 2026-01-25)
 - [ ] Read through SECURITY_CHECKLIST.md for week-by-week tasks
 - [ ] Schedule Phase 1 work (Week 1)
 - [ ] Set up automated test coverage reporting
@@ -718,7 +877,7 @@ try {
 
 ---
 
-## Appendix: Issue Distribution
+## 11. Appendix: Issue Distribution
 
 ### By Severity
 
@@ -756,5 +915,8 @@ Note: 61 additional low-severity issues (mostly in test files) marked as CLOSED.
 ---
 
 **Report End**
+
+**Last Updated:** 2026-01-25
+**Previous Version:** 2026-01-21
 
 For actionable week-by-week tasks, see **SECURITY_CHECKLIST.md**.
