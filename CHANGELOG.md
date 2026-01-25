@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha.4] - 2026-01-25
+
 ### Added
 - **Maintenance Mode Abilities** - WordPress maintenance mode management:
   - `ActivateMaintenance` - Enable maintenance mode with optional custom message
@@ -176,7 +178,8 @@ Alpha 3 release focusing on core functionality stabilization and production-read
 - Settings page for configuration
 - Webhook scheduling with Action Scheduler
 
-[Unreleased]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.3...HEAD
+[Unreleased]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.4...HEAD
+[1.0.0-alpha.4]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.3...v1.0.0-alpha.4
 [1.0.0-alpha.3]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-beta.1...v1.0.0-alpha.3
 [1.0.0-beta.1]: https://github.com/featherart/fa-wpmcp/compare/v1.0-alpha-2...v1.0.0-beta.1
 [1.0.0-alpha.2]: https://github.com/featherart/fa-wpmcp/compare/v1.0-alpha-1...v1.0-alpha-2
