@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Privacy;
 
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Exceptions\PrivacyRequestNotFoundException;
 
 /**
  * Ability to get details about a specific privacy request.
@@ -127,7 +128,7 @@ final class GetPrivacyRequest extends AbstractAbility {
 	 *
 	 * @param array<string, mixed> $input Validated input data.
 	 * @return array<string, mixed> Request details.
-	 * @throws \RuntimeException If request not found.
+	 * @throws PrivacyRequestNotFoundException If request not found.
 	 */
 	public function doExecute( array $input ): array {
 		$request_id = (int) $input['request_id'];
@@ -136,7 +137,7 @@ final class GetPrivacyRequest extends AbstractAbility {
 		$request = get_post( $request_id );
 
 		if ( ! $request || 'user_request' !== $request->post_type ) {
-			throw new \RuntimeException( 'Privacy request not found' );
+			throw new PrivacyRequestNotFoundException( 'Privacy request not found' );
 		}
 
 		// Get request metadata.

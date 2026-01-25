@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Webhooks;
 
+use FAWpmcp\Exceptions\EncryptionException;
+
 /**
  * Creates appropriate SecretEncryption implementation based on available extensions
  *
@@ -28,7 +30,7 @@ final class SecretEncryptionFactory {
 	 * - Falls back to OpenSSL if sodium not available
 	 *
 	 * @return SecretEncryption The encryption instance.
-	 * @throws \RuntimeException If no encryption extension available.
+	 * @throws EncryptionException If no encryption extension available.
 	 */
 	public static function create(): SecretEncryption {
 		// Prefer libsodium (modern, faster, simpler API).
@@ -41,7 +43,7 @@ final class SecretEncryptionFactory {
 			return new OpenSslSecretEncryption();
 		}
 
-		throw new \RuntimeException(
+		throw new EncryptionException(
 			'No encryption extension available. Install libsodium or enable OpenSSL.'
 		);
 	}

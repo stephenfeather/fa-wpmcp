@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 namespace FAWpmcp\Abilities\Plugins;
+
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Exceptions\PluginDeletionException;
 
 /**
  * Delete Plugin Ability (INTENTIONALLY UNIMPLEMENTED)
@@ -88,7 +90,7 @@ final class DeletePlugin extends AbstractAbility {
 	}
 
 	public function doExecute( array $input ): array {
-		throw new \RuntimeException(
+		throw new PluginDeletionException(
 			'Plugin deletion is not yet implemented. This ability requires WordPress delete_plugins() integration.'
 		);
 	}

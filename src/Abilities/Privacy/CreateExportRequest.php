@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Privacy;
 
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Exceptions\PrivacyRequestException;
 
 /**
  * Ability to create a personal data export request for GDPR compliance.
@@ -148,7 +149,7 @@ final class CreateExportRequest extends AbstractAbility {
 	 *
 	 * @param array<string, mixed> $input Validated input data.
 	 * @return array<string, mixed> Request creation result.
-	 * @throws \RuntimeException If request creation fails.
+	 * @throws PrivacyRequestException If request creation fails.
 	 */
 	public function doExecute( array $input ): array {
 		$email = $input['email'];
@@ -162,7 +163,7 @@ final class CreateExportRequest extends AbstractAbility {
 		$request_id = wp_create_user_request( $email, 'export_personal_data', $data );
 
 		if ( is_wp_error( $request_id ) ) {
-			throw new \RuntimeException(
+			throw new PrivacyRequestException(
 				sprintf( 'Failed to create export request: %s', $request_id->get_error_message() )
 			);
 		}
@@ -171,7 +172,7 @@ final class CreateExportRequest extends AbstractAbility {
 		$request = get_post( $request_id );
 
 		if ( ! $request ) {
-			throw new \RuntimeException( 'Failed to retrieve created request.' );
+			throw new PrivacyRequestException( 'Failed to retrieve created request.' );
 		}
 
 		// Get confirmation timestamp if available.

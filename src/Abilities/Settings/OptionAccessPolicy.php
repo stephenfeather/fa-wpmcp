@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Abilities\Settings;
 
-use RuntimeException;
+use FAWpmcp\Exceptions\OptionException;
 
 /**
  * Enforces allowlist/protected option access rules.
@@ -51,7 +51,7 @@ final class OptionAccessPolicy {
 	 */
 	public static function assertAllowed( string $option_name ): void {
 		if ( ! self::isAllowed( $option_name ) ) {
-			throw new RuntimeException( 'This option is protected and cannot be accessed.' );
+			throw new OptionException( 'This option is protected and cannot be accessed.' );
 		}
 	}
 

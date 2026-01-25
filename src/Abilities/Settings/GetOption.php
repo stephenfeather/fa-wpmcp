@@ -11,6 +11,7 @@ namespace FAWpmcp\Abilities\Settings;
 
 use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Settings\OptionAccessPolicy;
+use FAWpmcp\Exceptions\OptionException;
 
 /**
  * Ability to retrieve a WordPress option.
@@ -125,7 +126,7 @@ final class GetOption extends AbstractAbility {
 
 		// Validate option name length (MySQL utf8mb4 index limit).
 		if ( strlen( $option_name ) > 191 ) {
-			throw new \RuntimeException( 'Option name exceeds maximum length of 191 characters.' );
+			throw new OptionException( 'Option name exceeds maximum length of 191 characters.' );
 		}
 
 		OptionAccessPolicy::assertAllowed( $option_name );

@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Themes;
 
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Exceptions\ThemeDeletionException;
 
 /**
  * Delete Theme Ability (INTENTIONALLY UNIMPLEMENTED)
@@ -97,7 +98,7 @@ final class DeleteTheme extends AbstractAbility {
 	}
 
 	public function doExecute( array $input ): array {
-		throw new \RuntimeException(
+		throw new ThemeDeletionException(
 			'Theme deletion is not yet implemented. This ability requires WordPress delete_theme() integration.'
 		);
 	}

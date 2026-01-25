@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Themes;
 
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Exceptions\ThemeInstallationException;
 
 /**
  * Install Theme Ability (INTENTIONALLY UNIMPLEMENTED)
@@ -82,7 +83,7 @@ final class InstallTheme extends AbstractAbility {
 	}
 
 	public function doExecute( array $input ): array {
-		throw new \RuntimeException(
+		throw new ThemeInstallationException(
 			'Theme installation is not yet implemented. This ability requires WordPress Theme_Upgrader integration.'
 		);
 	}

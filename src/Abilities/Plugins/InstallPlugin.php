@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 namespace FAWpmcp\Abilities\Plugins;
+
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Exceptions\PluginInstallationException;
 
 /**
  * Install Plugin Ability (INTENTIONALLY UNIMPLEMENTED)
@@ -72,7 +74,7 @@ final class InstallPlugin extends AbstractAbility {
 		return 'install_plugins';
 	}
 	public function doExecute( array $input ): array {
-		throw new \RuntimeException(
+		throw new PluginInstallationException(
 			'Plugin installation is not yet implemented. This ability requires WordPress Plugin_Upgrader integration.'
 		);
 	}

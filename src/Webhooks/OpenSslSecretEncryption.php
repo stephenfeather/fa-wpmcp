@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Webhooks;
 
+use FAWpmcp\Exceptions\EncryptionException;
+
 /**
  * Encrypts webhook secrets using OpenSSL AES-256-GCM
  *
@@ -51,15 +53,15 @@ final class OpenSslSecretEncryption implements SecretEncryption {
 	/**
 	 * Constructor
 	 *
-	 * @throws \RuntimeException If openssl extension not available.
+	 * @throws EncryptionException If openssl extension not available.
 	 */
 	public function __construct() {
 		if ( ! extension_loaded( 'openssl' ) ) {
-			throw new \RuntimeException( 'OpenSSL extension not available' );
+			throw new EncryptionException( 'OpenSSL extension not available' );
 		}
 
 		if ( ! in_array( self::CIPHER, openssl_get_cipher_methods(), true ) ) {
-			throw new \RuntimeException( 'AES-256-GCM cipher not available' );
+			throw new EncryptionException( 'AES-256-GCM cipher not available' );
 		}
 
 		$this->key = $this->deriveKey();
@@ -81,7 +83,7 @@ final class OpenSslSecretEncryption implements SecretEncryption {
 	 *
 	 * @param string $plaintext The plaintext secret to encrypt.
 	 * @return string The encrypted secret with prefix.
-	 * @throws \RuntimeException If encryption fails.
+	 * @throws EncryptionException If encryption fails.
 	 */
 	public function encrypt( string $plaintext ): string {
 		try {
@@ -102,7 +104,7 @@ final class OpenSslSecretEncryption implements SecretEncryption {
 			);
 
 			if ( false === $ciphertext ) {
-				throw new \RuntimeException( 'Encryption failed' );
+				throw new EncryptionException( 'Encryption failed' );
 			}
 
 			// Format: iv || tag || ciphertext.
@@ -110,7 +112,7 @@ final class OpenSslSecretEncryption implements SecretEncryption {
 
 			return self::PREFIX . base64_encode( $encrypted );
 		} catch ( \Throwable $e ) {
-			throw new \RuntimeException( 'Encryption failed: ' . $e->getMessage(), 0, $e );
+			throw new EncryptionException( 'Encryption failed: ' . $e->getMessage(), 0, $e );
 		}
 	}
 
@@ -119,11 +121,11 @@ final class OpenSslSecretEncryption implements SecretEncryption {
 	 *
 	 * @param string $ciphertext The encrypted secret to decrypt.
 	 * @return string The decrypted plaintext secret.
-	 * @throws \RuntimeException If decryption fails or ciphertext is tampered.
+	 * @throws EncryptionException If decryption fails or ciphertext is tampered.
 	 */
 	public function decrypt( string $ciphertext ): string {
 		if ( ! $this->isEncrypted( $ciphertext ) ) {
-			throw new \RuntimeException( 'Invalid ciphertext format' );
+			throw new EncryptionException( 'Invalid ciphertext format' );
 		}
 
 		try {
@@ -131,13 +133,13 @@ final class OpenSslSecretEncryption implements SecretEncryption {
 			$encrypted = base64_decode( substr( $ciphertext, strlen( self::PREFIX ) ), true );
 
 			if ( false === $encrypted ) {
-				throw new \RuntimeException( 'Invalid base64 encoding' );
+				throw new EncryptionException( 'Invalid base64 encoding' );
 			}
 
 			// Extract IV, tag, and ciphertext.
 			$min_length = self::IV_LENGTH + self::TAG_LENGTH;
 			if ( strlen( $encrypted ) < $min_length ) {
-				throw new \RuntimeException( 'Ciphertext too short' );
+				throw new EncryptionException( 'Ciphertext too short' );
 			}
 
 			$iv         = substr( $encrypted, 0, self::IV_LENGTH );
@@ -156,12 +158,12 @@ final class OpenSslSecretEncryption implements SecretEncryption {
 			);
 
 			if ( false === $plaintext ) {
-				throw new \RuntimeException( 'Authentication failed - ciphertext tampered' );
+				throw new EncryptionException( 'Authentication failed - ciphertext tampered' );
 			}
 
 			return $plaintext;
 		} catch ( \Throwable $e ) {
-			throw new \RuntimeException( 'Decryption failed: ' . $e->getMessage(), 0, $e );
+			throw new EncryptionException( 'Decryption failed: ' . $e->getMessage(), 0, $e );
 		}
 	}
 
@@ -184,7 +186,7 @@ final class OpenSslSecretEncryption implements SecretEncryption {
 	 * - NONCE_SALT
 	 *
 	 * @return string 256-bit (32-byte) encryption key.
-	 * @throws \RuntimeException If salts not defined or HKDF fails.
+	 * @throws EncryptionException If salts not defined or HKDF fails.
 	 */
 	private function deriveKey(): string {
 		// Collect WordPress salts.
@@ -197,7 +199,7 @@ final class OpenSslSecretEncryption implements SecretEncryption {
 		// Verify salts are defined.
 		foreach ( $salts as $salt ) {
 			if ( empty( $salt ) || 'put your unique phrase here' === $salt ) {
-				throw new \RuntimeException( 'WordPress salts not properly configured' );
+				throw new EncryptionException( 'WordPress salts not properly configured' );
 			}
 		}
 
@@ -214,7 +216,7 @@ final class OpenSslSecretEncryption implements SecretEncryption {
 		);
 
 		if ( false === $key || 32 !== strlen( $key ) ) {
-			throw new \RuntimeException( 'Key derivation failed' );
+			throw new EncryptionException( 'Key derivation failed' );
 		}
 
 		return $key;

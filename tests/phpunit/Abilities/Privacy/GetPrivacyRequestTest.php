@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Tests\Abilities\Privacy;
 
 use FAWpmcp\Abilities\Privacy\GetPrivacyRequest;
+use FAWpmcp\Exceptions\PrivacyRequestNotFoundException;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -161,7 +162,7 @@ class GetPrivacyRequestTest extends TestCase {
 			->with( 999 )
 			->andReturn( null );
 
-		$this->expectException( \RuntimeException::class );
+		$this->expectException( PrivacyRequestNotFoundException::class );
 		$this->expectExceptionMessage( 'Privacy request not found' );
 
 		$ability->doExecute( $input );
@@ -188,7 +189,7 @@ class GetPrivacyRequestTest extends TestCase {
 			->with( 123 )
 			->andReturn( $mock_post );
 
-		$this->expectException( \RuntimeException::class );
+		$this->expectException( PrivacyRequestNotFoundException::class );
 		$this->expectExceptionMessage( 'Privacy request not found' );
 
 		$ability->doExecute( $input );

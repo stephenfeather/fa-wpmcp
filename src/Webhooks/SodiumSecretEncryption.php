@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Webhooks;
 
+use FAWpmcp\Exceptions\EncryptionException;
+
 /**
  * Encrypts webhook secrets using libsodium XChaCha20-Poly1305
  *
@@ -36,11 +38,11 @@ final class SodiumSecretEncryption implements SecretEncryption {
 	/**
 	 * Constructor
 	 *
-	 * @throws \RuntimeException If sodium extension not available.
+	 * @throws EncryptionException If sodium extension not available.
 	 */
 	public function __construct() {
 		if ( ! extension_loaded( 'sodium' ) ) {
-			throw new \RuntimeException( 'Sodium extension not available' );
+			throw new EncryptionException( 'Sodium extension not available' );
 		}
 
 		$this->key = $this->deriveKey();
@@ -60,7 +62,7 @@ final class SodiumSecretEncryption implements SecretEncryption {
 	 *
 	 * @param string $plaintext The plaintext secret to encrypt.
 	 * @return string The encrypted secret with prefix.
-	 * @throws \RuntimeException If encryption fails.
+	 * @throws EncryptionException If encryption fails.
 	 */
 	public function encrypt( string $plaintext ): string {
 		try {
@@ -83,7 +85,7 @@ final class SodiumSecretEncryption implements SecretEncryption {
 
 			return self::PREFIX . base64_encode( $encrypted );
 		} catch ( \Throwable $e ) {
-			throw new \RuntimeException( 'Encryption failed: ' . $e->getMessage(), 0, $e );
+			throw new EncryptionException( 'Encryption failed: ' . $e->getMessage(), 0, $e );
 		}
 	}
 
@@ -92,11 +94,11 @@ final class SodiumSecretEncryption implements SecretEncryption {
 	 *
 	 * @param string $ciphertext The encrypted secret to decrypt.
 	 * @return string The decrypted plaintext secret.
-	 * @throws \RuntimeException If decryption fails or ciphertext is tampered.
+	 * @throws EncryptionException If decryption fails or ciphertext is tampered.
 	 */
 	public function decrypt( string $ciphertext ): string {
 		if ( ! $this->isEncrypted( $ciphertext ) ) {
-			throw new \RuntimeException( 'Invalid ciphertext format' );
+			throw new EncryptionException( 'Invalid ciphertext format' );
 		}
 
 		try {
@@ -104,13 +106,13 @@ final class SodiumSecretEncryption implements SecretEncryption {
 			$encrypted = base64_decode( substr( $ciphertext, strlen( self::PREFIX ) ), true );
 
 			if ( false === $encrypted ) {
-				throw new \RuntimeException( 'Invalid base64 encoding' );
+				throw new EncryptionException( 'Invalid base64 encoding' );
 			}
 
 			// Extract nonce and ciphertext.
 			$nonce_length = SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES;
 			if ( strlen( $encrypted ) < $nonce_length ) {
-				throw new \RuntimeException( 'Ciphertext too short' );
+				throw new EncryptionException( 'Ciphertext too short' );
 			}
 
 			$nonce      = substr( $encrypted, 0, $nonce_length );
@@ -125,12 +127,12 @@ final class SodiumSecretEncryption implements SecretEncryption {
 			);
 
 			if ( false === $plaintext ) {
-				throw new \RuntimeException( 'Authentication failed - ciphertext tampered' );
+				throw new EncryptionException( 'Authentication failed - ciphertext tampered' );
 			}
 
 			return $plaintext;
 		} catch ( \Throwable $e ) {
-			throw new \RuntimeException( 'Decryption failed: ' . $e->getMessage(), 0, $e );
+			throw new EncryptionException( 'Decryption failed: ' . $e->getMessage(), 0, $e );
 		}
 	}
 
@@ -153,7 +155,7 @@ final class SodiumSecretEncryption implements SecretEncryption {
 	 * - NONCE_SALT
 	 *
 	 * @return string 256-bit (32-byte) encryption key.
-	 * @throws \RuntimeException If salts not defined or HKDF fails.
+	 * @throws EncryptionException If salts not defined or HKDF fails.
 	 */
 	private function deriveKey(): string {
 		// Collect WordPress salts.
@@ -166,7 +168,7 @@ final class SodiumSecretEncryption implements SecretEncryption {
 		// Verify salts are defined.
 		foreach ( $salts as $salt ) {
 			if ( empty( $salt ) || 'put your unique phrase here' === $salt ) {
-				throw new \RuntimeException( 'WordPress salts not properly configured' );
+				throw new EncryptionException( 'WordPress salts not properly configured' );
 			}
 		}
 
@@ -183,7 +185,7 @@ final class SodiumSecretEncryption implements SecretEncryption {
 		);
 
 		if ( false === $key || strlen( $key ) !== SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES ) {
-			throw new \RuntimeException( 'Key derivation failed' );
+			throw new EncryptionException( 'Key derivation failed' );
 		}
 
 		return $key;
