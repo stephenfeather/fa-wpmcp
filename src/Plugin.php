@@ -82,6 +82,7 @@ final class Plugin {
 		$this->registerPluginAbilities( $ability_registry );
 		$this->registerThemeAbilities( $ability_registry );
 		$this->registerPrivacyAbilities( $ability_registry );
+		$this->registerCacheAbilities( $ability_registry );
 		$this->registerService( 'ability_registry', $ability_registry );
 
 		// Initialize Admin Settings Page.
@@ -445,6 +446,18 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Privacy\CreateExportRequest() );
 		$registry->register( new \FAWpmcp\Abilities\Privacy\GetPrivacyRequest() );
 		$registry->register( new \FAWpmcp\Abilities\Privacy\ListPrivacyRequests() );
+	}
+
+	/**
+	 * Register cache abilities.
+	 *
+	 * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private function registerCacheAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Cache\FlushCache() );
+		$registry->register( new \FAWpmcp\Abilities\Cache\GetCacheStatus() );
+		$registry->register( new \FAWpmcp\Abilities\Cache\GetCacheType() );
 	}
 
 	/**
