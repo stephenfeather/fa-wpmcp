@@ -286,7 +286,7 @@ final class ListPrivacyRequests extends AbstractAbility {
 		$email               = get_post_meta( $post->ID, '_wp_user_request_user_email', true );
 		$action_name         = get_post_meta( $post->ID, 'action_name', true );
 		$confirmed_timestamp = get_post_meta( $post->ID, '_wp_user_request_confirmed_timestamp', true );
-		$confirmed_at        = $confirmed_timestamp ? gmdate( 'Y-m-d H:i:s', (int) $confirmed_timestamp ) : null;
+		$confirmed_at        = $confirmed_timestamp ? gmdate( 'Y-m-d H:i:s', (int) $confirmed_timestamp ) : '';
 
 		return array(
 			'id'           => $post->ID,
