@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Maintenance Mode Abilities** - WordPress maintenance mode management:
+  - `ActivateMaintenance` - Enable maintenance mode with optional custom message
+  - `DeactivateMaintenance` - Disable maintenance mode
+  - `GetMaintenanceStatus` - Check current maintenance mode state
+- **Cache Abilities** - WordPress object cache management:
+  - `FlushCache` - Clear object cache (entire cache or specific group)
+  - `GetCacheStatus` - Report cache statistics and group information
+  - `GetCacheType` - Identify active caching backend (redis, memcached, etc.)
+- **Delete Abilities** with safety patterns:
+  - `DeletePost` - Trash-by-default with optional permanent deletion
+  - `DeleteComment` - Trash-by-default with optional permanent deletion
+  - `DeleteMedia` - Permanent deletion with attachment cleanup
+  - `DeleteTerm` - Term removal with taxonomy validation
+  - `DeleteUser` - User deletion with content reassignment support
+
+### Fixed
+- ListPrivacyRequests type error and category test count
+- MCP schema: Added `mcp.public` annotation and fixed empty schema properties
+- GetCacheStatus output type: return group names instead of indices
+- GetCacheStatusTest mock to match real WordPress cache structure
+- ListUsers type error: `count_users()` returns array not object
+- Missing `getOperationType()` overrides in Comment abilities
+
+### Changed
+- Moved MCP_ABILITY_TESTS.md to `docs/` directory
+
+### Security
+- **Risk Level: LOW** (0 critical, 0 high, 0 medium - all security issues resolved)
+- **Rate Limit Bypass Prevention** - Added user-based rate limiting in addition to IP-based:
+  - Requests denied if EITHER IP or user limit exceeded
+  - Prevents bypass via IP rotation from single authenticated account
+- **GDPR IP Anonymization** - IP addresses anonymized by default in activity logs:
+  - IPv4: Last octet masked (192.168.1.100 → 192.168.1.0)
+  - IPv6: Last 80 bits masked, /48 prefix preserved
+  - Configurable via `fa_wpmcp_anonymize_ip` option (default: true)
+- **Max API Role Configuration** - Prevent high-privilege user creation via API:
+  - New option `fa_wpmcp_max_api_role` (default: editor)
+  - CreateUser/UpdateUser enforce role ceiling
+  - RolePolicy class with dependency injection for testability
+- **Webhook Secret Encryption** - Secrets encrypted at rest:
+  - Uses XChaCha20-Poly1305 (libsodium) or AES-256-GCM fallback
+  - Transparent decryption on webhook delivery
+- **HTTPS Enforcement** - Webhook URLs require HTTPS in production:
+  - Warning displayed for HTTP URLs in development/staging
+  - Hard block on HTTP URLs in production environment
+- **SSRF Protection** - Media URL import validates external URLs:
+  - Blocks localhost, loopback, and private IP ranges
+  - Validates URL scheme (http/https only)
+  - Resolves hostname before IP validation
+
 ## [1.0.0-alpha.3] - 2026-01-23
 
 ### Summary
