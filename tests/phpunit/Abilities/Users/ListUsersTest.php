@@ -386,12 +386,13 @@ class ListUsersTest extends TestCase {
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'getTotalUsers' );
 
-		$count_result               = (object) array();
-		$count_result->total_users  = 42;
-		$count_result->avail_roles = array(
-			'administrator' => 1,
-			'editor'        => 5,
-			'subscriber'    => 36,
+		$count_result = array(
+			'total_users' => 42,
+			'avail_roles' => array(
+				'administrator' => 1,
+				'editor'        => 5,
+				'subscriber'    => 36,
+			),
 		);
 
 		$total = $method->invoke( $ability, array(), $count_result );
@@ -410,12 +411,13 @@ class ListUsersTest extends TestCase {
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'getTotalUsers' );
 
-		$count_result               = (object) array();
-		$count_result->total_users  = 42;
-		$count_result->avail_roles = array(
-			'administrator' => 1,
-			'editor'        => 5,
-			'subscriber'    => 36,
+		$count_result = array(
+			'total_users' => 42,
+			'avail_roles' => array(
+				'administrator' => 1,
+				'editor'        => 5,
+				'subscriber'    => 36,
+			),
 		);
 
 		$total = $method->invoke( $ability, array( 'role' => 'editor' ), $count_result );
@@ -443,9 +445,10 @@ class ListUsersTest extends TestCase {
 
 		Functions\expect( 'get_users' )->andReturn( $mock_users );
 
-		$count_result               = (object) array();
-		$count_result->total_users  = 42;
-		$count_result->avail_roles = array();
+		$count_result = array(
+			'total_users' => 42,
+			'avail_roles' => array(),
+		);
 
 		$total = $method->invoke( $ability, array( 'search' => 'john' ), $count_result );
 

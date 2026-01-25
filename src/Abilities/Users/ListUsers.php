@@ -261,16 +261,16 @@ final class ListUsers extends AbstractAbility {
 	 *
 	 * Pure function - calculates total from count_users result.
 	 *
-	 * @param array<string, mixed> $count_args  Count arguments.
-	 * @param object               $count_result Result from count_users().
+	 * @param array<string, mixed> $count_args   Count arguments.
+	 * @param array<string, mixed> $count_result Result from count_users().
 	 * @return int Total users.
 	 */
-	private function getTotalUsers( array $count_args, object $count_result ): int {
+	private function getTotalUsers( array $count_args, array $count_result ): int {
 		// If filtering by role, use role-specific count.
 		if ( isset( $count_args['role'] ) ) {
 			$role = $count_args['role'];
-			return isset( $count_result->avail_roles[ $role ] )
-				? (int) $count_result->avail_roles[ $role ]
+			return isset( $count_result['avail_roles'][ $role ] )
+				? (int) $count_result['avail_roles'][ $role ]
 				: 0;
 		}
 
@@ -286,7 +286,7 @@ final class ListUsers extends AbstractAbility {
 		}
 
 		// No filters - return total users.
-		return (int) $count_result->total_users;
+		return (int) $count_result['total_users'];
 	}
 
 	/**
