@@ -638,6 +638,31 @@ if (!hash_equals($expected, $signature)) {
   - Histogram metrics for request duration
   - Expose `/metrics` endpoint for Prometheus scraping
 
+### Future Abilities
+
+Additional ability categories planned for implementation:
+
+- [ ] **Cron Abilities** - WordPress scheduled tasks management
+  - ListCronEvents, GetCronEvent, ScheduleCronEvent, UnscheduleCronEvent, RunCronEvent
+- [ ] **Role Abilities** - User role and capability management
+  - ListRoles, GetRole, CreateRole, UpdateRole, DeleteRole
+- [ ] **Cap Abilities** - Fine-grained capability management
+  - ListCaps, AddCap, RemoveCap
+- [ ] **Menu Abilities** - Navigation menu management
+  - ListMenus, GetMenu, CreateMenu, UpdateMenu, DeleteMenu, ListMenuItems
+- [ ] **Sidebar Abilities** - Widget area management
+  - ListSidebars, GetSidebar, ListWidgets
+- [ ] **Widget Abilities** - Widget instance management
+  - GetWidget, CreateWidget, UpdateWidget, DeleteWidget
+- [ ] **Rewrite Abilities** - URL rewrite rules management
+  - ListRewriteRules, FlushRewriteRules, AddRewriteRule
+- [ ] **Config Abilities** - wp-config.php constants inspection
+  - ListConfigConstants, GetConfigConstant
+- [ ] **Core Abilities** - WordPress core information
+  - GetCoreVersion, CheckCoreUpdates, ListCoreChecksums
+- [ ] **Search-Replace Abilities** - Database search and replace
+  - SearchReplace (with dry-run support)
+
 ## Troubleshooting
 
 ### Plugin won't activate
