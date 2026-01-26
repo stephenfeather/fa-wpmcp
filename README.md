@@ -662,6 +662,10 @@ Additional ability categories planned for implementation:
   - GetCoreVersion, CheckCoreUpdates, ListCoreChecksums
 - [ ] **Search-Replace Abilities** - Database search and replace
   - SearchReplace (with dry-run support)
+- [ ] **DB Abilities** *(possible)* - Direct database operations
+  - Query, Tables, Optimize, Repair
+- [ ] **Env Abilities** *(possible)* - Environment inspection
+  - GetEnvironmentType, GetPhpInfo, GetServerInfo
 
 ## Troubleshooting
 
