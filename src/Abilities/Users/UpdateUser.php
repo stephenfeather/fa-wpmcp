@@ -1,5 +1,4 @@
 <?php
-
 /**
  * UpdateUser ability - updates an existing WordPress user.
  *

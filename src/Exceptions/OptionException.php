@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Exception thrown when an option operation fails.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Database migration logic (pure functions).
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Rate limiter orchestration.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * CreateErasureRequest ability - creates a personal data erasure request.
  *

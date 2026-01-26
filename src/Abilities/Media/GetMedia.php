@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetMedia ability - retrieves a single media item by ID.
  *

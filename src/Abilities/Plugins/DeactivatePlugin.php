@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Deactivate Plugin ability - deactivates a WordPress plugin.
  *

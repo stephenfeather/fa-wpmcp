@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Trait for common ability metadata tests.
  *

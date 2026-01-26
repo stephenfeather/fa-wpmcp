@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Tests for UpdateOption ability.
  *

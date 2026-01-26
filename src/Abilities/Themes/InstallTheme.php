@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Install Theme ability for WordPress MCP.
  *

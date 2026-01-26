@@ -1,5 +1,4 @@
 <?php
-
 /**
  * UpdateTheme ability - updates a WordPress theme.
  *

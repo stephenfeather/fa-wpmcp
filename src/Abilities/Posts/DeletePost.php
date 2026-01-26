@@ -1,5 +1,4 @@
 <?php
-
 /**
  * DeletePost ability - deletes or trashes a WordPress post.
  *

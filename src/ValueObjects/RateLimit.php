@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Immutable rate limit configuration value object.
  *

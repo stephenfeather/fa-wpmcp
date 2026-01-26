@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetTerm ability - retrieves a single term by ID.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * DeleteTerm ability - deletes a WordPress taxonomy term.
  *

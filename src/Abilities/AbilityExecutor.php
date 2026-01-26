@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Pipeline executor for ability operations.
  *

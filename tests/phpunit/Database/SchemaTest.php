@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Test database schema generation.
  *

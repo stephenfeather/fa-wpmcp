@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListRolesAbility - lists all WordPress user roles.
  *

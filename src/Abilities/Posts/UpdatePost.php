@@ -1,5 +1,4 @@
 <?php
-
 /**
  * UpdatePost ability - updates an existing WordPress post.
  *

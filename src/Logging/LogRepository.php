@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Log repository for database operations.
  *

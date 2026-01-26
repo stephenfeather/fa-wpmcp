@@ -1,5 +1,4 @@
 <?php
-
 /**
  * DeleteMedia ability - deletes or trashes a WordPress media attachment.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListPosts ability - retrieves a paginated list of posts.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Exception thrown when term is not found.
  *

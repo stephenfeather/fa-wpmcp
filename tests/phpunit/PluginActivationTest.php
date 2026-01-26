@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Test plugin activation and basic scaffolding.
  *

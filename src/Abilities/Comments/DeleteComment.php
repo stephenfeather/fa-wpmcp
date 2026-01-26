@@ -1,5 +1,4 @@
 <?php
-
 /**
  * DeleteComment ability - deletes or trashes a WordPress comment.
  *

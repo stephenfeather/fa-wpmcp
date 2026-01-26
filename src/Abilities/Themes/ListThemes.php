@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListThemes ability - lists installed WordPress themes.
  *

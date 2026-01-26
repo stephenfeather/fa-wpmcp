@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Test Result value object.
  *

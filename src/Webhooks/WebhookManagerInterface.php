@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Webhook manager interface.
  *

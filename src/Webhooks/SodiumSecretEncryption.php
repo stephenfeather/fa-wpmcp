@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Sodium-based secret encryption using XChaCha20-Poly1305 AEAD
  *

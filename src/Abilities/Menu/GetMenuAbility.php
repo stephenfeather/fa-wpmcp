@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetMenuAbility - retrieves details of a specific WordPress navigation menu.
  *

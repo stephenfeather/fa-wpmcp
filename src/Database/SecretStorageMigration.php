@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Webhook Secret Storage Migration
  *

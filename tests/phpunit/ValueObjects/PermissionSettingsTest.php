@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Test PermissionSettings value object.
  *

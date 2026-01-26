@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Secret Encryption Interface
  *

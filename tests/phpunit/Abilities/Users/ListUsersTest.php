@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Tests for ListUsers ability.
  *

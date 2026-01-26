@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Result value object for functional programming patterns.
  *

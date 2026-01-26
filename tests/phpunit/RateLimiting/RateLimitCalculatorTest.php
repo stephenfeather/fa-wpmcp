@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Tests for RateLimitCalculator pure functions.
  *

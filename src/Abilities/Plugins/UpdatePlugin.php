@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Update Plugin ability - updates a WordPress plugin to the latest version.
  *

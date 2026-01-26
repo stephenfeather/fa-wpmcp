@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Exception for plugin not found errors.
  *

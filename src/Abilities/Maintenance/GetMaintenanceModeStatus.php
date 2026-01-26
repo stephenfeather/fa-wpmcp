@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetMaintenanceModeStatus ability - checks WordPress maintenance mode status.
  *

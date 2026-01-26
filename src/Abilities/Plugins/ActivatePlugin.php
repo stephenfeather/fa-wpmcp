@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Activate Plugin ability - activates a WordPress plugin.
  *

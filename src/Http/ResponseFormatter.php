@@ -1,5 +1,4 @@
 <?php
-
 /**
  * HTTP response formatting utility.
  *

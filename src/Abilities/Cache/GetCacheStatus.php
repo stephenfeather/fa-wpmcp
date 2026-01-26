@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetCacheStatus ability - retrieves WordPress object cache status and features.
  *

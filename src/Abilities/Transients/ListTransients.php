@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListTransients ability - lists transients with optional filtering.
  *

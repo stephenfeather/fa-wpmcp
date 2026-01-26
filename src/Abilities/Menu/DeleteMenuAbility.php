@@ -1,5 +1,4 @@
 <?php
-
 /**
  * DeleteMenuAbility - deletes a WordPress navigation menu.
  *

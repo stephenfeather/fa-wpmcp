@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetUser ability - retrieves a single user's data.
  *

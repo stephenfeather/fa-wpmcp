@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Get Plugin ability - retrieves details about a specific WordPress plugin.
  *

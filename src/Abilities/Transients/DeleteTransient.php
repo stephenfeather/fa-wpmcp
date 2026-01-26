@@ -1,5 +1,4 @@
 <?php
-
 /**
  * DeleteTransient ability - deletes transient(s).
  *

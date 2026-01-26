@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetCacheType ability - identifies the WordPress object cache implementation.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Exception thrown when encryption or decryption operations fail.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * DeleteOption ability - deletes a WordPress option.
  *

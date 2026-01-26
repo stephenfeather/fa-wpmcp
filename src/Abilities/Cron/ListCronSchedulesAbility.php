@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListCronSchedulesAbility - lists available cron recurrence schedules.
  *

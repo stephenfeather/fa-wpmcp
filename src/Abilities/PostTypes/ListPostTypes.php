@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListPostTypes ability - retrieves registered post type definitions.
  *

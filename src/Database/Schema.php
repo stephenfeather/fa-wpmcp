@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Database schema generation (pure functions).
  *

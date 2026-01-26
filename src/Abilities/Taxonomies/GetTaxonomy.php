@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetTaxonomy ability - retrieves a single taxonomy definition.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * WordPress HTTP API webhook sender.
  *

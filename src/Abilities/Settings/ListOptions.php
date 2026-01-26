@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListOptions ability - lists WordPress options.
  *

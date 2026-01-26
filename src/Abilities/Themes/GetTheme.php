@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetTheme ability - gets details about a specific WordPress theme.
  *

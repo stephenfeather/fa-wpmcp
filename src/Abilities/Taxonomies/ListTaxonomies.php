@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListTaxonomies ability - retrieves registered taxonomy definitions.
  *

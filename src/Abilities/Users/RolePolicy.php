@@ -1,5 +1,4 @@
 <?php
-
 /**
  * RolePolicy - enforces maximum role restrictions for API user operations.
  *

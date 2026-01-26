@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Options-based rate limit configuration.
  *

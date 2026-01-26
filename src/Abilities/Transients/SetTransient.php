@@ -1,5 +1,4 @@
 <?php
-
 /**
  * SetTransient ability - creates or updates a transient.
  *

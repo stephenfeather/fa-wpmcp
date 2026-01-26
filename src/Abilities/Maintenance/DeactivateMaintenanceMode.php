@@ -1,5 +1,4 @@
 <?php
-
 /**
  * DeactivateMaintenanceMode ability - disables WordPress maintenance mode.
  *

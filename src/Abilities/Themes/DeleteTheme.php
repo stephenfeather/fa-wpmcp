@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Delete Theme ability for WordPress MCP.
  *

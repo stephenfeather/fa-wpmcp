@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Immutable rate limit result value object.
  *

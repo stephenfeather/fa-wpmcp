@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Base test case with Brain\Monkey setup.
  *

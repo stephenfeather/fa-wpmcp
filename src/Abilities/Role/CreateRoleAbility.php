@@ -1,5 +1,4 @@
 <?php
-
 /**
  * CreateRoleAbility - creates a new WordPress user role.
  *

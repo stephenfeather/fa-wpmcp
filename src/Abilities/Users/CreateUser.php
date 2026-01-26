@@ -1,5 +1,4 @@
 <?php
-
 /**
  * CreateUser ability - creates a new WordPress user.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Permission settings value object.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Options-based permission settings loader.
  *

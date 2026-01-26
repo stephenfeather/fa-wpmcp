@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListUsers ability - retrieves a paginated list of users.
  *

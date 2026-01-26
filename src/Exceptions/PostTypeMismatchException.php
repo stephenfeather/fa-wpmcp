@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Exception thrown when post type doesn't match expected type.
  *

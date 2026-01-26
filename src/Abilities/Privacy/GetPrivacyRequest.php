@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetPrivacyRequest ability - retrieves a specific privacy request.
  *

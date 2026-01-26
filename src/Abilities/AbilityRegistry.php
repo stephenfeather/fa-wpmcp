@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Central ability registration and management.
  *

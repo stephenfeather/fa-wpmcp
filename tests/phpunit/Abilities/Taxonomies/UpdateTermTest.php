@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Tests for UpdateTerm ability.
  *

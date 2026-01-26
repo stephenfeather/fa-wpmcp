@@ -1,5 +1,4 @@
 <?php
-
 /**
  * UnscheduleCronEventAbility - removes scheduled WP-Cron events.
  *

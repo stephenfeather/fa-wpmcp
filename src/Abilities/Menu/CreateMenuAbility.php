@@ -1,5 +1,4 @@
 <?php
-
 /**
  * CreateMenuAbility - creates a new WordPress navigation menu.
  *

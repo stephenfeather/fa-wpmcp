@@ -1,5 +1,4 @@
 <?php
-
 /**
  * FlushCache ability - flushes the WordPress object cache.
  *

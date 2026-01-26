@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Exception thrown when attempting to create a role that already exists.
  *

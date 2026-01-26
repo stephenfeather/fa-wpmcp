@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListPlugins ability - lists installed WordPress plugins.
  *

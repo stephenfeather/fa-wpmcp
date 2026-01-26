@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Immutable log entry value object.
  *

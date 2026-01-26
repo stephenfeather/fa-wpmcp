@@ -1,5 +1,4 @@
 <?php
-
 /**
  * HMAC signature generation for webhooks.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * UpdateRoleAbility - updates capabilities of a WordPress user role.
  *

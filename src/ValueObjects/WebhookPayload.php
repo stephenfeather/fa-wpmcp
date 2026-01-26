@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Immutable webhook payload value object.
  *

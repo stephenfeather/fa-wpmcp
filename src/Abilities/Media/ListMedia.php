@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListMedia ability - retrieves a paginated list of media items.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetComment ability - retrieves a single comment by ID.
  *

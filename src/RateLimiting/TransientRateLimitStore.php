@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Transient-based rate limit storage.
  *

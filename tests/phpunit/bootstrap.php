@@ -1,5 +1,4 @@
 <?php
-
 /**
  * PHPUnit bootstrap for FA WPMCP plugin tests.
  *

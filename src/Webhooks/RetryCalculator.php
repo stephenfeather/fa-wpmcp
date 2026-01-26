@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Retry timing calculations for webhooks.
  *

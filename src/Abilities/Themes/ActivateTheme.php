@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ActivateTheme ability - activates a WordPress theme.
  *

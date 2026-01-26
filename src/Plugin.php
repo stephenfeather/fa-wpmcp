@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Main plugin orchestration class.
  *

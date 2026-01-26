@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Factory for creating secret encryption instances
  *

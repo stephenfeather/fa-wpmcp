@@ -1,5 +1,4 @@
 <?php
-
 /**
  * CreateTerm ability - creates a new taxonomy term.
  *

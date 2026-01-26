@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Immutable builder for LogEntry.
  *

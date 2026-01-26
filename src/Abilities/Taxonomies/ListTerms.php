@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListTerms ability - retrieves terms from a taxonomy.
  *

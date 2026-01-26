@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetOption ability - retrieves a WordPress option.
  *

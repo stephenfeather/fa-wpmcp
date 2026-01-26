@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Install Plugin ability for WordPress MCP.
  *

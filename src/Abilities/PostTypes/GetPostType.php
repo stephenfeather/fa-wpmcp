@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetPostType ability - retrieves a single post type definition.
  *

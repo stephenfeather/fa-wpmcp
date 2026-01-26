@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListCronEventsAbility - lists all scheduled WP-Cron events.
  *

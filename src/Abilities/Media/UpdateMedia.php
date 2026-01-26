@@ -1,5 +1,4 @@
 <?php
-
 /**
  * UpdateMedia ability - updates media metadata.
  *

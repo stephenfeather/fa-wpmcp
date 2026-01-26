@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetCronEventAbility - retrieves a specific cron event by hook name.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * UpdateOption ability - updates or creates a WordPress option.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * DeleteUser ability - deletes a WordPress user.
  *

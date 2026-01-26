@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListComments ability - retrieves a paginated list of comments.
  *

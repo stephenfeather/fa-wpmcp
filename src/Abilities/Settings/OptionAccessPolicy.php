@@ -1,5 +1,4 @@
 <?php
-
 /**
  * OptionAccessPolicy - enforces access rules for WordPress options.
  *

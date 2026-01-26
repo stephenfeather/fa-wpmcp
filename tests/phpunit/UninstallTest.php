@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Tests for plugin uninstall handler.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Test plugin core functionality.
  *

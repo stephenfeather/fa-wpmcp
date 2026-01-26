@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetRoleAbility - retrieves details of a specific WordPress user role.
  *

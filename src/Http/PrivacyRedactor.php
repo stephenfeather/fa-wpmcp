@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Privacy redaction utility for sensitive data.
  *

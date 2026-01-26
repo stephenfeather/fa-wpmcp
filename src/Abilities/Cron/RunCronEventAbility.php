@@ -1,5 +1,4 @@
 <?php
-
 /**
  * RunCronEventAbility - manually triggers a WP-Cron event.
  *

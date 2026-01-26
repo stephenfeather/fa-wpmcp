@@ -1,5 +1,4 @@
 <?php
-
 /**
  * WordPress options-based webhook configuration.
  *

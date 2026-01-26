@@ -1,5 +1,4 @@
 <?php
-
 /**
  * CreateComment ability - creates a new comment.
  *

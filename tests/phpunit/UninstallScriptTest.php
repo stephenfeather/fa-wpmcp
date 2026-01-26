@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Tests for uninstall.php execution paths.
  *

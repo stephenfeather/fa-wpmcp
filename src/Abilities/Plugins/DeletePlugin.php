@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Delete Plugin ability for WordPress MCP.
  *

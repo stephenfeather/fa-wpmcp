@@ -1,5 +1,4 @@
 <?php
-
 /**
  * CreatePost ability - creates a new WordPress post.
  *

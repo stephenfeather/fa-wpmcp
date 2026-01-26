@@ -1,5 +1,4 @@
 <?php
-
 /**
  * StatusTheme ability - gets status details for a WordPress theme.
  *

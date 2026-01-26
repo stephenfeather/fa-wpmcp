@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Exception thrown when a menu is not found.
  *

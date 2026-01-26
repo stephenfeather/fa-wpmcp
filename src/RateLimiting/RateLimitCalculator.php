@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Pure functions for rate limit calculations.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Permission checking logic (pure functions).
  *

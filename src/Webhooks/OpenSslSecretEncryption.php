@@ -1,5 +1,4 @@
 <?php
-
 /**
  * OpenSSL-based secret encryption using AES-256-GCM AEAD
  *

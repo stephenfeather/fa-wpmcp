@@ -1,5 +1,4 @@
 <?php
-
 /**
  * HTTP error codes and status mapping.
  *

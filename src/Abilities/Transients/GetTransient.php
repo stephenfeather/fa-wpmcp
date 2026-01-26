@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetTransient ability - retrieves a single transient value by key.
  *

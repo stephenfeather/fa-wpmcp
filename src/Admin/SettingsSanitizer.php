@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Settings Sanitizer for FA WPMCP.
  *

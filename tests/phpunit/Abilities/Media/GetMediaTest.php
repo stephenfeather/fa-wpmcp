@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Tests for GetMedia ability.
  *

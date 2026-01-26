@@ -1,5 +1,4 @@
 <?php
-
 /**
  * UploadMedia ability - uploads a new media file.
  *

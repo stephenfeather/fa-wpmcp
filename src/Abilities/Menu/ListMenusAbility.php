@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ListMenusAbility - lists all WordPress navigation menus.
  *

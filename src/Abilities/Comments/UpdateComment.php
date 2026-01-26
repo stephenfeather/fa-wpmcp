@@ -1,5 +1,4 @@
 <?php
-
 /**
  * UpdateComment ability - updates comment status (moderation).
  *

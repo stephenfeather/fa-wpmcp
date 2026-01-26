@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Exception thrown when a privacy request is not found.
  *

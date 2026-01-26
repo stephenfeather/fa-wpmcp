@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Activity logger orchestration.
  *

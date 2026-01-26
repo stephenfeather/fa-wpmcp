@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Database-backed webhook queue implementation.
  *

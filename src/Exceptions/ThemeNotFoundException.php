@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ThemeNotFoundException - thrown when a theme is not found.
  *

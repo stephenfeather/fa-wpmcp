@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Test PermissionChecker logic.
  *

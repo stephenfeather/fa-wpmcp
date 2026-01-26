@@ -1,5 +1,4 @@
 <?php
-
 /**
  * File-based MCP error handler.
  *

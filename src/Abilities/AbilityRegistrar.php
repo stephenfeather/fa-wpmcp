@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Ability registrar - registers all abilities with the AbilityRegistry.
  *

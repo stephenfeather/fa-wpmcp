@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ScheduleCronEventAbility - schedules a new WP-Cron event.
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Abstract base class for all abilities.
  *

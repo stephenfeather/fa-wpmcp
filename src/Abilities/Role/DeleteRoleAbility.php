@@ -1,5 +1,4 @@
 <?php
-
 /**
  * DeleteRoleAbility - deletes a WordPress user role.
  *

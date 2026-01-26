@@ -1,5 +1,4 @@
 <?php
-
 /**
  * GetPost ability - retrieves a single post by ID.
  *

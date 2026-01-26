@@ -1,5 +1,4 @@
 <?php
-
 /**
  * UpdateTerm ability - updates an existing taxonomy term.
  *

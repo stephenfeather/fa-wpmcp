@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Composable execution pipeline with immutable steps.
  *
