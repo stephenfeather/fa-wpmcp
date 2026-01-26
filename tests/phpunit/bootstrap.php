@@ -21,6 +21,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', '/tmp/wordpress/' );
 }
 
+// Ensure ABSPATH directory exists for tests that write files.
+if ( ! is_dir( ABSPATH ) ) {
+	mkdir( ABSPATH, 0755, true );
+}
+
 // Define plugin constants manually for testing (instead of loading the plugin file which has hooks).
 if ( ! defined( 'FA_WPMCP_VERSION' ) ) {
 	define( 'FA_WPMCP_VERSION', '1.0.0-alpha.2' );
