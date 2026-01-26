@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when a privacy request operation fails.
  *
@@ -18,5 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class PrivacyRequestException extends RuntimeException {
+class PrivacyRequestException extends RuntimeException
+{
 }

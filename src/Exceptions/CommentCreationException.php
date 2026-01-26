@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when comment creation fails.
  *
@@ -18,5 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class CommentCreationException extends Exception {
+class CommentCreationException extends Exception
+{
 }

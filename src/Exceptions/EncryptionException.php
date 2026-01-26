@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when encryption or decryption operations fail.
  *
@@ -18,5 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class EncryptionException extends RuntimeException {
+class EncryptionException extends RuntimeException
+{
 }

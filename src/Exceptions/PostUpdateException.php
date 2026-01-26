@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when post update fails.
  *
@@ -18,5 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class PostUpdateException extends Exception {
+class PostUpdateException extends Exception
+{
 }

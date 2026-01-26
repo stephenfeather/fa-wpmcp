@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when an option operation fails.
  *
@@ -18,5 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class OptionException extends RuntimeException {
+class OptionException extends RuntimeException
+{
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ListCronSchedulesAbility - lists available cron recurrence schedules.
  *
@@ -18,130 +19,139 @@ use FAWpmcp\Abilities\AbstractAbility;
  *
  * @package FAWpmcp\Abilities\Cron
  */
-final class ListCronSchedulesAbility extends AbstractAbility {
-	/**
-	 * Get the unique ability name.
-	 *
-	 * @return string Ability name.
-	 */
-	public function getName(): string {
-		return 'fa-wpmcp/list-cron-schedules';
-	}
+final class ListCronSchedulesAbility extends AbstractAbility
+{
+    /**
+     * Get the unique ability name.
+     *
+     * @return string Ability name.
+     */
+    public function getName(): string
+    {
+        return 'fa-wpmcp/list-cron-schedules';
+    }
 
-	/**
-	 * Get the ability category.
-	 *
-	 * @return string Category name.
-	 */
-	public function getCategory(): string {
-		return 'cron';
-	}
+    /**
+     * Get the ability category.
+     *
+     * @return string Category name.
+     */
+    public function getCategory(): string
+    {
+        return 'cron';
+    }
 
-	/**
-	 * Get the human-readable label.
-	 *
-	 * @return string Ability label.
-	 */
-	public function getLabel(): string {
-		return 'List Cron Schedules';
-	}
+    /**
+     * Get the human-readable label.
+     *
+     * @return string Ability label.
+     */
+    public function getLabel(): string
+    {
+        return 'List Cron Schedules';
+    }
 
-	/**
-	 * Get the ability description.
-	 *
-	 * @return string Description.
-	 */
-	public function getDescription(): string {
-		return 'List available WordPress cron recurrence schedules (hourly, daily, etc.) for scheduling events.';
-	}
+    /**
+     * Get the ability description.
+     *
+     * @return string Description.
+     */
+    public function getDescription(): string
+    {
+        return 'List available WordPress cron recurrence schedules (hourly, daily, etc.) for scheduling events.';
+    }
 
-	/**
-	 * Get the input schema.
-	 *
-	 * @return array<string, mixed> JSON Schema array.
-	 */
-	public function getInputSchema(): array {
-		return array(
-			'type'       => 'object',
-			'properties' => array(),
-		);
-	}
+    /**
+     * Get the input schema.
+     *
+     * @return array<string, mixed> JSON Schema array.
+     */
+    public function getInputSchema(): array
+    {
+        return array(
+            'type'       => 'object',
+            'properties' => array(),
+        );
+    }
 
-	/**
-	 * Get the output schema.
-	 *
-	 * @return array<string, mixed> JSON Schema array.
-	 */
-	public function getOutputSchema(): array {
-		return array(
-			'type'       => 'object',
-			'properties' => array(
-				'schedules' => array(
-					'type'        => 'array',
-					'description' => 'List of available cron schedules.',
-					'items'       => array(
-						'type'       => 'object',
-						'properties' => array(
-							'name'     => array( 'type' => 'string' ),
-							'interval' => array( 'type' => 'integer' ),
-							'display'  => array( 'type' => 'string' ),
-						),
-					),
-				),
-				'total'     => array(
-					'type'        => 'integer',
-					'description' => 'Total number of schedules available.',
-				),
-			),
-		);
-	}
+    /**
+     * Get the output schema.
+     *
+     * @return array<string, mixed> JSON Schema array.
+     */
+    public function getOutputSchema(): array
+    {
+        return array(
+            'type'       => 'object',
+            'properties' => array(
+                'schedules' => array(
+                    'type'        => 'array',
+                    'description' => 'List of available cron schedules.',
+                    'items'       => array(
+                        'type'       => 'object',
+                        'properties' => array(
+                            'name'     => array( 'type' => 'string' ),
+                            'interval' => array( 'type' => 'integer' ),
+                            'display'  => array( 'type' => 'string' ),
+                        ),
+                    ),
+                ),
+                'total'     => array(
+                    'type'        => 'integer',
+                    'description' => 'Total number of schedules available.',
+                ),
+            ),
+        );
+    }
 
-	/**
-	 * Get the required WordPress capability.
-	 *
-	 * @return string WordPress capability name.
-	 */
-	public function getRequiredCapability(): string {
-		return 'manage_options';
-	}
+    /**
+     * Get the required WordPress capability.
+     *
+     * @return string WordPress capability name.
+     */
+    public function getRequiredCapability(): string
+    {
+        return 'manage_options';
+    }
 
-	/**
-	 * Execute the ability.
-	 *
-	 * @param array<string, mixed> $input Validated input data.
-	 * @return array<string, mixed> List of cron schedules.
-	 */
-	public function doExecute( array $input ): array {
-		$wp_schedules = wp_get_schedules();
+    /**
+     * Execute the ability.
+     *
+     * @param array<string, mixed> $input Validated input data.
+     * @return array<string, mixed> List of cron schedules.
+     */
+    public function doExecute(array $input): array
+    {
+        $wp_schedules = wp_get_schedules();
 
-		if ( empty( $wp_schedules ) ) {
-			return array(
-				'schedules' => array(),
-				'total'     => 0,
-			);
-		}
+        if (empty($wp_schedules)) {
+            return array(
+                'schedules' => array(),
+                'total'     => 0,
+            );
+        }
 
-		$schedules = array();
+        $schedules = array();
 
-		foreach ( $wp_schedules as $name => $data ) {
-			$schedules[] = array(
-				'name'     => $name,
-				'interval' => (int) ( $data['interval'] ?? 0 ),
-				'display'  => $data['display'] ?? $name,
-			);
-		}
+        foreach ($wp_schedules as $name => $data) {
+            $schedules[] = array(
+                'name'     => $name,
+                'interval' => (int) ( $data['interval'] ?? 0 ),
+                'display'  => $data['display'] ?? $name,
+            );
+        }
 
-		// Sort by interval ascending.
-		usort(
-			$schedules,
-			function ( $a, $b ) {
-				return $a['interval'] <=> $b['interval'];
-			}
-		);
+        // Sort by interval ascending.
+        usort(
+            $schedules,
+            function ($a, $b) {
+                return $a['interval'] <=> $b['interval'];
+            }
+        );
 
-		return array(
-			'schedules' => $schedules,
-			'total'     => count( $schedules ),
-		);
-	}
+        return array(
+            'schedules' => $schedules,
+            'total'     => count($schedules),
+        );
+    }
 }

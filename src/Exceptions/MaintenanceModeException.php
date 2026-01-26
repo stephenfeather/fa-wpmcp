@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when a maintenance mode operation fails.
  *
@@ -14,5 +15,6 @@ use RuntimeException;
 /**
  * Exception for maintenance mode operation failures.
  */
-class MaintenanceModeException extends RuntimeException {
+class MaintenanceModeException extends RuntimeException
+{
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Database migration logic (pure functions).
  *
@@ -17,56 +18,60 @@ namespace FAWpmcp\Database;
  *
  * @package FAWpmcp\Database
  */
-final class Migrator {
-	/**
-	 * Determine if migration is needed.
-	 *
-	 * Pure function: compares version strings.
-	 *
-	 * @param string $current_version Current database version.
-	 * @param string $target_version  Target database version.
-	 * @return bool True if migration is needed.
-	 */
-	public static function shouldMigrate( string $current_version, string $target_version ): bool {
-		return version_compare( $current_version, $target_version, '<' );
-	}
+final class Migrator
+{
+    /**
+     * Determine if migration is needed.
+     *
+     * Pure function: compares version strings.
+     *
+     * @param string $current_version Current database version.
+     * @param string $target_version  Target database version.
+     * @return bool True if migration is needed.
+     */
+    public static function shouldMigrate(string $current_version, string $target_version): bool
+    {
+        return version_compare($current_version, $target_version, '<');
+    }
 
-	/**
-	 * Get migrations between versions.
-	 *
-	 * Pure function: filters migrations by version range.
-	 *
-	 * @param string $from_version Starting version (exclusive).
-	 * @param string $to_version   Target version (inclusive).
-	 * @return array<int, array<string, string>> Array of migrations to run.
-	 */
-	public static function getMigrations( string $from_version, string $to_version ): array {
-		$all_migrations = self::getAllMigrations();
+    /**
+     * Get migrations between versions.
+     *
+     * Pure function: filters migrations by version range.
+     *
+     * @param string $from_version Starting version (exclusive).
+     * @param string $to_version   Target version (inclusive).
+     * @return array<int, array<string, string>> Array of migrations to run.
+     */
+    public static function getMigrations(string $from_version, string $to_version): array
+    {
+        $all_migrations = self::getAllMigrations();
 
-		return array_values(
-			array_filter(
-				$all_migrations,
-				function ( array $migration ) use ( $from_version, $to_version ): bool {
-					return version_compare( $from_version, $migration['version'], '<' )
-						&& version_compare( $migration['version'], $to_version, '<=' );
-				}
-			)
-		);
-	}
+        return array_values(
+            array_filter(
+                $all_migrations,
+                function (array $migration) use ($from_version, $to_version): bool {
+                    return version_compare($from_version, $migration['version'], '<')
+                        && version_compare($migration['version'], $to_version, '<=');
+                }
+            )
+        );
+    }
 
-	/**
-	 * Get all available migrations.
-	 *
-	 * Pure function: returns complete migration list.
-	 *
-	 * @return array<int, array<string, string>> Array of all migrations.
-	 */
-	public static function getAllMigrations(): array {
-		return array(
-			array(
-				'version'  => '1.0.0',
-				'callback' => 'migrate_1_0_0',
-			),
-		);
-	}
+    /**
+     * Get all available migrations.
+     *
+     * Pure function: returns complete migration list.
+     *
+     * @return array<int, array<string, string>> Array of all migrations.
+     */
+    public static function getAllMigrations(): array
+    {
+        return array(
+            array(
+                'version'  => '1.0.0',
+                'callback' => 'migrate_1_0_0',
+            ),
+        );
+    }
 }

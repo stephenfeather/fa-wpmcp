@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when attempting to create a role that already exists.
  *
@@ -19,5 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class RoleAlreadyExistsException extends Exception {
+class RoleAlreadyExistsException extends Exception
+{
 }

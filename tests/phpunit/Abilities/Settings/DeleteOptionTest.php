@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for DeleteOption ability.
  *
@@ -24,136 +25,147 @@ use PHPUnit\Framework\TestCase;
  *
  * @package FAWpmcp\Tests\Abilities\Settings
  */
-class DeleteOptionTest extends TestCase {
-	/**
-	 * Set up Brain\Monkey before each test.
-	 *
-	 * @return void
-	 */
-	protected function setUp(): void {
-		parent::setUp();
-		Monkey\setUp();
-	}
+class DeleteOptionTest extends TestCase
+{
+    /**
+     * Set up Brain\Monkey before each test.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Monkey\setUp();
+    }
 
-	/**
-	 * Tear down Brain\Monkey after each test.
-	 *
-	 * @return void
-	 */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		Mockery::close();
-		parent::tearDown();
-	}
+    /**
+     * Tear down Brain\Monkey after each test.
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        Monkey\tearDown();
+        Mockery::close();
+        parent::tearDown();
+    }
 
-	/**
-	 * Test ability returns correct name.
-	 *
-	 * @return void
-	 */
-	public function testGetName(): void {
-		$ability = new DeleteOption();
-		$this->assertEquals( 'fa-wpmcp/delete-option', $ability->getName() );
-	}
+    /**
+     * Test ability returns correct name.
+     *
+     * @return void
+     */
+    public function testGetName(): void
+    {
+        $ability = new DeleteOption();
+        $this->assertEquals('fa-wpmcp/delete-option', $ability->getName());
+    }
 
-	/**
-	 * Test ability returns correct category.
-	 *
-	 * @return void
-	 */
-	public function testGetCategory(): void {
-		$ability = new DeleteOption();
-		$this->assertEquals( 'settings', $ability->getCategory() );
-	}
+    /**
+     * Test ability returns correct category.
+     *
+     * @return void
+     */
+    public function testGetCategory(): void
+    {
+        $ability = new DeleteOption();
+        $this->assertEquals('settings', $ability->getCategory());
+    }
 
-	/**
-	 * Test ability returns correct label.
-	 *
-	 * @return void
-	 */
-	public function testGetLabel(): void {
-		$ability = new DeleteOption();
-		$this->assertEquals( 'Delete Option', $ability->getLabel() );
-	}
+    /**
+     * Test ability returns correct label.
+     *
+     * @return void
+     */
+    public function testGetLabel(): void
+    {
+        $ability = new DeleteOption();
+        $this->assertEquals('Delete Option', $ability->getLabel());
+    }
 
-	/**
-	 * Test ability returns correct operation type.
-	 *
-	 * @return void
-	 */
-	public function testGetOperationType(): void {
-		$ability = new DeleteOption();
-		$this->assertEquals( 'write', $ability->getOperationType() );
-	}
+    /**
+     * Test ability returns correct operation type.
+     *
+     * @return void
+     */
+    public function testGetOperationType(): void
+    {
+        $ability = new DeleteOption();
+        $this->assertEquals('write', $ability->getOperationType());
+    }
 
-	/**
-	 * Test ability returns correct required capability.
-	 *
-	 * @return void
-	 */
-	public function testGetRequiredCapability(): void {
-		$ability = new DeleteOption();
-		$this->assertEquals( 'manage_options', $ability->getRequiredCapability() );
-	}
+    /**
+     * Test ability returns correct required capability.
+     *
+     * @return void
+     */
+    public function testGetRequiredCapability(): void
+    {
+        $ability = new DeleteOption();
+        $this->assertEquals('manage_options', $ability->getRequiredCapability());
+    }
 
-	/**
-	 * Test execute deletes existing option successfully.
-	 *
-	 * @return void
-	 */
-	public function testExecuteDeletesOption(): void {
-		$ability = new DeleteOption();
+    /**
+     * Test execute deletes existing option successfully.
+     *
+     * @return void
+     */
+    public function testExecuteDeletesOption(): void
+    {
+        $ability = new DeleteOption();
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\expect( 'delete_option' )
-			->once()
-			->with( 'test_option' )
-			->andReturn( true );
+        Functions\expect('delete_option')
+            ->once()
+            ->with('test_option')
+            ->andReturn(true);
 
-		$result = $ability->doExecute( array( 'option_name' => 'test_option' ) );
+        $result = $ability->doExecute(array( 'option_name' => 'test_option' ));
 
-		$this->assertEquals( 'test_option', $result['option_name'] );
-		$this->assertTrue( $result['deleted'] );
-	}
+        $this->assertEquals('test_option', $result['option_name']);
+        $this->assertTrue($result['deleted']);
+    }
 
-	/**
-	 * Test execute handles delete failure for non-existent option.
-	 *
-	 * @return void
-	 */
-	public function testExecuteHandlesDeleteFailure(): void {
-		$ability = new DeleteOption();
+    /**
+     * Test execute handles delete failure for non-existent option.
+     *
+     * @return void
+     */
+    public function testExecuteHandlesDeleteFailure(): void
+    {
+        $ability = new DeleteOption();
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\expect( 'delete_option' )
-			->once()
-			->with( 'missing_option' )
-			->andReturn( false );
+        Functions\expect('delete_option')
+            ->once()
+            ->with('missing_option')
+            ->andReturn(false);
 
-		$result = $ability->doExecute( array( 'option_name' => 'missing_option' ) );
+        $result = $ability->doExecute(array( 'option_name' => 'missing_option' ));
 
-		$this->assertEquals( 'missing_option', $result['option_name'] );
-		$this->assertFalse( $result['deleted'] );
-	}
+        $this->assertEquals('missing_option', $result['option_name']);
+        $this->assertFalse($result['deleted']);
+    }
 
-	/**
-	 * Test execute blocks protected options.
-	 *
-	 * @return void
-	 */
-	public function testExecuteBlocksProtectedOption(): void {
-		$ability = new DeleteOption();
+    /**
+     * Test execute blocks protected options.
+     *
+     * @return void
+     */
+    public function testExecuteBlocksProtectedOption(): void
+    {
+        $ability = new DeleteOption();
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\expect( 'delete_option' )
-			->never();
+        Functions\expect('delete_option')
+            ->never();
 
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( 'protected' );
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('protected');
 
-		$ability->doExecute( array( 'option_name' => 'admin_email' ) );
-	}
+        $ability->doExecute(array( 'option_name' => 'admin_email' ));
+    }
 }

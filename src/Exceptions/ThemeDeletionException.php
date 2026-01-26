@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when a theme deletion fails.
  *
@@ -18,5 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class ThemeDeletionException extends RuntimeException {
+class ThemeDeletionException extends RuntimeException
+{
 }

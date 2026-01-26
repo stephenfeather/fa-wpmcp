@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when user deletion fails.
  *
@@ -19,5 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class UserDeletionException extends Exception {
+class UserDeletionException extends Exception
+{
 }

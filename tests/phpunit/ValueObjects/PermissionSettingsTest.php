@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test PermissionSettings value object.
  *
@@ -15,112 +16,119 @@ use PHPUnit\Framework\TestCase;
 /**
  * Test PermissionSettings value object.
  */
-class PermissionSettingsTest extends TestCase {
-	/**
-	 * Test PermissionSettings is immutable.
-	 */
-	public function test_is_immutable(): void {
-		$settings = new PermissionSettings(
-			global_read_enabled: true,
-			global_write_enabled: false,
-			category_settings: array(),
-			ability_settings: array(),
-		);
+class PermissionSettingsTest extends TestCase
+{
+    /**
+     * Test PermissionSettings is immutable.
+     */
+    public function test_is_immutable(): void
+    {
+        $settings = new PermissionSettings(
+            global_read_enabled: true,
+            global_write_enabled: false,
+            category_settings: array(),
+            ability_settings: array(),
+        );
 
-		// Attempting to modify should create new instance.
-		$new_settings = $settings->withGlobalRead( false );
+        // Attempting to modify should create new instance.
+        $new_settings = $settings->withGlobalRead(false);
 
-		$this->assertTrue( $settings->global_read_enabled );
-		$this->assertFalse( $new_settings->global_read_enabled );
-		$this->assertNotSame( $settings, $new_settings );
-	}
+        $this->assertTrue($settings->global_read_enabled);
+        $this->assertFalse($new_settings->global_read_enabled);
+        $this->assertNotSame($settings, $new_settings);
+    }
 
-	/**
-	 * Test with_global_read creates new instance.
-	 */
-	public function test_with_global_read_creates_new_instance(): void {
-		$settings = new PermissionSettings(
-			global_read_enabled: true,
-			global_write_enabled: true,
-			category_settings: array(),
-			ability_settings: array(),
-		);
+    /**
+     * Test with_global_read creates new instance.
+     */
+    public function test_with_global_read_creates_new_instance(): void
+    {
+        $settings = new PermissionSettings(
+            global_read_enabled: true,
+            global_write_enabled: true,
+            category_settings: array(),
+            ability_settings: array(),
+        );
 
-		$new_settings = $settings->withGlobalRead( false );
+        $new_settings = $settings->withGlobalRead(false);
 
-		$this->assertFalse( $new_settings->global_read_enabled );
-		$this->assertTrue( $new_settings->global_write_enabled );
-	}
+        $this->assertFalse($new_settings->global_read_enabled);
+        $this->assertTrue($new_settings->global_write_enabled);
+    }
 
-	/**
-	 * Test with_global_write creates new instance.
-	 */
-	public function test_with_global_write_creates_new_instance(): void {
-		$settings = new PermissionSettings(
-			global_read_enabled: true,
-			global_write_enabled: true,
-			category_settings: array(),
-			ability_settings: array(),
-		);
+    /**
+     * Test with_global_write creates new instance.
+     */
+    public function test_with_global_write_creates_new_instance(): void
+    {
+        $settings = new PermissionSettings(
+            global_read_enabled: true,
+            global_write_enabled: true,
+            category_settings: array(),
+            ability_settings: array(),
+        );
 
-		$new_settings = $settings->withGlobalWrite( false );
+        $new_settings = $settings->withGlobalWrite(false);
 
-		$this->assertTrue( $new_settings->global_read_enabled );
-		$this->assertFalse( $new_settings->global_write_enabled );
-	}
+        $this->assertTrue($new_settings->global_read_enabled);
+        $this->assertFalse($new_settings->global_write_enabled);
+    }
 
-	/**
-	 * Test properties are readonly.
-	 */
-	public function test_properties_are_readonly(): void {
-		$settings = new PermissionSettings(
-			global_read_enabled: true,
-			global_write_enabled: false,
-			category_settings: array(),
-			ability_settings: array(),
-		);
+    /**
+     * Test properties are readonly.
+     */
+    public function test_properties_are_readonly(): void
+    {
+        $settings = new PermissionSettings(
+            global_read_enabled: true,
+            global_write_enabled: false,
+            category_settings: array(),
+            ability_settings: array(),
+        );
 
-		$this->expectException( \Error::class );
-		// @phpstan-ignore-next-line - Intentionally testing immutability.
-		$settings->global_read_enabled = false;
-	}
+        $this->expectException(\Error::class);
+        // @phpstan-ignore-next-line - Intentionally testing immutability.
+        $settings->global_read_enabled = false;
+    }
 
-	/**
-	 * Test category settings are stored correctly.
-	 */
-	public function test_category_settings_stored_correctly(): void {
-		$category_settings = array(
-			'posts-pages' => array(
-				'enable_read'  => true,
-				'enable_write' => false,
-			),
-		);
+    /**
+     * Test category settings are stored correctly.
+     */
+    public function test_category_settings_stored_correctly(): void
+    {
+        $category_settings = array(
+            'posts-pages' => array(
+                'enable_read'  => true,
+                'enable_write' => false,
+            ),
+        );
 
-		$settings = new PermissionSettings(
-			global_read_enabled: true,
-			global_write_enabled: true,
-			category_settings: $category_settings,
-			ability_settings: array(),
-		);
+        $settings = new PermissionSettings(
+            global_read_enabled: true,
+            global_write_enabled: true,
+            category_settings: $category_settings,
+            ability_settings: array(),
+        );
 
-		$this->assertSame( $category_settings, $settings->category_settings );
-	}
+        $this->assertSame($category_settings, $settings->category_settings);
+    }
 
-	/**
-	 * Test ability settings are stored correctly.
-	 */
-	public function test_ability_settings_stored_correctly(): void {
-		$ability_settings = array(
-			'fa-wpmcp/create-post' => array( 'enabled' => false ),
-		);
+    /**
+     * Test ability settings are stored correctly.
+     */
+    public function test_ability_settings_stored_correctly(): void
+    {
+        $ability_settings = array(
+            'fa-wpmcp/create-post' => array( 'enabled' => false ),
+        );
 
-		$settings = new PermissionSettings(
-			global_read_enabled: true,
-			global_write_enabled: true,
-			category_settings: array(),
-			ability_settings: $ability_settings,
-		);
+        $settings = new PermissionSettings(
+            global_read_enabled: true,
+            global_write_enabled: true,
+            category_settings: array(),
+            ability_settings: $ability_settings,
+        );
 
-		$this->assertSame( $ability_settings, $settings->ability_settings );
-	}
+        $this->assertSame($ability_settings, $settings->ability_settings);
+    }
 }

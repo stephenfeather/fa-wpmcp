@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ThemeNotFoundException - thrown when a theme is not found.
  *
@@ -16,5 +17,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-final class ThemeNotFoundException extends RuntimeException {
+final class ThemeNotFoundException extends RuntimeException
+{
 }

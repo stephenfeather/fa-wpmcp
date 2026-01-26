@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for UpdateOption ability.
  *
@@ -25,207 +26,220 @@ use PHPUnit\Framework\TestCase;
  *
  * @package FAWpmcp\Tests\Abilities\Settings
  */
-class UpdateOptionTest extends TestCase {
-	/**
-	 * Set up Brain\Monkey before each test.
-	 *
-	 * @return void
-	 */
-	protected function setUp(): void {
-		parent::setUp();
-		Monkey\setUp();
-	}
+class UpdateOptionTest extends TestCase
+{
+    /**
+     * Set up Brain\Monkey before each test.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Monkey\setUp();
+    }
 
-	/**
-	 * Tear down Brain\Monkey after each test.
-	 *
-	 * @return void
-	 */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		Mockery::close();
-		parent::tearDown();
-	}
+    /**
+     * Tear down Brain\Monkey after each test.
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        Monkey\tearDown();
+        Mockery::close();
+        parent::tearDown();
+    }
 
-	/**
-	 * Test ability returns correct name.
-	 *
-	 * @return void
-	 */
-	public function testGetName(): void {
-		$ability = new UpdateOption();
-		$this->assertEquals( 'fa-wpmcp/update-option', $ability->getName() );
-	}
+    /**
+     * Test ability returns correct name.
+     *
+     * @return void
+     */
+    public function testGetName(): void
+    {
+        $ability = new UpdateOption();
+        $this->assertEquals('fa-wpmcp/update-option', $ability->getName());
+    }
 
-	/**
-	 * Test ability returns correct category.
-	 *
-	 * @return void
-	 */
-	public function testGetCategory(): void {
-		$ability = new UpdateOption();
-		$this->assertEquals( 'settings', $ability->getCategory() );
-	}
+    /**
+     * Test ability returns correct category.
+     *
+     * @return void
+     */
+    public function testGetCategory(): void
+    {
+        $ability = new UpdateOption();
+        $this->assertEquals('settings', $ability->getCategory());
+    }
 
-	/**
-	 * Test ability returns correct label.
-	 *
-	 * @return void
-	 */
-	public function testGetLabel(): void {
-		$ability = new UpdateOption();
-		$this->assertEquals( 'Update Option', $ability->getLabel() );
-	}
+    /**
+     * Test ability returns correct label.
+     *
+     * @return void
+     */
+    public function testGetLabel(): void
+    {
+        $ability = new UpdateOption();
+        $this->assertEquals('Update Option', $ability->getLabel());
+    }
 
-	/**
-	 * Test ability returns correct operation type.
-	 *
-	 * @return void
-	 */
-	public function testGetOperationType(): void {
-		$ability = new UpdateOption();
-		$this->assertEquals( 'write', $ability->getOperationType() );
-	}
+    /**
+     * Test ability returns correct operation type.
+     *
+     * @return void
+     */
+    public function testGetOperationType(): void
+    {
+        $ability = new UpdateOption();
+        $this->assertEquals('write', $ability->getOperationType());
+    }
 
-	/**
-	 * Test ability returns correct required capability.
-	 *
-	 * @return void
-	 */
-	public function testGetRequiredCapability(): void {
-		$ability = new UpdateOption();
-		$this->assertEquals( 'manage_options', $ability->getRequiredCapability() );
-	}
+    /**
+     * Test ability returns correct required capability.
+     *
+     * @return void
+     */
+    public function testGetRequiredCapability(): void
+    {
+        $ability = new UpdateOption();
+        $this->assertEquals('manage_options', $ability->getRequiredCapability());
+    }
 
-	/**
-	 * Test execute updates existing option successfully.
-	 *
-	 * @return void
-	 */
-	public function testExecuteUpdatesOption(): void {
-		$ability = new UpdateOption();
+    /**
+     * Test execute updates existing option successfully.
+     *
+     * @return void
+     */
+    public function testExecuteUpdatesOption(): void
+    {
+        $ability = new UpdateOption();
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\expect( 'update_option' )
-			->once()
-			->with( 'test_option', 'new_value', null )
-			->andReturn( true );
+        Functions\expect('update_option')
+            ->once()
+            ->with('test_option', 'new_value', null)
+            ->andReturn(true);
 
-		$result = $ability->doExecute(
-			array(
-				'option_name' => 'test_option',
-				'value'       => 'new_value',
-			)
-		);
+        $result = $ability->doExecute(
+            array(
+                'option_name' => 'test_option',
+                'value'       => 'new_value',
+            )
+        );
 
-		$this->assertEquals( 'test_option', $result['option_name'] );
-		$this->assertTrue( $result['updated'] );
-	}
+        $this->assertEquals('test_option', $result['option_name']);
+        $this->assertTrue($result['updated']);
+    }
 
-	/**
-	 * Test execute updates option with autoload setting.
-	 *
-	 * @return void
-	 */
-	public function testExecuteUpdatesOptionWithAutoload(): void {
-		$ability = new UpdateOption();
+    /**
+     * Test execute updates option with autoload setting.
+     *
+     * @return void
+     */
+    public function testExecuteUpdatesOptionWithAutoload(): void
+    {
+        $ability = new UpdateOption();
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\expect( 'update_option' )
-			->once()
-			->with( 'test_option', 'value', 'yes' )
-			->andReturn( true );
+        Functions\expect('update_option')
+            ->once()
+            ->with('test_option', 'value', 'yes')
+            ->andReturn(true);
 
-		$result = $ability->doExecute(
-			array(
-				'option_name' => 'test_option',
-				'value'       => 'value',
-				'autoload'    => 'yes',
-			)
-		);
+        $result = $ability->doExecute(
+            array(
+                'option_name' => 'test_option',
+                'value'       => 'value',
+                'autoload'    => 'yes',
+            )
+        );
 
-		$this->assertEquals( 'test_option', $result['option_name'] );
-		$this->assertTrue( $result['updated'] );
-	}
+        $this->assertEquals('test_option', $result['option_name']);
+        $this->assertTrue($result['updated']);
+    }
 
-	/**
-	 * Test execute handles update failure.
-	 *
-	 * @return void
-	 */
-	public function testExecuteHandlesUpdateFailure(): void {
-		$ability = new UpdateOption();
+    /**
+     * Test execute handles update failure.
+     *
+     * @return void
+     */
+    public function testExecuteHandlesUpdateFailure(): void
+    {
+        $ability = new UpdateOption();
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\expect( 'update_option' )
-			->once()
-			->with( 'test_option', 'value', null )
-			->andReturn( false );
+        Functions\expect('update_option')
+            ->once()
+            ->with('test_option', 'value', null)
+            ->andReturn(false);
 
-		$result = $ability->doExecute(
-			array(
-				'option_name' => 'test_option',
-				'value'       => 'value',
-			)
-		);
+        $result = $ability->doExecute(
+            array(
+                'option_name' => 'test_option',
+                'value'       => 'value',
+            )
+        );
 
-		$this->assertEquals( 'test_option', $result['option_name'] );
-		$this->assertFalse( $result['updated'] );
-	}
+        $this->assertEquals('test_option', $result['option_name']);
+        $this->assertFalse($result['updated']);
+    }
 
-	/**
-	 * Test execute handles array values.
-	 *
-	 * @return void
-	 */
-	public function testExecuteHandlesArrayValues(): void {
-		$ability = new UpdateOption();
-		$value   = array(
-			'key1' => 'value1',
-			'key2' => 'value2',
-		);
+    /**
+     * Test execute handles array values.
+     *
+     * @return void
+     */
+    public function testExecuteHandlesArrayValues(): void
+    {
+        $ability = new UpdateOption();
+        $value   = array(
+            'key1' => 'value1',
+            'key2' => 'value2',
+        );
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\expect( 'update_option' )
-			->once()
-			->with( 'test_option', $value, null )
-			->andReturn( true );
+        Functions\expect('update_option')
+            ->once()
+            ->with('test_option', $value, null)
+            ->andReturn(true);
 
-		$result = $ability->doExecute(
-			array(
-				'option_name' => 'test_option',
-				'value'       => $value,
-			)
-		);
+        $result = $ability->doExecute(
+            array(
+                'option_name' => 'test_option',
+                'value'       => $value,
+            )
+        );
 
-		$this->assertTrue( $result['updated'] );
-	}
+        $this->assertTrue($result['updated']);
+    }
 
-	/**
-	 * Test execute blocks protected options.
-	 *
-	 * @return void
-	 */
-	public function testExecuteBlocksProtectedOption(): void {
-		$ability = new UpdateOption();
+    /**
+     * Test execute blocks protected options.
+     *
+     * @return void
+     */
+    public function testExecuteBlocksProtectedOption(): void
+    {
+        $ability = new UpdateOption();
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\expect( 'update_option' )
-			->never();
+        Functions\expect('update_option')
+            ->never();
 
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( 'protected' );
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('protected');
 
-		$ability->doExecute(
-			array(
-				'option_name' => 'admin_email',
-				'value'       => 'hacker@example.com',
-			)
-		);
-	}
+        $ability->doExecute(
+            array(
+                'option_name' => 'admin_email',
+                'value'       => 'hacker@example.com',
+            )
+        );
+    }
 }

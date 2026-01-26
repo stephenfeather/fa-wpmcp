@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when a plugin installation fails.
  *
@@ -18,5 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class PluginInstallationException extends RuntimeException {
+class PluginInstallationException extends RuntimeException
+{
 }

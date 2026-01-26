@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when a plugin deletion fails.
  *
@@ -18,5 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class PluginDeletionException extends RuntimeException {
+class PluginDeletionException extends RuntimeException
+{
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when a privacy request is not found.
  *
@@ -18,5 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class PrivacyRequestNotFoundException extends Exception {
+class PrivacyRequestNotFoundException extends Exception
+{
 }

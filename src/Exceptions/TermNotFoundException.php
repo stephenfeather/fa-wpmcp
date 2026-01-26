@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when term is not found.
  *
@@ -18,5 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class TermNotFoundException extends Exception {
+class TermNotFoundException extends Exception
+{
 }

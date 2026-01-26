@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when a post is not found.
  *
@@ -18,5 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class PostNotFoundException extends Exception {
+class PostNotFoundException extends Exception
+{
 }

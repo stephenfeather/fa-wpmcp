@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when media deletion fails.
  *
@@ -18,5 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class MediaDeletionException extends Exception {
+class MediaDeletionException extends Exception
+{
 }
