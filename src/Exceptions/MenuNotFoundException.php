@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when a menu is not found.
  *
@@ -19,6 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class MenuNotFoundException extends Exception {
-
+class MenuNotFoundException extends Exception
+{
 }

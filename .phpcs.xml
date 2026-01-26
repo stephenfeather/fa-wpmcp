@@ -1,80 +1,52 @@
 <?xml version="1.0"?>
 <ruleset name="FA WPMCP">
-	<description>WordPress Coding Standards for FA WPMCP plugin</description>
+    <description>PSR-12 Coding Standards for FA WPMCP plugin</description>
 
-	<!-- What to scan -->
-	<file>.</file>
+    <!-- What to scan -->
+    <file>.</file>
 
-	<!-- Exclude paths -->
-	<exclude-pattern>*/vendor/*</exclude-pattern>
-	<exclude-pattern>*/tests/coverage/*</exclude-pattern>
-	<exclude-pattern>*/node_modules/*</exclude-pattern>
-	<exclude-pattern>*/opc/*</exclude-pattern>
-	<exclude-pattern>*/.venv/*</exclude-pattern>
-	<exclude-pattern>*/thoughts/*</exclude-pattern>
-	<exclude-pattern>*/.tldr/*</exclude-pattern>
-	<exclude-pattern>*/.claude/*</exclude-pattern>
+    <!-- Exclude paths -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/tests/coverage/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/opc/*</exclude-pattern>
+    <exclude-pattern>*/.venv/*</exclude-pattern>
+    <exclude-pattern>*/thoughts/*</exclude-pattern>
+    <exclude-pattern>*/.tldr/*</exclude-pattern>
+    <exclude-pattern>*/.claude/*</exclude-pattern>
+    <exclude-pattern>*/bin/*</exclude-pattern>
 
-	<!-- Show progress -->
-	<arg value="ps"/>
+    <!-- Show progress -->
+    <arg value="ps"/>
 
-	<!-- Show sniff codes in all reports -->
-	<arg value="ns"/>
+    <!-- Show sniff codes in all reports -->
+    <arg value="ns"/>
 
-	<!-- Use colors in output -->
-	<arg name="colors"/>
+    <!-- Use colors in output -->
+    <arg name="colors"/>
 
-	<!-- Check up to 8 files simultaneously -->
-	<arg name="parallel" value="8"/>
+    <!-- Check up to 8 files simultaneously -->
+    <arg name="parallel" value="8"/>
 
-	<!-- WordPress Coding Standards -->
-	<rule ref="WordPress">
-		<!-- Allow short array syntax -->
-		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
-		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
-	</rule>
+    <!-- PSR-12 Coding Standard -->
+    <rule ref="PSR12"/>
 
-	<!-- WordPress Core Standards -->
-	<rule ref="WordPress-Core"/>
+    <!-- Allow snake_case test method names (PHPUnit convention) -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
 
-	<!-- WordPress Extra Standards -->
-	<rule ref="WordPress-Extra"/>
+    <!-- Enforce strict types -->
+    <rule ref="Generic.PHP.RequireStrictTypes"/>
 
-	<!-- WordPress Docs Standards -->
-	<rule ref="WordPress-Docs"/>
+    <!-- Check for PHP cross-version compatibility -->
+    <config name="testVersion" value="8.1-"/>
 
-	<!-- Enforce strict types -->
-	<rule ref="Generic.PHP.RequireStrictTypes"/>
-
-	<!-- Check for PHP cross-version compatibility -->
-	<config name="testVersion" value="8.1-"/>
-
-	<!-- Text domain check -->
-	<rule ref="WordPress.WP.I18n">
-		<properties>
-			<property name="text_domain" type="array">
-				<element value="fa-wpmcp"/>
-			</property>
-		</properties>
-	</rule>
-
-	<!-- Namespace and class naming -->
-	<rule ref="PSR1.Classes.ClassDeclaration"/>
-
-	<!-- Exclude WordPress filename rules for PSR-4 autoloaded directories -->
-	<rule ref="WordPress.Files.FileName">
-		<exclude-pattern>*/src/*</exclude-pattern>
-		<exclude-pattern>*/tests/*</exclude-pattern>
-	</rule>
-
-	<!-- Exclude doc comment requirements for test methods and value object constructors -->
-	<rule ref="Squiz.Commenting.FunctionComment.Missing">
-		<exclude-pattern>*/tests/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.ClassComment.Missing">
-		<exclude-pattern>*/tests/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.InlineComment.InvalidEndChar">
-		<exclude-pattern>*/tests/*</exclude-pattern>
-	</rule>
+    <!-- Allow longer lines for readability -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+            <property name="absoluteLineLimit" value="0"/>
+        </properties>
+    </rule>
 </ruleset>

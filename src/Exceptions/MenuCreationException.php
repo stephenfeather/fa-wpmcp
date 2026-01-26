@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when menu creation fails.
  *
@@ -19,6 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class MenuCreationException extends Exception {
-
+class MenuCreationException extends Exception
+{
 }

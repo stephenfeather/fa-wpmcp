@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when media item is not found.
  *
@@ -19,6 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class MediaNotFoundException extends Exception {
-
+class MediaNotFoundException extends Exception
+{
 }

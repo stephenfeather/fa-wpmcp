@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for ListTransients ability.
  *
@@ -21,269 +22,280 @@ use Mockery;
  *
  * @package FAWpmcp\Tests\Abilities\Transients
  */
-class ListTransientsTest extends BrainMonkeyTestCase {
-	use AbilityTestTrait;
+class ListTransientsTest extends BrainMonkeyTestCase
+{
+    use AbilityTestTrait;
 
-	/**
-	 * Get an instance of the ability being tested.
-	 *
-	 * @return AbstractAbility
-	 */
-	protected function getAbilityInstance(): AbstractAbility {
-		return new ListTransients();
-	}
+    /**
+     * Get an instance of the ability being tested.
+     *
+     * @return AbstractAbility
+     */
+    protected function getAbilityInstance(): AbstractAbility
+    {
+        return new ListTransients();
+    }
 
-	/**
-	 * Get expected metadata for the ability.
-	 *
-	 * @return array{
-	 *     name: string,
-	 *     category: string,
-	 *     label: string,
-	 *     description_contains: string,
-	 *     operation_type: string,
-	 *     required_capability: string
-	 * }
-	 */
-	protected function getExpectedMetadata(): array {
-		return array(
-			'name'                 => 'fa-wpmcp/list-transients',
-			'category'             => 'transients',
-			'label'                => 'List Transients',
-			'description_contains' => 'list',
-			'operation_type'       => 'read',
-			'required_capability'  => 'manage_options',
-		);
-	}
+    /**
+     * Get expected metadata for the ability.
+     *
+     * @return array{
+     *     name: string,
+     *     category: string,
+     *     label: string,
+     *     description_contains: string,
+     *     operation_type: string,
+     *     required_capability: string
+     * }
+     */
+    protected function getExpectedMetadata(): array
+    {
+        return array(
+            'name'                 => 'fa-wpmcp/list-transients',
+            'category'             => 'transients',
+            'label'                => 'List Transients',
+            'description_contains' => 'list',
+            'operation_type'       => 'read',
+            'required_capability'  => 'manage_options',
+        );
+    }
 
-	/**
-	 * Test input schema has optional parameters.
-	 *
-	 * @return void
-	 */
-	public function testInputSchemaHasOptionalParameters(): void {
-		$ability = $this->getAbilityInstance();
-		$schema  = $ability->getInputSchema();
+    /**
+     * Test input schema has optional parameters.
+     *
+     * @return void
+     */
+    public function testInputSchemaHasOptionalParameters(): void
+    {
+        $ability = $this->getAbilityInstance();
+        $schema  = $ability->getInputSchema();
 
-		$this->assertArrayHasKey( 'search', $schema['properties'] );
-		$this->assertArrayHasKey( 'exclude', $schema['properties'] );
-		$this->assertArrayHasKey( 'network', $schema['properties'] );
-	}
+        $this->assertArrayHasKey('search', $schema['properties']);
+        $this->assertArrayHasKey('exclude', $schema['properties']);
+        $this->assertArrayHasKey('network', $schema['properties']);
+    }
 
-	/**
-	 * Test output schema has expected fields.
-	 *
-	 * @return void
-	 */
-	public function testOutputSchemaHasExpectedFields(): void {
-		$ability = $this->getAbilityInstance();
-		$schema  = $ability->getOutputSchema();
+    /**
+     * Test output schema has expected fields.
+     *
+     * @return void
+     */
+    public function testOutputSchemaHasExpectedFields(): void
+    {
+        $ability = $this->getAbilityInstance();
+        $schema  = $ability->getOutputSchema();
 
-		$this->assertArrayHasKey( 'transients', $schema['properties'] );
-		$this->assertArrayHasKey( 'total', $schema['properties'] );
-	}
+        $this->assertArrayHasKey('transients', $schema['properties']);
+        $this->assertArrayHasKey('total', $schema['properties']);
+    }
 
-	/**
-	 * Test execute returns list of transients from database.
-	 *
-	 * @return void
-	 */
-	public function testExecuteReturnsTransientsList(): void {
-		$ability = $this->getAbilityInstance();
+    /**
+     * Test execute returns list of transients from database.
+     *
+     * @return void
+     */
+    public function testExecuteReturnsTransientsList(): void
+    {
+        $ability = $this->getAbilityInstance();
 
-		// Mock global wpdb.
-		global $wpdb;
-		$wpdb          = Mockery::mock( 'wpdb' );
-		$wpdb->prefix  = 'wp_';
-		$wpdb->options = 'wp_options';
+        // Mock global wpdb.
+        global $wpdb;
+        $wpdb          = Mockery::mock('wpdb');
+        $wpdb->prefix  = 'wp_';
+        $wpdb->options = 'wp_options';
 
-		// Mock database results.
-		$db_results = array(
-			(object) array(
-				'option_name'  => '_transient_my_cache',
-				'option_value' => serialize( 'cached_value' ),
-			),
-			(object) array(
-				'option_name'  => '_transient_timeout_my_cache',
-				'option_value' => (string) ( time() + 3600 ),
-			),
-		);
+        // Mock database results.
+        $db_results = array(
+            (object) array(
+                'option_name'  => '_transient_my_cache',
+                'option_value' => serialize('cached_value'),
+            ),
+            (object) array(
+                'option_name'  => '_transient_timeout_my_cache',
+                'option_value' => (string) ( time() + 3600 ),
+            ),
+        );
 
-		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing(
-				function ( $query ) {
-					return $query;
-				}
-			);
-		$wpdb->shouldReceive( 'get_results' )
-			->andReturn( $db_results );
+        $wpdb->shouldReceive('prepare')
+            ->andReturnUsing(
+                function ($query) {
+                    return $query;
+                }
+            );
+        $wpdb->shouldReceive('get_results')
+            ->andReturn($db_results);
 
-		Functions\when( 'maybe_unserialize' )->alias(
-			function ( $value ) {
-				return @unserialize( $value ) ?: $value;
-			}
-		);
+        Functions\when('maybe_unserialize')->alias(
+            function ($value) {
+                return @unserialize($value) ?: $value;
+            }
+        );
 
-		$result = $ability->doExecute( array() );
+        $result = $ability->doExecute(array());
 
-		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'transients', $result );
-		$this->assertArrayHasKey( 'total', $result );
-		$this->assertIsArray( $result['transients'] );
-	}
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('transients', $result);
+        $this->assertArrayHasKey('total', $result);
+        $this->assertIsArray($result['transients']);
+    }
 
-	/**
-	 * Test execute filters transients by search pattern.
-	 *
-	 * @return void
-	 */
-	public function testExecuteFiltersTransientsBySearch(): void {
-		$ability = $this->getAbilityInstance();
+    /**
+     * Test execute filters transients by search pattern.
+     *
+     * @return void
+     */
+    public function testExecuteFiltersTransientsBySearch(): void
+    {
+        $ability = $this->getAbilityInstance();
 
-		// Mock global wpdb.
-		global $wpdb;
-		$wpdb          = Mockery::mock( 'wpdb' );
-		$wpdb->prefix  = 'wp_';
-		$wpdb->options = 'wp_options';
+        // Mock global wpdb.
+        global $wpdb;
+        $wpdb          = Mockery::mock('wpdb');
+        $wpdb->prefix  = 'wp_';
+        $wpdb->options = 'wp_options';
 
-		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing(
-				function ( $query, ...$args ) {
-					// Check that search pattern is included.
-					return $query;
-				}
-			);
-		$wpdb->shouldReceive( 'get_results' )
-			->andReturn( array() );
-		$wpdb->shouldReceive( 'esc_like' )
-			->with( 'cache' )
-			->andReturn( 'cache' );
+        $wpdb->shouldReceive('prepare')
+            ->andReturnUsing(
+                function ($query, ...$args) {
+                    // Check that search pattern is included.
+                    return $query;
+                }
+            );
+        $wpdb->shouldReceive('get_results')
+            ->andReturn(array());
+        $wpdb->shouldReceive('esc_like')
+            ->with('cache')
+            ->andReturn('cache');
 
-		$result = $ability->doExecute( array( 'search' => 'cache' ) );
+        $result = $ability->doExecute(array( 'search' => 'cache' ));
 
-		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'transients', $result );
-	}
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('transients', $result);
+    }
 
-	/**
-	 * Test execute excludes transients matching exclude pattern.
-	 *
-	 * @return void
-	 */
-	public function testExecuteExcludesTransients(): void {
-		$ability = $this->getAbilityInstance();
+    /**
+     * Test execute excludes transients matching exclude pattern.
+     *
+     * @return void
+     */
+    public function testExecuteExcludesTransients(): void
+    {
+        $ability = $this->getAbilityInstance();
 
-		// Mock global wpdb.
-		global $wpdb;
-		$wpdb          = Mockery::mock( 'wpdb' );
-		$wpdb->prefix  = 'wp_';
-		$wpdb->options = 'wp_options';
+        // Mock global wpdb.
+        global $wpdb;
+        $wpdb          = Mockery::mock('wpdb');
+        $wpdb->prefix  = 'wp_';
+        $wpdb->options = 'wp_options';
 
-		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing(
-				function ( $query, ...$args ) {
-					return $query;
-				}
-			);
-		$wpdb->shouldReceive( 'get_results' )
-			->andReturn( array() );
-		$wpdb->shouldReceive( 'esc_like' )
-			->andReturn( 'secret' );
+        $wpdb->shouldReceive('prepare')
+            ->andReturnUsing(
+                function ($query, ...$args) {
+                    return $query;
+                }
+            );
+        $wpdb->shouldReceive('get_results')
+            ->andReturn(array());
+        $wpdb->shouldReceive('esc_like')
+            ->andReturn('secret');
 
-		$result = $ability->doExecute( array( 'exclude' => 'secret' ) );
+        $result = $ability->doExecute(array( 'exclude' => 'secret' ));
 
-		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'transients', $result );
-	}
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('transients', $result);
+    }
 
-	/**
-	 * Test execute uses sitemeta table for network transients.
-	 *
-	 * @return void
-	 */
-	public function testExecuteUsesNetworkTableForNetworkTransients(): void {
-		$ability = $this->getAbilityInstance();
+    /**
+     * Test execute uses sitemeta table for network transients.
+     *
+     * @return void
+     */
+    public function testExecuteUsesNetworkTableForNetworkTransients(): void
+    {
+        $ability = $this->getAbilityInstance();
 
-		// Mock global wpdb.
-		global $wpdb;
-		$wpdb              = Mockery::mock( 'wpdb' );
-		$wpdb->prefix      = 'wp_';
-		$wpdb->base_prefix = 'wp_';
-		$wpdb->options     = 'wp_options';
-		$wpdb->sitemeta    = 'wp_sitemeta';
+        // Mock global wpdb.
+        global $wpdb;
+        $wpdb              = Mockery::mock('wpdb');
+        $wpdb->prefix      = 'wp_';
+        $wpdb->base_prefix = 'wp_';
+        $wpdb->options     = 'wp_options';
+        $wpdb->sitemeta    = 'wp_sitemeta';
 
-		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing(
-				function ( $query ) {
-					return $query;
-				}
-			);
-		$wpdb->shouldReceive( 'get_results' )
-			->andReturn( array() );
+        $wpdb->shouldReceive('prepare')
+            ->andReturnUsing(
+                function ($query) {
+                    return $query;
+                }
+            );
+        $wpdb->shouldReceive('get_results')
+            ->andReturn(array());
 
-		$result = $ability->doExecute( array( 'network' => true ) );
+        $result = $ability->doExecute(array( 'network' => true ));
 
-		$this->assertIsArray( $result );
-	}
+        $this->assertIsArray($result);
+    }
 
-	/**
-	 * Test transient output includes expiration time.
-	 *
-	 * @return void
-	 */
-	public function testTransientOutputIncludesExpiration(): void {
-		$ability = $this->getAbilityInstance();
+    /**
+     * Test transient output includes expiration time.
+     *
+     * @return void
+     */
+    public function testTransientOutputIncludesExpiration(): void
+    {
+        $ability = $this->getAbilityInstance();
 
-		// Mock global wpdb.
-		global $wpdb;
-		$wpdb          = Mockery::mock( 'wpdb' );
-		$wpdb->prefix  = 'wp_';
-		$wpdb->options = 'wp_options';
+        // Mock global wpdb.
+        global $wpdb;
+        $wpdb          = Mockery::mock('wpdb');
+        $wpdb->prefix  = 'wp_';
+        $wpdb->options = 'wp_options';
 
-		$future_time = time() + 3600;
-		$db_results  = array(
-			(object) array(
-				'option_name'  => '_transient_test_cache',
-				'option_value' => serialize( 'value' ),
-			),
-			(object) array(
-				'option_name'  => '_transient_timeout_test_cache',
-				'option_value' => (string) $future_time,
-			),
-		);
+        $future_time = time() + 3600;
+        $db_results  = array(
+            (object) array(
+                'option_name'  => '_transient_test_cache',
+                'option_value' => serialize('value'),
+            ),
+            (object) array(
+                'option_name'  => '_transient_timeout_test_cache',
+                'option_value' => (string) $future_time,
+            ),
+        );
 
-		$wpdb->shouldReceive( 'prepare' )->andReturnUsing( fn( $q ) => $q );
-		$wpdb->shouldReceive( 'get_results' )->andReturn( $db_results );
+        $wpdb->shouldReceive('prepare')->andReturnUsing(fn($q) => $q);
+        $wpdb->shouldReceive('get_results')->andReturn($db_results);
 
-		Functions\when( 'maybe_unserialize' )->alias(
-			function ( $value ) {
-				return @unserialize( $value ) ?: $value;
-			}
-		);
+        Functions\when('maybe_unserialize')->alias(
+            function ($value) {
+                return @unserialize($value) ?: $value;
+            }
+        );
 
-		$result = $ability->doExecute( array() );
+        $result = $ability->doExecute(array());
 
-		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'transients', $result );
-		if ( count( $result['transients'] ) > 0 ) {
-			$transient = $result['transients'][0];
-			$this->assertArrayHasKey( 'name', $transient );
-			$this->assertArrayHasKey( 'value', $transient );
-			$this->assertArrayHasKey( 'expiration', $transient );
-		}
-	}
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('transients', $result);
+        if (count($result['transients']) > 0) {
+            $transient = $result['transients'][0];
+            $this->assertArrayHasKey('name', $transient);
+            $this->assertArrayHasKey('value', $transient);
+            $this->assertArrayHasKey('expiration', $transient);
+        }
+    }
 
-	/**
-	 * Test annotations are correct for read-only ability.
-	 *
-	 * @return void
-	 */
-	public function testGetAnnotations(): void {
-		$ability     = $this->getAbilityInstance();
-		$annotations = $ability->getAnnotations();
+    /**
+     * Test annotations are correct for read-only ability.
+     *
+     * @return void
+     */
+    public function testGetAnnotations(): void
+    {
+        $ability     = $this->getAbilityInstance();
+        $annotations = $ability->getAnnotations();
 
-		$this->assertTrue( $annotations['readonly'] );
-		$this->assertFalse( $annotations['destructive'] );
-		$this->assertTrue( $annotations['idempotent'] );
-	}
+        $this->assertTrue($annotations['readonly']);
+        $this->assertFalse($annotations['destructive']);
+        $this->assertTrue($annotations['idempotent']);
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Database schema generation (pure functions).
  *
@@ -18,20 +19,21 @@ namespace FAWpmcp\Database;
  *
  * @package FAWpmcp\Database
  */
-final class Schema {
+final class Schema
+{
+    /**
+     * Generate activity log table SQL.
+     *
+     * Pure function: same prefix always produces same SQL.
+     *
+     * @param string $prefix Database table prefix (e.g., 'wp_').
+     * @return string SQL CREATE TABLE statement.
+     */
+    public static function getActivityLogSchema(string $prefix): string
+    {
+        $table = "{$prefix}fa_wpmcp_activity_log";
 
-	/**
-	 * Generate activity log table SQL.
-	 *
-	 * Pure function: same prefix always produces same SQL.
-	 *
-	 * @param string $prefix Database table prefix (e.g., 'wp_').
-	 * @return string SQL CREATE TABLE statement.
-	 */
-	public static function getActivityLogSchema( string $prefix ): string {
-		$table = "{$prefix}fa_wpmcp_activity_log";
-
-		return "CREATE TABLE {$table} (
+        return "CREATE TABLE {$table} (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             correlation_id VARCHAR(36) NOT NULL,
             timestamp DATETIME NOT NULL,
@@ -53,20 +55,21 @@ final class Schema {
             INDEX idx_ability_name (ability_name),
             INDEX idx_success (success)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-	}
+    }
 
-	/**
-	 * Generate webhook queue table SQL.
-	 *
-	 * Pure function: same prefix always produces same SQL.
-	 *
-	 * @param string $prefix Database table prefix (e.g., 'wp_').
-	 * @return string SQL CREATE TABLE statement.
-	 */
-	public static function getWebhookQueueSchema( string $prefix ): string {
-		$table = "{$prefix}fa_wpmcp_webhook_queue";
+    /**
+     * Generate webhook queue table SQL.
+     *
+     * Pure function: same prefix always produces same SQL.
+     *
+     * @param string $prefix Database table prefix (e.g., 'wp_').
+     * @return string SQL CREATE TABLE statement.
+     */
+    public static function getWebhookQueueSchema(string $prefix): string
+    {
+        $table = "{$prefix}fa_wpmcp_webhook_queue";
 
-		return "CREATE TABLE {$table} (
+        return "CREATE TABLE {$table} (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             url VARCHAR(2048) NOT NULL,
             event_type VARCHAR(100) NOT NULL,
@@ -83,20 +86,21 @@ final class Schema {
             INDEX idx_next_retry_at (next_retry_at),
             INDEX idx_event_type (event_type)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-	}
+    }
 
-	/**
-	 * Get all schema SQL statements.
-	 *
-	 * Pure function: returns array of SQL strings.
-	 *
-	 * @param string $prefix Database table prefix (e.g., 'wp_').
-	 * @return array<int, string> Array of CREATE TABLE statements.
-	 */
-	public static function getAllSchemas( string $prefix ): array {
-		return array(
-			self::getActivityLogSchema( $prefix ),
-			self::getWebhookQueueSchema( $prefix ),
-		);
-	}
+    /**
+     * Get all schema SQL statements.
+     *
+     * Pure function: returns array of SQL strings.
+     *
+     * @param string $prefix Database table prefix (e.g., 'wp_').
+     * @return array<int, string> Array of CREATE TABLE statements.
+     */
+    public static function getAllSchemas(string $prefix): array
+    {
+        return array(
+            self::getActivityLogSchema($prefix),
+            self::getWebhookQueueSchema($prefix),
+        );
+    }
 }

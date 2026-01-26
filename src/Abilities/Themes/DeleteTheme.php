@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Delete Theme ability for WordPress MCP.
  *
@@ -48,118 +49,128 @@ use FAWpmcp\Exceptions\ThemeDeletionException;
  *
  * @package FAWpmcp\Abilities\Themes
  */
-final class DeleteTheme extends AbstractAbility {
+final class DeleteTheme extends AbstractAbility
+{
+    /**
+     * Returns the ability identifier.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return 'fa-wpmcp/delete-theme';
+    }
 
-	/**
-	 * Returns the ability identifier.
-	 *
-	 * @return string
-	 */
-	public function getName(): string {
-		return 'fa-wpmcp/delete-theme';
-	}
+    /**
+     * Returns the ability category.
+     *
+     * @return string
+     */
+    public function getCategory(): string
+    {
+        return 'themes';
+    }
 
-	/**
-	 * Returns the ability category.
-	 *
-	 * @return string
-	 */
-	public function getCategory(): string {
-		return 'themes';
-	}
+    /**
+     * Returns the display label.
+     *
+     * @return string
+     */
+    public function getLabel(): string
+    {
+        return 'Delete Theme';
+    }
 
-	/**
-	 * Returns the display label.
-	 *
-	 * @return string
-	 */
-	public function getLabel(): string {
-		return 'Delete Theme';
-	}
+    /**
+     * Returns the ability description.
+     *
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return 'Delete a WordPress theme.';
+    }
 
-	/**
-	 * Returns the ability description.
-	 *
-	 * @return string
-	 */
-	public function getDescription(): string {
-		return 'Delete a WordPress theme.';
-	}
+    /**
+     * Returns the JSON Schema for input validation.
+     *
+     * @return array
+     */
+    public function getInputSchema(): array
+    {
+        return array(
+            'type'       => 'object',
+            'properties' => array(
+                'stylesheet' => array(
+                    'type'        => 'string',
+                    'description' => 'Theme stylesheet name to delete.',
+                ),
+            ),
+            'required'   => array( 'stylesheet' ),
+        );
+    }
 
-	/**
-	 * Returns the JSON Schema for input validation.
-	 *
-	 * @return array
-	 */
-	public function getInputSchema(): array {
-		return array(
-			'type'       => 'object',
-			'properties' => array(
-				'stylesheet' => array(
-					'type'        => 'string',
-					'description' => 'Theme stylesheet name to delete.',
-				),
-			),
-			'required'   => array( 'stylesheet' ),
-		);
-	}
+    /**
+     * Returns the JSON Schema for output.
+     *
+     * @return array
+     */
+    public function getOutputSchema(): array
+    {
+        return array(
+            'type'       => 'object',
+            'properties' => array(
+                'success' => array( 'type' => 'boolean' ),
+            ),
+        );
+    }
 
-	/**
-	 * Returns the JSON Schema for output.
-	 *
-	 * @return array
-	 */
-	public function getOutputSchema(): array {
-		return array(
-			'type'       => 'object',
-			'properties' => array(
-				'success' => array( 'type' => 'boolean' ),
-			),
-		);
-	}
+    /**
+     * Returns the WordPress capability required.
+     *
+     * @return string
+     */
+    public function getRequiredCapability(): string
+    {
+        return 'delete_themes';
+    }
 
-	/**
-	 * Returns the WordPress capability required.
-	 *
-	 * @return string
-	 */
-	public function getRequiredCapability(): string {
-		return 'delete_themes';
-	}
+    /**
+     * Returns the operation type.
+     *
+     * @return string
+     */
+    public function getOperationType(): string
+    {
+        return 'write';
+    }
 
-	/**
-	 * Returns the operation type.
-	 *
-	 * @return string
-	 */
-	public function getOperationType(): string {
-		return 'write';
-	}
+    /**
+     * Get ability annotations.
+     *
+     * Marks this ability as destructive and non-idempotent.
+     *
+     * @return array<string, mixed> Annotations array.
+     */
+    public function getAnnotations(): array
+    {
+        $annotations                = parent::getAnnotations();
+        $annotations['destructive'] = true;
+        $annotations['idempotent']  = false;
+        return $annotations;
+    }
 
-	/**
-	 * Get ability annotations.
-	 *
-	 * Marks this ability as destructive and non-idempotent.
-	 *
-	 * @return array<string, mixed> Annotations array.
-	 */
-	public function getAnnotations(): array {
-		$annotations                = parent::getAnnotations();
-		$annotations['destructive'] = true;
-		$annotations['idempotent']  = false;
-		return $annotations;
-	}
-
-	/**
-	 * Executes the ability.
-	 *
-	 * @param array $input Input parameters.
-	 * @return array
-	 * @throws ThemeDeletionException Always thrown as this ability is not yet implemented.
-	 */
-	public function doExecute( array $input ): array {
-		throw new ThemeDeletionException(
-			'Theme deletion is not yet implemented. This ability requires WordPress delete_theme() integration.'
-		);
-	}
+    /**
+     * Executes the ability.
+     *
+     * @param array $input Input parameters.
+     * @return array
+     * @throws ThemeDeletionException Always thrown as this ability is not yet implemented.
+     */
+    public function doExecute(array $input): array
+    {
+        throw new ThemeDeletionException(
+            'Theme deletion is not yet implemented. This ability requires WordPress delete_theme() integration.'
+        );
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when user update fails.
  *
@@ -18,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class UserUpdateException extends Exception {
-
+class UserUpdateException extends Exception
+{
 }

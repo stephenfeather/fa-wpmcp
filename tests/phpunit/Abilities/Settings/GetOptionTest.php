@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for GetOption ability.
  *
@@ -26,134 +27,140 @@ use Mockery;
  *
  * @package FAWpmcp\Tests\Abilities\Settings
  */
-class GetOptionTest extends BrainMonkeyTestCase {
+class GetOptionTest extends BrainMonkeyTestCase
+{
+    use AbilityTestTrait;
 
-	use AbilityTestTrait;
+    /**
+     * Get an instance of the ability being tested.
+     *
+     * @return AbstractAbility
+     */
+    protected function getAbilityInstance(): AbstractAbility
+    {
+        return new GetOption();
+    }
 
-	/**
-	 * Get an instance of the ability being tested.
-	 *
-	 * @return AbstractAbility
-	 */
-	protected function getAbilityInstance(): AbstractAbility {
-		return new GetOption();
-	}
+    /**
+     * Get expected metadata for the ability.
+     *
+     * @return array{
+     *     name: string,
+     *     category: string,
+     *     label: string,
+     *     description_contains: string,
+     *     operation_type: string,
+     *     required_capability: string
+     * }
+     */
+    protected function getExpectedMetadata(): array
+    {
+        return array(
+            'name'                  => 'fa-wpmcp/get-option',
+            'category'              => 'settings',
+            'label'                 => 'Get Option',
+            'description_contains'  => 'retrieve',
+            'operation_type'        => 'read',
+            'required_capability'   => 'manage_options',
+        );
+    }
 
-	/**
-	 * Get expected metadata for the ability.
-	 *
-	 * @return array{
-	 *     name: string,
-	 *     category: string,
-	 *     label: string,
-	 *     description_contains: string,
-	 *     operation_type: string,
-	 *     required_capability: string
-	 * }
-	 */
-	protected function getExpectedMetadata(): array {
-		return array(
-			'name'                  => 'fa-wpmcp/get-option',
-			'category'              => 'settings',
-			'label'                 => 'Get Option',
-			'description_contains'  => 'retrieve',
-			'operation_type'        => 'read',
-			'required_capability'   => 'manage_options',
-		);
-	}
+    /**
+     * Test execute retrieves existing option.
+     *
+     * @return void
+     */
+    public function testExecuteRetrievesExistingOption(): void
+    {
+        $ability = $this->getAbilityInstance();
 
-	/**
-	 * Test execute retrieves existing option.
-	 *
-	 * @return void
-	 */
-	public function testExecuteRetrievesExistingOption(): void {
-		$ability = $this->getAbilityInstance();
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        Functions\expect('get_option')
+            ->once()
+            ->with('test_option', Mockery::type('stdClass'))
+            ->andReturn('test_value');
 
-		Functions\expect( 'get_option' )
-			->once()
-			->with( 'test_option', Mockery::type( 'stdClass' ) )
-			->andReturn( 'test_value' );
+        $result = $ability->doExecute(array( 'option_name' => 'test_option' ));
 
-		$result = $ability->doExecute( array( 'option_name' => 'test_option' ) );
+        $this->assertEquals('test_option', $result['option_name']);
+        $this->assertEquals('test_value', $result['value']);
+        $this->assertTrue($result['exists']);
+    }
 
-		$this->assertEquals( 'test_option', $result['option_name'] );
-		$this->assertEquals( 'test_value', $result['value'] );
-		$this->assertTrue( $result['exists'] );
-	}
+    /**
+     * Test execute returns default for non-existent option.
+     *
+     * @return void
+     */
+    public function testExecuteReturnsDefaultForNonExistentOption(): void
+    {
+        $ability = $this->getAbilityInstance();
 
-	/**
-	 * Test execute returns default for non-existent option.
-	 *
-	 * @return void
-	 */
-	public function testExecuteReturnsDefaultForNonExistentOption(): void {
-		$ability = $this->getAbilityInstance();
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        Functions\expect('get_option')
+            ->once()
+            ->with('missing_option', Mockery::type('stdClass'))
+            ->andReturnUsing(
+                function ($name, $sentinel) {
+                    return $sentinel;
+                }
+            );
 
-		Functions\expect( 'get_option' )
-			->once()
-			->with( 'missing_option', Mockery::type( 'stdClass' ) )
-			->andReturnUsing(
-				function ( $name, $sentinel ) {
-					return $sentinel;
-				}
-			);
+        $result = $ability->doExecute(
+            array(
+                'option_name' => 'missing_option',
+                'default'     => 'default_value',
+            )
+        );
 
-		$result = $ability->doExecute(
-			array(
-				'option_name' => 'missing_option',
-				'default'     => 'default_value',
-			)
-		);
+        $this->assertEquals('missing_option', $result['option_name']);
+        $this->assertEquals('default_value', $result['value']);
+        $this->assertFalse($result['exists']);
+    }
 
-		$this->assertEquals( 'missing_option', $result['option_name'] );
-		$this->assertEquals( 'default_value', $result['value'] );
-		$this->assertFalse( $result['exists'] );
-	}
+    /**
+     * Test execute handles array option values.
+     *
+     * @return void
+     */
+    public function testExecuteHandlesArrayOptionValues(): void
+    {
+        $ability      = $this->getAbilityInstance();
+        $option_value = array(
+            'key1' => 'value1',
+            'key2' => 'value2',
+        );
 
-	/**
-	 * Test execute handles array option values.
-	 *
-	 * @return void
-	 */
-	public function testExecuteHandlesArrayOptionValues(): void {
-		$ability      = $this->getAbilityInstance();
-		$option_value = array(
-			'key1' => 'value1',
-			'key2' => 'value2',
-		);
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        Functions\expect('get_option')
+            ->once()
+            ->with('array_option', Mockery::type('stdClass'))
+            ->andReturn($option_value);
 
-		Functions\expect( 'get_option' )
-			->once()
-			->with( 'array_option', Mockery::type( 'stdClass' ) )
-			->andReturn( $option_value );
+        $result = $ability->doExecute(array( 'option_name' => 'array_option' ));
 
-		$result = $ability->doExecute( array( 'option_name' => 'array_option' ) );
+        $this->assertEquals('array_option', $result['option_name']);
+        $this->assertEquals($option_value, $result['value']);
+        $this->assertTrue($result['exists']);
+    }
 
-		$this->assertEquals( 'array_option', $result['option_name'] );
-		$this->assertEquals( $option_value, $result['value'] );
-		$this->assertTrue( $result['exists'] );
-	}
+    /**
+     * Test execute blocks protected options.
+     *
+     * @return void
+     */
+    public function testExecuteBlocksProtectedOption(): void
+    {
+        $ability = $this->getAbilityInstance();
 
-	/**
-	 * Test execute blocks protected options.
-	 *
-	 * @return void
-	 */
-	public function testExecuteBlocksProtectedOption(): void {
-		$ability = $this->getAbilityInstance();
+        Functions\when('sanitize_key')->returnArg();
 
-		Functions\when( 'sanitize_key' )->returnArg();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('protected');
 
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( 'protected' );
-
-		$ability->doExecute( array( 'option_name' => 'admin_email' ) );
-	}
+        $ability->doExecute(array( 'option_name' => 'admin_email' ));
+    }
 }

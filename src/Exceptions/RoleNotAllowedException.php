@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when a role assignment is not allowed.
  *
@@ -19,6 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class RoleNotAllowedException extends Exception {
-
+class RoleNotAllowedException extends Exception
+{
 }

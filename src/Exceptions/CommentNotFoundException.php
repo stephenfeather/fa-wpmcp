@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when a comment is not found.
  *
@@ -18,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class CommentNotFoundException extends Exception {
-
+class CommentNotFoundException extends Exception
+{
 }

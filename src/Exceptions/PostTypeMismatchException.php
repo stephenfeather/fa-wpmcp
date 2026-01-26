@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when post type doesn't match expected type.
  *
@@ -19,6 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class PostTypeMismatchException extends Exception {
-
+class PostTypeMismatchException extends Exception
+{
 }

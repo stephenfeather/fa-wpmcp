@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for ActivateTheme.
  *
@@ -20,45 +21,48 @@ use Brain\Monkey\Functions;
  *
  * @package FAWpmcp\Tests\Abilities\Themes
  */
-class ActivateThemeTest extends BrainMonkeyTestCase {
+class ActivateThemeTest extends BrainMonkeyTestCase
+{
+    use AbilityTestTrait;
 
-	use AbilityTestTrait;
+    /**
+     * Get an instance of the ability being tested.
+     *
+     * @return AbstractAbility
+     */
+    protected function getAbilityInstance(): AbstractAbility
+    {
+        return new ActivateTheme();
+    }
 
-	/**
-	 * Get an instance of the ability being tested.
-	 *
-	 * @return AbstractAbility
-	 */
-	protected function getAbilityInstance(): AbstractAbility {
-		return new ActivateTheme();
-	}
+    /**
+     * Get expected metadata for the ability.
+     *
+     * @return array{
+     *     name: string,
+     *     category: string,
+     *     label: string,
+     *     description_contains: string,
+     *     operation_type: string,
+     *     required_capability: string
+     * }
+     */
+    protected function getExpectedMetadata(): array
+    {
+        return array(
+            'name'                  => 'fa-wpmcp/activate-theme',
+            'category'              => 'themes',
+            'label'                 => 'Activate Theme',
+            'description_contains'  => 'activate a wordpress theme',
+            'operation_type'        => 'write',
+            'required_capability'   => 'switch_themes',
+        );
+    }
 
-	/**
-	 * Get expected metadata for the ability.
-	 *
-	 * @return array{
-	 *     name: string,
-	 *     category: string,
-	 *     label: string,
-	 *     description_contains: string,
-	 *     operation_type: string,
-	 *     required_capability: string
-	 * }
-	 */
-	protected function getExpectedMetadata(): array {
-		return array(
-			'name'                  => 'fa-wpmcp/activate-theme',
-			'category'              => 'themes',
-			'label'                 => 'Activate Theme',
-			'description_contains'  => 'activate a wordpress theme',
-			'operation_type'        => 'write',
-			'required_capability'   => 'switch_themes',
-		);
-	}
-
-	public function testExecuteActivatesTheme(): void {
-		Functions\expect( 'switch_theme' )->once()->with( 'twentytwentyfour' );
-		$result = $this->getAbilityInstance()->doExecute( array( 'stylesheet' => 'twentytwentyfour' ) );
-		$this->assertTrue( $result['success'] );
-	}
+    public function testExecuteActivatesTheme(): void
+    {
+        Functions\expect('switch_theme')->once()->with('twentytwentyfour');
+        $result = $this->getAbilityInstance()->doExecute(array( 'stylesheet' => 'twentytwentyfour' ));
+        $this->assertTrue($result['success']);
+    }
 }

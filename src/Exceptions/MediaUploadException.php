@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when media upload fails.
  *
@@ -18,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class MediaUploadException extends Exception {
-
+class MediaUploadException extends Exception
+{
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception thrown when user creation fails.
  *
@@ -18,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class UserCreationException extends Exception {
-
+class UserCreationException extends Exception
+{
 }
