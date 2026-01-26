@@ -632,6 +632,11 @@ if (!hash_equals($expected, $signature)) {
 - [ ] **GraphQL Endpoint** - Optional GraphQL API
 - [ ] **Delete Operations** - Delete abilities for posts, media, and taxonomies
 - [ ] **Bulk Operations** - Bulk operations for terms and media
+- [ ] **Prometheus Observability** - Export MCP metrics to Prometheus
+  - Custom `PrometheusMcpObservabilityHandler` implementation
+  - Counter metrics for request counts by method, status, tool
+  - Histogram metrics for request duration
+  - Expose `/metrics` endpoint for Prometheus scraping
 
 ## Troubleshooting
 
