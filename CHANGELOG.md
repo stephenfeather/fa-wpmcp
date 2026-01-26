@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **File Error Logging** - Optional file-based MCP error logging:
+  - `FileErrorHandler` - Logs errors to `wp-content/mcp-errors.log`
+  - Enable/disable via admin UI toggle in Settings > FA WPMCP
+  - Log format: `[timestamp] [TYPE] message | Context: {json}`
+  - Implements `McpErrorHandlerInterface` for MCP adapter integration
+- **Domain-Specific Exception Hierarchy** - Replaced generic RuntimeException:
+  - `EncryptionException` - Webhook secret encryption failures
+  - `OptionException` - WordPress option operation failures
+  - `PluginDeletionException` / `PluginInstallationException` - Plugin operations
+  - `ThemeDeletionException` / `ThemeInstallationException` - Theme operations
+  - `PrivacyRequestException` / `PrivacyRequestNotFoundException` - Privacy requests
+  - `TransientException` - Transient operation failures
+- **Transient Abilities** - WordPress transient management:
+  - `GetTransient` - Retrieve transient value
+  - `ListTransients` - List all transients with expiration info
+  - `SetTransient` - Create/update transients with TTL
+  - `DeleteTransient` - Remove transients
+- **Post Type Abilities** - WordPress post type introspection:
+  - `ListPostTypes` - List all registered post types
+  - `GetPostType` - Get details for a specific post type
+- **MCP Observability Handler** - Structured event logging to PHP error log
+
 ## [1.0.0-alpha.4] - 2026-01-25
 
 ### Added

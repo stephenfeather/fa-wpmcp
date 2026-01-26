@@ -201,6 +201,150 @@ if (str_starts_with($secret, 'sodium:v1:') || str_starts_with($secret, 'openssl:
 - Tamper detection via Poly1305/GCM authentication tags
 - Memory safety with `sodium_memzero()` (when using libsodium)
 
+### Observability Configuration
+
+**Status:** ✅ Enabled by default
+
+FA WPMCP configures the MCP Adapter to use `ErrorLogMcpObservabilityHandler`, which logs all MCP events to the PHP error log with structured formatting.
+
+**Log Format:**
+```
+[MCP Observability] EVENT mcp.request 45.23ms [status=success,method=tools/call,site_id=1,user_id=123,...]
+```
+
+**Events Tracked:**
+- `mcp.request` - All MCP tool/resource/prompt calls with timing
+- `mcp.server.created` - Server initialization with component counts
+
+**Log Location:**
+- Check your PHP error log location (typically nginx error.log or php-fpm error.log)
+- For Docker setups, check container logs
+
+**Example Log Entries:**
+```
+# Successful tool call
+[MCP Observability] EVENT mcp.request 0.26ms [site_id=1,user_id=1,method=tools/call,tool_name=core-get-site-info,status=success]
+
+# Server startup
+[MCP Observability] EVENT mcp.server.created [site_id=1,tools_count=64,resources_count=0,prompts_count=0,status=success]
+```
+
+**Viewing Logs:**
+```bash
+# Nginx error log
+grep "MCP Observability" /var/log/nginx/error.log | tail -20
+
+# Docker container
+docker logs <container-name> 2>&1 | grep "MCP Observability"
+```
+
+**Customizing Observability:**
+
+To disable observability or use a different handler, use the `mcp_adapter_default_server_config` filter:
+
+```php
+// Disable observability
+add_filter('mcp_adapter_default_server_config', function($config) {
+    $config['observability_handler'] = \WP\MCP\Infrastructure\Observability\NullMcpObservabilityHandler::class;
+    return $config;
+}, 20);  // Priority 20 to run after FA WPMCP's filter
+```
+
+**Available Handlers:**
+- `ErrorLogMcpObservabilityHandler` - Logs to PHP error_log (default)
+- `NullMcpObservabilityHandler` - No-op, disables logging
+- `ConsoleObservabilityHandler` - Console output (for CLI/debugging)
+
+**Creating Custom Handlers:**
+
+Implement `McpObservabilityHandlerInterface` to send events to external systems:
+
+```php
+use WP\MCP\Infrastructure\Observability\Contracts\McpObservabilityHandlerInterface;
+use WP\MCP\Infrastructure\Observability\McpObservabilityHelperTrait;
+
+class MyCustomHandler implements McpObservabilityHandlerInterface {
+    use McpObservabilityHelperTrait;
+
+    public function record_event(string $event, array $tags = [], ?float $duration_ms = null): void {
+        // Send to StatsD, Prometheus, DataDog, etc.
+        $formatted_event = self::format_metric_name($event);
+        $merged_tags = self::merge_tags($tags);
+
+        // Your external service call here
+    }
+}
+```
+
+### File Error Logging
+
+**Status:** ✅ Implemented (v1.0.0-alpha.5)
+
+FA WPMCP includes optional file-based error logging that writes MCP errors to a dedicated log file for debugging.
+
+**Option Name:** `fa_wpmcp_settings`
+
+**Key:** `file_error_logging_enabled`
+
+**Log Location:** `wp-content/mcp-errors.log`
+
+**Enabling via Admin UI:**
+
+1. Go to **Settings > FA WPMCP**
+2. Check **Enable File Error Logging**
+3. Click **Save Settings**
+
+**Enabling Programmatically:**
+```php
+$settings = get_option('fa_wpmcp_settings', []);
+$settings['file_error_logging_enabled'] = true;
+update_option('fa_wpmcp_settings', $settings);
+```
+
+**Log Format:**
+```
+[2026-01-25 12:34:56] [ERROR] Ability returned WP_Error object | Context: {"ability":"fa-wpmcp/get-post","error_code":"ability_execution_failed","error_message":"Post not found"}
+```
+
+Each log entry contains:
+- **Timestamp** - UTC time in Y-m-d H:i:s format
+- **Type** - Log level (ERROR, INFO, DEBUG)
+- **Message** - Description of the error
+- **Context** - JSON-encoded metadata (ability name, error codes, etc.)
+
+**Viewing Logs:**
+```bash
+# View recent errors
+tail -20 /path/to/wordpress/wp-content/mcp-errors.log
+
+# Watch in real-time
+tail -f /path/to/wordpress/wp-content/mcp-errors.log
+
+# Search for specific ability errors
+grep "get-post" /path/to/wordpress/wp-content/mcp-errors.log
+```
+
+**Log Rotation:**
+
+The log file grows unbounded by default. For production, configure log rotation:
+
+```bash
+# /etc/logrotate.d/fa-wpmcp
+/path/to/wordpress/wp-content/mcp-errors.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+}
+```
+
+**Security Considerations:**
+- The log file is created in `wp-content/`, which should not be web-accessible
+- Context data may contain ability parameters; sensitive data is not logged
+- Consider disabling in production once debugging is complete
+
 ## Filters
 
 Customize plugin behavior at runtime using WordPress filters.
