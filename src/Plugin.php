@@ -192,6 +192,12 @@ final class Plugin {
 					$config['tools'] = array_merge( $config['tools'] ?? array(), $fa_abilities );
 				}
 
+				// Enable observability logging to PHP error log.
+				$config['observability_handler'] = \WP\MCP\Infrastructure\Observability\ErrorLogMcpObservabilityHandler::class;
+
+				// Enable file-based error logging (controlled by settings).
+				$config['error_handler'] = \FAWpmcp\Logging\FileErrorHandler::class;
+
 				return $config;
 			},
 			10
