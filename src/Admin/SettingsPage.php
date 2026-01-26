@@ -250,6 +250,8 @@ final class SettingsPage {
             return;
         }
 
+        $settings = $this->getMainSettings();
+
         $output = '<div class="wrap">';
         $output .= '<h1>' . esc_html( 'FA WPMCP Settings' ) . '</h1>';
 
@@ -261,6 +263,22 @@ final class SettingsPage {
         $output .= wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME, true, false );
 
         $output .= '<p>' . esc_html( 'Welcome to FA WPMCP. Use the submenus to configure permissions, rate limits, and webhooks.' ) . '</p>';
+
+        // Error Logging Settings.
+        $output .= '<h2>' . esc_html( 'Error Logging' ) . '</h2>';
+        $output .= '<table class="form-table">';
+
+        $output .= '<tr>';
+        $output .= '<th scope="row"><label for="file_error_logging_enabled">' . esc_html( 'Enable File Error Logging' ) . '</label></th>';
+        $output .= '<td>';
+        $output .= '<input type="checkbox" id="file_error_logging_enabled" name="file_error_logging_enabled" value="1" ';
+        $output .= checked( $settings['file_error_logging_enabled'] ?? false, true, false );
+        $output .= ' />';
+        $output .= '<p class="description">' . esc_html( 'Log MCP errors to wp-content/mcp-errors.log for debugging.' ) . '</p>';
+        $output .= '</td>';
+        $output .= '</tr>';
+
+        $output .= '</table>';
 
         $output .= '<p class="submit">';
         $output .= '<input type="submit" name="submit" class="button button-primary" value="' . esc_attr( 'Save Settings' ) . '" />';
@@ -652,7 +670,9 @@ final class SettingsPage {
 
         // Save general settings.
         $settings = array(
-            'version' => FA_WPMCP_VERSION,
+            'version'                    => FA_WPMCP_VERSION,
+            'file_error_logging_enabled' => isset( $_POST['file_error_logging_enabled'] )
+                && '1' === sanitize_text_field( wp_unslash( $_POST['file_error_logging_enabled'] ) ),
         );
 
         update_option( 'fa_wpmcp_settings', $settings );
@@ -814,6 +834,26 @@ final class SettingsPage {
                 admin_url( 'admin.php?page=fa-wpmcp-webhooks' )
             )
         );
+    }
+
+    /**
+     * Get main settings.
+     *
+     * @return array<string, mixed> Settings array.
+     */
+    private function getMainSettings(): array {
+        $defaults = array(
+            'version'                    => '',
+            'file_error_logging_enabled' => false,
+        );
+
+        $settings = get_option( 'fa_wpmcp_settings', $defaults );
+
+        if ( ! is_array( $settings ) ) {
+            return $defaults;
+        }
+
+        return array_merge( $defaults, $settings );
     }
 
     /**

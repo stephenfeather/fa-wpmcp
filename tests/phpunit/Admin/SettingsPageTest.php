@@ -58,6 +58,18 @@ class SettingsPageTest extends TestCase {
 	}
 
 	/**
+	 * Capture output from a callable that echoes instead of returns.
+	 *
+	 * @param callable $callable The callable to execute.
+	 * @return string The captured output.
+	 */
+	private function captureOutput( callable $callable ): string {
+		ob_start();
+		$callable();
+		return ob_get_clean() ?: '';
+	}
+
+	/**
 	 * Create a registry with test abilities.
 	 *
 	 * @param array<array<string, mixed>> $abilities_config Array of ability configs.
@@ -307,13 +319,20 @@ class SettingsPageTest extends TestCase {
 		Functions\expect( 'esc_html' )
 			->andReturnFirstArg();
 
+		Functions\expect( 'checked' )
+			->andReturnUsing(
+				function ( $checked, $current, $echo ) {
+					return $checked === $current ? 'checked="checked"' : '';
+				}
+			);
+
 		Functions\expect( 'admin_url' )
 			->andReturn( 'http://example.com/wp-admin/admin-post.php' );
 
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderSettingsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderSettingsPage() );
 
 		$this->assertStringContainsString( '<form', $output );
 		$this->assertStringContainsString( 'method="post"', $output );
@@ -344,13 +363,20 @@ class SettingsPageTest extends TestCase {
 		Functions\expect( 'esc_html' )
 			->andReturnFirstArg();
 
+		Functions\expect( 'checked' )
+			->andReturnUsing(
+				function ( $checked, $current, $echo ) {
+					return $checked === $current ? 'checked="checked"' : '';
+				}
+			);
+
 		Functions\expect( 'admin_url' )
 			->andReturn( 'http://example.com/wp-admin/admin-post.php' );
 
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderSettingsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderSettingsPage() );
 
 		$this->assertStringContainsString( 'fa_wpmcp_nonce', $output );
 	}
@@ -377,6 +403,13 @@ class SettingsPageTest extends TestCase {
 		Functions\expect( 'esc_html' )
 			->andReturnFirstArg();
 
+		Functions\expect( 'checked' )
+			->andReturnUsing(
+				function ( $checked, $current, $echo ) {
+					return $checked === $current ? 'checked="checked"' : '';
+				}
+			);
+
 		Functions\expect( 'admin_url' )
 			->once()
 			->with( 'admin-post.php' )
@@ -385,7 +418,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderSettingsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderSettingsPage() );
 
 		$this->assertStringContainsString( 'action="http://example.com/wp-admin/admin-post.php"', $output );
 		$this->assertStringContainsString( 'name="action" value="fa_wpmcp_save_settings"', $output );
@@ -435,7 +468,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderPermissionsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderPermissionsPage() );
 
 		$this->assertStringContainsString( 'global_read_enabled', $output );
 		$this->assertStringContainsString( 'global_write_enabled', $output );
@@ -504,7 +537,7 @@ class SettingsPageTest extends TestCase {
 		);
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderPermissionsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderPermissionsPage() );
 
 		$this->assertStringContainsString( 'category_settings[posts-pages]', $output );
 		$this->assertStringContainsString( 'enable_read', $output );
@@ -562,7 +595,7 @@ class SettingsPageTest extends TestCase {
 		);
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderPermissionsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderPermissionsPage() );
 
 		$this->assertStringContainsString( 'ability_settings[fa-wpmcp/create-post]', $output );
 		$this->assertStringContainsString( 'Create Post', $output );
@@ -611,7 +644,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderPermissionsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderPermissionsPage() );
 
 		// Global read should be checked by default.
 		$this->assertStringContainsString( 'global_read_enabled', $output );
@@ -655,7 +688,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderRateLimitsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderRateLimitsPage() );
 
 		$this->assertStringContainsString( 'default_requests_per_minute', $output );
 		$this->assertStringContainsString( 'default_requests_per_hour', $output );
@@ -708,7 +741,7 @@ class SettingsPageTest extends TestCase {
 		);
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderRateLimitsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderRateLimitsPage() );
 
 		$this->assertStringContainsString( 'ability_rate_limits[fa-wpmcp/create-post]', $output );
 		$this->assertStringContainsString( 'requests_per_minute', $output );
@@ -749,7 +782,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderRateLimitsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderRateLimitsPage() );
 
 		$this->assertStringContainsString( 'value="60"', $output );
 		$this->assertStringContainsString( 'value="500"', $output );
@@ -812,7 +845,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderWebhooksPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderWebhooksPage() );
 
 		$this->assertStringContainsString( 'webhook_endpoints', $output );
 		$this->assertStringContainsString( 'type="url"', $output );
@@ -867,7 +900,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderWebhooksPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderWebhooksPage() );
 
 		$this->assertStringContainsString( 'webhook_secret', $output );
 		$this->assertStringContainsString( 'type="password"', $output );
@@ -926,7 +959,7 @@ class SettingsPageTest extends TestCase {
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderWebhooksPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderWebhooksPage() );
 
 		$this->assertStringContainsString( 'ability.before_execute', $output );
 		$this->assertStringContainsString( 'ability.after_execute', $output );
@@ -1087,13 +1120,20 @@ class SettingsPageTest extends TestCase {
 		Functions\expect( 'esc_html' )
 			->andReturnFirstArg();
 
+		Functions\expect( 'checked' )
+			->andReturnUsing(
+				function ( $checked, $current, $echo ) {
+					return $checked === $current ? 'checked="checked"' : '';
+				}
+			);
+
 		Functions\expect( 'admin_url' )
 			->andReturn( 'http://example.com/wp-admin/admin-post.php' );
 
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderSettingsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderSettingsPage() );
 
 		$this->assertNotEmpty( $output );
 	}
@@ -1149,6 +1189,13 @@ class SettingsPageTest extends TestCase {
 
 		Functions\expect( 'esc_html' )
 			->andReturnFirstArg();
+
+		Functions\expect( 'checked' )
+			->andReturnUsing(
+				function ( $checked, $current, $echo ) {
+					return $checked === $current ? 'checked="checked"' : '';
+				}
+			);
 
 		Functions\expect( 'admin_url' )
 			->andReturn( 'http://example.com/wp-admin/admin-post.php' );
@@ -1572,13 +1619,20 @@ class SettingsPageTest extends TestCase {
 		Functions\expect( 'esc_html' )
 			->andReturnFirstArg();
 
+		Functions\expect( 'checked' )
+			->andReturnUsing(
+				function ( $checked, $current, $echo ) {
+					return $checked === $current ? 'checked="checked"' : '';
+				}
+			);
+
 		Functions\expect( 'admin_url' )
 			->andReturn( 'http://example.com/wp-admin/admin-post.php' );
 
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderSettingsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderSettingsPage() );
 
 		$this->assertStringContainsString( 'notice-success', $output );
 		$this->assertStringContainsString( 'Settings saved', $output );
@@ -1611,13 +1665,20 @@ class SettingsPageTest extends TestCase {
 		Functions\expect( 'esc_html' )
 			->andReturnFirstArg();
 
+		Functions\expect( 'checked' )
+			->andReturnUsing(
+				function ( $checked, $current, $echo ) {
+					return $checked === $current ? 'checked="checked"' : '';
+				}
+			);
+
 		Functions\expect( 'admin_url' )
 			->andReturn( 'http://example.com/wp-admin/admin-post.php' );
 
 		$registry = $this->create_registry_with_abilities();
 
 		$settings_page = new SettingsPage( $registry );
-		$output = $settings_page->renderSettingsPage();
+		$output = $this->captureOutput( fn() => $settings_page->renderSettingsPage() );
 
 		$this->assertStringContainsString( 'notice-error', $output );
 
