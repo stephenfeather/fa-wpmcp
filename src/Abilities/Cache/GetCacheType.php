@@ -23,6 +23,12 @@ use FAWpmcp\Abilities\AbstractAbility;
 final class GetCacheType extends AbstractAbility
 {
     /**
+     * Cache type patterns to check (order matters: memcached before memcache).
+     *
+     * @var array<string>
+     */
+    private const CACHE_TYPES = ['redis', 'memcached', 'memcache', 'apcu', 'xcache', 'wincache'];
+    /**
      * Get the unique ability name.
      *
      * @return string Ability name.
@@ -172,54 +178,65 @@ final class GetCacheType extends AbstractAbility
      */
     private function detectCacheType($cache, string $drop_in_path): string
     {
-        // If no external cache, it's the default.
         if (! wp_using_ext_object_cache()) {
             return 'default';
         }
 
-        // Check by class name.
-        if (is_object($cache)) {
-            $class_name = strtolower(get_class($cache));
+        $type = $this->detectFromClassName($cache);
+        if ('unknown' !== $type) {
+            return $type;
+        }
 
-            if (false !== strpos($class_name, 'redis')) {
-                return 'redis';
-            }
-            if (false !== strpos($class_name, 'memcached')) {
-                return 'memcached';
-            }
-            if (false !== strpos($class_name, 'memcache')) {
-                return 'memcache';
-            }
-            if (false !== strpos($class_name, 'apcu')) {
-                return 'apcu';
-            }
-            if (false !== strpos($class_name, 'xcache')) {
-                return 'xcache';
-            }
-            if (false !== strpos($class_name, 'wincache')) {
-                return 'wincache';
+        return $this->detectFromDropInFile($drop_in_path);
+    }
+
+    /**
+     * Detect cache type from the cache object's class name.
+     *
+     * @param mixed $cache The global cache object.
+     * @return string The detected cache type or 'unknown'.
+     */
+    private function detectFromClassName($cache): string
+    {
+        if (! is_object($cache)) {
+            return 'unknown';
+        }
+
+        $class_name = strtolower(get_class($cache));
+
+        foreach (self::CACHE_TYPES as $type) {
+            if (str_contains($class_name, $type)) {
+                return $type;
             }
         }
 
-        // Check drop-in file content for hints.
-        if (file_exists($drop_in_path) && is_readable($drop_in_path)) {
-            // Read first 2KB to find identifiers.
-            $content = file_get_contents($drop_in_path, false, null, 0, 2048);
-            if (false !== $content) {
-                $content_lower = strtolower($content);
+        return 'unknown';
+    }
 
-                if (false !== strpos($content_lower, 'redis')) {
-                    return 'redis';
-                }
-                if (false !== strpos($content_lower, 'memcached')) {
-                    return 'memcached';
-                }
-                if (false !== strpos($content_lower, 'memcache')) {
-                    return 'memcache';
-                }
-                if (false !== strpos($content_lower, 'apcu')) {
-                    return 'apcu';
-                }
+    /**
+     * Detect cache type from the drop-in file content.
+     *
+     * @param string $drop_in_path Path to the drop-in file.
+     * @return string The detected cache type or 'unknown'.
+     */
+    private function detectFromDropInFile(string $drop_in_path): string
+    {
+        if (! file_exists($drop_in_path) || ! is_readable($drop_in_path)) {
+            return 'unknown';
+        }
+
+        $content = file_get_contents($drop_in_path, false, null, 0, 2048);
+        if (false === $content) {
+            return 'unknown';
+        }
+
+        $content_lower = strtolower($content);
+
+        // Only check types that commonly appear in drop-in files.
+        $file_types = ['redis', 'memcached', 'memcache', 'apcu'];
+        foreach ($file_types as $type) {
+            if (str_contains($content_lower, $type)) {
+                return $type;
             }
         }
 
