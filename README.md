@@ -1,6 +1,6 @@
 # FA WPMCP - WordPress MCP Plugin
 
-WordPress plugin that exposes WordPress functionality to AI agents via the Abilities API and MCP (Model Context Protocol) Adapter.
+WordPress plugin that exposes WordPress functionality to AI agents via the Abilities API and MCP (Model Context Protocol) Adapter. Connect AI assistants like Claude, GPT, or Gemini to your WordPress site for intelligent content management.
 
 ## Requirements
 
@@ -8,154 +8,17 @@ WordPress plugin that exposes WordPress functionality to AI agents via the Abili
 - **WordPress:** 6.9 or higher (Abilities API)
 - **Composer:** For dependency management
 
-## Installation
+## Quick Installation
 
-1. Clone this repository into your WordPress plugins directory:
-   ```bash
-   cd wp-content/plugins
-   git clone https://github.com/featherart/fa-wpmcp.git
-   cd fa-wpmcp
-   ```
-
-2. Install dependencies:
-   ```bash
-   composer install --no-dev  # Production
-   composer install           # Development (includes test dependencies)
-   ```
-
-3. Activate the plugin in WordPress admin or via WP-CLI:
-   ```bash
-   wp plugin activate fa-wpmcp
-   ```
-
-## Quick Start
-
-Once activated, the plugin automatically:
-- Initializes the Ability Framework
-- Sets up rate limiting (60 requests/min, 1000 requests/hour)
-- Configures activity logging
-- Registers webhook processing
-
-Default permissions:
-- Global read: **Enabled**
-- Global write: **Disabled**
-
-Configure via WordPress options or filters (see [Configuration](#configuration)).
-
-**Connect AI Assistants:**
-- **[Quick Start Guide](docs/QUICK_START.md)** - Get connected in 5 minutes
-- **[Client Configuration](docs/MCP_CLIENT_CONFIGURATION.md)** - Claude, GPT, Gemini setup examples
-- **[Full API Documentation](docs/MCP_DOCUMENTATION.md)** - Complete reference
-
-**API Reference:**
-- **[REST API Endpoints](docs/REST_API_ENDPOINTS.md)** - Complete reference for all 87 REST endpoints
-
-## MCP Server Integration
-
-Connect AI assistants like Claude Desktop to your WordPress site using the **Model Context Protocol (MCP)**. We recommend using the official `@automattic/mcp-wordpress-remote` package, which provides automatic OAuth authentication and seamless integration.
-
-### Prerequisites
-
-1. **WordPress Application Password:**
-   - Navigate to **Users → Profile** in WordPress admin
-   - Scroll to **Application Passwords**
-   - Create a new application password (save it securely)
-
-2. **Claude Desktop** (or other MCP-compatible client)
-
-### Recommended: Using @automattic/mcp-wordpress-remote
-
-The official WordPress MCP Remote package from Automattic provides the best experience with support for OAuth 2.1, Application Passwords, and JWT authentication.
-
-**Configure Claude Desktop:**
-
-Edit your Claude Desktop config file:
-- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
-- **Linux:** `~/.config/Claude/claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "fa-wpmcp": {
-      "command": "npx",
-      "args": ["-y", "@automattic/mcp-wordpress-remote"],
-      "env": {
-        "WP_API_URL": "https://your-site.com",
-        "WP_API_USERNAME": "your_wordpress_username",
-        "WP_API_PASSWORD": "xxxx xxxx xxxx xxxx xxxx xxxx",
-        "OAUTH_ENABLED": "false"
-      }
-    }
-  }
-}
+```bash
+cd wp-content/plugins
+git clone https://github.com/featherart/fa-wpmcp.git
+cd fa-wpmcp
+composer install --no-dev
+wp plugin activate fa-wpmcp
 ```
 
-**Configuration Options:**
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `WP_API_URL` | Yes | Your WordPress site URL |
-| `WP_API_USERNAME` | Yes* | WordPress username |
-| `WP_API_PASSWORD` | Yes* | Application password from WordPress |
-| `OAUTH_ENABLED` | No | Set to `"false"` to use Application Passwords (default: `"true"` for OAuth) |
-
-*Required when using Application Password authentication
-
-**Restart Claude Desktop** after saving the configuration.
-
-### Alternative: Bundled MCP Server
-
-For advanced use cases or custom configurations, the plugin includes a bundled Node.js MCP server in the `bin/` directory.
-
-See [`bin/README.md`](bin/README.md) for installation and configuration instructions.
-
-### Verification
-
-After restarting Claude Desktop, start a new conversation and look for the MCP icon (🔌) in the interface. Your WordPress abilities should be available as tools.
-
-Test with a prompt:
-```
-"List my WordPress site information"
-```
-
-Claude should connect to your WordPress site and return site details!
-
-### Available Tools
-
-Once connected, all registered WordPress abilities become available as MCP tools:
-
-| Tool Name | Description |
-|-----------|-------------|
-| `core-get-site-info` | Get WordPress site information (name, URL, version) |
-| `core-get-environment-info` | Get environment details (PHP, DB, WP versions) |
-| `posts-list-posts` | List WordPress posts with filtering |
-| `posts-get-post` | Get a specific post by ID |
-| *(32+ more abilities)* | Auto-discovered from WordPress API |
-
-Tool names are automatically sanitized based on ability names.
-
-### Architecture
-
-```
-Claude Desktop
-    ↓ (stdio via MCP SDK)
-@automattic/mcp-wordpress-remote
-    ↓ (HTTP + Auth)
-WordPress REST API
-    ↓ (wp-json/wp-abilities/v1/)
-FA-WPMCP Plugin
-    ↓ (Ability Framework)
-WordPress Core
-```
-
-**How It Works:**
-1. MCP server authenticates with WordPress (OAuth or Application Password)
-2. Discovers all abilities from WordPress Abilities API
-3. Exposes each ability as an MCP tool
-4. When Claude calls a tool, the server sends HTTP request to WordPress
-5. WordPress executes the ability and returns JSON response
-6. MCP server returns result to Claude
+For detailed setup including AI assistant configuration, see the **[Quick Start Guide](docs/QUICK_START.md)**.
 
 ## Features
 
@@ -174,16 +37,16 @@ The plugin provides comprehensive WordPress content management through the follo
 - **Posts & Pages:** Full CRUD operations for posts, pages, and custom post types
   - Universal `post_type` parameter supports WordPress pages, WooCommerce products, and any custom post type
   - List, Get, Create, Update operations with filtering, pagination, and search
-  
+
 - **Comments:** Complete comment management system
   - List, Get, Create, Update, Delete operations
   - Support for comment moderation, threading, and metadata
-  
+
 - **Media Library:** Upload and manage media files
   - List, Get, Update, Upload operations
   - Base64 and URL upload support with automatic thumbnail generation
   - MIME type filtering and file size limits (10MB default)
-  
+
 - **Taxonomies:** Manage categories, tags, and custom taxonomies
   - List Terms, Get Term, Create Term, Update Term
   - Works with any taxonomy including hierarchical parent/child relationships
@@ -215,6 +78,12 @@ The plugin provides comprehensive WordPress content management through the follo
   - Full integration with WordPress privacy tools
   - Email confirmation workflow for data requests
 
+- **Cron:** Scheduled tasks management
+  - List, Get, Schedule, Unschedule, Run cron events
+
+- **Roles:** User role and capability management
+  - List, Get, Create, Update, Delete roles
+
 ### Permission System
 
 - **Permission System:** Multi-level access control
@@ -243,7 +112,6 @@ The plugin provides comprehensive WordPress content management through the follo
   - HMAC-SHA256 signature signing
   - Retry logic with exponential backoff
   - Queue-based processing (Action Scheduler or WP-Cron)
-  - Configurable subscribers via WordPress options
 
 ### Standards Compliance
 
@@ -257,435 +125,38 @@ The plugin provides comprehensive WordPress content management through the follo
 - **Code Quality:** Professional-grade implementation
   - PSR-12 coding standards
   - PHPStan level 8 static analysis
-  - 645 unit tests, 79.41% coverage
+  - 700+ unit tests
   - Type-safe with PHP 8.1 features
 
-## Architecture
-
-The plugin follows professional software engineering practices: TDD, functional programming, SOLID principles, and strict type safety.
-
-**For complete architecture documentation, see [Architecture Guide](docs/ARCHITECTURE.md).**
-
-### Quick Overview
-
-**Design Principles:**
-- Test-Driven Development (TDD)
-- Functional Programming (FP) with immutable value objects
-- SOLID principles with dependency injection
-- Type safety with PHP 8.1+ features
-
-**Core Components:**
-- **Ability Framework** - Registry, executor, pipeline orchestration
-- **Permission System** - Multi-level access control (global/category/ability)
-- **Rate Limiting** - Dual-track (per-user/per-IP) with transient storage
-- **Activity Logging** - Audit trail with correlation IDs and PII redaction
-- **Webhooks** - Event-driven notifications with HMAC signing
-
-**Request Flow:**
-```
-Request → Permissions → Rate Limit → Execute → Log → Webhook
-```
-
-See the [Architecture Guide](docs/ARCHITECTURE.md) for detailed component documentation, database schema, design patterns, and extension points.
-
-## Configuration
-
-The plugin can be configured through WordPress options, filters, and constants.
-
-**For complete configuration documentation, see [Configuration Guide](docs/CONFIGURATION.md).**
-
-### Quick Configuration
-
-**WordPress Options:**
-- `fa_wpmcp_permissions` - Control global/category/ability-level access
-- `fa_wpmcp_rate_limits` - Configure rate limiting thresholds
-- `fa_wpmcp_webhooks` - Enable/configure webhook delivery
-
-**Useful Filters:**
-- `fa_wpmcp_permission_settings` - Modify permissions at runtime
-- `fa_wpmcp_rate_limit_config` - Adjust rate limits dynamically
-- `fa_wpmcp_webhook_payload` - Customize webhook payloads
-
-**Constants (wp-config.php):**
-- `FA_WPMCP_DISABLE_RATE_LIMITING` - Disable rate limiting
-- `FA_WPMCP_DISABLE_WEBHOOKS` - Disable webhook delivery
-- `FA_WPMCP_LOG_RETENTION_DAYS` - Set log retention period
-- `FA_WPMCP_PRESERVE_DATA_ON_UNINSTALL` - Prevent data deletion on uninstall
-
-See the [Configuration Guide](docs/CONFIGURATION.md) for detailed examples, best practices, and troubleshooting.
-
-## Development
-
-**For comprehensive development documentation, see [Development Guide](docs/DEVELOPMENT.md).**
-
-This guide includes:
-- WordPress 6.9 Abilities API requirements (critical ordering constraints)
-- Step-by-step guide for adding new abilities
-- Category management and registration workflow
-- Testing patterns and debugging techniques
-- Best practices and code standards
-
-### Project Structure
-
-```
-fa-wpmcp/
-├── src/
-│   ├── Abilities/          # Ability framework
-│   ├── Database/           # Migrations and schema
-│   ├── Logging/            # Activity logging
-│   ├── Permissions/        # Permission system
-│   ├── RateLimiting/       # Rate limiting
-│   ├── ValueObjects/       # Immutable value objects
-│   ├── Webhooks/           # Webhook system
-│   └── Plugin.php          # Main plugin class
-├── tests/
-│   └── phpunit/            # Unit tests
-├── docs/
-│   ├── DEVELOPMENT.md      # Comprehensive developer guide
-│   ├── ARCHITECTURE.md     # System architecture
-│   ├── CONFIGURATION.md    # Configuration options
-│   └── SECURITY.md         # Security guidelines
-├── .phpcs.xml              # Code standards config
-├── phpstan.neon            # Static analysis config
-├── phpunit.xml             # Test configuration
-└── composer.json           # Dependencies
-```
-
-### Code Standards
-
-This project follows **PSR-12** and **WordPress Coding Standards**.
-
-Check code standards:
-```bash
-composer phpcs
-```
-
-Auto-fix code standards:
-```bash
-composer phpcbf
-```
-
-### Static Analysis
-
-Run PHPStan (level 8):
-```bash
-composer phpstan
-```
-
-### Test Coverage
-
-Generate HTML coverage report:
-```bash
-composer test:coverage
-```
-
-View report at `tests/coverage/index.html`.
-
-Current coverage: **74.33%** (703 tests, 1543 assertions)
-
-### Creating New Abilities
-
-**For detailed instructions, see [Development Guide](docs/DEVELOPMENT.md#adding-new-abilities).**
-
-Quick example - extend `AbstractAbility` to create custom abilities:
-
-```php
-<?php
-declare(strict_types=1);
-
-namespace FAWpmcp\Abilities\Posts;
-
-use FAWpmcp\Abilities\AbstractAbility;
-
-class GetPostAbility extends AbstractAbility {
-    
-    public function get_name(): string {
-        return 'posts.get';
-    }
-    
-    public function get_category(): string {
-        return 'posts';
-    }
-    
-    public function get_label(): string {
-        return 'Get Post';
-    }
-    
-    public function get_description(): string {
-        return 'Retrieve a single post by ID';
-    }
-    
-    public function get_input_schema(): array {
-        return [
-            'type' => 'object',
-            'properties' => [
-                'id' => [
-                    'type' => 'integer',
-                    'description' => 'Post ID'
-                ]
-            ],
-            'required' => ['id']
-        ];
-    }
-    
-    public function get_output_schema(): array {
-        return [
-            'type' => 'object',
-            'properties' => [
-                'id' => ['type' => 'integer'],
-                'title' => ['type' => 'string'],
-                'content' => ['type' => 'string'],
-                'status' => ['type' => 'string']
-            ]
-        ];
-    }
-    
-    public function get_required_capability(): string {
-        return 'read';
-    }
-    
-    public function get_operation_type(): string {
-        return 'READ';
-    }
-    
-    protected function do_execute(array $input): array {
-        $post = get_post($input['id']);
-        
-        if (!$post) {
-            throw new \RuntimeException('Post not found');
-        }
-        
-        return [
-            'id' => $post->ID,
-            'title' => $post->post_title,
-            'content' => $post->post_content,
-            'status' => $post->post_status
-        ];
-    }
-}
-```
-
-Register in `Plugin::init()`:
-
-```php
-$ability_registry->register(new GetPostAbility());
-```
-
-**Important:** When creating abilities, you must:
-1. Ensure the category is registered in `Plugin::registerAbilityCategories()`
-2. Use proper hook priorities (categories at priority 5, abilities at priority 15)
-3. Follow WordPress 6.9 Abilities API requirements
-
-See [Development Guide](docs/DEVELOPMENT.md) for complete details on category registration, hook priorities, and WordPress 6.9 API requirements.
-
-### Testing Patterns
-
-Use **Brain\Monkey** for WordPress function mocking:
-
-```php
-use Brain\Monkey\Functions;
-
-public function test_get_post() {
-    Functions\when('get_post')->justReturn((object)[
-        'ID' => 1,
-        'post_title' => 'Test Post',
-        'post_content' => 'Content',
-        'post_status' => 'publish'
-    ]);
-    
-    $ability = new GetPostAbility();
-    $result = $ability->execute(['id' => 1]);
-    
-    $this->assertTrue($result->is_success());
-    $this->assertEquals('Test Post', $result->data['title']);
-}
-```
-
-### Continuous Integration
-
-The project includes test commands suitable for CI pipelines:
-
-```bash
-# Full CI check
-composer install --no-dev --prefer-dist
-composer test
-composer phpcs
-composer phpstan
-```
-
-## API Documentation
-
-### Ability Registration
-
-Register abilities with WordPress:
-
-```php
-// In your plugin or theme
-add_action('init', function() {
-    if (function_exists('wp_register_ability')) {
-        wp_register_ability([
-            'name' => 'posts.get',
-            'category' => 'posts',
-            'label' => 'Get Post',
-            'description' => 'Retrieve a single post',
-            'input_schema' => [...],
-            'output_schema' => [...],
-            'required_capability' => 'read',
-            'operation_type' => 'READ',
-            'callback' => [new GetPostAbility(), 'execute']
-        ]);
-    }
-});
-```
-
-### Execution Flow
-
-```php
-// Internal execution flow
-$executor = $plugin->get_service('ability_executor');
-$result = $executor->execute('posts.get', ['id' => 1]);
-
-if ($result->is_success()) {
-    echo $result->data['title'];
-} else {
-    echo $result->error_message;
-}
-```
-
-### Webhook Payloads
-
-Webhook events send this payload structure:
-
-```json
-{
-  "event": "ability.before_execute",
-  "timestamp": "2026-01-20T12:00:00+00:00",
-  "correlation_id": "550e8400-e29b-41d4-a716-446655440000",
-  "ability": {
-    "name": "posts.get",
-    "category": "posts"
-  },
-  "input": {
-    "id": 1
-  },
-  "user_id": 42,
-  "ip_address": "203.0.113.1"
-}
-```
-
-Verify signatures:
-
-```php
-$signature = $_SERVER['HTTP_X_WEBHOOK_SIGNATURE'] ?? '';
-$payload = file_get_contents('php://input');
-$secret = get_option('fa_wpmcp_webhooks')['secret'] ?? '';
-
-$expected = hash_hmac('sha256', $payload, $secret);
-
-if (!hash_equals($expected, $signature)) {
-    http_response_code(401);
-    exit('Invalid signature');
-}
-```
-
-## Roadmap
-
-### Completed Phases ✅
-- [x] Phase 1.1-1.12: Core framework, permissions, rate limiting, logging, webhooks, error handling
-- [x] Privacy redaction system (PrivacyRedactor)
-- [x] HTTP response formatting utilities
-- [x] Database schema and migrations
-- [x] **Post Abilities** - Complete CRUD operations for posts, pages, and custom post types
-  - Supports any post type via `post_type` parameter (posts, pages, WooCommerce products, etc.)
-  - List, Get, Create, Update operations
-- [x] **Comment Abilities** - Complete CRUD operations for comments
-  - List, Get, Create, Update, Delete operations
-- [x] **Media Abilities** - Media library management
-  - List, Get, Update, Upload operations
-  - Support for base64 and URL uploads
-- [x] **Taxonomy Abilities** - Taxonomy and term management
-  - List Terms, Get Term, Create Term, Update Term
-  - Works with any taxonomy (categories, tags, custom taxonomies)
-- [x] **User Abilities** - Complete user management system
-  - List, Get, Create, Update operations
-  - Role filtering, search, and flexible user lookup (ID, username, email)
-- [x] **Settings Abilities** - WordPress options management
-  - Get Option, Update Option, Delete Option, List Options
-  - Search filtering and pagination
-  - Safe serialization handling and option existence detection
-- [x] **Plugin Abilities** - WordPress plugin management
-  - List Plugins, Get Plugin, Install Plugin, Activate Plugin, Deactivate Plugin, Delete Plugin, Update Plugin
-  - Follows wp-cli naming conventions
-  - Full plugin lifecycle management
-- [x] **Theme Abilities** - Plugin and theme management (complete)
-
-### Future Enhancements
-- [x] **MCP Server Integration** - Complete support for Model Context Protocol
-  - ✅ Bundled MCP server (`bin/mcp-server.js`) with auto-discovery
-  - ✅ Documentation updated to recommend `@automattic/mcp-wordpress-remote`
-  - ✅ Application Password authentication support
-  - ✅ OAuth 2.1 support via Automattic package
-- [ ] **GDPR Compliance** - Data export/erasure hooks (Privacy abilities implemented)
-- [ ] **Uninstall Handler** - Clean database on plugin removal
-- [ ] **Integration Tests** - E2E testing with WordPress
-- [ ] **Multisite Support** - Multi-site network compatibility
-- [ ] **GraphQL Endpoint** - Optional GraphQL API
-- [ ] **Delete Operations** - Delete abilities for posts, media, and taxonomies
-- [ ] **Bulk Operations** - Bulk operations for terms and media
-- [ ] **Prometheus Observability** - Export MCP metrics to Prometheus
-  - Custom `PrometheusMcpObservabilityHandler` implementation
-  - Counter metrics for request counts by method, status, tool
-  - Histogram metrics for request duration
-  - Expose `/metrics` endpoint for Prometheus scraping
-
-### Future Abilities
-
-Additional ability categories planned for implementation:
-
-- [x] **Cron Abilities** - WordPress scheduled tasks management ✅
-  - ListCronEvents, GetCronEvent, ScheduleCronEvent, UnscheduleCronEvent, RunCronEvent, ListCronSchedules
-- [x] **Role Abilities** - User role and capability management ✅
-  - ListRoles, GetRole, CreateRole, UpdateRole, DeleteRole
-- [ ] **Cap Abilities** - Fine-grained capability management
-  - ListCaps, AddCap, RemoveCap
-- [ ] **Menu Abilities** - Navigation menu management
-  - ListMenus, GetMenu, CreateMenu, UpdateMenu, DeleteMenu, ListMenuItems
-- [ ] **Sidebar Abilities** - Widget area management
-  - ListSidebars, GetSidebar, ListWidgets
-- [ ] **Widget Abilities** - Widget instance management
-  - GetWidget, CreateWidget, UpdateWidget, DeleteWidget
-- [ ] **Rewrite Abilities** - URL rewrite rules management
-  - ListRewriteRules, FlushRewriteRules, AddRewriteRule
-- [ ] **Config Abilities** - wp-config.php constants inspection
-  - ListConfigConstants, GetConfigConstant
-- [ ] **Core Abilities** - WordPress core information
-  - GetCoreVersion, CheckCoreUpdates, ListCoreChecksums
-- [ ] **Search-Replace Abilities** - Database search and replace
-  - SearchReplace (with dry-run support)
-- [ ] **DB Abilities** *(possible)* - Direct database operations
-  - Query, Tables, Optimize, Repair
-- [ ] **Env Abilities** *(possible)* - Environment inspection
-  - GetEnvironmentType, GetPhpInfo, GetServerInfo
+## Documentation
+
+| Guide | Description |
+|-------|-------------|
+| **[Quick Start](docs/QUICK_START.md)** | Get connected in 5 minutes |
+| **[MCP Client Configuration](docs/MCP_CLIENT_CONFIGURATION.md)** | Claude, GPT, Gemini setup examples |
+| **[Configuration](docs/CONFIGURATION.md)** | Options, filters, and constants |
+| **[Architecture](docs/ARCHITECTURE.md)** | System design and components |
+| **[Development](docs/DEVELOPMENT.md)** | Adding abilities, testing, code standards |
+| **[Security](docs/SECURITY.md)** | Security guidelines and reporting |
+| **[REST API](docs/REST_API_ENDPOINTS.md)** | Complete API reference |
+| **[MCP Documentation](docs/MCP_DOCUMENTATION.md)** | Full MCP integration reference |
 
 ## Troubleshooting
 
 ### Plugin won't activate
 
 **Error:** "FA WPMCP requires WordPress Abilities API"
-
-**Solution:** Ensure WordPress 6.9+ is installed. The Abilities API is built into WP 6.9+.
+**Solution:** Ensure WordPress 6.9+ is installed.
 
 ### Composer autoloader not found
 
 **Error:** Admin notice about missing autoloader
-
 **Solution:** Run `composer install` in the plugin directory.
 
 ### Rate limiting too aggressive
 
 **Symptom:** Requests denied with 429 status
-
-**Solution:** Adjust rate limits via filter:
+**Solution:** Adjust via filter:
 
 ```php
 add_filter('fa_wpmcp_rate_limit_config', function($config) {
@@ -694,79 +165,55 @@ add_filter('fa_wpmcp_rate_limit_config', function($config) {
 });
 ```
 
-### Webhooks not firing
+For additional troubleshooting, see the [Configuration Guide](docs/CONFIGURATION.md).
 
-**Check:**
-1. Verify webhooks are enabled: `get_option('fa_wpmcp_webhooks')['enabled']`
-2. Check webhook queue: `SELECT * FROM {$wpdb->prefix}fa_wpmcp_webhook_queue`
-3. Ensure Action Scheduler or WP-Cron is running
+## Development
 
-### Activity log growing too large
+**Quick commands:**
 
-**Solution:** Configure automatic cleanup via cron:
-
-```php
-add_action('init', function() {
-    if (!wp_next_scheduled('fa_wpmcp_cleanup_logs')) {
-        wp_schedule_event(time(), 'daily', 'fa_wpmcp_cleanup_logs');
-    }
-});
-
-add_action('fa_wpmcp_cleanup_logs', function() {
-    global $wpdb;
-    $days = defined('FA_WPMCP_LOG_RETENTION_DAYS') 
-        ? FA_WPMCP_LOG_RETENTION_DAYS 
-        : 30;
-    
-    $repo = new \FAWpmcp\Logging\LogRepository($wpdb);
-    $repo->delete_older_than($days);
-});
+```bash
+composer test          # Run all tests
+composer phpcs         # Check code standards
+composer phpcbf        # Auto-fix code standards
+composer phpstan       # Static analysis (level 8)
+composer test:coverage # Generate coverage report
 ```
+
+For comprehensive development documentation including adding new abilities, testing patterns, and architecture details, see the **[Development Guide](docs/DEVELOPMENT.md)**.
+
+## Roadmap
+
+### Completed
+
+- Core framework, permissions, rate limiting, logging, webhooks
+- Posts, Comments, Media, Taxonomies, Users, Settings abilities
+- Plugin, Theme, Privacy, Cron, Roles abilities
+- MCP Server integration with OAuth and Application Password support
+
+### Planned
+
+- Delete operations for posts, media, taxonomies
+- Bulk operations
+- Menu and widget abilities
+- Multisite support
+- GraphQL endpoint
+- Prometheus observability
 
 ## Security
 
-**For complete security documentation, see [Security Guide](docs/SECURITY.md).**
+For security guidelines and vulnerability reporting, see the **[Security Guide](docs/SECURITY.md)**.
 
-### Reporting Vulnerabilities
-
-Please do NOT open public issues for security vulnerabilities.
-
-### Security Features
-
-- HMAC-SHA256 webhook signing
-- Rate limiting (DDoS protection)
-- WordPress capability checks
-- Input validation via JSON Schema
-- SQL injection protection (prepared statements)
-- XSS protection (escaped output)
-- CSRF protection (WordPress nonces where applicable)
-- PII redaction in activity logs (50+ sensitive fields)
-- Protected WordPress options (prevents modification of critical settings)
-- Comment content sanitization (XSS prevention)
+**Do NOT open public issues for security vulnerabilities.**
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/my-feature`
 3. Write tests first (TDD)
-4. Implement feature
-5. Ensure tests pass: `composer test`
-6. Check code standards: `composer phpcs`
-7. Run static analysis: `composer phpstan`
-8. Commit: `git commit -m "Add feature"`
-9. Push: `git push origin feature/my-feature`
-10. Open a Pull Request
+4. Ensure tests pass: `composer test && composer phpcs && composer phpstan`
+5. Open a Pull Request
 
-### Coding Guidelines
-
-- **PSR-12** coding standard
-- **Type declarations** on all parameters and returns
-- **Strict types** (`declare(strict_types=1)`) in all files
-- **Readonly properties** for immutable value objects
-- **Pure functions** where possible
-- **Dependency injection** over globals
-- **Interface-based** design
-- **100% test coverage** for new code
+For coding guidelines and detailed contribution workflow, see the **[Development Guide](docs/DEVELOPMENT.md)**.
 
 ## License
 
@@ -774,8 +221,8 @@ GPL v2 or later - https://www.gnu.org/licenses/gpl-2.0.html
 
 ## Author
 
-**Stephen Feather**  
-Website: https://stephenfeather.com  
+**Stephen Feather**
+Website: https://stephenfeather.com
 Email: stephen@feather.us
 
 ## Acknowledgments
@@ -787,4 +234,4 @@ Email: stephen@feather.us
 
 ---
 
-**Version:** 1.0.0 ✅ | **74 Abilities Implemented** | Posts, Comments, Media, Taxonomy, User, Settings, Plugin, Theme, Privacy, Cache, Maintenance, Transients, PostTypes, Cron, and Role management complete
+**Version:** 1.0.0 | **74 Abilities Implemented** | Posts, Comments, Media, Taxonomy, User, Settings, Plugin, Theme, Privacy, Cache, Maintenance, Transients, PostTypes, Cron, and Role management complete
