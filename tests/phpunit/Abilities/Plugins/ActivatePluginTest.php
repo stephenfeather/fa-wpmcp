@@ -1,6 +1,13 @@
 <?php
+/**
+ * Tests for ActivatePlugin.
+ *
+ * @package FAWpmcp\Tests\Abilities\Plugins
+ */
+
 declare(strict_types=1);
 namespace FAWpmcp\Tests\Abilities\Plugins;
+
 use FAWpmcp\Abilities\Plugins\ActivatePlugin;
 use Brain\Monkey;
 use Brain\Monkey\Functions;

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for DeleteMedia.
+ *
+ * @package FAWpmcp\Tests\Abilities\Media
+ */
+
 declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Media;
@@ -90,10 +96,12 @@ final class DeleteMediaTest extends TestCase {
 		Functions\expect( 'wp_delete_attachment' )->once()->with( 42, true )->andReturn( $post );
 
 		$ability = new DeleteMedia();
-		$result  = $ability->doExecute( array(
-			'media_id' => 42,
-			'force'    => true,
-		) );
+		$result  = $ability->doExecute(
+			array(
+				'media_id' => 42,
+				'force'    => true,
+			)
+		);
 
 		$this->assertEquals( 42, $result['media_id'] );
 		$this->assertEquals( 'deleted', $result['action'] );
@@ -151,10 +159,12 @@ final class DeleteMediaTest extends TestCase {
 		Functions\expect( 'wp_delete_attachment' )->once()->with( 42, true )->andReturn( false );
 
 		$ability = new DeleteMedia();
-		$ability->doExecute( array(
-			'media_id' => 42,
-			'force'    => true,
-		) );
+		$ability->doExecute(
+			array(
+				'media_id' => 42,
+				'force'    => true,
+			)
+		);
 	}
 
 	public function test_throws_exception_when_delete_returns_null(): void {
@@ -168,9 +178,11 @@ final class DeleteMediaTest extends TestCase {
 		Functions\expect( 'wp_delete_attachment' )->once()->with( 42, true )->andReturn( null );
 
 		$ability = new DeleteMedia();
-		$ability->doExecute( array(
-			'media_id' => 42,
-			'force'    => true,
-		) );
+		$ability->doExecute(
+			array(
+				'media_id' => 42,
+				'force'    => true,
+			)
+		);
 	}
 }

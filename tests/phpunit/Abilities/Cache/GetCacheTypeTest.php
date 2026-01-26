@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for GetCacheType.
+ *
+ * @package FAWpmcp\Tests\Abilities\Cache
+ */
+
 declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Cache;
@@ -72,14 +78,14 @@ final class GetCacheTypeTest extends TestCase {
 		global $wp_object_cache;
 
 		// Create a mock Redis cache class.
-		$wp_object_cache = new class {
+		$wp_object_cache = new class() {
 		};
 
 		// Override get_class to return a Redis class name.
 		Functions\expect( 'wp_using_ext_object_cache' )->twice()->andReturn( true );
 
 		// We need to use a real Redis class mock.
-		$redis_cache = \Mockery::mock( 'WP_Object_Cache_Redis' );
+		$redis_cache                = \Mockery::mock( 'WP_Object_Cache_Redis' );
 		$GLOBALS['wp_object_cache'] = $redis_cache;
 
 		$ability = new GetCacheType();

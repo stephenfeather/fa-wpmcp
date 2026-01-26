@@ -204,7 +204,10 @@ class GetTransientTest extends TestCase {
 	public function testExecuteHandlesArrayValues(): void {
 		$ability = new GetTransient();
 
-		$array_value = array( 'key1' => 'value1', 'key2' => 'value2' );
+		$array_value = array(
+			'key1' => 'value1',
+			'key2' => 'value2',
+		);
 		Functions\when( 'get_transient' )->justReturn( $array_value );
 
 		$result = $ability->doExecute( array( 'key' => 'array_transient' ) );

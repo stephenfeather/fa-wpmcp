@@ -111,7 +111,12 @@ final class ListCommentsTest extends TestCase {
 			->andReturn( 'https://example.com/post#comment-1' );
 
 		$ability = new ListComments();
-		$result  = $ability->doExecute( array( 'page' => 1, 'per_page' => 10 ) );
+		$result  = $ability->doExecute(
+			array(
+				'page'     => 1,
+				'per_page' => 10,
+			)
+		);
 
 		$this->assertArrayHasKey( 'comments', $result );
 		$this->assertArrayHasKey( 'total', $result );
@@ -126,9 +131,13 @@ final class ListCommentsTest extends TestCase {
 	public function test_filters_by_post_id(): void {
 		Functions\expect( 'get_comments' )
 			->once()
-			->with( Mockery::on( function( $args ) {
-				return $args['post_id'] === 42;
-			} ) )
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return $args['post_id'] === 42;
+					}
+				)
+			)
 			->andReturn( array() );
 
 		Functions\expect( 'wp_count_comments' )
@@ -149,9 +158,13 @@ final class ListCommentsTest extends TestCase {
 	public function test_filters_by_status(): void {
 		Functions\expect( 'get_comments' )
 			->once()
-			->with( Mockery::on( function( $args ) {
-				return $args['status'] === 'hold';
-			} ) )
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return $args['status'] === 'hold';
+					}
+				)
+			)
 			->andReturn( array() );
 
 		Functions\expect( 'wp_count_comments' )

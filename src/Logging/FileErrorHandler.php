@@ -144,7 +144,7 @@ final class FileErrorHandler implements McpErrorHandlerInterface {
 	 * @return string Formatted log entry.
 	 */
 	private function formatLogEntry( string $message, array $context, string $type ): string {
-		$timestamp = gmdate( 'Y-m-d H:i:s' );
+		$timestamp    = gmdate( 'Y-m-d H:i:s' );
 		$json_context = function_exists( 'wp_json_encode' )
 			? wp_json_encode( $context )
 			: json_encode( $context );

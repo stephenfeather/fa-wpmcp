@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for DeleteTerm.
+ *
+ * @package FAWpmcp\Tests\Abilities\Taxonomies
+ */
+
 declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Taxonomies;
@@ -76,10 +82,12 @@ final class DeleteTermTest extends TestCase {
 		Functions\expect( 'wp_delete_term' )->once()->with( 42, 'category' )->andReturn( true );
 
 		$ability = new DeleteTerm();
-		$result  = $ability->doExecute( array(
-			'term_id'  => 42,
-			'taxonomy' => 'category',
-		) );
+		$result  = $ability->doExecute(
+			array(
+				'term_id'  => 42,
+				'taxonomy' => 'category',
+			)
+		);
 
 		$this->assertEquals( 42, $result['term_id'] );
 		$this->assertEquals( 'category', $result['taxonomy'] );
@@ -96,10 +104,12 @@ final class DeleteTermTest extends TestCase {
 		Functions\expect( 'wp_delete_term' )->once()->with( 55, 'product_cat' )->andReturn( true );
 
 		$ability = new DeleteTerm();
-		$result  = $ability->doExecute( array(
-			'term_id'  => 55,
-			'taxonomy' => 'product_cat',
-		) );
+		$result  = $ability->doExecute(
+			array(
+				'term_id'  => 55,
+				'taxonomy' => 'product_cat',
+			)
+		);
 
 		$this->assertEquals( 55, $result['term_id'] );
 		$this->assertEquals( 'product_cat', $result['taxonomy'] );
@@ -114,10 +124,12 @@ final class DeleteTermTest extends TestCase {
 		Functions\expect( 'get_term' )->once()->with( 999, 'category' )->andReturn( null );
 
 		$ability = new DeleteTerm();
-		$ability->doExecute( array(
-			'term_id'  => 999,
-			'taxonomy' => 'category',
-		) );
+		$ability->doExecute(
+			array(
+				'term_id'  => 999,
+				'taxonomy' => 'category',
+			)
+		);
 	}
 
 	public function test_throws_exception_when_get_term_returns_wp_error(): void {
@@ -128,10 +140,12 @@ final class DeleteTermTest extends TestCase {
 		Functions\expect( 'get_term' )->once()->with( 42, 'invalid_tax' )->andReturn( $wp_error );
 
 		$ability = new DeleteTerm();
-		$ability->doExecute( array(
-			'term_id'  => 42,
-			'taxonomy' => 'invalid_tax',
-		) );
+		$ability->doExecute(
+			array(
+				'term_id'  => 42,
+				'taxonomy' => 'invalid_tax',
+			)
+		);
 	}
 
 	public function test_throws_exception_when_delete_returns_false(): void {
@@ -147,10 +161,12 @@ final class DeleteTermTest extends TestCase {
 		Functions\expect( 'is_wp_error' )->twice()->andReturn( false );
 
 		$ability = new DeleteTerm();
-		$ability->doExecute( array(
-			'term_id'  => 42,
-			'taxonomy' => 'category',
-		) );
+		$ability->doExecute(
+			array(
+				'term_id'  => 42,
+				'taxonomy' => 'category',
+			)
+		);
 	}
 
 	public function test_throws_exception_when_delete_returns_wp_error(): void {
@@ -169,9 +185,11 @@ final class DeleteTermTest extends TestCase {
 		Functions\expect( 'is_wp_error' )->once()->with( $wp_error )->andReturn( true );
 
 		$ability = new DeleteTerm();
-		$ability->doExecute( array(
-			'term_id'  => 1,
-			'taxonomy' => 'category',
-		) );
+		$ability->doExecute(
+			array(
+				'term_id'  => 1,
+				'taxonomy' => 'category',
+			)
+		);
 	}
 }

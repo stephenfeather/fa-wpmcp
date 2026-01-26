@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for DeleteUser.
+ *
+ * @package FAWpmcp\Tests\Abilities\Users
+ */
+
 declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Users;
@@ -101,10 +107,12 @@ final class DeleteUserTest extends TestCase {
 		Functions\expect( 'wp_delete_user' )->once()->with( 42, 10 )->andReturn( true );
 
 		$ability = new DeleteUser();
-		$result  = $ability->doExecute( array(
-			'user_id'  => 42,
-			'reassign' => 10,
-		) );
+		$result  = $ability->doExecute(
+			array(
+				'user_id'  => 42,
+				'reassign' => 10,
+			)
+		);
 
 		$this->assertEquals( 42, $result['user_id'] );
 		$this->assertEquals( 10, $result['reassigned'] );
@@ -148,10 +156,12 @@ final class DeleteUserTest extends TestCase {
 		Functions\expect( 'get_userdata' )->once()->with( 999 )->andReturn( false );
 
 		$ability = new DeleteUser();
-		$ability->doExecute( array(
-			'user_id'  => 42,
-			'reassign' => 999,
-		) );
+		$ability->doExecute(
+			array(
+				'user_id'  => 42,
+				'reassign' => 999,
+			)
+		);
 	}
 
 	public function test_throws_exception_when_delete_fails(): void {

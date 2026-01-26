@@ -148,8 +148,8 @@ final class CreateComment extends AbstractAbility {
 	 * @return array<string, mixed> Annotations array.
 	 */
 	public function getAnnotations(): array {
-		$annotations                = parent::getAnnotations();
-		$annotations['idempotent']  = false;
+		$annotations               = parent::getAnnotations();
+		$annotations['idempotent'] = false;
 		return $annotations;
 	}
 

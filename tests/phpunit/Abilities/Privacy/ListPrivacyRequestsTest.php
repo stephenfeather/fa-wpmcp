@@ -110,19 +110,19 @@ class ListPrivacyRequestsTest extends TestCase {
 		);
 
 		// Mock WP_Query.
-		$mock_post1 = Mockery::mock( '\WP_Post' );
-		$mock_post1->ID = 123;
+		$mock_post1              = Mockery::mock( '\WP_Post' );
+		$mock_post1->ID          = 123;
 		$mock_post1->post_status = 'request-pending';
-		$mock_post1->post_date = '2026-01-20 10:00:00';
+		$mock_post1->post_date   = '2026-01-20 10:00:00';
 
-		$mock_post2 = Mockery::mock( '\WP_Post' );
-		$mock_post2->ID = 124;
+		$mock_post2              = Mockery::mock( '\WP_Post' );
+		$mock_post2->ID          = 124;
 		$mock_post2->post_status = 'request-confirmed';
-		$mock_post2->post_date = '2026-01-21 11:00:00';
+		$mock_post2->post_date   = '2026-01-21 11:00:00';
 
-		$mock_query = Mockery::mock( '\WP_Query' );
-		$mock_query->posts = array( $mock_post1, $mock_post2 );
-		$mock_query->found_posts = 2;
+		$mock_query                = Mockery::mock( '\WP_Query' );
+		$mock_query->posts         = array( $mock_post1, $mock_post2 );
+		$mock_query->found_posts   = 2;
 		$mock_query->max_num_pages = 1;
 
 		Functions\expect( 'get_posts' )
@@ -132,7 +132,12 @@ class ListPrivacyRequestsTest extends TestCase {
 		Functions\expect( 'wp_count_posts' )
 			->once()
 			->with( 'user_request' )
-			->andReturn( (object) array( 'request-pending' => 1, 'request-confirmed' => 1 ) );
+			->andReturn(
+				(object) array(
+					'request-pending'   => 1,
+					'request-confirmed' => 1,
+				)
+			);
 
 		Functions\expect( 'get_post_meta' )
 			->times( 6 )
@@ -169,10 +174,10 @@ class ListPrivacyRequestsTest extends TestCase {
 			'type'     => 'export_personal_data',
 		);
 
-		$mock_post = Mockery::mock( '\WP_Post' );
-		$mock_post->ID = 123;
+		$mock_post              = Mockery::mock( '\WP_Post' );
+		$mock_post->ID          = 123;
 		$mock_post->post_status = 'request-pending';
-		$mock_post->post_date = '2026-01-20 10:00:00';
+		$mock_post->post_date   = '2026-01-20 10:00:00';
 
 		Functions\expect( 'get_posts' )
 			->once()

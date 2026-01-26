@@ -198,13 +198,13 @@ class UpdateUserTest extends TestCase {
 	public function testBuildUpdateDataWithAllFields(): void {
 		Functions\stubs(
 			array(
-				'sanitize_email'        => function ( $v ) {
+				'sanitize_email'          => function ( $v ) {
 					return $v; },
-				'sanitize_text_field'   => function ( $v ) {
+				'sanitize_text_field'     => function ( $v ) {
 					return $v; },
 				'sanitize_textarea_field' => function ( $v ) {
 					return $v; },
-				'esc_url_raw'           => function ( $v ) {
+				'esc_url_raw'             => function ( $v ) {
 					return $v; },
 			)
 		);

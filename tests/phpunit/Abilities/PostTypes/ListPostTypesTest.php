@@ -134,15 +134,15 @@ class ListPostTypesTest extends TestCase {
 	public function testExecuteReturnsPostTypesList(): void {
 		$ability = new ListPostTypes();
 
-		$mock_post_type              = Mockery::mock( \WP_Post_Type::class );
-		$mock_post_type->name        = 'post';
-		$mock_post_type->label       = 'Posts';
-		$mock_post_type->description = 'Default post type';
-		$mock_post_type->public      = true;
+		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
+		$mock_post_type->name         = 'post';
+		$mock_post_type->label        = 'Posts';
+		$mock_post_type->description  = 'Default post type';
+		$mock_post_type->public       = true;
 		$mock_post_type->hierarchical = false;
-		$mock_post_type->show_ui     = true;
+		$mock_post_type->show_ui      = true;
 		$mock_post_type->show_in_rest = true;
-		$mock_post_type->rest_base   = 'posts';
+		$mock_post_type->rest_base    = 'posts';
 
 		Functions\when( 'get_post_types' )->justReturn( array( 'post' => $mock_post_type ) );
 
@@ -181,21 +181,26 @@ class ListPostTypesTest extends TestCase {
 	public function testExecuteFiltersByPublic(): void {
 		$ability = new ListPostTypes();
 
-		$mock_post_type              = Mockery::mock( \WP_Post_Type::class );
-		$mock_post_type->name        = 'post';
-		$mock_post_type->label       = 'Posts';
-		$mock_post_type->description = '';
-		$mock_post_type->public      = true;
+		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
+		$mock_post_type->name         = 'post';
+		$mock_post_type->label        = 'Posts';
+		$mock_post_type->description  = '';
+		$mock_post_type->public       = true;
 		$mock_post_type->hierarchical = false;
-		$mock_post_type->show_ui     = true;
+		$mock_post_type->show_ui      = true;
 		$mock_post_type->show_in_rest = true;
-		$mock_post_type->rest_base   = 'posts';
+		$mock_post_type->rest_base    = 'posts';
 
 		Functions\expect( 'get_post_types' )
 			->once()
-			->with( Mockery::on( function ( $args ) {
-				return isset( $args['public'] ) && $args['public'] === true;
-			} ), 'objects' )
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return isset( $args['public'] ) && $args['public'] === true;
+					}
+				),
+				'objects'
+			)
 			->andReturn( array( 'post' => $mock_post_type ) );
 
 		$result = $ability->doExecute( array( 'public' => true ) );
@@ -211,21 +216,26 @@ class ListPostTypesTest extends TestCase {
 	public function testExecuteFiltersByHierarchical(): void {
 		$ability = new ListPostTypes();
 
-		$mock_post_type              = Mockery::mock( \WP_Post_Type::class );
-		$mock_post_type->name        = 'page';
-		$mock_post_type->label       = 'Pages';
-		$mock_post_type->description = '';
-		$mock_post_type->public      = true;
+		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
+		$mock_post_type->name         = 'page';
+		$mock_post_type->label        = 'Pages';
+		$mock_post_type->description  = '';
+		$mock_post_type->public       = true;
 		$mock_post_type->hierarchical = true;
-		$mock_post_type->show_ui     = true;
+		$mock_post_type->show_ui      = true;
 		$mock_post_type->show_in_rest = true;
-		$mock_post_type->rest_base   = 'pages';
+		$mock_post_type->rest_base    = 'pages';
 
 		Functions\expect( 'get_post_types' )
 			->once()
-			->with( Mockery::on( function ( $args ) {
-				return isset( $args['hierarchical'] ) && $args['hierarchical'] === true;
-			} ), 'objects' )
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return isset( $args['hierarchical'] ) && $args['hierarchical'] === true;
+					}
+				),
+				'objects'
+			)
 			->andReturn( array( 'page' => $mock_post_type ) );
 
 		$result = $ability->doExecute( array( 'hierarchical' => true ) );
@@ -241,30 +251,32 @@ class ListPostTypesTest extends TestCase {
 	public function testExecuteReturnsMultiplePostTypes(): void {
 		$ability = new ListPostTypes();
 
-		$mock_post              = Mockery::mock( \WP_Post_Type::class );
-		$mock_post->name        = 'post';
-		$mock_post->label       = 'Posts';
-		$mock_post->description = '';
-		$mock_post->public      = true;
+		$mock_post               = Mockery::mock( \WP_Post_Type::class );
+		$mock_post->name         = 'post';
+		$mock_post->label        = 'Posts';
+		$mock_post->description  = '';
+		$mock_post->public       = true;
 		$mock_post->hierarchical = false;
-		$mock_post->show_ui     = true;
+		$mock_post->show_ui      = true;
 		$mock_post->show_in_rest = true;
-		$mock_post->rest_base   = 'posts';
+		$mock_post->rest_base    = 'posts';
 
-		$mock_page              = Mockery::mock( \WP_Post_Type::class );
-		$mock_page->name        = 'page';
-		$mock_page->label       = 'Pages';
-		$mock_page->description = '';
-		$mock_page->public      = true;
+		$mock_page               = Mockery::mock( \WP_Post_Type::class );
+		$mock_page->name         = 'page';
+		$mock_page->label        = 'Pages';
+		$mock_page->description  = '';
+		$mock_page->public       = true;
 		$mock_page->hierarchical = true;
-		$mock_page->show_ui     = true;
+		$mock_page->show_ui      = true;
 		$mock_page->show_in_rest = true;
-		$mock_page->rest_base   = 'pages';
+		$mock_page->rest_base    = 'pages';
 
-		Functions\when( 'get_post_types' )->justReturn( array(
-			'post' => $mock_post,
-			'page' => $mock_page,
-		) );
+		Functions\when( 'get_post_types' )->justReturn(
+			array(
+				'post' => $mock_post,
+				'page' => $mock_page,
+			)
+		);
 
 		$result = $ability->doExecute( array() );
 

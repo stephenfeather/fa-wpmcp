@@ -17,22 +17,47 @@ use FAWpmcp\Abilities\AbstractAbility;
  * @package FAWpmcp\Abilities\Plugins
  */
 final class ListPlugins extends AbstractAbility {
+	/**
+	 * Returns the ability identifier.
+	 *
+	 * @return string
+	 */
 	public function getName(): string {
 		return 'fa-wpmcp/list-plugins';
 	}
 
+	/**
+	 * Returns the ability category.
+	 *
+	 * @return string
+	 */
 	public function getCategory(): string {
 		return 'plugins';
 	}
 
+	/**
+	 * Returns the display label.
+	 *
+	 * @return string
+	 */
 	public function getLabel(): string {
 		return 'List Plugins';
 	}
 
+	/**
+	 * Returns the ability description.
+	 *
+	 * @return string
+	 */
 	public function getDescription(): string {
 		return 'List installed WordPress plugins with their activation status and metadata.';
 	}
 
+	/**
+	 * Returns the JSON Schema for input validation.
+	 *
+	 * @return array
+	 */
 	public function getInputSchema(): array {
 		return array(
 			'type'       => 'object',
@@ -46,6 +71,11 @@ final class ListPlugins extends AbstractAbility {
 		);
 	}
 
+	/**
+	 * Returns the JSON Schema for output.
+	 *
+	 * @return array
+	 */
 	public function getOutputSchema(): array {
 		return array(
 			'type'       => 'object',
@@ -67,10 +97,21 @@ final class ListPlugins extends AbstractAbility {
 		);
 	}
 
+	/**
+	 * Returns the WordPress capability required.
+	 *
+	 * @return string
+	 */
 	public function getRequiredCapability(): string {
 		return 'activate_plugins';
 	}
 
+	/**
+	 * Executes the ability.
+	 *
+	 * @param array $input Input parameters.
+	 * @return array
+	 */
 	public function doExecute( array $input ): array {
 		$all_plugins = get_plugins();
 		$status      = $input['status'] ?? 'all';

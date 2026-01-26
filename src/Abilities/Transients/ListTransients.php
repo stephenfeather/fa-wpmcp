@@ -138,17 +138,17 @@ final class ListTransients extends AbstractAbility {
 
 		// Determine table and prefix based on network flag.
 		if ( $network ) {
-			$table  = $wpdb->sitemeta;
-			$prefix = '_site_transient_';
+			$table          = $wpdb->sitemeta;
+			$prefix         = '_site_transient_';
 			$timeout_prefix = '_site_transient_timeout_';
-			$name_column = 'meta_key';
-			$value_column = 'meta_value';
+			$name_column    = 'meta_key';
+			$value_column   = 'meta_value';
 		} else {
-			$table  = $wpdb->options;
-			$prefix = '_transient_';
+			$table          = $wpdb->options;
+			$prefix         = '_transient_';
 			$timeout_prefix = '_transient_timeout_';
-			$name_column = 'option_name';
-			$value_column = 'option_value';
+			$name_column    = 'option_name';
+			$value_column   = 'option_value';
 		}
 
 		// Build the query.

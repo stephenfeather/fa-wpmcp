@@ -157,27 +157,30 @@ class GetPostTypeTest extends TestCase {
 		);
 
 		$mock_cap = (object) array(
-			'edit_post'          => 'edit_post',
-			'read_post'          => 'read_post',
-			'delete_post'        => 'delete_post',
-			'edit_posts'         => 'edit_posts',
-			'publish_posts'      => 'publish_posts',
+			'edit_post'     => 'edit_post',
+			'read_post'     => 'read_post',
+			'delete_post'   => 'delete_post',
+			'edit_posts'    => 'edit_posts',
+			'publish_posts' => 'publish_posts',
 		);
 
-		$mock_post_type              = Mockery::mock( \WP_Post_Type::class );
-		$mock_post_type->name        = 'post';
-		$mock_post_type->label       = 'Posts';
-		$mock_post_type->labels      = $mock_labels;
-		$mock_post_type->description = 'Default post type';
-		$mock_post_type->public      = true;
+		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
+		$mock_post_type->name         = 'post';
+		$mock_post_type->label        = 'Posts';
+		$mock_post_type->labels       = $mock_labels;
+		$mock_post_type->description  = 'Default post type';
+		$mock_post_type->public       = true;
 		$mock_post_type->hierarchical = false;
-		$mock_post_type->show_ui     = true;
+		$mock_post_type->show_ui      = true;
 		$mock_post_type->show_in_rest = true;
-		$mock_post_type->rest_base   = 'posts';
-		$mock_post_type->cap         = $mock_cap;
-		$mock_post_type->rewrite     = array( 'slug' => 'posts', 'with_front' => true );
-		$mock_post_type->supports    = array( 'title', 'editor', 'thumbnail', 'excerpt' );
-		$mock_post_type->taxonomies  = array( 'category', 'post_tag' );
+		$mock_post_type->rest_base    = 'posts';
+		$mock_post_type->cap          = $mock_cap;
+		$mock_post_type->rewrite      = array(
+			'slug'       => 'posts',
+			'with_front' => true,
+		);
+		$mock_post_type->supports     = array( 'title', 'editor', 'thumbnail', 'excerpt' );
+		$mock_post_type->taxonomies   = array( 'category', 'post_tag' );
 
 		Functions\when( 'get_post_type_object' )->justReturn( $mock_post_type );
 
@@ -205,20 +208,20 @@ class GetPostTypeTest extends TestCase {
 			'singular_name' => 'Page',
 		);
 
-		$mock_post_type              = Mockery::mock( \WP_Post_Type::class );
-		$mock_post_type->name        = 'page';
-		$mock_post_type->label       = 'Pages';
-		$mock_post_type->labels      = $mock_labels;
-		$mock_post_type->description = '';
-		$mock_post_type->public      = true;
+		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
+		$mock_post_type->name         = 'page';
+		$mock_post_type->label        = 'Pages';
+		$mock_post_type->labels       = $mock_labels;
+		$mock_post_type->description  = '';
+		$mock_post_type->public       = true;
 		$mock_post_type->hierarchical = true;
-		$mock_post_type->show_ui     = true;
+		$mock_post_type->show_ui      = true;
 		$mock_post_type->show_in_rest = true;
-		$mock_post_type->rest_base   = 'pages';
-		$mock_post_type->cap         = null;
-		$mock_post_type->rewrite     = true;
-		$mock_post_type->supports    = array( 'title', 'editor' );
-		$mock_post_type->taxonomies  = array();
+		$mock_post_type->rest_base    = 'pages';
+		$mock_post_type->cap          = null;
+		$mock_post_type->rewrite      = true;
+		$mock_post_type->supports     = array( 'title', 'editor' );
+		$mock_post_type->taxonomies   = array();
 
 		Functions\when( 'get_post_type_object' )->justReturn( $mock_post_type );
 
@@ -237,20 +240,20 @@ class GetPostTypeTest extends TestCase {
 	public function testExecuteHandlesNullLabels(): void {
 		$ability = new GetPostType();
 
-		$mock_post_type              = Mockery::mock( \WP_Post_Type::class );
-		$mock_post_type->name        = 'custom_type';
-		$mock_post_type->label       = 'Custom';
-		$mock_post_type->labels      = null;
-		$mock_post_type->description = '';
-		$mock_post_type->public      = true;
+		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
+		$mock_post_type->name         = 'custom_type';
+		$mock_post_type->label        = 'Custom';
+		$mock_post_type->labels       = null;
+		$mock_post_type->description  = '';
+		$mock_post_type->public       = true;
 		$mock_post_type->hierarchical = false;
-		$mock_post_type->show_ui     = true;
+		$mock_post_type->show_ui      = true;
 		$mock_post_type->show_in_rest = false;
-		$mock_post_type->rest_base   = null;
-		$mock_post_type->cap         = null;
-		$mock_post_type->rewrite     = false;
-		$mock_post_type->supports    = array();
-		$mock_post_type->taxonomies  = array();
+		$mock_post_type->rest_base    = null;
+		$mock_post_type->cap          = null;
+		$mock_post_type->rewrite      = false;
+		$mock_post_type->supports     = array();
+		$mock_post_type->taxonomies   = array();
 
 		Functions\when( 'get_post_type_object' )->justReturn( $mock_post_type );
 
@@ -268,20 +271,20 @@ class GetPostTypeTest extends TestCase {
 	public function testExecuteHandlesBooleanRewrite(): void {
 		$ability = new GetPostType();
 
-		$mock_post_type              = Mockery::mock( \WP_Post_Type::class );
-		$mock_post_type->name        = 'attachment';
-		$mock_post_type->label       = 'Media';
-		$mock_post_type->labels      = null;
-		$mock_post_type->description = '';
-		$mock_post_type->public      = true;
+		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
+		$mock_post_type->name         = 'attachment';
+		$mock_post_type->label        = 'Media';
+		$mock_post_type->labels       = null;
+		$mock_post_type->description  = '';
+		$mock_post_type->public       = true;
 		$mock_post_type->hierarchical = false;
-		$mock_post_type->show_ui     = true;
+		$mock_post_type->show_ui      = true;
 		$mock_post_type->show_in_rest = true;
-		$mock_post_type->rest_base   = 'media';
-		$mock_post_type->cap         = null;
-		$mock_post_type->rewrite     = false;
-		$mock_post_type->supports    = array( 'title' );
-		$mock_post_type->taxonomies  = array();
+		$mock_post_type->rest_base    = 'media';
+		$mock_post_type->cap          = null;
+		$mock_post_type->rewrite      = false;
+		$mock_post_type->supports     = array( 'title' );
+		$mock_post_type->taxonomies   = array();
 
 		Functions\when( 'get_post_type_object' )->justReturn( $mock_post_type );
 
@@ -298,20 +301,25 @@ class GetPostTypeTest extends TestCase {
 	public function testExecuteHandlesArrayRewrite(): void {
 		$ability = new GetPostType();
 
-		$mock_post_type              = Mockery::mock( \WP_Post_Type::class );
-		$mock_post_type->name        = 'post';
-		$mock_post_type->label       = 'Posts';
-		$mock_post_type->labels      = null;
-		$mock_post_type->description = '';
-		$mock_post_type->public      = true;
+		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
+		$mock_post_type->name         = 'post';
+		$mock_post_type->label        = 'Posts';
+		$mock_post_type->labels       = null;
+		$mock_post_type->description  = '';
+		$mock_post_type->public       = true;
 		$mock_post_type->hierarchical = false;
-		$mock_post_type->show_ui     = true;
+		$mock_post_type->show_ui      = true;
 		$mock_post_type->show_in_rest = true;
-		$mock_post_type->rest_base   = 'posts';
-		$mock_post_type->cap         = null;
-		$mock_post_type->rewrite     = array( 'slug' => 'posts', 'with_front' => true, 'pages' => true, 'feeds' => true );
-		$mock_post_type->supports    = array( 'title', 'editor' );
-		$mock_post_type->taxonomies  = array();
+		$mock_post_type->rest_base    = 'posts';
+		$mock_post_type->cap          = null;
+		$mock_post_type->rewrite      = array(
+			'slug'       => 'posts',
+			'with_front' => true,
+			'pages'      => true,
+			'feeds'      => true,
+		);
+		$mock_post_type->supports     = array( 'title', 'editor' );
+		$mock_post_type->taxonomies   = array();
 
 		Functions\when( 'get_post_type_object' )->justReturn( $mock_post_type );
 

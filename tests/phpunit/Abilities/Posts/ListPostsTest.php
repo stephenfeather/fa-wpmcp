@@ -175,20 +175,20 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_execute_returns_posts_array(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 1;
-		$mock_post->post_title = 'Test Post';
-		$mock_post->post_excerpt = 'Test excerpt';
-		$mock_post->post_status = 'publish';
-		$mock_post->post_type = 'post';
-		$mock_post->post_author = 1;
-		$mock_post->post_date = '2025-01-20 12:00:00';
+		$mock_post                = Mockery::mock( 'WP_Post' );
+		$mock_post->ID            = 1;
+		$mock_post->post_title    = 'Test Post';
+		$mock_post->post_excerpt  = 'Test excerpt';
+		$mock_post->post_status   = 'publish';
+		$mock_post->post_type     = 'post';
+		$mock_post->post_author   = 1;
+		$mock_post->post_date     = '2025-01-20 12:00:00';
 		$mock_post->post_modified = '2025-01-20 14:00:00';
-		$mock_post->post_name = 'test-post';
+		$mock_post->post_name     = 'test-post';
 
-		$mock_query = Mockery::mock( 'WP_Query' );
-		$mock_query->posts = array( $mock_post );
-		$mock_query->found_posts = 1;
+		$mock_query                = Mockery::mock( 'WP_Query' );
+		$mock_query->posts         = array( $mock_post );
+		$mock_query->found_posts   = 1;
 		$mock_query->max_num_pages = 1;
 
 		// format_results uses get_permalink and get_the_author_meta.
@@ -212,9 +212,9 @@ class ListPostsTest extends TestCase {
 	 * @return void
 	 */
 	public function test_execute_uses_default_pagination(): void {
-		$mock_query = Mockery::mock( 'WP_Query' );
-		$mock_query->posts = array();
-		$mock_query->found_posts = 0;
+		$mock_query                = Mockery::mock( 'WP_Query' );
+		$mock_query->posts         = array();
+		$mock_query->found_posts   = 0;
 		$mock_query->max_num_pages = 0;
 
 		$ability = new ListPosts();
@@ -314,9 +314,9 @@ class ListPostsTest extends TestCase {
 	 * @return void
 	 */
 	public function test_execute_returns_pagination_metadata(): void {
-		$mock_query = Mockery::mock( 'WP_Query' );
-		$mock_query->posts = array();
-		$mock_query->found_posts = 50;
+		$mock_query                = Mockery::mock( 'WP_Query' );
+		$mock_query->posts         = array();
+		$mock_query->found_posts   = 50;
 		$mock_query->max_num_pages = 5;
 
 		$ability = new ListPosts();
@@ -342,16 +342,16 @@ class ListPostsTest extends TestCase {
 	 */
 	public function test_format_post_item_is_pure(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 1;
-		$mock_post->post_title = 'Test';
-		$mock_post->post_excerpt = 'Excerpt';
-		$mock_post->post_status = 'publish';
-		$mock_post->post_type = 'post';
-		$mock_post->post_author = 1;
-		$mock_post->post_date = '2025-01-20 12:00:00';
+		$mock_post                = Mockery::mock( 'WP_Post' );
+		$mock_post->ID            = 1;
+		$mock_post->post_title    = 'Test';
+		$mock_post->post_excerpt  = 'Excerpt';
+		$mock_post->post_status   = 'publish';
+		$mock_post->post_type     = 'post';
+		$mock_post->post_author   = 1;
+		$mock_post->post_date     = '2025-01-20 12:00:00';
 		$mock_post->post_modified = '2025-01-20 12:00:00';
-		$mock_post->post_name = 'test';
+		$mock_post->post_name     = 'test';
 
 		Functions\stubs(
 			array(

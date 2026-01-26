@@ -178,6 +178,7 @@ final class Plugin {
 					'maintenance',
 					'transients',
 					'cron',
+					'role',
 					'site',
 				);
 
@@ -284,6 +285,10 @@ final class Plugin {
 			'cron'        => array(
 				'label'       => __( 'Cron', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress cron scheduled events and schedules', 'fa-wpmcp' ),
+			),
+			'role'        => array(
+				'label'       => __( 'Roles', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress user roles and capabilities', 'fa-wpmcp' ),
 			),
 		);
 

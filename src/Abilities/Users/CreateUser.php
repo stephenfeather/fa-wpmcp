@@ -41,7 +41,7 @@ final class CreateUser extends AbstractAbility {
 	}
 
 	/**
-	 * Get the unique ability name.
+	 * Returns the ability identifier.
 	 *
 	 * @return string Ability name.
 	 */
@@ -50,7 +50,7 @@ final class CreateUser extends AbstractAbility {
 	}
 
 	/**
-	 * Get the ability category.
+	 * Returns the ability category.
 	 *
 	 * @return string Category name.
 	 */
@@ -59,7 +59,7 @@ final class CreateUser extends AbstractAbility {
 	}
 
 	/**
-	 * Get the human-readable label.
+	 * Returns the display label.
 	 *
 	 * @return string Ability label.
 	 */
@@ -68,7 +68,7 @@ final class CreateUser extends AbstractAbility {
 	}
 
 	/**
-	 * Get the ability description.
+	 * Returns the ability description.
 	 *
 	 * @return string Description.
 	 */
@@ -77,7 +77,7 @@ final class CreateUser extends AbstractAbility {
 	}
 
 	/**
-	 * Get the input schema.
+	 * Returns the JSON Schema for input validation.
 	 *
 	 * @return array<string, mixed> JSON Schema array.
 	 */
@@ -134,7 +134,7 @@ final class CreateUser extends AbstractAbility {
 	}
 
 	/**
-	 * Get the output schema.
+	 * Returns the JSON Schema for output.
 	 *
 	 * @return array<string, mixed> JSON Schema array.
 	 */
@@ -142,23 +142,23 @@ final class CreateUser extends AbstractAbility {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
-				'user_id'   => array(
+				'user_id'  => array(
 					'type'        => 'integer',
 					'description' => 'The ID of the created user.',
 				),
-				'username'  => array(
+				'username' => array(
 					'type'        => 'string',
 					'description' => 'The username of the created user.',
 				),
-				'email'     => array(
+				'email'    => array(
 					'type'        => 'string',
 					'description' => 'The email of the created user.',
 				),
-				'role'      => array(
+				'role'     => array(
 					'type'        => 'string',
 					'description' => 'The role of the created user.',
 				),
-				'edit_url'  => array(
+				'edit_url' => array(
 					'type'        => 'string',
 					'description' => 'The URL to edit the user in WordPress admin.',
 				),
@@ -167,7 +167,7 @@ final class CreateUser extends AbstractAbility {
 	}
 
 	/**
-	 * Get the required WordPress capability.
+	 * Returns the WordPress capability required.
 	 *
 	 * @return string WordPress capability name.
 	 */
@@ -176,7 +176,7 @@ final class CreateUser extends AbstractAbility {
 	}
 
 	/**
-	 * Get the operation type.
+	 * Returns the operation type.
 	 *
 	 * @return string 'write' for create operations.
 	 */
@@ -192,13 +192,13 @@ final class CreateUser extends AbstractAbility {
 	 * @return array<string, mixed> Annotations array.
 	 */
 	public function getAnnotations(): array {
-		$annotations                = parent::getAnnotations();
-		$annotations['idempotent']  = false;
+		$annotations               = parent::getAnnotations();
+		$annotations['idempotent'] = false;
 		return $annotations;
 	}
 
 	/**
-	 * Execute the ability.
+	 * Executes the ability.
 	 *
 	 * @param array<string, mixed> $input Validated input data.
 	 * @return array<string, mixed> Created user data.

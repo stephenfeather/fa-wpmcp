@@ -1,6 +1,13 @@
 <?php
+/**
+ * Tests for UpdatePlugin.
+ *
+ * @package FAWpmcp\Tests\Abilities\Plugins
+ */
+
 declare(strict_types=1);
 namespace FAWpmcp\Tests\Abilities\Plugins;
+
 use FAWpmcp\Abilities\Plugins\UpdatePlugin;
 use Brain\Monkey;
 use Brain\Monkey\Functions;

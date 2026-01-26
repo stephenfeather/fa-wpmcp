@@ -135,8 +135,8 @@ class ListTransientsTest extends TestCase {
 
 		// Mock global wpdb.
 		global $wpdb;
-		$wpdb = Mockery::mock( 'wpdb' );
-		$wpdb->prefix = 'wp_';
+		$wpdb          = Mockery::mock( 'wpdb' );
+		$wpdb->prefix  = 'wp_';
 		$wpdb->options = 'wp_options';
 
 		// Mock database results.
@@ -152,15 +152,19 @@ class ListTransientsTest extends TestCase {
 		);
 
 		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing( function( $query ) {
-				return $query;
-			} );
+			->andReturnUsing(
+				function ( $query ) {
+					return $query;
+				}
+			);
 		$wpdb->shouldReceive( 'get_results' )
 			->andReturn( $db_results );
 
-		Functions\when( 'maybe_unserialize' )->alias( function( $value ) {
-			return @unserialize( $value ) ?: $value;
-		} );
+		Functions\when( 'maybe_unserialize' )->alias(
+			function ( $value ) {
+				return @unserialize( $value ) ?: $value;
+			}
+		);
 
 		$result = $ability->doExecute( array() );
 
@@ -180,15 +184,17 @@ class ListTransientsTest extends TestCase {
 
 		// Mock global wpdb.
 		global $wpdb;
-		$wpdb = Mockery::mock( 'wpdb' );
-		$wpdb->prefix = 'wp_';
+		$wpdb          = Mockery::mock( 'wpdb' );
+		$wpdb->prefix  = 'wp_';
 		$wpdb->options = 'wp_options';
 
 		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing( function( $query, ...$args ) {
-				// Check that search pattern is included.
-				return $query;
-			} );
+			->andReturnUsing(
+				function ( $query, ...$args ) {
+					// Check that search pattern is included.
+					return $query;
+				}
+			);
 		$wpdb->shouldReceive( 'get_results' )
 			->andReturn( array() );
 		$wpdb->shouldReceive( 'esc_like' )
@@ -211,14 +217,16 @@ class ListTransientsTest extends TestCase {
 
 		// Mock global wpdb.
 		global $wpdb;
-		$wpdb = Mockery::mock( 'wpdb' );
-		$wpdb->prefix = 'wp_';
+		$wpdb          = Mockery::mock( 'wpdb' );
+		$wpdb->prefix  = 'wp_';
 		$wpdb->options = 'wp_options';
 
 		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing( function( $query, ...$args ) {
-				return $query;
-			} );
+			->andReturnUsing(
+				function ( $query, ...$args ) {
+					return $query;
+				}
+			);
 		$wpdb->shouldReceive( 'get_results' )
 			->andReturn( array() );
 		$wpdb->shouldReceive( 'esc_like' )
@@ -240,16 +248,18 @@ class ListTransientsTest extends TestCase {
 
 		// Mock global wpdb.
 		global $wpdb;
-		$wpdb = Mockery::mock( 'wpdb' );
-		$wpdb->prefix = 'wp_';
+		$wpdb              = Mockery::mock( 'wpdb' );
+		$wpdb->prefix      = 'wp_';
 		$wpdb->base_prefix = 'wp_';
-		$wpdb->options = 'wp_options';
-		$wpdb->sitemeta = 'wp_sitemeta';
+		$wpdb->options     = 'wp_options';
+		$wpdb->sitemeta    = 'wp_sitemeta';
 
 		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing( function( $query ) {
-				return $query;
-			} );
+			->andReturnUsing(
+				function ( $query ) {
+					return $query;
+				}
+			);
 		$wpdb->shouldReceive( 'get_results' )
 			->andReturn( array() );
 
@@ -268,12 +278,12 @@ class ListTransientsTest extends TestCase {
 
 		// Mock global wpdb.
 		global $wpdb;
-		$wpdb = Mockery::mock( 'wpdb' );
-		$wpdb->prefix = 'wp_';
+		$wpdb          = Mockery::mock( 'wpdb' );
+		$wpdb->prefix  = 'wp_';
 		$wpdb->options = 'wp_options';
 
 		$future_time = time() + 3600;
-		$db_results = array(
+		$db_results  = array(
 			(object) array(
 				'option_name'  => '_transient_test_cache',
 				'option_value' => serialize( 'value' ),
@@ -287,9 +297,11 @@ class ListTransientsTest extends TestCase {
 		$wpdb->shouldReceive( 'prepare' )->andReturnUsing( fn( $q ) => $q );
 		$wpdb->shouldReceive( 'get_results' )->andReturn( $db_results );
 
-		Functions\when( 'maybe_unserialize' )->alias( function( $value ) {
-			return @unserialize( $value ) ?: $value;
-		} );
+		Functions\when( 'maybe_unserialize' )->alias(
+			function ( $value ) {
+				return @unserialize( $value ) ?: $value;
+			}
+		);
 
 		$result = $ability->doExecute( array() );
 

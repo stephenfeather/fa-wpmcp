@@ -133,18 +133,18 @@ final class ListUsers extends AbstractAbility {
 					'items' => array(
 						'type'       => 'object',
 						'properties' => array(
-							'id'            => array( 'type' => 'integer' ),
-							'username'      => array( 'type' => 'string' ),
-							'email'         => array( 'type' => 'string' ),
-							'display_name'  => array( 'type' => 'string' ),
-							'first_name'    => array( 'type' => 'string' ),
-							'last_name'     => array( 'type' => 'string' ),
-							'roles'         => array(
+							'id'           => array( 'type' => 'integer' ),
+							'username'     => array( 'type' => 'string' ),
+							'email'        => array( 'type' => 'string' ),
+							'display_name' => array( 'type' => 'string' ),
+							'first_name'   => array( 'type' => 'string' ),
+							'last_name'    => array( 'type' => 'string' ),
+							'roles'        => array(
 								'type'  => 'array',
 								'items' => array( 'type' => 'string' ),
 							),
-							'registered'    => array( 'type' => 'string' ),
-							'avatar_url'    => array( 'type' => 'string' ),
+							'registered'   => array( 'type' => 'string' ),
+							'avatar_url'   => array( 'type' => 'string' ),
 						),
 					),
 				),
@@ -276,7 +276,7 @@ final class ListUsers extends AbstractAbility {
 
 		// If searching, need to run separate query.
 		if ( isset( $count_args['search'] ) ) {
-			$search_args = array(
+			$search_args  = array(
 				'search'         => '*' . $count_args['search'] . '*',
 				'search_columns' => array( 'user_login', 'user_email', 'display_name' ),
 				'fields'         => 'ID',

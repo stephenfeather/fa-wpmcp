@@ -124,7 +124,12 @@ class CreateTermTest extends TestCase {
 
 		Functions\when( 'sanitize_title' )->returnArg();
 		Functions\when( 'sanitize_textarea_field' )->returnArg();
-		Functions\when( 'wp_insert_term' )->justReturn( array( 'term_id' => 1, 'term_taxonomy_id' => 1 ) );
+		Functions\when( 'wp_insert_term' )->justReturn(
+			array(
+				'term_id' => 1,
+				'term_taxonomy_id' => 1,
+			)
+		);
 		Functions\when( 'is_wp_error' )->justReturn( false );
 		Functions\when( 'get_term' )->justReturn( $mock_term );
 		Functions\when( 'get_term_link' )->justReturn( 'https://example.com/category/test' );
@@ -177,7 +182,12 @@ class CreateTermTest extends TestCase {
 					'parent'      => 12,
 				)
 			)
-			->andReturn( array( 'term_id' => 10, 'term_taxonomy_id' => 10 ) );
+			->andReturn(
+				array(
+					'term_id' => 10,
+					'term_taxonomy_id' => 10,
+				)
+			);
 		Functions\when( 'is_wp_error' )->justReturn( false );
 		Functions\when( 'get_term' )->justReturn( $mock_term );
 		Functions\when( 'get_term_link' )->justReturn( 'https://example.com/category/clean' );
@@ -206,7 +216,12 @@ class CreateTermTest extends TestCase {
 
 		Functions\when( 'sanitize_title' )->returnArg();
 		Functions\when( 'sanitize_textarea_field' )->returnArg();
-		Functions\when( 'wp_insert_term' )->justReturn( array( 'term_id' => 5, 'term_taxonomy_id' => 5 ) );
+		Functions\when( 'wp_insert_term' )->justReturn(
+			array(
+				'term_id' => 5,
+				'term_taxonomy_id' => 5,
+			)
+		);
 		Functions\when( 'is_wp_error' )->justReturn( false );
 		Functions\when( 'get_term' )->justReturn( null );
 

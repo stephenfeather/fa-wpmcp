@@ -70,7 +70,7 @@ final class SettingsSanitizerTest extends TestCase {
 				'enable_read'  => '1',
 				'enable_write' => '0',
 			),
-			'pages'  => array(
+			'pages'   => array(
 				'enable_read'  => '0',
 				'enable_write' => '1',
 			),
@@ -104,9 +104,9 @@ final class SettingsSanitizerTest extends TestCase {
 		);
 
 		$expected = array(
-			'fa-wpmcp/get-post'  => array( 'enabled' => true ),
-			'fa-wpmcp/update-post' => array( 'enabled' => false ),
-			'fa-wpmcp/list-posts'  => array( 'enabled' => false ),
+			'fa-wpmcp/get-post'     => array( 'enabled' => true ),
+			'fa-wpmcp/update-post'  => array( 'enabled' => false ),
+			'fa-wpmcp/list-posts'   => array( 'enabled' => false ),
 			'fa-wpmcp/delete-posts' => array( 'enabled' => true ),
 		);
 
@@ -128,7 +128,7 @@ final class SettingsSanitizerTest extends TestCase {
 		);
 
 		$expected = array(
-			'fa-wpmcp/get-post' => array(
+			'fa-wpmcp/get-post'   => array(
 				'requests_per_minute' => 5,
 				'requests_per_hour'   => 10,
 			),

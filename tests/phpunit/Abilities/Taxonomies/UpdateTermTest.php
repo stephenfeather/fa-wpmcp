@@ -102,7 +102,7 @@ class UpdateTermTest extends TestCase {
 	public function testExecuteThrowsExceptionOnUpdateError(): void {
 		$ability = new UpdateTerm();
 
-		$mock_term = Mockery::mock( \WP_Term::class );
+		$mock_term          = Mockery::mock( \WP_Term::class );
 		$mock_term->term_id = 1;
 
 		$mock_error = Mockery::mock( 'WP_Error' );
@@ -143,7 +143,7 @@ class UpdateTermTest extends TestCase {
 	public function testExecuteUpdatesTermSuccessfully(): void {
 		$ability = new UpdateTerm();
 
-		$mock_term = Mockery::mock( \WP_Term::class );
+		$mock_term           = Mockery::mock( \WP_Term::class );
 		$mock_term->term_id  = 1;
 		$mock_term->name     = 'Updated Category';
 		$mock_term->slug     = 'updated-category';
@@ -180,7 +180,7 @@ class UpdateTermTest extends TestCase {
 	public function testExecuteBuildsSanitizedUpdateData(): void {
 		$ability = new UpdateTerm();
 
-		$mock_term = Mockery::mock( \WP_Term::class );
+		$mock_term           = Mockery::mock( \WP_Term::class );
 		$mock_term->term_id  = 2;
 		$mock_term->name     = 'After Update';
 		$mock_term->slug     = 'after-update';
@@ -238,7 +238,7 @@ class UpdateTermTest extends TestCase {
 	public function testExecuteReturnsFallbackWhenTermLookupFails(): void {
 		$ability = new UpdateTerm();
 
-		$existing_term = Mockery::mock( \WP_Term::class );
+		$existing_term          = Mockery::mock( \WP_Term::class );
 		$existing_term->term_id = 7;
 
 		Functions\when( 'get_term' )->alias(

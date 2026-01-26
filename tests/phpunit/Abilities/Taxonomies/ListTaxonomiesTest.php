@@ -195,9 +195,14 @@ class ListTaxonomiesTest extends TestCase {
 
 		Functions\expect( 'get_taxonomies' )
 			->once()
-			->with( Mockery::on( function ( $args ) {
-				return isset( $args['object_type'] ) && $args['object_type'] === array( 'post' );
-			} ), 'objects' )
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return isset( $args['object_type'] ) && $args['object_type'] === array( 'post' );
+					}
+				),
+				'objects'
+			)
 			->andReturn( array( 'category' => $mock_taxonomy ) );
 
 		$result = $ability->doExecute( array( 'object_type' => 'post' ) );
@@ -226,9 +231,14 @@ class ListTaxonomiesTest extends TestCase {
 
 		Functions\expect( 'get_taxonomies' )
 			->once()
-			->with( Mockery::on( function ( $args ) {
-				return isset( $args['hierarchical'] ) && $args['hierarchical'] === true;
-			} ), 'objects' )
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return isset( $args['hierarchical'] ) && $args['hierarchical'] === true;
+					}
+				),
+				'objects'
+			)
 			->andReturn( array( 'category' => $mock_taxonomy ) );
 
 		$result = $ability->doExecute( array( 'hierarchical' => true ) );
@@ -266,10 +276,12 @@ class ListTaxonomiesTest extends TestCase {
 		$mock_tag->rest_base   = 'tags';
 		$mock_tag->object_type = array( 'post' );
 
-		Functions\when( 'get_taxonomies' )->justReturn( array(
-			'category' => $mock_category,
-			'post_tag' => $mock_tag,
-		) );
+		Functions\when( 'get_taxonomies' )->justReturn(
+			array(
+				'category' => $mock_category,
+				'post_tag' => $mock_tag,
+			)
+		);
 
 		$result = $ability->doExecute( array() );
 

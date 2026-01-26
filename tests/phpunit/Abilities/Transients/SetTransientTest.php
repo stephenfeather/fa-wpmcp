@@ -242,7 +242,10 @@ class SetTransientTest extends TestCase {
 	public function testExecuteHandlesArrayValues(): void {
 		$ability = new SetTransient();
 
-		$array_value = array( 'key1' => 'value1', 'key2' => 'value2' );
+		$array_value = array(
+			'key1' => 'value1',
+			'key2' => 'value2',
+		);
 
 		Functions\expect( 'set_transient' )
 			->once()

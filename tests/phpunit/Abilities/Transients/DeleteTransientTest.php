@@ -192,14 +192,16 @@ class DeleteTransientTest extends TestCase {
 
 		// Mock global wpdb.
 		global $wpdb;
-		$wpdb = Mockery::mock( 'wpdb' );
-		$wpdb->prefix = 'wp_';
+		$wpdb          = Mockery::mock( 'wpdb' );
+		$wpdb->prefix  = 'wp_';
 		$wpdb->options = 'wp_options';
 
 		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing( function( $query ) {
-				return $query;
-			} );
+			->andReturnUsing(
+				function ( $query ) {
+					return $query;
+				}
+			);
 
 		$wpdb->shouldReceive( 'query' )
 			->once()
@@ -220,23 +222,27 @@ class DeleteTransientTest extends TestCase {
 
 		// Mock global wpdb.
 		global $wpdb;
-		$wpdb = Mockery::mock( 'wpdb' );
-		$wpdb->prefix = 'wp_';
+		$wpdb          = Mockery::mock( 'wpdb' );
+		$wpdb->prefix  = 'wp_';
 		$wpdb->options = 'wp_options';
 
 		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing( function( $query ) {
-				return $query;
-			} );
+			->andReturnUsing(
+				function ( $query ) {
+					return $query;
+				}
+			);
 
 		// Return expired timeout keys.
 		$wpdb->shouldReceive( 'get_col' )
 			->once()
-			->andReturn( array(
-				'_transient_timeout_cache1',
-				'_transient_timeout_cache2',
-				'_transient_timeout_cache3',
-			) );
+			->andReturn(
+				array(
+					'_transient_timeout_cache1',
+					'_transient_timeout_cache2',
+					'_transient_timeout_cache3',
+				)
+			);
 
 		// Delete queries for each expired transient.
 		$wpdb->shouldReceive( 'query' )
@@ -257,15 +263,17 @@ class DeleteTransientTest extends TestCase {
 
 		// Mock global wpdb.
 		global $wpdb;
-		$wpdb = Mockery::mock( 'wpdb' );
-		$wpdb->prefix = 'wp_';
+		$wpdb              = Mockery::mock( 'wpdb' );
+		$wpdb->prefix      = 'wp_';
 		$wpdb->base_prefix = 'wp_';
-		$wpdb->sitemeta = 'wp_sitemeta';
+		$wpdb->sitemeta    = 'wp_sitemeta';
 
 		$wpdb->shouldReceive( 'prepare' )
-			->andReturnUsing( function( $query ) {
-				return $query;
-			} );
+			->andReturnUsing(
+				function ( $query ) {
+					return $query;
+				}
+			);
 
 		$wpdb->shouldReceive( 'query' )
 			->once()

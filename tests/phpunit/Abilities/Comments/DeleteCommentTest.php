@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for DeleteComment.
+ *
+ * @package FAWpmcp\Tests\Abilities\Comments
+ */
+
 declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Comments;
@@ -66,7 +72,7 @@ final class DeleteCommentTest extends TestCase {
 	}
 
 	public function test_trashes_comment_by_default(): void {
-		$comment       = new \stdClass();
+		$comment             = new \stdClass();
 		$comment->comment_ID = 42;
 
 		Functions\expect( 'get_comment' )->once()->with( 42 )->andReturn( $comment );
@@ -81,17 +87,19 @@ final class DeleteCommentTest extends TestCase {
 	}
 
 	public function test_permanently_deletes_when_force_true(): void {
-		$comment       = new \stdClass();
+		$comment             = new \stdClass();
 		$comment->comment_ID = 42;
 
 		Functions\expect( 'get_comment' )->once()->with( 42 )->andReturn( $comment );
 		Functions\expect( 'wp_delete_comment' )->once()->with( 42, true )->andReturn( true );
 
 		$ability = new DeleteComment();
-		$result  = $ability->doExecute( array(
-			'comment_id' => 42,
-			'force'      => true,
-		) );
+		$result  = $ability->doExecute(
+			array(
+				'comment_id' => 42,
+				'force'      => true,
+			)
+		);
 
 		$this->assertEquals( 42, $result['comment_id'] );
 		$this->assertEquals( 'deleted', $result['action'] );
@@ -112,7 +120,7 @@ final class DeleteCommentTest extends TestCase {
 		$this->expectException( CommentDeletionException::class );
 		$this->expectExceptionMessage( 'Failed to trashed comment 42' );
 
-		$comment       = new \stdClass();
+		$comment             = new \stdClass();
 		$comment->comment_ID = 42;
 
 		Functions\expect( 'get_comment' )->once()->with( 42 )->andReturn( $comment );
@@ -126,16 +134,18 @@ final class DeleteCommentTest extends TestCase {
 		$this->expectException( CommentDeletionException::class );
 		$this->expectExceptionMessage( 'Failed to deleted comment 42' );
 
-		$comment       = new \stdClass();
+		$comment             = new \stdClass();
 		$comment->comment_ID = 42;
 
 		Functions\expect( 'get_comment' )->once()->with( 42 )->andReturn( $comment );
 		Functions\expect( 'wp_delete_comment' )->once()->with( 42, true )->andReturn( false );
 
 		$ability = new DeleteComment();
-		$ability->doExecute( array(
-			'comment_id' => 42,
-			'force'      => true,
-		) );
+		$ability->doExecute(
+			array(
+				'comment_id' => 42,
+				'force'      => true,
+			)
+		);
 	}
 }

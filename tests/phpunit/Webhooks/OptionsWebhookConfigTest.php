@@ -65,9 +65,11 @@ final class OptionsWebhookConfigTest extends TestCase {
 	public function test_getSubscribedUrls_returns_event_urls(): void {
 		Functions\expect( 'get_option' )
 			->once()
-			->andReturn( array(
-				'event' => array( 'https://a.test', 'https://b.test' ),
-			) );
+			->andReturn(
+				array(
+					'event' => array( 'https://a.test', 'https://b.test' ),
+				)
+			);
 
 		$config = new OptionsWebhookConfig( $this->createMockEncryption() );
 		$this->assertSame( array( 'https://a.test', 'https://b.test' ), $config->getSubscribedUrls( 'event' ) );
@@ -139,9 +141,13 @@ final class OptionsWebhookConfigTest extends TestCase {
 		$encryption = Mockery::mock( SecretEncryption::class );
 		$encryption->shouldReceive( 'encrypt' )
 			->once()
-			->with( Mockery::on( function( $secret ) {
-				return is_string( $secret ) && 64 === strlen( $secret );
-			} ) )
+			->with(
+				Mockery::on(
+					function ( $secret ) {
+						return is_string( $secret ) && 64 === strlen( $secret );
+					}
+				)
+			)
 			->andReturn( 'sodium:v1:encrypted-new-secret' );
 
 		Functions\expect( 'get_option' )

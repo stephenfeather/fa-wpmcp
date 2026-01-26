@@ -38,6 +38,20 @@ if ( ! defined( 'FA_WPMCP_BASENAME' ) ) {
 	define( 'FA_WPMCP_BASENAME', 'fa-wpmcp/fa-wpmcp.php' );
 }
 
+// Define WordPress authentication keys and salts for testing.
+// These are required by SodiumSecretEncryption and OpenSslSecretEncryption.
+if ( ! defined( 'SECURE_AUTH_KEY' ) ) {
+	define( 'SECURE_AUTH_KEY', 'test-secure-auth-key-for-phpunit-testing-only-32chars!' );
+}
+
+if ( ! defined( 'LOGGED_IN_KEY' ) ) {
+	define( 'LOGGED_IN_KEY', 'test-logged-in-key-for-phpunit-testing-only-32chars!' );
+}
+
+if ( ! defined( 'NONCE_SALT' ) ) {
+	define( 'NONCE_SALT', 'test-nonce-salt-for-phpunit-testing-only-32characters!' );
+}
+
 if ( ! function_exists( 'user_can' ) ) {
 	/**
 	 * Test stub for user_can.

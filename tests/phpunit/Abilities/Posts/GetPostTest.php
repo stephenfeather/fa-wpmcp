@@ -159,17 +159,17 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_execute_returns_post_data(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 42;
-		$mock_post->post_title = 'Test Post Title';
-		$mock_post->post_content = '<p>Test content</p>';
-		$mock_post->post_excerpt = 'Test excerpt';
-		$mock_post->post_status = 'publish';
-		$mock_post->post_type = 'post';
-		$mock_post->post_author = 1;
-		$mock_post->post_date = '2025-01-20 12:00:00';
+		$mock_post                = Mockery::mock( 'WP_Post' );
+		$mock_post->ID            = 42;
+		$mock_post->post_title    = 'Test Post Title';
+		$mock_post->post_content  = '<p>Test content</p>';
+		$mock_post->post_excerpt  = 'Test excerpt';
+		$mock_post->post_status   = 'publish';
+		$mock_post->post_type     = 'post';
+		$mock_post->post_author   = 1;
+		$mock_post->post_date     = '2025-01-20 12:00:00';
 		$mock_post->post_modified = '2025-01-20 14:00:00';
-		$mock_post->post_name = 'test-post-title';
+		$mock_post->post_name     = 'test-post-title';
 
 		Functions\expect( 'get_post' )
 			->once()
@@ -263,17 +263,17 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_execute_returns_categories(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 1;
-		$mock_post->post_title = 'Test';
-		$mock_post->post_content = 'Content';
-		$mock_post->post_excerpt = '';
-		$mock_post->post_status = 'publish';
-		$mock_post->post_type = 'post';
-		$mock_post->post_author = 1;
-		$mock_post->post_date = '2025-01-20 12:00:00';
+		$mock_post                = Mockery::mock( 'WP_Post' );
+		$mock_post->ID            = 1;
+		$mock_post->post_title    = 'Test';
+		$mock_post->post_content  = 'Content';
+		$mock_post->post_excerpt  = '';
+		$mock_post->post_status   = 'publish';
+		$mock_post->post_type     = 'post';
+		$mock_post->post_author   = 1;
+		$mock_post->post_date     = '2025-01-20 12:00:00';
 		$mock_post->post_modified = '2025-01-20 12:00:00';
-		$mock_post->post_name = 'test';
+		$mock_post->post_name     = 'test';
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
 		Functions\expect( 'get_permalink' )->andReturn( 'https://example.com/test/' );
@@ -317,17 +317,17 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_execute_returns_tags(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 1;
-		$mock_post->post_title = 'Test';
-		$mock_post->post_content = 'Content';
-		$mock_post->post_excerpt = '';
-		$mock_post->post_status = 'publish';
-		$mock_post->post_type = 'post';
-		$mock_post->post_author = 1;
-		$mock_post->post_date = '2025-01-20 12:00:00';
+		$mock_post                = Mockery::mock( 'WP_Post' );
+		$mock_post->ID            = 1;
+		$mock_post->post_title    = 'Test';
+		$mock_post->post_content  = 'Content';
+		$mock_post->post_excerpt  = '';
+		$mock_post->post_status   = 'publish';
+		$mock_post->post_type     = 'post';
+		$mock_post->post_author   = 1;
+		$mock_post->post_date     = '2025-01-20 12:00:00';
 		$mock_post->post_modified = '2025-01-20 12:00:00';
-		$mock_post->post_name = 'test';
+		$mock_post->post_name     = 'test';
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
 		Functions\expect( 'get_permalink' )->andReturn( 'https://example.com/test/' );
@@ -370,17 +370,17 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_execute_returns_featured_image(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 1;
-		$mock_post->post_title = 'Test';
-		$mock_post->post_content = 'Content';
-		$mock_post->post_excerpt = '';
-		$mock_post->post_status = 'publish';
-		$mock_post->post_type = 'post';
-		$mock_post->post_author = 1;
-		$mock_post->post_date = '2025-01-20 12:00:00';
+		$mock_post                = Mockery::mock( 'WP_Post' );
+		$mock_post->ID            = 1;
+		$mock_post->post_title    = 'Test';
+		$mock_post->post_content  = 'Content';
+		$mock_post->post_excerpt  = '';
+		$mock_post->post_status   = 'publish';
+		$mock_post->post_type     = 'post';
+		$mock_post->post_author   = 1;
+		$mock_post->post_date     = '2025-01-20 12:00:00';
 		$mock_post->post_modified = '2025-01-20 12:00:00';
-		$mock_post->post_name = 'test';
+		$mock_post->post_name     = 'test';
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
 		Functions\expect( 'get_permalink' )->andReturn( 'https://example.com/test/' );
@@ -408,17 +408,17 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_execute_returns_author_info(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 1;
-		$mock_post->post_title = 'Test';
-		$mock_post->post_content = 'Content';
-		$mock_post->post_excerpt = '';
-		$mock_post->post_status = 'publish';
-		$mock_post->post_type = 'post';
-		$mock_post->post_author = 5;
-		$mock_post->post_date = '2025-01-20 12:00:00';
+		$mock_post                = Mockery::mock( 'WP_Post' );
+		$mock_post->ID            = 1;
+		$mock_post->post_title    = 'Test';
+		$mock_post->post_content  = 'Content';
+		$mock_post->post_excerpt  = '';
+		$mock_post->post_status   = 'publish';
+		$mock_post->post_type     = 'post';
+		$mock_post->post_author   = 5;
+		$mock_post->post_date     = '2025-01-20 12:00:00';
 		$mock_post->post_modified = '2025-01-20 12:00:00';
-		$mock_post->post_name = 'test';
+		$mock_post->post_name     = 'test';
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
 		Functions\expect( 'get_permalink' )->andReturn( 'https://example.com/test/' );
@@ -447,17 +447,17 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_execute_accepts_page_post_type(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 10;
-		$mock_post->post_title = 'Test Page';
-		$mock_post->post_content = 'Page content';
-		$mock_post->post_excerpt = '';
-		$mock_post->post_status = 'publish';
-		$mock_post->post_type = 'page';
-		$mock_post->post_author = 1;
-		$mock_post->post_date = '2025-01-20 12:00:00';
+		$mock_post                = Mockery::mock( 'WP_Post' );
+		$mock_post->ID            = 10;
+		$mock_post->post_title    = 'Test Page';
+		$mock_post->post_content  = 'Page content';
+		$mock_post->post_excerpt  = '';
+		$mock_post->post_status   = 'publish';
+		$mock_post->post_type     = 'page';
+		$mock_post->post_author   = 1;
+		$mock_post->post_date     = '2025-01-20 12:00:00';
 		$mock_post->post_modified = '2025-01-20 12:00:00';
-		$mock_post->post_name = 'test-page';
+		$mock_post->post_name     = 'test-page';
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
 		Functions\expect( 'get_permalink' )->andReturn( 'https://example.com/test-page/' );
@@ -487,8 +487,8 @@ class GetPostTest extends TestCase {
 	 */
 	public function test_execute_throws_when_post_type_mismatch(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 10;
+		$mock_post            = Mockery::mock( 'WP_Post' );
+		$mock_post->ID        = 10;
 		$mock_post->post_type = 'page';
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );

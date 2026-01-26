@@ -239,7 +239,13 @@ class FileErrorHandlerTest extends TestCase {
 			->andReturnUsing( fn( $data ) => json_encode( $data ) );
 
 		$handler = new FileErrorHandler( $this->temp_log_file );
-		$handler->log( 'Test message', array( 'user_id' => 123, 'action' => 'delete' ) );
+		$handler->log(
+			'Test message',
+			array(
+				'user_id' => 123,
+				'action' => 'delete',
+			)
+		);
 
 		$content = file_get_contents( $this->temp_log_file );
 

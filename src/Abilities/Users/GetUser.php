@@ -95,21 +95,21 @@ final class GetUser extends AbstractAbility {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
-				'id'              => array( 'type' => 'integer' ),
-				'username'        => array( 'type' => 'string' ),
-				'email'           => array( 'type' => 'string' ),
-				'display_name'    => array( 'type' => 'string' ),
-				'first_name'      => array( 'type' => 'string' ),
-				'last_name'       => array( 'type' => 'string' ),
-				'nickname'        => array( 'type' => 'string' ),
-				'description'     => array( 'type' => 'string' ),
-				'roles'           => array(
+				'id'           => array( 'type' => 'integer' ),
+				'username'     => array( 'type' => 'string' ),
+				'email'        => array( 'type' => 'string' ),
+				'display_name' => array( 'type' => 'string' ),
+				'first_name'   => array( 'type' => 'string' ),
+				'last_name'    => array( 'type' => 'string' ),
+				'nickname'     => array( 'type' => 'string' ),
+				'description'  => array( 'type' => 'string' ),
+				'roles'        => array(
 					'type'  => 'array',
 					'items' => array( 'type' => 'string' ),
 				),
-				'registered'      => array( 'type' => 'string' ),
-				'avatar_url'      => array( 'type' => 'string' ),
-				'website'         => array( 'type' => 'string' ),
+				'registered'   => array( 'type' => 'string' ),
+				'avatar_url'   => array( 'type' => 'string' ),
+				'website'      => array( 'type' => 'string' ),
 			),
 		);
 	}
@@ -174,18 +174,18 @@ final class GetUser extends AbstractAbility {
 	 */
 	private function formatUserData( \WP_User $user ): array {
 		return array(
-			'id'              => $user->ID,
-			'username'        => $user->user_login,
-			'email'           => $user->user_email,
-			'display_name'    => $user->display_name,
-			'first_name'      => $user->first_name,
-			'last_name'       => $user->last_name,
-			'nickname'        => $user->nickname,
-			'description'     => $user->description,
-			'roles'           => $user->roles,
-			'registered'      => $user->user_registered,
-			'avatar_url'      => get_avatar_url( $user->ID ),
-			'website'         => $user->user_url,
+			'id'           => $user->ID,
+			'username'     => $user->user_login,
+			'email'        => $user->user_email,
+			'display_name' => $user->display_name,
+			'first_name'   => $user->first_name,
+			'last_name'    => $user->last_name,
+			'nickname'     => $user->nickname,
+			'description'  => $user->description,
+			'roles'        => $user->roles,
+			'registered'   => $user->user_registered,
+			'avatar_url'   => get_avatar_url( $user->ID ),
+			'website'      => $user->user_url,
 		);
 	}
 }

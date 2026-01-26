@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for StatusTheme.
+ *
+ * @package FAWpmcp\Tests\Abilities\Themes
+ */
+
 declare(strict_types=1);
 namespace FAWpmcp\Tests\Abilities\Themes;
 

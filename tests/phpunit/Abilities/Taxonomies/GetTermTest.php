@@ -112,7 +112,7 @@ class GetTermTest extends TestCase {
 	public function testExecuteReturnsTermData(): void {
 		$ability = new GetTerm();
 
-		$mock_term = Mockery::mock( \WP_Term::class );
+		$mock_term              = Mockery::mock( \WP_Term::class );
 		$mock_term->term_id     = 1;
 		$mock_term->name        = 'Test Category';
 		$mock_term->slug        = 'test-category';
@@ -142,7 +142,7 @@ class GetTermTest extends TestCase {
 	public function testExecuteFiltersTermMeta(): void {
 		$ability = new GetTerm();
 
-		$mock_term = Mockery::mock( \WP_Term::class );
+		$mock_term              = Mockery::mock( \WP_Term::class );
 		$mock_term->term_id     = 22;
 		$mock_term->name        = 'Meta Term';
 		$mock_term->slug        = 'meta-term';
@@ -184,7 +184,7 @@ class GetTermTest extends TestCase {
 	public function testExecuteHandlesNonArrayMeta(): void {
 		$ability = new GetTerm();
 
-		$mock_term = Mockery::mock( \WP_Term::class );
+		$mock_term              = Mockery::mock( \WP_Term::class );
 		$mock_term->term_id     = 33;
 		$mock_term->name        = 'Empty Meta Term';
 		$mock_term->slug        = 'empty-meta-term';

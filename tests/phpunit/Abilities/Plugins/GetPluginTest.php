@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for GetPlugin.
+ *
+ * @package FAWpmcp\Tests\Abilities\Plugins
+ */
+
 declare(strict_types=1);
 namespace FAWpmcp\Tests\Abilities\Plugins;
 
@@ -33,7 +39,12 @@ class GetPluginTest extends TestCase {
 		$ability = new GetPlugin();
 
 		Functions\expect( 'get_plugins' )->once()->andReturn(
-			array( 'test/test.php' => array( 'Name' => 'Test Plugin', 'Version' => '1.0' ) )
+			array(
+				'test/test.php' => array(
+					'Name'    => 'Test Plugin',
+					'Version' => '1.0',
+				),
+			)
 		);
 		Functions\expect( 'is_plugin_active' )->once()->with( 'test/test.php' )->andReturn( true );
 

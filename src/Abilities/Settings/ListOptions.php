@@ -159,10 +159,10 @@ final class ListOptions extends AbstractAbility {
 		$where = $where_clauses ? 'WHERE ' . implode( ' AND ', $where_clauses ) : '';
 
 		// Prepare and execute query for options.
-		$query       = "SELECT option_name, option_value FROM {$wpdb->options} {$where} ORDER BY option_name ASC LIMIT %d OFFSET %d";
-		$query_args  = array_merge( $args, array( $limit, $offset ) );
-		$sql         = $wpdb->prepare( $query, ...$query_args ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$results     = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$query      = "SELECT option_name, option_value FROM {$wpdb->options} {$where} ORDER BY option_name ASC LIMIT %d OFFSET %d";
+		$query_args = array_merge( $args, array( $limit, $offset ) );
+		$sql        = $wpdb->prepare( $query, ...$query_args ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$results    = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 		// Get total count.
 		$count_query = "SELECT COUNT(*) FROM {$wpdb->options} {$where}";

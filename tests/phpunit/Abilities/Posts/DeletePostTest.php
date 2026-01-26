@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for DeletePost.
+ *
+ * @package FAWpmcp\Tests\Abilities\Posts
+ */
+
 declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Posts;
@@ -88,10 +94,12 @@ final class DeletePostTest extends TestCase {
 		Functions\expect( 'wp_delete_post' )->once()->with( 42, true )->andReturn( $post );
 
 		$ability = new DeletePost();
-		$result  = $ability->doExecute( array(
-			'post_id' => 42,
-			'force'   => true,
-		) );
+		$result  = $ability->doExecute(
+			array(
+				'post_id' => 42,
+				'force'   => true,
+			)
+		);
 
 		$this->assertEquals( 42, $result['post_id'] );
 		$this->assertEquals( 'deleted', $result['action'] );
@@ -133,10 +141,12 @@ final class DeletePostTest extends TestCase {
 		Functions\expect( 'wp_delete_post' )->once()->with( 42, true )->andReturn( false );
 
 		$ability = new DeletePost();
-		$ability->doExecute( array(
-			'post_id' => 42,
-			'force'   => true,
-		) );
+		$ability->doExecute(
+			array(
+				'post_id' => 42,
+				'force'   => true,
+			)
+		);
 	}
 
 	public function test_throws_exception_when_delete_returns_null(): void {
@@ -149,9 +159,11 @@ final class DeletePostTest extends TestCase {
 		Functions\expect( 'wp_delete_post' )->once()->with( 42, true )->andReturn( null );
 
 		$ability = new DeletePost();
-		$ability->doExecute( array(
-			'post_id' => 42,
-			'force'   => true,
-		) );
+		$ability->doExecute(
+			array(
+				'post_id' => 42,
+				'force'   => true,
+			)
+		);
 	}
 }

@@ -146,7 +146,12 @@ class GetMediaTest extends TestCase {
 		$mock_post->post_content     = 'Test description';
 
 		Functions\when( 'get_post' )->justReturn( $mock_post );
-		Functions\when( 'wp_get_attachment_metadata' )->justReturn( array( 'width' => 800, 'height' => 600 ) );
+		Functions\when( 'wp_get_attachment_metadata' )->justReturn(
+			array(
+				'width' => 800,
+				'height' => 600,
+			)
+		);
 		Functions\when( 'get_attached_file' )->justReturn( 'file.jpg' );
 		Functions\when( 'wp_get_attachment_url' )->justReturn( 'https://example.com/file.jpg' );
 		Functions\when( 'get_post_meta' )->justReturn( array() );
@@ -189,7 +194,10 @@ class GetMediaTest extends TestCase {
 				'width'  => 1200,
 				'height' => 800,
 				'sizes'  => array(
-					'thumbnail' => array( 'width' => 150, 'height' => 150 ),
+					'thumbnail' => array(
+						'width' => 150,
+						'height' => 150,
+					),
 				),
 			)
 		);

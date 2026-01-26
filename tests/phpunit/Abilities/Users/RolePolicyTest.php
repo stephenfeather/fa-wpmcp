@@ -98,7 +98,7 @@ class RolePolicyTest extends TestCase {
 		Functions\when( 'get_option' )
 			->justReturn( 'editor' );
 
-		$policy = new RolePolicy();
+		$policy  = new RolePolicy();
 		$allowed = $policy->getAllowedRoles();
 
 		$this->assertContains( 'editor', $allowed );
@@ -117,7 +117,7 @@ class RolePolicyTest extends TestCase {
 		Functions\when( 'get_option' )
 			->justReturn( 'administrator' );
 
-		$policy = new RolePolicy();
+		$policy  = new RolePolicy();
 		$allowed = $policy->getAllowedRoles();
 
 		$this->assertCount( 5, $allowed );
@@ -135,7 +135,7 @@ class RolePolicyTest extends TestCase {
 		Functions\when( 'get_option' )
 			->justReturn( 'subscriber' );
 
-		$policy = new RolePolicy();
+		$policy  = new RolePolicy();
 		$allowed = $policy->getAllowedRoles();
 
 		$this->assertCount( 1, $allowed );

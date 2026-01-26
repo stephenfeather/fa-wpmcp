@@ -419,9 +419,9 @@ final class UploadMedia extends AbstractAbility {
 	 * @return array<string, mixed> Response data.
 	 */
 	private function formatResponse( int $attachment_id ): array {
-		$file     = get_attached_file( $attachment_id );
-		$filesize = $file && file_exists( $file ) ? filesize( $file ) : 0;
-		$post     = get_post( $attachment_id );
+		$file      = get_attached_file( $attachment_id );
+		$filesize  = $file && file_exists( $file ) ? filesize( $file ) : 0;
+		$post      = get_post( $attachment_id );
 		$mime_type = $post ? $post->post_mime_type : '';
 
 		return array(

@@ -69,7 +69,7 @@ final class UninstallTest extends TestCase {
 	 * @return void
 	 */
 	public function test_drops_activity_log_table(): void {
-		$wpdb = Mockery::mock( 'wpdb' );
+		$wpdb         = Mockery::mock( 'wpdb' );
 		$wpdb->prefix = 'wp_';
 		$wpdb->shouldReceive( 'query' )
 			->once()
@@ -88,7 +88,7 @@ final class UninstallTest extends TestCase {
 	 * @return void
 	 */
 	public function test_drops_webhook_queue_table(): void {
-		$wpdb = Mockery::mock( 'wpdb' );
+		$wpdb         = Mockery::mock( 'wpdb' );
 		$wpdb->prefix = 'wp_';
 		$wpdb->shouldReceive( 'query' )
 			->once()
@@ -107,7 +107,7 @@ final class UninstallTest extends TestCase {
 	 * @return void
 	 */
 	public function test_deletes_all_plugin_options(): void {
-		$wpdb = Mockery::mock( 'wpdb' );
+		$wpdb          = Mockery::mock( 'wpdb' );
 		$wpdb->options = 'wp_options';
 		$wpdb->shouldReceive( 'query' )
 			->once()
@@ -126,7 +126,7 @@ final class UninstallTest extends TestCase {
 	 * @return void
 	 */
 	public function test_deletes_all_transients(): void {
-		$wpdb = Mockery::mock( 'wpdb' );
+		$wpdb          = Mockery::mock( 'wpdb' );
 		$wpdb->options = 'wp_options';
 
 		// Delete transient values.
@@ -142,7 +142,7 @@ final class UninstallTest extends TestCase {
 			->andReturn( 3 );
 
 		// Simulate transient deletion.
-		$deleted_values = $wpdb->query( "DELETE FROM wp_options WHERE option_name LIKE '_transient_fa_wpmcp_%'" );
+		$deleted_values   = $wpdb->query( "DELETE FROM wp_options WHERE option_name LIKE '_transient_fa_wpmcp_%'" );
 		$deleted_timeouts = $wpdb->query( "DELETE FROM wp_options WHERE option_name LIKE '_transient_timeout_fa_wpmcp_%'" );
 
 		$this->assertEquals( 3, $deleted_values );
@@ -155,7 +155,7 @@ final class UninstallTest extends TestCase {
 	 * @return void
 	 */
 	public function test_deletes_all_user_meta(): void {
-		$wpdb = Mockery::mock( 'wpdb' );
+		$wpdb           = Mockery::mock( 'wpdb' );
 		$wpdb->usermeta = 'wp_usermeta';
 		$wpdb->shouldReceive( 'query' )
 			->once()
@@ -174,7 +174,7 @@ final class UninstallTest extends TestCase {
 	 * @return void
 	 */
 	public function test_deletes_multisite_options(): void {
-		$wpdb = Mockery::mock( 'wpdb' );
+		$wpdb           = Mockery::mock( 'wpdb' );
 		$wpdb->sitemeta = 'wp_sitemeta';
 		$wpdb->shouldReceive( 'query' )
 			->once()
@@ -229,7 +229,7 @@ final class UninstallTest extends TestCase {
 
 		// Simulate clearing cron hooks.
 		$cleared_webhooks = wp_clear_scheduled_hook( 'fa_wpmcp_process_webhook_queue' );
-		$cleared_cleanup = wp_clear_scheduled_hook( 'fa_wpmcp_cleanup_old_logs' );
+		$cleared_cleanup  = wp_clear_scheduled_hook( 'fa_wpmcp_cleanup_old_logs' );
 
 		$this->assertEquals( 1, $cleared_webhooks );
 		$this->assertEquals( 1, $cleared_cleanup );
@@ -259,9 +259,9 @@ final class UninstallTest extends TestCase {
 	 * @return void
 	 */
 	public function test_complete_uninstall_runs_all_steps(): void {
-		$wpdb = Mockery::mock( 'wpdb' );
-		$wpdb->prefix = 'wp_';
-		$wpdb->options = 'wp_options';
+		$wpdb           = Mockery::mock( 'wpdb' );
+		$wpdb->prefix   = 'wp_';
+		$wpdb->options  = 'wp_options';
 		$wpdb->usermeta = 'wp_usermeta';
 
 		// Mock all cleanup queries.

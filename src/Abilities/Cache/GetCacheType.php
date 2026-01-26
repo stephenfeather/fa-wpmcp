@@ -77,16 +77,16 @@ final class GetCacheType extends AbstractAbility {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
-				'type'       => array(
+				'type'         => array(
 					'type'        => 'string',
 					'description' => 'The cache implementation type.',
 					'enum'        => array( 'default', 'redis', 'memcached', 'memcache', 'apcu', 'xcache', 'wincache', 'unknown' ),
 				),
-				'persistent' => array(
+				'persistent'   => array(
 					'type'        => 'boolean',
 					'description' => 'Whether the cache is persistent.',
 				),
-				'drop_in'    => array(
+				'drop_in'      => array(
 					'type'        => 'boolean',
 					'description' => 'Whether an object-cache.php drop-in is active.',
 				),

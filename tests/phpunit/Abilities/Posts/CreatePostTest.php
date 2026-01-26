@@ -556,8 +556,8 @@ class CreatePostTest extends TestCase {
 	public function test_build_post_data_is_pure(): void {
 		Functions\stubs(
 			array(
-				'sanitize_text_field'    => fn( $v ) => $v,
-				'wp_kses_post'           => fn( $v ) => $v,
+				'sanitize_text_field'     => fn( $v ) => $v,
+				'wp_kses_post'            => fn( $v ) => $v,
 				'sanitize_textarea_field' => fn( $v ) => $v,
 			)
 		);

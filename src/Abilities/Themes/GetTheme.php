@@ -18,22 +18,47 @@ use FAWpmcp\Exceptions\ThemeNotFoundException;
  * @package FAWpmcp\Abilities\Themes
  */
 final class GetTheme extends AbstractAbility {
+	/**
+	 * Returns the ability identifier.
+	 *
+	 * @return string
+	 */
 	public function getName(): string {
 		return 'fa-wpmcp/get-theme';
 	}
 
+	/**
+	 * Returns the ability category.
+	 *
+	 * @return string
+	 */
 	public function getCategory(): string {
 		return 'themes';
 	}
 
+	/**
+	 * Returns the display label.
+	 *
+	 * @return string
+	 */
 	public function getLabel(): string {
 		return 'Get Theme';
 	}
 
+	/**
+	 * Returns the ability description.
+	 *
+	 * @return string
+	 */
 	public function getDescription(): string {
 		return 'Get details about a specific WordPress theme.';
 	}
 
+	/**
+	 * Returns the JSON Schema for input validation.
+	 *
+	 * @return array
+	 */
 	public function getInputSchema(): array {
 		return array(
 			'type'       => 'object',
@@ -47,6 +72,11 @@ final class GetTheme extends AbstractAbility {
 		);
 	}
 
+	/**
+	 * Returns the JSON Schema for output.
+	 *
+	 * @return array
+	 */
 	public function getOutputSchema(): array {
 		return array(
 			'type'       => 'object',
@@ -59,10 +89,22 @@ final class GetTheme extends AbstractAbility {
 		);
 	}
 
+	/**
+	 * Returns the WordPress capability required.
+	 *
+	 * @return string
+	 */
 	public function getRequiredCapability(): string {
 		return 'switch_themes';
 	}
 
+	/**
+	 * Executes the ability.
+	 *
+	 * @param array $input Input parameters.
+	 * @return array
+	 * @throws ThemeNotFoundException If the specified theme is not found.
+	 */
 	public function doExecute( array $input ): array {
 		$stylesheet = $input['stylesheet'];
 		$theme      = wp_get_theme( $stylesheet );

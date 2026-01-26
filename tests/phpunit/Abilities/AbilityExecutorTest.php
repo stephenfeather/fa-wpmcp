@@ -57,7 +57,7 @@ class AbilityExecutorTest extends TestCase {
 		string $name = 'fa-wpmcp/test-ability',
 		string $category = 'test-category',
 		string $operation = 'read',
-		array $execute_return = [ 'result' => 'success' ],
+		array $execute_return = array( 'result' => 'success' ),
 		string $required_capability = 'read'
 	): AbstractAbility {
 		$ability = Mockery::mock( AbstractAbility::class );
@@ -83,8 +83,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		// Mock RateLimiter.
@@ -123,7 +123,7 @@ class AbilityExecutorTest extends TestCase {
 		);
 
 		$ability = $this->create_mock_ability();
-		$result  = $executor->execute( $ability, [ 'test' => 'input' ], 1, 'admin', '127.0.0.1' );
+		$result  = $executor->execute( $ability, array( 'test' => 'input' ), 1, 'admin', '127.0.0.1' );
 
 		$this->assertTrue( $result->is_success );
 	}
@@ -140,8 +140,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: false,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		// These should not be called when permission fails.
@@ -162,7 +162,7 @@ class AbilityExecutorTest extends TestCase {
 		);
 
 		$ability = $this->create_mock_ability( operation: 'read' );
-		$result  = $executor->execute( $ability, [ 'test' => 'input' ], 1, 'admin', '127.0.0.1' );
+		$result  = $executor->execute( $ability, array( 'test' => 'input' ), 1, 'admin', '127.0.0.1' );
 
 		$this->assertFalse( $result->is_success );
 		$this->assertEquals( 'ability_disabled', $result->error_code );
@@ -177,8 +177,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		$GLOBALS['fa_wpmcp_user_can'] = array(
@@ -209,7 +209,7 @@ class AbilityExecutorTest extends TestCase {
 			operation: 'read',
 			required_capability: 'manage_options'
 		);
-		$result = $executor->execute( $ability, [], 1, 'editor', '127.0.0.1' );
+		$result  = $executor->execute( $ability, array(), 1, 'editor', '127.0.0.1' );
 
 		unset( $GLOBALS['fa_wpmcp_user_can'] );
 
@@ -228,8 +228,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		// Rate limiter returns denied.
@@ -254,7 +254,7 @@ class AbilityExecutorTest extends TestCase {
 		);
 
 		$ability = $this->create_mock_ability();
-		$result  = $executor->execute( $ability, [ 'test' => 'input' ], 1, 'admin', '127.0.0.1' );
+		$result  = $executor->execute( $ability, array( 'test' => 'input' ), 1, 'admin', '127.0.0.1' );
 
 		$this->assertFalse( $result->is_success );
 		$this->assertEquals( 'rate_limit_exceeded', $result->error_code );
@@ -272,8 +272,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
@@ -290,7 +290,7 @@ class AbilityExecutorTest extends TestCase {
 				1,
 				'admin',
 				'192.168.1.1',
-				[ 'limit' => 10 ]
+				array( 'limit' => 10 )
 			)
 			->andReturn( 'correlation-123' );
 		$logger->shouldReceive( 'logAfterExecute' );
@@ -310,7 +310,7 @@ class AbilityExecutorTest extends TestCase {
 			category: 'posts-pages',
 			operation: 'read'
 		);
-		$executor->execute( $ability, [ 'limit' => 10 ], 1, 'admin', '192.168.1.1' );
+		$executor->execute( $ability, array( 'limit' => 10 ), 1, 'admin', '192.168.1.1' );
 	}
 
 	/**
@@ -322,8 +322,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
@@ -337,7 +337,7 @@ class AbilityExecutorTest extends TestCase {
 			->once()
 			->with(
 				'correlation-456',
-				[ 'result' => 'success' ],
+				array( 'result' => 'success' ),
 				true,
 				null,
 				Mockery::type( 'float' )
@@ -354,7 +354,7 @@ class AbilityExecutorTest extends TestCase {
 		);
 
 		$ability = $this->create_mock_ability();
-		$executor->execute( $ability, [], 1, 'admin', '127.0.0.1' );
+		$executor->execute( $ability, array(), 1, 'admin', '127.0.0.1' );
 	}
 
 	/**
@@ -366,8 +366,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
@@ -407,7 +407,7 @@ class AbilityExecutorTest extends TestCase {
 			category: 'posts-pages',
 			operation: 'write'
 		);
-		$executor->execute( $ability, [ 'title' => 'Test' ], 1, 'admin', '127.0.0.1' );
+		$executor->execute( $ability, array( 'title' => 'Test' ), 1, 'admin', '127.0.0.1' );
 	}
 
 	/**
@@ -419,8 +419,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
@@ -456,7 +456,7 @@ class AbilityExecutorTest extends TestCase {
 		);
 
 		$ability = $this->create_mock_ability( name: 'fa-wpmcp/list-posts' );
-		$executor->execute( $ability, [], 1, 'admin', '127.0.0.1' );
+		$executor->execute( $ability, array(), 1, 'admin', '127.0.0.1' );
 	}
 
 	/**
@@ -470,8 +470,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
@@ -512,7 +512,7 @@ class AbilityExecutorTest extends TestCase {
 			$webhook_manager,
 		);
 
-		$result = $executor->execute( $ability, [], 1, 'admin', '127.0.0.1' );
+		$result = $executor->execute( $ability, array(), 1, 'admin', '127.0.0.1' );
 
 		$this->assertFalse( $result->is_success );
 		$this->assertEquals( 'internal_error', $result->error_code );
@@ -528,8 +528,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
@@ -572,7 +572,7 @@ class AbilityExecutorTest extends TestCase {
 			$webhook_manager,
 		);
 
-		$executor->execute( $ability, [], 1, 'admin', '127.0.0.1' );
+		$executor->execute( $ability, array(), 1, 'admin', '127.0.0.1' );
 	}
 
 	/**
@@ -586,8 +586,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
@@ -616,7 +616,7 @@ class AbilityExecutorTest extends TestCase {
 					}
 				)
 			)
-			->andReturn( [ 'done' => true ] );
+			->andReturn( array( 'done' => true ) );
 
 		$executor = new AbilityExecutor(
 			$permission_settings,
@@ -627,20 +627,20 @@ class AbilityExecutorTest extends TestCase {
 
 		$executor->execute(
 			$ability,
-			[
+			array(
 				'key1' => 'value1',
 				'key2' => 'value2',
-			],
+			),
 			1,
 			'admin',
 			'127.0.0.1'
 		);
 
 		$this->assertEquals(
-			[
+			array(
 				'key1' => 'value1',
 				'key2' => 'value2',
-			],
+			),
 			$received_input
 		);
 	}
@@ -654,10 +654,10 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [
-				'posts-pages' => [ 'enable_write' => false ],
-			],
-			ability_settings: [],
+			category_settings: array(
+				'posts-pages' => array( 'enable_write' => false ),
+			),
+			ability_settings: array(),
 		);
 
 		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
@@ -681,7 +681,7 @@ class AbilityExecutorTest extends TestCase {
 			category: 'posts-pages',
 			operation: 'write'
 		);
-		$result = $executor->execute( $ability, [], 1, 'admin', '127.0.0.1' );
+		$result  = $executor->execute( $ability, array(), 1, 'admin', '127.0.0.1' );
 
 		$this->assertFalse( $result->is_success );
 		$this->assertEquals( 'ability_disabled', $result->error_code );
@@ -696,10 +696,10 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [
-				'fa-wpmcp/dangerous-ability' => [ 'enabled' => false ],
-			],
+			category_settings: array(),
+			ability_settings: array(
+				'fa-wpmcp/dangerous-ability' => array( 'enabled' => false ),
+			),
 		);
 
 		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
@@ -719,7 +719,7 @@ class AbilityExecutorTest extends TestCase {
 		);
 
 		$ability = $this->create_mock_ability( name: 'fa-wpmcp/dangerous-ability' );
-		$result  = $executor->execute( $ability, [], 1, 'admin', '127.0.0.1' );
+		$result  = $executor->execute( $ability, array(), 1, 'admin', '127.0.0.1' );
 
 		$this->assertFalse( $result->is_success );
 		$this->assertEquals( 'ability_disabled', $result->error_code );
@@ -734,8 +734,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
@@ -759,7 +759,7 @@ class AbilityExecutorTest extends TestCase {
 		);
 
 		$ability = $this->create_mock_ability();
-		$executor->execute( $ability, [], 42, 'testuser', '10.0.0.1' );
+		$executor->execute( $ability, array(), 42, 'testuser', '10.0.0.1' );
 	}
 
 	/**
@@ -771,8 +771,8 @@ class AbilityExecutorTest extends TestCase {
 		$permission_settings = new PermissionSettings(
 			global_read_enabled: true,
 			global_write_enabled: true,
-			category_settings: [],
-			ability_settings: [],
+			category_settings: array(),
+			ability_settings: array(),
 		);
 
 		$rate_limiter = Mockery::mock( RateLimiterInterface::class );
@@ -794,11 +794,11 @@ class AbilityExecutorTest extends TestCase {
 		);
 
 		$ability = $this->create_mock_ability(
-			execute_return: [ 'posts' => [ [ 'id' => 1 ], [ 'id' => 2 ] ] ]
+			execute_return: array( 'posts' => array( array( 'id' => 1 ), array( 'id' => 2 ) ) )
 		);
-		$result = $executor->execute( $ability, [], 1, 'admin', '127.0.0.1' );
+		$result  = $executor->execute( $ability, array(), 1, 'admin', '127.0.0.1' );
 
 		$this->assertTrue( $result->is_success );
-		$this->assertEquals( [ 'posts' => [ [ 'id' => 1 ], [ 'id' => 2 ] ] ], $result->value );
+		$this->assertEquals( array( 'posts' => array( array( 'id' => 1 ), array( 'id' => 2 ) ) ), $result->value );
 	}
 }

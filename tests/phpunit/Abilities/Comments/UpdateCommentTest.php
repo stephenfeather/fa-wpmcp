@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for UpdateComment.
+ *
+ * @package FAWpmcp\Tests\Abilities\Comments
+ */
+
 declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Comments;
@@ -57,10 +63,12 @@ final class UpdateCommentTest extends TestCase {
 		Functions\expect( 'get_comment_link' )->once()->andReturn( 'https://example.com/post#comment-42' );
 
 		$ability = new UpdateComment();
-		$result  = $ability->doExecute( array(
-			'comment_id' => 42,
-			'status'     => 'approve',
-		) );
+		$result  = $ability->doExecute(
+			array(
+				'comment_id' => 42,
+				'status'     => 'approve',
+			)
+		);
 
 		$this->assertEquals( 42, $result['comment_id'] );
 	}
@@ -72,9 +80,11 @@ final class UpdateCommentTest extends TestCase {
 		Functions\expect( 'wp_set_comment_status' )->once()->andReturn( false );
 
 		$ability = new UpdateComment();
-		$ability->doExecute( array(
-			'comment_id' => 42,
-			'status'     => 'trash',
-		) );
+		$ability->doExecute(
+			array(
+				'comment_id' => 42,
+				'status'     => 'trash',
+			)
+		);
 	}
 }

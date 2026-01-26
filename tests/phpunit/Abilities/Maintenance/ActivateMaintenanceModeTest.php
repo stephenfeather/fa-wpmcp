@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for ActivateMaintenanceMode.
+ *
+ * @package FAWpmcp\Tests\Abilities\Maintenance
+ */
+
 declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Maintenance;

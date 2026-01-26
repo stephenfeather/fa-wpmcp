@@ -174,7 +174,10 @@ class GetTaxonomyTest extends TestCase {
 		$mock_taxonomy->rest_base   = 'categories';
 		$mock_taxonomy->object_type = array( 'post' );
 		$mock_taxonomy->cap         = $mock_cap;
-		$mock_taxonomy->rewrite     = array( 'slug' => 'category', 'with_front' => true );
+		$mock_taxonomy->rewrite     = array(
+			'slug' => 'category',
+			'with_front' => true,
+		);
 
 		Functions\when( 'get_taxonomy' )->justReturn( $mock_taxonomy );
 
@@ -303,7 +306,10 @@ class GetTaxonomyTest extends TestCase {
 		$mock_taxonomy->rest_base   = 'categories';
 		$mock_taxonomy->object_type = array( 'post' );
 		$mock_taxonomy->cap         = null;
-		$mock_taxonomy->rewrite     = array( 'slug' => 'category', 'with_front' => true );
+		$mock_taxonomy->rewrite     = array(
+			'slug' => 'category',
+			'with_front' => true,
+		);
 
 		Functions\when( 'get_taxonomy' )->justReturn( $mock_taxonomy );
 

@@ -56,12 +56,14 @@ final class OptionsRateLimitConfigTest extends TestCase {
 	public function test_get_returns_ability_override_when_present(): void {
 		Functions\expect( 'get_option' )
 			->once()
-			->andReturn( array(
-				'custom' => array(
-					'requests_per_minute' => 10,
-					'requests_per_hour'   => 100,
-				),
-			) );
+			->andReturn(
+				array(
+					'custom' => array(
+						'requests_per_minute' => 10,
+						'requests_per_hour'   => 100,
+					),
+				)
+			);
 
 		$config = new OptionsRateLimitConfig();
 		$result = $config->get( 'custom' );
@@ -82,9 +84,14 @@ final class OptionsRateLimitConfigTest extends TestCase {
 
 		Functions\expect( 'update_option' )
 			->once()
-			->with( 'fa_wpmcp_rate_limits', Mockery::on( function( $config ) {
-				return isset( $config['default'] ) && isset( $config['ability-x'] );
-			} ) )
+			->with(
+				'fa_wpmcp_rate_limits',
+				Mockery::on(
+					function ( $config ) {
+						return isset( $config['default'] ) && isset( $config['ability-x'] );
+					}
+				)
+			)
 			->andReturn( true );
 
 		$config = new OptionsRateLimitConfig();

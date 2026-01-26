@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for CreateComment.
+ *
+ * @package FAWpmcp\Tests\Abilities\Comments
+ */
+
 declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Comments;
@@ -62,22 +68,28 @@ final class CreateCommentTest extends TestCase {
 
 		Functions\expect( 'wp_insert_comment' )
 			->once()
-			->with( \Mockery::on( function( $args ) {
-				return 10 === $args['comment_post_ID']
-					&& 'John' === $args['comment_author']
-					&& 'john@example.com' === $args['comment_author_email']
-					&& 'Great post!' === $args['comment_content'];
-			} ) )
+			->with(
+				\Mockery::on(
+					function ( $args ) {
+						return 10 === $args['comment_post_ID']
+						&& 'John' === $args['comment_author']
+						&& 'john@example.com' === $args['comment_author_email']
+						&& 'Great post!' === $args['comment_content'];
+					}
+				)
+			)
 			->andReturn( 42 );
 		Functions\expect( 'get_comment_link' )->once()->andReturn( 'https://example.com/post#comment-42' );
 
 		$ability = new CreateComment();
-		$result  = $ability->doExecute( array(
-			'post_id' => 10,
-			'author'  => 'John',
-			'email'   => 'john@example.com',
-			'content' => 'Great post!',
-		) );
+		$result  = $ability->doExecute(
+			array(
+				'post_id' => 10,
+				'author'  => 'John',
+				'email'   => 'john@example.com',
+				'content' => 'Great post!',
+			)
+		);
 
 		$this->assertEquals( 42, $result['comment_id'] );
 	}
@@ -91,21 +103,27 @@ final class CreateCommentTest extends TestCase {
 
 		Functions\expect( 'wp_insert_comment' )
 			->once()
-			->with( \Mockery::on( function( $args ) {
-				return 'https://example.com' === $args['comment_author_url'];
-			} ) )
+			->with(
+				\Mockery::on(
+					function ( $args ) {
+						return 'https://example.com' === $args['comment_author_url'];
+					}
+				)
+			)
 			->andReturn( 77 );
 
 		Functions\expect( 'get_comment_link' )->once()->andReturn( 'https://example.com/post#comment-77' );
 
 		$ability = new CreateComment();
-		$result  = $ability->doExecute( array(
-			'post_id' => 10,
-			'author'  => 'John',
-			'email'   => 'john@example.com',
-			'content' => 'Great post!',
-			'url'     => 'https://example.com',
-		) );
+		$result  = $ability->doExecute(
+			array(
+				'post_id' => 10,
+				'author'  => 'John',
+				'email'   => 'john@example.com',
+				'content' => 'Great post!',
+				'url'     => 'https://example.com',
+			)
+		);
 
 		$this->assertEquals( 77, $result['comment_id'] );
 	}
@@ -122,11 +140,13 @@ final class CreateCommentTest extends TestCase {
 		Functions\expect( 'wp_insert_comment' )->once()->andReturn( 0 );
 
 		$ability = new CreateComment();
-		$ability->doExecute( array(
-			'post_id' => 10,
-			'author'  => 'John',
-			'email'   => 'john@example.com',
-			'content' => 'Great post!',
-		) );
+		$ability->doExecute(
+			array(
+				'post_id' => 10,
+				'author'  => 'John',
+				'email'   => 'john@example.com',
+				'content' => 'Great post!',
+			)
+		);
 	}
 }

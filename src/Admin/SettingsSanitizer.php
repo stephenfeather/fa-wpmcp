@@ -46,7 +46,7 @@ final class SettingsSanitizer {
 		$sanitized = array();
 
 		foreach ( $input as $category => $settings ) {
-			$category = sanitize_text_field( $category );
+			$category               = sanitize_text_field( $category );
 			$sanitized[ $category ] = array(
 				'enable_read'  => isset( $settings['enable_read'] ) && '1' === sanitize_text_field( $settings['enable_read'] ),
 				'enable_write' => isset( $settings['enable_write'] ) && '1' === sanitize_text_field( $settings['enable_write'] ),
@@ -70,7 +70,7 @@ final class SettingsSanitizer {
 		$sanitized = array();
 
 		foreach ( $input as $ability => $settings ) {
-			$ability = sanitize_text_field( $ability );
+			$ability               = sanitize_text_field( $ability );
 			$sanitized[ $ability ] = array(
 				'enabled' => isset( $settings['enabled'] ) && '1' === sanitize_text_field( $settings['enabled'] ),
 			);
@@ -93,7 +93,7 @@ final class SettingsSanitizer {
 		$sanitized = array();
 
 		foreach ( $input as $ability => $limits ) {
-			$ability = sanitize_text_field( $ability );
+			$ability               = sanitize_text_field( $ability );
 			$sanitized[ $ability ] = array(
 				'requests_per_minute' => absint( $limits['requests_per_minute'] ?? 0 ),
 				'requests_per_hour'   => absint( $limits['requests_per_hour'] ?? 0 ),

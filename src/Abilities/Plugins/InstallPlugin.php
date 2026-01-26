@@ -1,5 +1,12 @@
 <?php
+/**
+ * Install Plugin ability for WordPress MCP.
+ *
+ * @package FAWpmcp\Abilities\Plugins
+ */
+
 declare(strict_types=1);
+
 namespace FAWpmcp\Abilities\Plugins;
 
 use FAWpmcp\Abilities\AbstractAbility;
@@ -34,21 +41,56 @@ use FAWpmcp\Exceptions\PluginInstallationException;
  * - Compatibility checking against WordPress version
  */
 final class InstallPlugin extends AbstractAbility {
+	/**
+	 * Returns the ability identifier.
+	 *
+	 * @return string
+	 */
 	public function getName(): string {
 		return 'fa-wpmcp/install-plugin';
 	}
+
+	/**
+	 * Returns the ability category.
+	 *
+	 * @return string
+	 */
 	public function getCategory(): string {
 		return 'plugins';
 	}
+
+	/**
+	 * Returns the display label.
+	 *
+	 * @return string
+	 */
 	public function getLabel(): string {
 		return 'Install Plugin';
 	}
+
+	/**
+	 * Returns the ability description.
+	 *
+	 * @return string
+	 */
 	public function getDescription(): string {
 		return 'Install a WordPress plugin from WordPress.org or zip URL.';
 	}
+
+	/**
+	 * Returns the operation type.
+	 *
+	 * @return string
+	 */
 	public function getOperationType(): string {
 		return 'write';
 	}
+
+	/**
+	 * Returns the JSON Schema for input validation.
+	 *
+	 * @return array
+	 */
 	public function getInputSchema(): array {
 		return array(
 			'type'       => 'object',
@@ -61,6 +103,12 @@ final class InstallPlugin extends AbstractAbility {
 			'required'   => array( 'slug' ),
 		);
 	}
+
+	/**
+	 * Returns the JSON Schema for output.
+	 *
+	 * @return array
+	 */
 	public function getOutputSchema(): array {
 		return array(
 			'type'       => 'object',
@@ -70,9 +118,23 @@ final class InstallPlugin extends AbstractAbility {
 			),
 		);
 	}
+
+	/**
+	 * Returns the WordPress capability required.
+	 *
+	 * @return string
+	 */
 	public function getRequiredCapability(): string {
 		return 'install_plugins';
 	}
+
+	/**
+	 * Executes the ability.
+	 *
+	 * @param array $input Input parameters.
+	 * @return array
+	 * @throws PluginInstallationException Always, as this ability is not yet implemented.
+	 */
 	public function doExecute( array $input ): array {
 		throw new PluginInstallationException(
 			'Plugin installation is not yet implemented. This ability requires WordPress Plugin_Upgrader integration.'

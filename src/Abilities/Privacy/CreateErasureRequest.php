@@ -89,23 +89,23 @@ final class CreateErasureRequest extends AbstractAbility {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
-				'success'           => array(
+				'success'      => array(
 					'type'        => 'boolean',
 					'description' => 'Whether the request was created successfully.',
 				),
-				'request_id'        => array(
+				'request_id'   => array(
 					'type'        => 'integer',
 					'description' => 'The ID of the created request.',
 				),
-				'status'            => array(
+				'status'       => array(
 					'type'        => 'string',
 					'description' => 'Current status of the request (request-pending, request-confirmed, request-failed, request-completed).',
 				),
-				'email'             => array(
+				'email'        => array(
 					'type'        => 'string',
 					'description' => 'Email address of the requester.',
 				),
-				'confirmed_at'      => array(
+				'confirmed_at' => array(
 					'type'        => 'string',
 					'description' => 'Timestamp when the request was confirmed (if confirmed).',
 				),
@@ -139,8 +139,8 @@ final class CreateErasureRequest extends AbstractAbility {
 	 * @return array<string, mixed> Annotations array.
 	 */
 	public function getAnnotations(): array {
-		$annotations                = parent::getAnnotations();
-		$annotations['idempotent']  = false;
+		$annotations               = parent::getAnnotations();
+		$annotations['idempotent'] = false;
 		return $annotations;
 	}
 

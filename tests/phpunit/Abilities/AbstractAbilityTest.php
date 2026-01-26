@@ -89,11 +89,17 @@ final class AbstractAbilityTest extends TestCase {
 			}
 
 			public function getInputSchema(): array {
-				return array( 'type' => 'object', 'properties' => array() );
+				return array(
+					'type'       => 'object',
+					'properties' => array(),
+				);
 			}
 
 			public function getOutputSchema(): array {
-				return array( 'type' => 'object', 'properties' => array() );
+				return array(
+					'type'       => 'object',
+					'properties' => array(),
+				);
 			}
 
 			public function getRequiredCapability(): string {

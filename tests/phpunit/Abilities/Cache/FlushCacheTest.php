@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for FlushCache.
+ *
+ * @package FAWpmcp\Tests\Abilities\Cache
+ */
+
 declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Cache;

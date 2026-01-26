@@ -77,11 +77,11 @@ final class GetCacheStatus extends AbstractAbility {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
-				'persistent'       => array(
+				'persistent'            => array(
 					'type'        => 'boolean',
 					'description' => 'Whether the cache is persistent (survives page loads).',
 				),
-				'supports'         => array(
+				'supports'              => array(
 					'type'        => 'object',
 					'description' => 'Cache feature support flags.',
 					'properties'  => array(
@@ -93,7 +93,7 @@ final class GetCacheStatus extends AbstractAbility {
 						'flush_group'     => array( 'type' => 'boolean' ),
 					),
 				),
-				'global_groups'    => array(
+				'global_groups'         => array(
 					'type'        => 'array',
 					'description' => 'List of global cache groups.',
 					'items'       => array( 'type' => 'string' ),

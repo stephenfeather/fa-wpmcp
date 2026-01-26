@@ -52,8 +52,8 @@ class AbilityRegistryTest extends TestCase {
 		$ability->shouldReceive( 'getDescription' )->andReturn( 'Test description' );
 		$ability->shouldReceive( 'getOperationType' )->andReturn( 'read' );
 		$ability->shouldReceive( 'getRequiredCapability' )->andReturn( 'read' );
-		$ability->shouldReceive( 'getInputSchema' )->andReturn( [] );
-		$ability->shouldReceive( 'getOutputSchema' )->andReturn( [] );
+		$ability->shouldReceive( 'getInputSchema' )->andReturn( array() );
+		$ability->shouldReceive( 'getOutputSchema' )->andReturn( array() );
 		return $ability;
 	}
 
@@ -411,12 +411,12 @@ class AbilityRegistryTest extends TestCase {
 		$ability->shouldReceive( 'getName' )->andReturn( 'fa-wpmcp/list-posts' );
 		$ability->shouldReceive( 'getCategory' )->andReturn( 'posts-pages' );
 		$ability->shouldReceive( 'toRegistrationArray' )->andReturn(
-			[
+			array(
 				'name'        => 'fa-wpmcp/list-posts',
 				'category'    => 'posts-pages',
 				'label'       => 'List Posts',
 				'description' => 'List all posts',
-			]
+			)
 		);
 
 		$registry->register( $ability );

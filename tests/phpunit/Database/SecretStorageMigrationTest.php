@@ -58,10 +58,12 @@ final class SecretStorageMigrationTest extends TestCase {
 		Functions\expect( 'get_option' )
 			->once()
 			->with( 'fa_wpmcp_webhooks', array() )
-			->andReturn( array(
-				'webhook_secret'    => 'ui-secret',
-				'webhook_endpoints' => array(),
-			) );
+			->andReturn(
+				array(
+					'webhook_secret'    => 'ui-secret',
+					'webhook_endpoints' => array(),
+				)
+			);
 
 		// Should update canonical location.
 		Functions\expect( 'update_option' )
@@ -108,10 +110,12 @@ final class SecretStorageMigrationTest extends TestCase {
 		Functions\expect( 'get_option' )
 			->once()
 			->with( 'fa_wpmcp_webhooks', array() )
-			->andReturn( array(
-				'webhook_secret'    => 'ui-secret',
-				'webhook_endpoints' => array(),
-			) );
+			->andReturn(
+				array(
+					'webhook_secret'    => 'ui-secret',
+					'webhook_endpoints' => array(),
+				)
+			);
 
 		// Should save UI secret to canonical location.
 		Functions\expect( 'update_option' )

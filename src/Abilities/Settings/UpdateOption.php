@@ -23,7 +23,7 @@ use FAWpmcp\Exceptions\OptionException;
  */
 final class UpdateOption extends AbstractAbility {
 	/**
-	 * Get the unique ability name.
+	 * Returns the ability identifier.
 	 *
 	 * @return string Ability name.
 	 */
@@ -32,7 +32,7 @@ final class UpdateOption extends AbstractAbility {
 	}
 
 	/**
-	 * Get the ability category.
+	 * Returns the ability category.
 	 *
 	 * @return string Category name.
 	 */
@@ -41,7 +41,7 @@ final class UpdateOption extends AbstractAbility {
 	}
 
 	/**
-	 * Get the human-readable label.
+	 * Returns the display label.
 	 *
 	 * @return string Ability label.
 	 */
@@ -50,7 +50,7 @@ final class UpdateOption extends AbstractAbility {
 	}
 
 	/**
-	 * Get the ability description.
+	 * Returns the ability description.
 	 *
 	 * @return string Description.
 	 */
@@ -59,7 +59,7 @@ final class UpdateOption extends AbstractAbility {
 	}
 
 	/**
-	 * Get the operation type.
+	 * Returns the operation type.
 	 *
 	 * @return string Operation type.
 	 */
@@ -68,7 +68,7 @@ final class UpdateOption extends AbstractAbility {
 	}
 
 	/**
-	 * Get the input schema.
+	 * Returns the JSON Schema for input validation.
 	 *
 	 * @return array<string, mixed> JSON Schema array.
 	 */
@@ -94,7 +94,7 @@ final class UpdateOption extends AbstractAbility {
 	}
 
 	/**
-	 * Get the output schema.
+	 * Returns the JSON Schema for output.
 	 *
 	 * @return array<string, mixed> JSON Schema array.
 	 */
@@ -115,7 +115,7 @@ final class UpdateOption extends AbstractAbility {
 	}
 
 	/**
-	 * Get the required WordPress capability.
+	 * Returns the WordPress capability required.
 	 *
 	 * @return string WordPress capability name.
 	 */
@@ -124,10 +124,11 @@ final class UpdateOption extends AbstractAbility {
 	}
 
 	/**
-	 * Execute the ability.
+	 * Executes the ability.
 	 *
 	 * @param array<string, mixed> $input Validated input data.
 	 * @return array<string, mixed> Update result.
+	 * @throws OptionException If option name is invalid or protected.
 	 */
 	public function doExecute( array $input ): array {
 		$option_name = sanitize_key( $input['option_name'] );

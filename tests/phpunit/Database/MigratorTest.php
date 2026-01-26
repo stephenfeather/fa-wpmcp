@@ -99,7 +99,7 @@ class MigratorTest extends TestCase {
 	public function test_migrations_are_ordered_by_version(): void {
 		$migrations = Migrator::getAllMigrations();
 
-		$versions = array_column( $migrations, 'version' );
+		$versions        = array_column( $migrations, 'version' );
 		$sorted_versions = $versions;
 		usort( $sorted_versions, 'version_compare' );
 

@@ -131,7 +131,7 @@ class ListTermsTest extends TestCase {
 	public function testExecuteReturnsTermsList(): void {
 		$ability = new ListTerms();
 
-		$mock_term = Mockery::mock( \WP_Term::class );
+		$mock_term              = Mockery::mock( \WP_Term::class );
 		$mock_term->term_id     = 1;
 		$mock_term->name        = 'Test Category';
 		$mock_term->slug        = 'test-category';
@@ -143,7 +143,12 @@ class ListTermsTest extends TestCase {
 		Functions\when( 'get_terms' )->justReturn( array( $mock_term ), 1 );
 		Functions\when( 'get_term_link' )->justReturn( 'https://example.com/category/test' );
 
-		$result = $ability->doExecute( array( 'taxonomy' => 'category', 'page' => 1 ) );
+		$result = $ability->doExecute(
+			array(
+				'taxonomy' => 'category',
+				'page'     => 1,
+			)
+		);
 
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'terms', $result );

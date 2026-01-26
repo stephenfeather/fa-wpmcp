@@ -135,8 +135,8 @@ final class UpdateComment extends AbstractAbility {
 	 * @return array<string, mixed> Annotations array.
 	 */
 	public function getAnnotations(): array {
-		$annotations                 = parent::getAnnotations();
-		$annotations['destructive']  = true;
+		$annotations                = parent::getAnnotations();
+		$annotations['destructive'] = true;
 		return $annotations;
 	}
 

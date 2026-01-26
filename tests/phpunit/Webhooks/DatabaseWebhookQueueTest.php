@@ -60,14 +60,16 @@ final class DatabaseWebhookQueueTest extends TestCase {
 			->once()
 			->with(
 				'wp_fa_wpmcp_webhook_queue',
-				Mockery::on( function( $data ) use ( $payload ) {
-					return 'https://example.com' === $data['url']
+				Mockery::on(
+					function ( $data ) use ( $payload ) {
+						return 'https://example.com' === $data['url']
 						&& 'ability.executed' === $data['event_type']
 						&& $payload->toJson() === $data['payload']
 						&& 'pending' === $data['status']
 						&& is_string( $data['created_at'] )
 						&& '' !== $data['created_at'];
-				} ),
+					}
+				),
 				array( '%s', '%s', '%s', '%s', '%s', '%s' )
 			)
 			->andReturn( 1 );
@@ -92,14 +94,16 @@ final class DatabaseWebhookQueueTest extends TestCase {
 		$wpdb->shouldReceive( 'get_results' )
 			->once()
 			->with( 'prepared', ARRAY_A )
-			->andReturn( array(
+			->andReturn(
 				array(
-					'id'          => '5',
-					'url'         => 'https://example.com',
-					'payload'     => '{}',
-					'retry_count' => '2',
-				),
-			) );
+					array(
+						'id'          => '5',
+						'url'         => 'https://example.com',
+						'payload'     => '{}',
+						'retry_count' => '2',
+					),
+				)
+			);
 
 		$GLOBALS['wpdb'] = $wpdb;
 
@@ -144,11 +148,13 @@ final class DatabaseWebhookQueueTest extends TestCase {
 			->once()
 			->with(
 				'wp_fa_wpmcp_webhook_queue',
-				Mockery::on( function( $data ) {
-					return 'completed' === $data['status']
+				Mockery::on(
+					function ( $data ) {
+						return 'completed' === $data['status']
 						&& is_string( $data['completed_at'] )
 						&& '' !== $data['completed_at'];
-				} ),
+					}
+				),
 				array( 'id' => 10 ),
 				array( '%s', '%s' ),
 				array( '%d' )

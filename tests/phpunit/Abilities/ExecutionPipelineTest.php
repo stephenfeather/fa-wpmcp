@@ -32,7 +32,7 @@ class ExecutionPipelineTest extends TestCase {
 	 * @return void
 	 */
 	public function test_pipeline_executes_steps_in_order(): void {
-		$execution_order = [];
+		$execution_order = array();
 
 		$pipeline = ExecutionPipeline::create()
 			->pipe(
@@ -54,9 +54,9 @@ class ExecutionPipelineTest extends TestCase {
 				}
 			);
 
-		$result = $pipeline->execute( [ 'test' => 'data' ] );
+		$result = $pipeline->execute( array( 'test' => 'data' ) );
 
-		$this->assertEquals( [ 'step1', 'step2', 'step3' ], $execution_order );
+		$this->assertEquals( array( 'step1', 'step2', 'step3' ), $execution_order );
 		$this->assertTrue( $result->is_success );
 	}
 
@@ -68,7 +68,7 @@ class ExecutionPipelineTest extends TestCase {
 	 * @return void
 	 */
 	public function test_pipeline_stops_on_failure(): void {
-		$execution_order = [];
+		$execution_order = array();
 
 		$pipeline = ExecutionPipeline::create()
 			->pipe(
@@ -90,9 +90,9 @@ class ExecutionPipelineTest extends TestCase {
 				}
 			);
 
-		$result = $pipeline->execute( [ 'test' => 'data' ] );
+		$result = $pipeline->execute( array( 'test' => 'data' ) );
 
-		$this->assertEquals( [ 'step1', 'step2' ], $execution_order );
+		$this->assertEquals( array( 'step1', 'step2' ), $execution_order );
 		$this->assertFalse( $result->is_success );
 		$this->assertEquals( 'step2_error', $result->error_code );
 		$this->assertEquals( 'Step 2 failed', $result->error_message );
@@ -108,13 +108,13 @@ class ExecutionPipelineTest extends TestCase {
 	public function test_pipeline_passes_transformed_data(): void {
 		$pipeline = ExecutionPipeline::create()
 			->pipe(
-				fn( $input ) => Result::success( array_merge( $input, [ 'added1' => 'value1' ] ) )
+				fn( $input ) => Result::success( array_merge( $input, array( 'added1' => 'value1' ) ) )
 			)
 			->pipe(
-				fn( $input ) => Result::success( array_merge( $input, [ 'added2' => 'value2' ] ) )
+				fn( $input ) => Result::success( array_merge( $input, array( 'added2' => 'value2' ) ) )
 			);
 
-		$result = $pipeline->execute( [ 'original' => 'data' ] );
+		$result = $pipeline->execute( array( 'original' => 'data' ) );
 
 		$this->assertTrue( $result->is_success );
 		$this->assertEquals( 'data', $result->value['original'] );
@@ -150,7 +150,7 @@ class ExecutionPipelineTest extends TestCase {
 		);
 
 		// Execute original pipeline (should only run step1).
-		$pipeline1->execute( [ 'test' => 'data' ] );
+		$pipeline1->execute( array( 'test' => 'data' ) );
 		$this->assertEquals( 1, $step1_calls );
 		$this->assertEquals( 0, $step2_calls );
 
@@ -159,7 +159,7 @@ class ExecutionPipelineTest extends TestCase {
 		$step2_calls = 0;
 
 		// Execute extended pipeline (should run both steps).
-		$pipeline2->execute( [ 'test' => 'data' ] );
+		$pipeline2->execute( array( 'test' => 'data' ) );
 		$this->assertEquals( 1, $step1_calls );
 		$this->assertEquals( 1, $step2_calls );
 	}
@@ -172,10 +172,10 @@ class ExecutionPipelineTest extends TestCase {
 	public function test_empty_pipeline_returns_success(): void {
 		$pipeline = ExecutionPipeline::create();
 
-		$result = $pipeline->execute( [ 'original' => 'data' ] );
+		$result = $pipeline->execute( array( 'original' => 'data' ) );
 
 		$this->assertTrue( $result->is_success );
-		$this->assertEquals( [ 'original' => 'data' ], $result->value );
+		$this->assertEquals( array( 'original' => 'data' ), $result->value );
 	}
 
 	/**
@@ -185,12 +185,12 @@ class ExecutionPipelineTest extends TestCase {
 	 */
 	public function test_single_step_pipeline(): void {
 		$pipeline = ExecutionPipeline::create()
-			->pipe( fn( $input ) => Result::success( [ 'transformed' => true ] ) );
+			->pipe( fn( $input ) => Result::success( array( 'transformed' => true ) ) );
 
-		$result = $pipeline->execute( [ 'original' => 'data' ] );
+		$result = $pipeline->execute( array( 'original' => 'data' ) );
 
 		$this->assertTrue( $result->is_success );
-		$this->assertEquals( [ 'transformed' => true ], $result->value );
+		$this->assertEquals( array( 'transformed' => true ), $result->value );
 	}
 
 	/**
@@ -203,7 +203,7 @@ class ExecutionPipelineTest extends TestCase {
 			->pipe( fn( $input ) => Result::failure( 'first_error', 'First failure' ) )
 			->pipe( fn( $input ) => Result::failure( 'second_error', 'Second failure' ) );
 
-		$result = $pipeline->execute( [ 'test' => 'data' ] );
+		$result = $pipeline->execute( array( 'test' => 'data' ) );
 
 		$this->assertFalse( $result->is_success );
 		$this->assertEquals( 'first_error', $result->error_code );
@@ -222,7 +222,7 @@ class ExecutionPipelineTest extends TestCase {
 			->pipe(
 				function ( $input ) use ( &$received_input ) {
 					$received_input = $input;
-					return Result::success( [ 'processed' => true ] );
+					return Result::success( array( 'processed' => true ) );
 				}
 			);
 
@@ -257,7 +257,7 @@ class ExecutionPipelineTest extends TestCase {
 		$pipeline = ExecutionPipeline::create();
 
 		for ( $i = 0; $i < 10; $i++ ) {
-			$step = $i;
+			$step     = $i;
 			$pipeline = $pipeline->pipe(
 				fn( $input ) => Result::success( $input + 1 )
 			);

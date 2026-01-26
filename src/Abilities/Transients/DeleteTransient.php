@@ -202,13 +202,13 @@ final class DeleteTransient extends AbstractAbility {
 		global $wpdb;
 
 		if ( $network ) {
-			$table        = $wpdb->sitemeta;
-			$name_column  = 'meta_key';
-			$prefix       = '_site_transient_';
+			$table       = $wpdb->sitemeta;
+			$name_column = 'meta_key';
+			$prefix      = '_site_transient_';
 		} else {
-			$table        = $wpdb->options;
-			$name_column  = 'option_name';
-			$prefix       = '_transient_';
+			$table       = $wpdb->options;
+			$name_column = 'option_name';
+			$prefix      = '_transient_';
 		}
 
 		// Delete all transients (both values and timeouts).
@@ -288,7 +288,7 @@ final class DeleteTransient extends AbstractAbility {
 				)
 			);
 
-			$deleted_count++;
+			++$deleted_count;
 		}
 
 		return array(

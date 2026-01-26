@@ -204,11 +204,11 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_updates_post(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 42;
-		$mock_post->post_title = 'Original Title';
+		$mock_post               = Mockery::mock( 'WP_Post' );
+		$mock_post->ID           = 42;
+		$mock_post->post_title   = 'Original Title';
 		$mock_post->post_content = 'Original content';
-		$mock_post->post_status = 'draft';
+		$mock_post->post_status  = 'draft';
 
 		Functions\expect( 'get_post' )
 			->once()
@@ -280,9 +280,9 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_allows_partial_updates(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 1;
-		$mock_post->post_title = 'Original Title';
+		$mock_post              = Mockery::mock( 'WP_Post' );
+		$mock_post->ID          = 1;
+		$mock_post->post_title  = 'Original Title';
 		$mock_post->post_status = 'draft';
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
@@ -327,8 +327,8 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_updates_status(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 1;
+		$mock_post              = Mockery::mock( 'WP_Post' );
+		$mock_post->ID          = 1;
 		$mock_post->post_status = 'draft';
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
@@ -368,7 +368,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_sanitizes_title(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
+		$mock_post     = Mockery::mock( 'WP_Post' );
 		$mock_post->ID = 1;
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
@@ -413,7 +413,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_sanitizes_content(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
+		$mock_post     = Mockery::mock( 'WP_Post' );
 		$mock_post->ID = 1;
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
@@ -458,7 +458,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_throws_on_update_error(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
+		$mock_post     = Mockery::mock( 'WP_Post' );
 		$mock_post->ID = 1;
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
@@ -497,7 +497,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_updates_categories(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
+		$mock_post     = Mockery::mock( 'WP_Post' );
 		$mock_post->ID = 1;
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
@@ -537,7 +537,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_updates_tags(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
+		$mock_post     = Mockery::mock( 'WP_Post' );
 		$mock_post->ID = 1;
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
@@ -577,7 +577,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_updates_excerpt(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
+		$mock_post     = Mockery::mock( 'WP_Post' );
 		$mock_post->ID = 1;
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
@@ -654,7 +654,7 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_returns_edit_url(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
+		$mock_post     = Mockery::mock( 'WP_Post' );
 		$mock_post->ID = 50;
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
@@ -687,8 +687,8 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_validates_status(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 1;
+		$mock_post              = Mockery::mock( 'WP_Post' );
+		$mock_post->ID          = 1;
 		$mock_post->post_status = 'draft';
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
@@ -730,8 +730,8 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_accepts_page_post_type(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 10;
+		$mock_post            = Mockery::mock( 'WP_Post' );
+		$mock_post->ID        = 10;
 		$mock_post->post_type = 'page';
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );
@@ -761,8 +761,8 @@ class UpdatePostTest extends TestCase {
 	 */
 	public function test_execute_throws_when_post_type_mismatch(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_post = Mockery::mock( 'WP_Post' );
-		$mock_post->ID = 10;
+		$mock_post            = Mockery::mock( 'WP_Post' );
+		$mock_post->ID        = 10;
 		$mock_post->post_type = 'page';
 
 		Functions\expect( 'get_post' )->andReturn( $mock_post );

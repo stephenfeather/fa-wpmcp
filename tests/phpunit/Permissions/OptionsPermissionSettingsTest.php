@@ -56,12 +56,14 @@ final class OptionsPermissionSettingsTest extends TestCase {
 	public function test_load_returns_option_values(): void {
 		Functions\expect( 'get_option' )
 			->once()
-			->andReturn( array(
-				'global_read_enabled'  => false,
-				'global_write_enabled' => true,
-				'category_settings'    => array( 'posts-pages' => array( 'enable_read' => false ) ),
-				'ability_settings'     => array( 'fa-wpmcp/list-posts' => array( 'enabled' => false ) ),
-			) );
+			->andReturn(
+				array(
+					'global_read_enabled'  => false,
+					'global_write_enabled' => true,
+					'category_settings'    => array( 'posts-pages' => array( 'enable_read' => false ) ),
+					'ability_settings'     => array( 'fa-wpmcp/list-posts' => array( 'enabled' => false ) ),
+				)
+			);
 
 		$settings = OptionsPermissionSettings::load();
 
@@ -86,12 +88,15 @@ final class OptionsPermissionSettingsTest extends TestCase {
 
 		Functions\expect( 'update_option' )
 			->once()
-			->with( 'fa_wpmcp_permissions', array(
-				'global_read_enabled'  => true,
-				'global_write_enabled' => true,
-				'category_settings'    => array( 'posts-pages' => array( 'enable_read' => true ) ),
-				'ability_settings'     => array( 'fa-wpmcp/list-posts' => array( 'enabled' => true ) ),
-			) )
+			->with(
+				'fa_wpmcp_permissions',
+				array(
+					'global_read_enabled'  => true,
+					'global_write_enabled' => true,
+					'category_settings'    => array( 'posts-pages' => array( 'enable_read' => true ) ),
+					'ability_settings'     => array( 'fa-wpmcp/list-posts' => array( 'enabled' => true ) ),
+				)
+			)
 			->andReturn( true );
 
 		OptionsPermissionSettings::save( $settings );

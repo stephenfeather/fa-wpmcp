@@ -271,14 +271,14 @@ class ListUsersTest extends TestCase {
 	 */
 	public function testFormatUserItemIsPure(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_user                 = Mockery::mock( \WP_User::class );
-		$mock_user->ID             = 1;
-		$mock_user->user_login     = 'johndoe';
-		$mock_user->user_email     = 'john@example.com';
-		$mock_user->display_name   = 'John Doe';
-		$mock_user->first_name     = 'John';
-		$mock_user->last_name      = 'Doe';
-		$mock_user->roles          = array( 'editor' );
+		$mock_user                  = Mockery::mock( \WP_User::class );
+		$mock_user->ID              = 1;
+		$mock_user->user_login      = 'johndoe';
+		$mock_user->user_email      = 'john@example.com';
+		$mock_user->display_name    = 'John Doe';
+		$mock_user->first_name      = 'John';
+		$mock_user->last_name       = 'Doe';
+		$mock_user->roles           = array( 'editor' );
 		$mock_user->user_registered = '2025-01-01 00:00:00';
 
 		Functions\stubs(
@@ -335,14 +335,14 @@ class ListUsersTest extends TestCase {
 	 */
 	public function testFormatResultsWithUsers(): void {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-		$mock_user                 = Mockery::mock( \WP_User::class );
-		$mock_user->ID             = 1;
-		$mock_user->user_login     = 'testuser';
-		$mock_user->user_email     = 'test@example.com';
-		$mock_user->display_name   = 'Test User';
-		$mock_user->first_name     = 'Test';
-		$mock_user->last_name      = 'User';
-		$mock_user->roles          = array( 'subscriber' );
+		$mock_user                  = Mockery::mock( \WP_User::class );
+		$mock_user->ID              = 1;
+		$mock_user->user_login      = 'testuser';
+		$mock_user->user_email      = 'test@example.com';
+		$mock_user->display_name    = 'Test User';
+		$mock_user->first_name      = 'Test';
+		$mock_user->last_name       = 'User';
+		$mock_user->roles           = array( 'subscriber' );
 		$mock_user->user_registered = '2025-01-01 00:00:00';
 
 		Functions\stubs(

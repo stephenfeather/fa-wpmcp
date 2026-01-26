@@ -1,4 +1,10 @@
 <?php
+/**
+ * Tests for GetCacheStatus.
+ *
+ * @package FAWpmcp\Tests\Abilities\Cache
+ */
+
 declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Cache;
@@ -111,7 +117,7 @@ final class GetCacheStatusTest extends TestCase {
 
 	public function test_returns_non_persistent_groups_when_available(): void {
 		global $wp_object_cache;
-		$wp_object_cache = new \stdClass();
+		$wp_object_cache               = new \stdClass();
 		$wp_object_cache->no_mc_groups = array( 'counts', 'plugins' );
 
 		Functions\expect( 'wp_using_ext_object_cache' )->once()->andReturn( true );

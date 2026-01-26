@@ -116,8 +116,8 @@ class CreateExportRequestTest extends TestCase {
 			->andReturn( 123 );
 
 		// Mock get_post to return request post.
-		$mock_post           = Mockery::mock( '\WP_Post' );
-		$mock_post->ID       = 123;
+		$mock_post              = Mockery::mock( '\WP_Post' );
+		$mock_post->ID          = 123;
 		$mock_post->post_status = 'request-pending';
 
 		Functions\expect( 'get_post' )
@@ -165,8 +165,8 @@ class CreateExportRequestTest extends TestCase {
 			->andReturn( 124 );
 
 		// Mock get_post to return request post.
-		$mock_post           = Mockery::mock( '\WP_Post' );
-		$mock_post->ID       = 124;
+		$mock_post              = Mockery::mock( '\WP_Post' );
+		$mock_post->ID          = 124;
 		$mock_post->post_status = 'request-pending';
 
 		Functions\expect( 'get_post' )

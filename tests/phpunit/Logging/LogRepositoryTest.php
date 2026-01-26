@@ -73,14 +73,16 @@ final class LogRepositoryTest extends TestCase {
 			->once()
 			->with(
 				'wp_fa_wpmcp_activity_log',
-				Mockery::on( function( $data ) {
-					return 'corr-1' === $data['correlation_id']
+				Mockery::on(
+					function ( $data ) {
+						return 'corr-1' === $data['correlation_id']
 						&& '2026-01-21 10:00:00' === $data['timestamp']
 						&& '{"json":true}' === $data['input_data']
 						&& '{"json":true}' === $data['output_data']
 						&& 1 === $data['success']
 						&& '127.0.0.0' === $data['ip_address']; // Anonymized.
-				} ),
+					}
+				),
 				Mockery::type( 'array' )
 			)
 			->andReturn( 1 );
@@ -155,12 +157,14 @@ final class LogRepositoryTest extends TestCase {
 			->once()
 			->with(
 				'wp_fa_wpmcp_activity_log',
-				Mockery::on( function( $data ) {
-					return '{"json":true}' === $data['output_data']
+				Mockery::on(
+					function ( $data ) {
+						return '{"json":true}' === $data['output_data']
 						&& 1 === $data['success']
 						&& 'done' === $data['error_message']
 						&& 42 === $data['execution_time_ms'];
-				} ),
+					}
+				),
 				array( 'correlation_id' => 'corr-4' ),
 				array( '%s', '%d', '%s', '%d' ),
 				array( '%s' )
@@ -279,9 +283,11 @@ final class LogRepositoryTest extends TestCase {
 			->once()
 			->with(
 				'wp_fa_wpmcp_activity_log',
-				Mockery::on( function( $data ) {
-					return '192.168.1.0' === $data['ip_address'];
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return '192.168.1.0' === $data['ip_address'];
+					}
+				),
 				Mockery::type( 'array' )
 			)
 			->andReturn( 1 );
@@ -324,9 +330,11 @@ final class LogRepositoryTest extends TestCase {
 			->once()
 			->with(
 				'wp_fa_wpmcp_activity_log',
-				Mockery::on( function( $data ) {
-					return '2001:db8::' === $data['ip_address'];
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return '2001:db8::' === $data['ip_address'];
+					}
+				),
 				Mockery::type( 'array' )
 			)
 			->andReturn( 1 );
@@ -369,9 +377,11 @@ final class LogRepositoryTest extends TestCase {
 			->once()
 			->with(
 				'wp_fa_wpmcp_activity_log',
-				Mockery::on( function( $data ) {
-					return '192.168.1.100' === $data['ip_address'];
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return '192.168.1.100' === $data['ip_address'];
+					}
+				),
 				Mockery::type( 'array' )
 			)
 			->andReturn( 1 );
@@ -401,9 +411,11 @@ final class LogRepositoryTest extends TestCase {
 			->once()
 			->with(
 				Mockery::type( 'string' ),
-				Mockery::on( function( $data ) {
-					return '127.0.0.0' === $data['ip_address'];
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return '127.0.0.0' === $data['ip_address'];
+					}
+				),
 				Mockery::type( 'array' )
 			)
 			->andReturn( 1 );
@@ -431,9 +443,11 @@ final class LogRepositoryTest extends TestCase {
 			->once()
 			->with(
 				Mockery::type( 'string' ),
-				Mockery::on( function( $data ) {
-					return '10.0.0.0' === $data['ip_address'];
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return '10.0.0.0' === $data['ip_address'];
+					}
+				),
 				Mockery::type( 'array' )
 			)
 			->andReturn( 1 );
@@ -460,9 +474,11 @@ final class LogRepositoryTest extends TestCase {
 			->once()
 			->with(
 				Mockery::type( 'string' ),
-				Mockery::on( function( $data ) {
-					return '172.16.254.0' === $data['ip_address'];
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return '172.16.254.0' === $data['ip_address'];
+					}
+				),
 				Mockery::type( 'array' )
 			)
 			->andReturn( 1 );
@@ -506,9 +522,11 @@ final class LogRepositoryTest extends TestCase {
 			->once()
 			->with(
 				Mockery::type( 'string' ),
-				Mockery::on( function( $data ) {
-					return '2001:db8::' === $data['ip_address'];
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return '2001:db8::' === $data['ip_address'];
+					}
+				),
 				Mockery::type( 'array' )
 			)
 			->andReturn( 1 );
@@ -536,9 +554,11 @@ final class LogRepositoryTest extends TestCase {
 			->once()
 			->with(
 				Mockery::type( 'string' ),
-				Mockery::on( function( $data ) {
-					return 'fe80::' === $data['ip_address'];
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return 'fe80::' === $data['ip_address'];
+					}
+				),
 				Mockery::type( 'array' )
 			)
 			->andReturn( 1 );
@@ -595,9 +615,11 @@ final class LogRepositoryTest extends TestCase {
 			->once()
 			->with(
 				Mockery::type( 'string' ),
-				Mockery::on( function( $data ) {
-					return 'not-an-ip' === $data['ip_address'];
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return 'not-an-ip' === $data['ip_address'];
+					}
+				),
 				Mockery::type( 'array' )
 			)
 			->andReturn( 1 );

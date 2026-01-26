@@ -1,6 +1,6 @@
 <?php
 /**
- * Option access policy for settings abilities.
+ * OptionAccessPolicy - enforces access rules for WordPress options.
  *
  * @package FAWpmcp\Abilities\Settings
  */
@@ -12,7 +12,11 @@ namespace FAWpmcp\Abilities\Settings;
 use FAWpmcp\Exceptions\OptionException;
 
 /**
- * Enforces allowlist/protected option access rules.
+ * Policy class for validating option access permissions.
+ *
+ * Provides allowlist/blocklist functionality to control which WordPress
+ * options can be accessed through the MCP server. Protects sensitive
+ * options like security keys and core WordPress settings.
  *
  * @package FAWpmcp\Abilities\Settings
  */
@@ -48,6 +52,7 @@ final class OptionAccessPolicy {
 	 *
 	 * @param string $option_name Option name.
 	 * @return void
+	 * @throws OptionException If the option is protected.
 	 */
 	public static function assertAllowed( string $option_name ): void {
 		if ( ! self::isAllowed( $option_name ) ) {
