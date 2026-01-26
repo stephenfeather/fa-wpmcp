@@ -36,6 +36,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `UnscheduleCronEvent` - Remove scheduled cron events
   - `RunCronEvent` - Manually trigger a cron event hook
   - `ListCronSchedules` - List available cron recurrence schedules
+- **Role Abilities** - WordPress user role and capability management:
+  - `ListRoles` - List all WordPress roles with their capabilities
+  - `GetRole` - Get specific role details including all capabilities
+  - `CreateRole` - Create new custom roles with capabilities
+  - `UpdateRole` - Add or remove capabilities from existing roles
+  - `DeleteRole` - Delete custom roles (default WordPress roles protected)
 
 ## [1.0.0-alpha.4] - 2026-01-25
 

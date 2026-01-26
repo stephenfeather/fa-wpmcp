@@ -87,6 +87,7 @@ final class Plugin {
 		$this->registerMaintenanceAbilities( $ability_registry );
 		$this->registerTransientAbilities( $ability_registry );
 		$this->registerCronAbilities( $ability_registry );
+		$this->registerRoleAbilities( $ability_registry );
 		$this->registerService( 'ability_registry', $ability_registry );
 
 		// Initialize Admin Settings Page.
@@ -550,6 +551,20 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Cron\UnscheduleCronEventAbility() );
 		$registry->register( new \FAWpmcp\Abilities\Cron\RunCronEventAbility() );
 		$registry->register( new \FAWpmcp\Abilities\Cron\ListCronSchedulesAbility() );
+	}
+
+	/**
+	 * Register role abilities.
+	 *
+	 * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private function registerRoleAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Role\ListRolesAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Role\GetRoleAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Role\CreateRoleAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Role\UpdateRoleAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Role\DeleteRoleAbility() );
 	}
 
 	/**
