@@ -10,12 +10,13 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Users;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Users\GetUser;
 use FAWpmcp\Exceptions\UserNotFoundException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test GetUser ability functionality.
@@ -27,87 +28,40 @@ use PHPUnit\Framework\TestCase;
  *
  * @package FAWpmcp\Tests\Abilities\Users
  */
-class GetUserTest extends TestCase {
+class GetUserTest extends BrainMonkeyTestCase {
+
+	use AbilityTestTrait;
 
 	/**
-	 * Set up Brain\Monkey before each test.
+	 * Get an instance of the ability being tested.
 	 *
-	 * @return void
+	 * @return AbstractAbility
 	 */
-	protected function setUp(): void {
-		parent::setUp();
-		Monkey\setUp();
+	protected function getAbilityInstance(): AbstractAbility {
+		return new GetUser();
 	}
 
 	/**
-	 * Tear down Brain\Monkey after each test.
+	 * Get expected metadata for the ability.
 	 *
-	 * @return void
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
 	 */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		Mockery::close();
-		parent::tearDown();
-	}
-
-	/**
-	 * Test ability returns correct name.
-	 *
-	 * @return void
-	 */
-	public function testGetName(): void {
-		$ability = new GetUser();
-		$this->assertEquals( 'fa-wpmcp/get-user', $ability->getName() );
-	}
-
-	/**
-	 * Test ability returns correct category.
-	 *
-	 * @return void
-	 */
-	public function testGetCategory(): void {
-		$ability = new GetUser();
-		$this->assertEquals( 'users', $ability->getCategory() );
-	}
-
-	/**
-	 * Test ability returns correct label.
-	 *
-	 * @return void
-	 */
-	public function testGetLabel(): void {
-		$ability = new GetUser();
-		$this->assertEquals( 'Get User', $ability->getLabel() );
-	}
-
-	/**
-	 * Test ability returns correct description.
-	 *
-	 * @return void
-	 */
-	public function testGetDescription(): void {
-		$ability = new GetUser();
-		$this->assertStringContainsString( 'user', strtolower( $ability->getDescription() ) );
-	}
-
-	/**
-	 * Test ability returns correct operation type.
-	 *
-	 * @return void
-	 */
-	public function testGetOperationType(): void {
-		$ability = new GetUser();
-		$this->assertEquals( 'read', $ability->getOperationType() );
-	}
-
-	/**
-	 * Test ability returns correct required capability.
-	 *
-	 * @return void
-	 */
-	public function testGetRequiredCapability(): void {
-		$ability = new GetUser();
-		$this->assertEquals( 'list_users', $ability->getRequiredCapability() );
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                  => 'fa-wpmcp/get-user',
+			'category'              => 'users',
+			'label'                 => 'Get User',
+			'description_contains'  => 'user',
+			'operation_type'        => 'read',
+			'required_capability'   => 'list_users',
+		);
 	}
 
 	/**
@@ -116,7 +70,7 @@ class GetUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testInputSchemaSupportsUserId(): void {
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'user_id', $schema['properties'] );
@@ -129,7 +83,7 @@ class GetUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testInputSchemaSupportsUsername(): void {
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'username', $schema['properties'] );
@@ -142,7 +96,7 @@ class GetUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testInputSchemaSupportsEmail(): void {
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'email', $schema['properties'] );
@@ -155,7 +109,7 @@ class GetUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testOutputSchemaStructure(): void {
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getOutputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
@@ -190,7 +144,7 @@ class GetUserTest extends TestCase {
 		Functions\expect( 'get_userdata' )->with( 5 )->andReturn( $mock_user );
 		Functions\expect( 'get_avatar_url' )->with( 5 )->andReturn( 'https://example.com/avatar.jpg' );
 
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 		$result  = $ability->doExecute( array( 'user_id' => 5 ) );
 
 		$this->assertEquals( 5, $result['id'] );
@@ -223,7 +177,7 @@ class GetUserTest extends TestCase {
 		Functions\expect( 'get_user_by' )->with( 'login', 'johndoe' )->andReturn( $mock_user );
 		Functions\expect( 'get_avatar_url' )->with( 5 )->andReturn( 'https://example.com/avatar.jpg' );
 
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 		$result  = $ability->doExecute( array( 'username' => 'johndoe' ) );
 
 		$this->assertEquals( 5, $result['id'] );
@@ -255,7 +209,7 @@ class GetUserTest extends TestCase {
 		Functions\expect( 'get_user_by' )->with( 'email', 'jane@example.com' )->andReturn( $mock_user );
 		Functions\expect( 'get_avatar_url' )->with( 5 )->andReturn( 'https://example.com/avatar.jpg' );
 
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 		$result  = $ability->doExecute( array( 'email' => 'jane@example.com' ) );
 
 		$this->assertEquals( 5, $result['id'] );
@@ -270,7 +224,7 @@ class GetUserTest extends TestCase {
 	public function testExecuteThrowsExceptionWhenUserNotFound(): void {
 		Functions\expect( 'get_userdata' )->with( 999 )->andReturn( false );
 
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 
 		$this->expectException( UserNotFoundException::class );
 		$ability->doExecute( array( 'user_id' => 999 ) );
@@ -288,7 +242,7 @@ class GetUserTest extends TestCase {
 
 		Functions\expect( 'get_userdata' )->with( 10 )->andReturn( $mock_user );
 
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 
 		$this->expectException( UserNotFoundException::class );
 		$ability->doExecute( array( 'user_id' => 10 ) );
@@ -320,7 +274,7 @@ class GetUserTest extends TestCase {
 			)
 		);
 
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'formatUserData' );
@@ -346,7 +300,7 @@ class GetUserTest extends TestCase {
 
 		Functions\expect( 'get_userdata' )->with( 5 )->andReturn( $mock_user );
 
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'fetchUser' );
@@ -373,7 +327,7 @@ class GetUserTest extends TestCase {
 
 		Functions\expect( 'get_user_by' )->with( 'login', 'testuser' )->andReturn( $mock_user );
 
-		$ability = new GetUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'fetchUser' );

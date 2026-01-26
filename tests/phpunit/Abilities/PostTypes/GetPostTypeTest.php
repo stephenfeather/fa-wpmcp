@@ -10,121 +10,53 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\PostTypes;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\PostTypes\GetPostType;
 use FAWpmcp\Exceptions\PostNotFoundException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test GetPostType ability functionality.
  *
  * @package FAWpmcp\Tests\Abilities\PostTypes
  */
-class GetPostTypeTest extends TestCase {
+class GetPostTypeTest extends BrainMonkeyTestCase {
+
+	use AbilityTestTrait;
 
 	/**
-	 * Set up Brain\Monkey before each test.
+	 * Get an instance of the ability being tested.
 	 *
-	 * @return void
+	 * @return AbstractAbility
 	 */
-	protected function setUp(): void {
-		parent::setUp();
-		Monkey\setUp();
+	protected function getAbilityInstance(): AbstractAbility {
+		return new GetPostType();
 	}
 
 	/**
-	 * Tear down Brain\Monkey after each test.
+	 * Get expected metadata for the ability.
 	 *
-	 * @return void
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
 	 */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		Mockery::close();
-		parent::tearDown();
-	}
-
-	/**
-	 * Test ability returns correct name.
-	 *
-	 * @return void
-	 */
-	public function testGetName(): void {
-		$ability = new GetPostType();
-		$this->assertEquals( 'fa-wpmcp/get-post-type', $ability->getName() );
-	}
-
-	/**
-	 * Test ability returns correct category.
-	 *
-	 * @return void
-	 */
-	public function testGetCategory(): void {
-		$ability = new GetPostType();
-		$this->assertEquals( 'post-types', $ability->getCategory() );
-	}
-
-	/**
-	 * Test ability returns correct label.
-	 *
-	 * @return void
-	 */
-	public function testGetLabel(): void {
-		$ability = new GetPostType();
-		$this->assertEquals( 'Get Post Type', $ability->getLabel() );
-	}
-
-	/**
-	 * Test ability returns correct operation type.
-	 *
-	 * @return void
-	 */
-	public function testGetOperationType(): void {
-		$ability = new GetPostType();
-		$this->assertEquals( 'read', $ability->getOperationType() );
-	}
-
-	/**
-	 * Test ability returns correct required capability.
-	 *
-	 * @return void
-	 */
-	public function testGetRequiredCapability(): void {
-		$ability = new GetPostType();
-		$this->assertEquals( 'read', $ability->getRequiredCapability() );
-	}
-
-	/**
-	 * Test ability returns input schema with required post_type field.
-	 *
-	 * @return void
-	 */
-	public function testGetInputSchema(): void {
-		$ability = new GetPostType();
-		$schema  = $ability->getInputSchema();
-
-		$this->assertIsArray( $schema );
-		$this->assertArrayHasKey( 'type', $schema );
-		$this->assertArrayHasKey( 'properties', $schema );
-		$this->assertArrayHasKey( 'required', $schema );
-		$this->assertArrayHasKey( 'post_type', $schema['properties'] );
-		$this->assertContains( 'post_type', $schema['required'] );
-	}
-
-	/**
-	 * Test ability returns output schema.
-	 *
-	 * @return void
-	 */
-	public function testGetOutputSchema(): void {
-		$ability = new GetPostType();
-		$schema  = $ability->getOutputSchema();
-
-		$this->assertIsArray( $schema );
-		$this->assertArrayHasKey( 'type', $schema );
-		$this->assertArrayHasKey( 'properties', $schema );
-		$this->assertArrayHasKey( 'post_type', $schema['properties'] );
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/get-post-type',
+			'category'             => 'post-types',
+			'label'                => 'Get Post Type',
+			'description_contains' => 'retrieve a single wordpress post type definition',
+			'operation_type'       => 'read',
+			'required_capability'  => 'read',
+		);
 	}
 
 	/**
@@ -133,7 +65,7 @@ class GetPostTypeTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteThrowsExceptionForNonExistentPostType(): void {
-		$ability = new GetPostType();
+		$ability = $this->getAbilityInstance();
 
 		Functions\when( 'get_post_type_object' )->justReturn( null );
 
@@ -149,7 +81,7 @@ class GetPostTypeTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteReturnsPostTypeData(): void {
-		$ability = new GetPostType();
+		$ability = $this->getAbilityInstance();
 
 		$mock_labels = (object) array(
 			'name'          => 'Posts',
@@ -203,7 +135,7 @@ class GetPostTypeTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteReturnsLabelsAsArray(): void {
-		$ability = new GetPostType();
+		$ability = $this->getAbilityInstance();
 
 		$mock_labels = (object) array(
 			'name'          => 'Pages',
@@ -240,7 +172,7 @@ class GetPostTypeTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteHandlesNullLabels(): void {
-		$ability = new GetPostType();
+		$ability = $this->getAbilityInstance();
 
 		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
 		$mock_post_type->name         = 'custom_type';
@@ -271,7 +203,7 @@ class GetPostTypeTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteHandlesBooleanRewrite(): void {
-		$ability = new GetPostType();
+		$ability = $this->getAbilityInstance();
 
 		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
 		$mock_post_type->name         = 'attachment';
@@ -301,7 +233,7 @@ class GetPostTypeTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteHandlesArrayRewrite(): void {
-		$ability = new GetPostType();
+		$ability = $this->getAbilityInstance();
 
 		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
 		$mock_post_type->name         = 'post';

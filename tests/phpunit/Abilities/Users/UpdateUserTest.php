@@ -10,13 +10,14 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Users;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Users\UpdateUser;
 use FAWpmcp\Exceptions\UserNotFoundException;
 use FAWpmcp\Exceptions\UserUpdateException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test UpdateUser ability functionality.
@@ -29,16 +30,17 @@ use PHPUnit\Framework\TestCase;
  *
  * @package FAWpmcp\Tests\Abilities\Users
  */
-class UpdateUserTest extends TestCase {
+class UpdateUserTest extends BrainMonkeyTestCase {
+
+	use AbilityTestTrait;
 
 	/**
-	 * Set up Brain\Monkey before each test.
+	 * Set up default mocks for RolePolicy.
 	 *
 	 * @return void
 	 */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
 
 		// Default mock for RolePolicy's get_option call.
 		// Tests can override this as needed.
@@ -54,64 +56,35 @@ class UpdateUserTest extends TestCase {
 	}
 
 	/**
-	 * Tear down Brain\Monkey after each test.
+	 * Get an instance of the ability being tested.
 	 *
-	 * @return void
+	 * @return AbstractAbility
 	 */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		Mockery::close();
-		parent::tearDown();
+	protected function getAbilityInstance(): AbstractAbility {
+		return new UpdateUser();
 	}
 
 	/**
-	 * Test ability returns correct name.
+	 * Get expected metadata for the ability.
 	 *
-	 * @return void
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
 	 */
-	public function testGetName(): void {
-		$ability = new UpdateUser();
-		$this->assertEquals( 'fa-wpmcp/update-user', $ability->getName() );
-	}
-
-	/**
-	 * Test ability returns correct category.
-	 *
-	 * @return void
-	 */
-	public function testGetCategory(): void {
-		$ability = new UpdateUser();
-		$this->assertEquals( 'users', $ability->getCategory() );
-	}
-
-	/**
-	 * Test ability returns correct label.
-	 *
-	 * @return void
-	 */
-	public function testGetLabel(): void {
-		$ability = new UpdateUser();
-		$this->assertEquals( 'Update User', $ability->getLabel() );
-	}
-
-	/**
-	 * Test ability returns correct operation type.
-	 *
-	 * @return void
-	 */
-	public function testGetOperationType(): void {
-		$ability = new UpdateUser();
-		$this->assertEquals( 'write', $ability->getOperationType() );
-	}
-
-	/**
-	 * Test ability returns correct required capability.
-	 *
-	 * @return void
-	 */
-	public function testGetRequiredCapability(): void {
-		$ability = new UpdateUser();
-		$this->assertEquals( 'edit_users', $ability->getRequiredCapability() );
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                  => 'fa-wpmcp/update-user',
+			'category'              => 'users',
+			'label'                 => 'Update User',
+			'description_contains'  => 'update',
+			'operation_type'        => 'write',
+			'required_capability'   => 'edit_users',
+		);
 	}
 
 	/**
@@ -120,7 +93,7 @@ class UpdateUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testInputSchemaRequiresUserId(): void {
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'required', $schema );
@@ -133,7 +106,7 @@ class UpdateUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testInputSchemaSupportsUpdateFields(): void {
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'email', $schema['properties'] );
@@ -150,7 +123,7 @@ class UpdateUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testBuildUpdateDataWithMinimalInput(): void {
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildUpdateData' );
@@ -176,7 +149,7 @@ class UpdateUserTest extends TestCase {
 			)
 		);
 
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildUpdateData' );
@@ -216,7 +189,7 @@ class UpdateUserTest extends TestCase {
 			)
 		);
 
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildUpdateData' );
@@ -253,7 +226,7 @@ class UpdateUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testValidateRoleWithValidRole(): void {
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'validateRole' );
@@ -270,7 +243,7 @@ class UpdateUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testValidateRoleAllowsCustomRoles(): void {
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'validateRole' );
@@ -288,7 +261,7 @@ class UpdateUserTest extends TestCase {
 	public function testExecuteWithUserNotFound(): void {
 		Functions\expect( 'get_userdata' )->with( 999 )->andReturn( false );
 
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 
 		$this->expectException( UserNotFoundException::class );
 		$ability->doExecute( array( 'user_id' => 999 ) );
@@ -306,7 +279,7 @@ class UpdateUserTest extends TestCase {
 
 		Functions\expect( 'get_userdata' )->with( 10 )->andReturn( $mock_user );
 
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 
 		$this->expectException( UserNotFoundException::class );
 		$ability->doExecute( array( 'user_id' => 10 ) );
@@ -324,7 +297,7 @@ class UpdateUserTest extends TestCase {
 
 		Functions\expect( 'get_userdata' )->with( 5 )->andReturn( $mock_user );
 
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 		$result  = $ability->doExecute( array( 'user_id' => 5 ) );
 
 		$this->assertEquals( 5, $result['user_id'] );
@@ -355,7 +328,7 @@ class UpdateUserTest extends TestCase {
 		Functions\expect( 'wp_update_user' )->andReturn( 5 );
 		Functions\expect( 'is_wp_error' )->andReturn( false );
 
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 		$result  = $ability->doExecute(
 			array(
 				'user_id'    => 5,
@@ -394,7 +367,7 @@ class UpdateUserTest extends TestCase {
 		Functions\expect( 'wp_update_user' )->andReturn( $wp_error );
 		Functions\expect( 'is_wp_error' )->with( $wp_error )->andReturn( true );
 
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 
 		$this->expectException( UserUpdateException::class );
 		$this->expectExceptionMessage( 'Email already exists' );
@@ -424,7 +397,7 @@ class UpdateUserTest extends TestCase {
 			)
 		);
 
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildUpdateData' );
@@ -449,7 +422,7 @@ class UpdateUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testBuildUpdateDataDoesNotIncludeEmptyPassword(): void {
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildUpdateData' );
@@ -470,7 +443,7 @@ class UpdateUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testFormatResponseExcludesIdFromUpdatedFields(): void {
-		$ability = new UpdateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'formatResponse' );

@@ -10,119 +10,76 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Transients;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Transients\ListTransients;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test ListTransients ability functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Transients
  */
-class ListTransientsTest extends TestCase {
+class ListTransientsTest extends BrainMonkeyTestCase {
+	use AbilityTestTrait;
 
 	/**
-	 * Set up Brain\Monkey before each test.
+	 * Get an instance of the ability being tested.
 	 *
-	 * @return void
+	 * @return AbstractAbility
 	 */
-	protected function setUp(): void {
-		parent::setUp();
-		Monkey\setUp();
+	protected function getAbilityInstance(): AbstractAbility {
+		return new ListTransients();
 	}
 
 	/**
-	 * Tear down Brain\Monkey after each test.
+	 * Get expected metadata for the ability.
 	 *
-	 * @return void
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
 	 */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		Mockery::close();
-		parent::tearDown();
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/list-transients',
+			'category'             => 'transients',
+			'label'                => 'List Transients',
+			'description_contains' => 'list',
+			'operation_type'       => 'read',
+			'required_capability'  => 'manage_options',
+		);
 	}
 
 	/**
-	 * Test ability returns correct name.
+	 * Test input schema has optional parameters.
 	 *
 	 * @return void
 	 */
-	public function testGetName(): void {
-		$ability = new ListTransients();
-		$this->assertEquals( 'fa-wpmcp/list-transients', $ability->getName() );
-	}
-
-	/**
-	 * Test ability returns correct category.
-	 *
-	 * @return void
-	 */
-	public function testGetCategory(): void {
-		$ability = new ListTransients();
-		$this->assertEquals( 'transients', $ability->getCategory() );
-	}
-
-	/**
-	 * Test ability returns correct label.
-	 *
-	 * @return void
-	 */
-	public function testGetLabel(): void {
-		$ability = new ListTransients();
-		$this->assertEquals( 'List Transients', $ability->getLabel() );
-	}
-
-	/**
-	 * Test ability returns correct operation type.
-	 *
-	 * @return void
-	 */
-	public function testGetOperationType(): void {
-		$ability = new ListTransients();
-		$this->assertEquals( 'read', $ability->getOperationType() );
-	}
-
-	/**
-	 * Test ability returns correct required capability.
-	 *
-	 * @return void
-	 */
-	public function testGetRequiredCapability(): void {
-		$ability = new ListTransients();
-		$this->assertEquals( 'manage_options', $ability->getRequiredCapability() );
-	}
-
-	/**
-	 * Test ability returns input schema with optional search parameter.
-	 *
-	 * @return void
-	 */
-	public function testGetInputSchema(): void {
-		$ability = new ListTransients();
+	public function testInputSchemaHasOptionalParameters(): void {
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
-		$this->assertIsArray( $schema );
-		$this->assertArrayHasKey( 'type', $schema );
-		$this->assertArrayHasKey( 'properties', $schema );
 		$this->assertArrayHasKey( 'search', $schema['properties'] );
 		$this->assertArrayHasKey( 'exclude', $schema['properties'] );
 		$this->assertArrayHasKey( 'network', $schema['properties'] );
 	}
 
 	/**
-	 * Test ability returns output schema.
+	 * Test output schema has expected fields.
 	 *
 	 * @return void
 	 */
-	public function testGetOutputSchema(): void {
-		$ability = new ListTransients();
+	public function testOutputSchemaHasExpectedFields(): void {
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getOutputSchema();
 
-		$this->assertIsArray( $schema );
-		$this->assertArrayHasKey( 'type', $schema );
-		$this->assertArrayHasKey( 'properties', $schema );
 		$this->assertArrayHasKey( 'transients', $schema['properties'] );
 		$this->assertArrayHasKey( 'total', $schema['properties'] );
 	}
@@ -133,7 +90,7 @@ class ListTransientsTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteReturnsTransientsList(): void {
-		$ability = new ListTransients();
+		$ability = $this->getAbilityInstance();
 
 		// Mock global wpdb.
 		global $wpdb;
@@ -182,7 +139,7 @@ class ListTransientsTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteFiltersTransientsBySearch(): void {
-		$ability = new ListTransients();
+		$ability = $this->getAbilityInstance();
 
 		// Mock global wpdb.
 		global $wpdb;
@@ -215,7 +172,7 @@ class ListTransientsTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteExcludesTransients(): void {
-		$ability = new ListTransients();
+		$ability = $this->getAbilityInstance();
 
 		// Mock global wpdb.
 		global $wpdb;
@@ -246,7 +203,7 @@ class ListTransientsTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteUsesNetworkTableForNetworkTransients(): void {
-		$ability = new ListTransients();
+		$ability = $this->getAbilityInstance();
 
 		// Mock global wpdb.
 		global $wpdb;
@@ -276,7 +233,7 @@ class ListTransientsTest extends TestCase {
 	 * @return void
 	 */
 	public function testTransientOutputIncludesExpiration(): void {
-		$ability = new ListTransients();
+		$ability = $this->getAbilityInstance();
 
 		// Mock global wpdb.
 		global $wpdb;
@@ -323,7 +280,7 @@ class ListTransientsTest extends TestCase {
 	 * @return void
 	 */
 	public function testGetAnnotations(): void {
-		$ability     = new ListTransients();
+		$ability     = $this->getAbilityInstance();
 		$annotations = $ability->getAnnotations();
 
 		$this->assertTrue( $annotations['readonly'] );

@@ -10,103 +10,61 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Transients;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Transients\GetTransient;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
-use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test GetTransient ability functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Transients
  */
-class GetTransientTest extends TestCase {
+class GetTransientTest extends BrainMonkeyTestCase {
+	use AbilityTestTrait;
 
 	/**
-	 * Set up Brain\Monkey before each test.
+	 * Get an instance of the ability being tested.
 	 *
-	 * @return void
+	 * @return AbstractAbility
 	 */
-	protected function setUp(): void {
-		parent::setUp();
-		Monkey\setUp();
+	protected function getAbilityInstance(): AbstractAbility {
+		return new GetTransient();
 	}
 
 	/**
-	 * Tear down Brain\Monkey after each test.
+	 * Get expected metadata for the ability.
 	 *
-	 * @return void
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
 	 */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		Mockery::close();
-		parent::tearDown();
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/get-transient',
+			'category'             => 'transients',
+			'label'                => 'Get Transient',
+			'description_contains' => 'retrieve',
+			'operation_type'       => 'read',
+			'required_capability'  => 'manage_options',
+		);
 	}
 
 	/**
-	 * Test ability returns correct name.
+	 * Test input schema includes required key field.
 	 *
 	 * @return void
 	 */
-	public function testGetName(): void {
-		$ability = new GetTransient();
-		$this->assertEquals( 'fa-wpmcp/get-transient', $ability->getName() );
-	}
-
-	/**
-	 * Test ability returns correct category.
-	 *
-	 * @return void
-	 */
-	public function testGetCategory(): void {
-		$ability = new GetTransient();
-		$this->assertEquals( 'transients', $ability->getCategory() );
-	}
-
-	/**
-	 * Test ability returns correct label.
-	 *
-	 * @return void
-	 */
-	public function testGetLabel(): void {
-		$ability = new GetTransient();
-		$this->assertEquals( 'Get Transient', $ability->getLabel() );
-	}
-
-	/**
-	 * Test ability returns correct operation type.
-	 *
-	 * @return void
-	 */
-	public function testGetOperationType(): void {
-		$ability = new GetTransient();
-		$this->assertEquals( 'read', $ability->getOperationType() );
-	}
-
-	/**
-	 * Test ability returns correct required capability.
-	 *
-	 * @return void
-	 */
-	public function testGetRequiredCapability(): void {
-		$ability = new GetTransient();
-		$this->assertEquals( 'manage_options', $ability->getRequiredCapability() );
-	}
-
-	/**
-	 * Test ability returns input schema with required key field.
-	 *
-	 * @return void
-	 */
-	public function testGetInputSchema(): void {
-		$ability = new GetTransient();
+	public function testInputSchemaHasKeyField(): void {
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
-		$this->assertIsArray( $schema );
-		$this->assertArrayHasKey( 'type', $schema );
-		$this->assertArrayHasKey( 'properties', $schema );
-		$this->assertArrayHasKey( 'required', $schema );
 		$this->assertArrayHasKey( 'key', $schema['properties'] );
 		$this->assertContains( 'key', $schema['required'] );
 	}
@@ -116,8 +74,8 @@ class GetTransientTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function testGetInputSchemaHasNetworkParameter(): void {
-		$ability = new GetTransient();
+	public function testInputSchemaHasNetworkParameter(): void {
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'network', $schema['properties'] );
@@ -125,17 +83,14 @@ class GetTransientTest extends TestCase {
 	}
 
 	/**
-	 * Test ability returns output schema.
+	 * Test output schema has expected fields.
 	 *
 	 * @return void
 	 */
-	public function testGetOutputSchema(): void {
-		$ability = new GetTransient();
+	public function testOutputSchemaHasExpectedFields(): void {
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getOutputSchema();
 
-		$this->assertIsArray( $schema );
-		$this->assertArrayHasKey( 'type', $schema );
-		$this->assertArrayHasKey( 'properties', $schema );
 		$this->assertArrayHasKey( 'value', $schema['properties'] );
 		$this->assertArrayHasKey( 'exists', $schema['properties'] );
 	}
@@ -146,7 +101,7 @@ class GetTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteReturnsTransientValue(): void {
-		$ability = new GetTransient();
+		$ability = $this->getAbilityInstance();
 
 		Functions\when( 'get_transient' )->justReturn( 'cached_value' );
 
@@ -163,7 +118,7 @@ class GetTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteReturnsExistsFalseWhenNotFound(): void {
-		$ability = new GetTransient();
+		$ability = $this->getAbilityInstance();
 
 		Functions\when( 'get_transient' )->justReturn( false );
 
@@ -180,7 +135,7 @@ class GetTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteUsesGetSiteTransientForNetwork(): void {
-		$ability = new GetTransient();
+		$ability = $this->getAbilityInstance();
 
 		Functions\expect( 'get_site_transient' )
 			->once()
@@ -204,7 +159,7 @@ class GetTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteHandlesArrayValues(): void {
-		$ability = new GetTransient();
+		$ability = $this->getAbilityInstance();
 
 		$array_value = array(
 			'key1' => 'value1',
@@ -224,7 +179,7 @@ class GetTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteHandlesObjectValues(): void {
-		$ability = new GetTransient();
+		$ability = $this->getAbilityInstance();
 
 		$object_value = (object) array( 'prop' => 'value' );
 		Functions\when( 'get_transient' )->justReturn( $object_value );
@@ -241,7 +196,7 @@ class GetTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testGetAnnotations(): void {
-		$ability     = new GetTransient();
+		$ability     = $this->getAbilityInstance();
 		$annotations = $ability->getAnnotations();
 
 		$this->assertTrue( $annotations['readonly'] );

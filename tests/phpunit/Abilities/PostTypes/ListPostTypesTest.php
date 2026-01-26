@@ -10,122 +10,52 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\PostTypes;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\PostTypes\ListPostTypes;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test ListPostTypes ability functionality.
  *
  * @package FAWpmcp\Tests\Abilities\PostTypes
  */
-class ListPostTypesTest extends TestCase {
+class ListPostTypesTest extends BrainMonkeyTestCase {
+
+	use AbilityTestTrait;
 
 	/**
-	 * Set up Brain\Monkey before each test.
+	 * Get an instance of the ability being tested.
 	 *
-	 * @return void
+	 * @return AbstractAbility
 	 */
-	protected function setUp(): void {
-		parent::setUp();
-		Monkey\setUp();
+	protected function getAbilityInstance(): AbstractAbility {
+		return new ListPostTypes();
 	}
 
 	/**
-	 * Tear down Brain\Monkey after each test.
+	 * Get expected metadata for the ability.
 	 *
-	 * @return void
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
 	 */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		Mockery::close();
-		parent::tearDown();
-	}
-
-	/**
-	 * Test ability returns correct name.
-	 *
-	 * @return void
-	 */
-	public function testGetName(): void {
-		$ability = new ListPostTypes();
-		$this->assertEquals( 'fa-wpmcp/list-post-types', $ability->getName() );
-	}
-
-	/**
-	 * Test ability returns correct category.
-	 *
-	 * @return void
-	 */
-	public function testGetCategory(): void {
-		$ability = new ListPostTypes();
-		$this->assertEquals( 'post-types', $ability->getCategory() );
-	}
-
-	/**
-	 * Test ability returns correct label.
-	 *
-	 * @return void
-	 */
-	public function testGetLabel(): void {
-		$ability = new ListPostTypes();
-		$this->assertEquals( 'List Post Types', $ability->getLabel() );
-	}
-
-	/**
-	 * Test ability returns correct operation type.
-	 *
-	 * @return void
-	 */
-	public function testGetOperationType(): void {
-		$ability = new ListPostTypes();
-		$this->assertEquals( 'read', $ability->getOperationType() );
-	}
-
-	/**
-	 * Test ability returns correct required capability.
-	 *
-	 * @return void
-	 */
-	public function testGetRequiredCapability(): void {
-		$ability = new ListPostTypes();
-		$this->assertEquals( 'read', $ability->getRequiredCapability() );
-	}
-
-	/**
-	 * Test ability returns input schema.
-	 *
-	 * @return void
-	 */
-	public function testGetInputSchema(): void {
-		$ability = new ListPostTypes();
-		$schema  = $ability->getInputSchema();
-
-		$this->assertIsArray( $schema );
-		$this->assertArrayHasKey( 'type', $schema );
-		$this->assertArrayHasKey( 'properties', $schema );
-		$this->assertArrayHasKey( 'public', $schema['properties'] );
-		$this->assertArrayHasKey( 'show_ui', $schema['properties'] );
-		$this->assertArrayHasKey( 'hierarchical', $schema['properties'] );
-		$this->assertArrayHasKey( 'capability_type', $schema['properties'] );
-	}
-
-	/**
-	 * Test ability returns output schema.
-	 *
-	 * @return void
-	 */
-	public function testGetOutputSchema(): void {
-		$ability = new ListPostTypes();
-		$schema  = $ability->getOutputSchema();
-
-		$this->assertIsArray( $schema );
-		$this->assertArrayHasKey( 'type', $schema );
-		$this->assertArrayHasKey( 'properties', $schema );
-		$this->assertArrayHasKey( 'post_types', $schema['properties'] );
-		$this->assertArrayHasKey( 'total', $schema['properties'] );
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/list-post-types',
+			'category'             => 'post-types',
+			'label'                => 'List Post Types',
+			'description_contains' => 'registered wordpress post type definitions',
+			'operation_type'       => 'read',
+			'required_capability'  => 'read',
+		);
 	}
 
 	/**
@@ -134,7 +64,7 @@ class ListPostTypesTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteReturnsPostTypesList(): void {
-		$ability = new ListPostTypes();
+		$ability = $this->getAbilityInstance();
 
 		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
 		$mock_post_type->name         = 'post';
@@ -164,7 +94,7 @@ class ListPostTypesTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteReturnsEmptyListWhenNoMatch(): void {
-		$ability = new ListPostTypes();
+		$ability = $this->getAbilityInstance();
 
 		Functions\when( 'get_post_types' )->justReturn( array() );
 
@@ -181,7 +111,7 @@ class ListPostTypesTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteFiltersByPublic(): void {
-		$ability = new ListPostTypes();
+		$ability = $this->getAbilityInstance();
 
 		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
 		$mock_post_type->name         = 'post';
@@ -216,7 +146,7 @@ class ListPostTypesTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteFiltersByHierarchical(): void {
-		$ability = new ListPostTypes();
+		$ability = $this->getAbilityInstance();
 
 		$mock_post_type               = Mockery::mock( \WP_Post_Type::class );
 		$mock_post_type->name         = 'page';
@@ -251,7 +181,7 @@ class ListPostTypesTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteReturnsMultiplePostTypes(): void {
-		$ability = new ListPostTypes();
+		$ability = $this->getAbilityInstance();
 
 		$mock_post               = Mockery::mock( \WP_Post_Type::class );
 		$mock_post->name         = 'post';
@@ -292,7 +222,7 @@ class ListPostTypesTest extends TestCase {
 	 * @return void
 	 */
 	public function testGetAnnotations(): void {
-		$ability     = new ListPostTypes();
+		$ability     = $this->getAbilityInstance();
 		$annotations = $ability->getAnnotations();
 
 		$this->assertTrue( $annotations['readonly'] );

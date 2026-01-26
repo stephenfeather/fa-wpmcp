@@ -10,12 +10,13 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Users;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Users\CreateUser;
 use FAWpmcp\Exceptions\UserCreationException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test CreateUser ability functionality.
@@ -27,16 +28,17 @@ use PHPUnit\Framework\TestCase;
  *
  * @package FAWpmcp\Tests\Abilities\Users
  */
-class CreateUserTest extends TestCase {
+class CreateUserTest extends BrainMonkeyTestCase {
+
+	use AbilityTestTrait;
 
 	/**
-	 * Set up Brain\Monkey before each test.
+	 * Set up default mocks for RolePolicy.
 	 *
 	 * @return void
 	 */
 	protected function setUp(): void {
 		parent::setUp();
-		Monkey\setUp();
 
 		// Default mock for RolePolicy's get_option call.
 		// Tests can override this as needed.
@@ -52,64 +54,35 @@ class CreateUserTest extends TestCase {
 	}
 
 	/**
-	 * Tear down Brain\Monkey after each test.
+	 * Get an instance of the ability being tested.
 	 *
-	 * @return void
+	 * @return AbstractAbility
 	 */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		Mockery::close();
-		parent::tearDown();
+	protected function getAbilityInstance(): AbstractAbility {
+		return new CreateUser();
 	}
 
 	/**
-	 * Test ability returns correct name.
+	 * Get expected metadata for the ability.
 	 *
-	 * @return void
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
 	 */
-	public function testGetName(): void {
-		$ability = new CreateUser();
-		$this->assertEquals( 'fa-wpmcp/create-user', $ability->getName() );
-	}
-
-	/**
-	 * Test ability returns correct category.
-	 *
-	 * @return void
-	 */
-	public function testGetCategory(): void {
-		$ability = new CreateUser();
-		$this->assertEquals( 'users', $ability->getCategory() );
-	}
-
-	/**
-	 * Test ability returns correct label.
-	 *
-	 * @return void
-	 */
-	public function testGetLabel(): void {
-		$ability = new CreateUser();
-		$this->assertEquals( 'Create User', $ability->getLabel() );
-	}
-
-	/**
-	 * Test ability returns correct operation type.
-	 *
-	 * @return void
-	 */
-	public function testGetOperationType(): void {
-		$ability = new CreateUser();
-		$this->assertEquals( 'write', $ability->getOperationType() );
-	}
-
-	/**
-	 * Test ability returns correct required capability.
-	 *
-	 * @return void
-	 */
-	public function testGetRequiredCapability(): void {
-		$ability = new CreateUser();
-		$this->assertEquals( 'create_users', $ability->getRequiredCapability() );
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                  => 'fa-wpmcp/create-user',
+			'category'              => 'users',
+			'label'                 => 'Create User',
+			'description_contains'  => 'create',
+			'operation_type'        => 'write',
+			'required_capability'   => 'create_users',
+		);
 	}
 
 	/**
@@ -159,7 +132,7 @@ class CreateUserTest extends TestCase {
 			)
 		);
 
-		$ability = new CreateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildUserData' );
@@ -203,7 +176,7 @@ class CreateUserTest extends TestCase {
 			)
 		);
 
-		$ability = new CreateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildUserData' );
@@ -239,7 +212,7 @@ class CreateUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testValidateRoleWithValidRole(): void {
-		$ability = new CreateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'validateRole' );
@@ -255,7 +228,7 @@ class CreateUserTest extends TestCase {
 	 * @return void
 	 */
 	public function testValidateRoleWithInvalidRole(): void {
-		$ability = new CreateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'validateRole' );
@@ -292,7 +265,7 @@ class CreateUserTest extends TestCase {
 		Functions\expect( 'get_userdata' )->with( 42 )->andReturn( $mock_user );
 		Functions\expect( 'get_edit_user_link' )->with( 42 )->andReturn( 'https://example.com/wp-admin/user-edit.php?user_id=42' );
 
-		$ability = new CreateUser();
+		$ability = $this->getAbilityInstance();
 		$result  = $ability->doExecute(
 			array(
 				'username' => 'testuser',
@@ -328,7 +301,7 @@ class CreateUserTest extends TestCase {
 		Functions\expect( 'wp_insert_user' )->andReturn( $wp_error );
 		Functions\expect( 'is_wp_error' )->with( $wp_error )->andReturn( true );
 
-		$ability = new CreateUser();
+		$ability = $this->getAbilityInstance();
 
 		$this->expectException( UserCreationException::class );
 		$this->expectExceptionMessage( 'Username already exists' );
@@ -358,7 +331,7 @@ class CreateUserTest extends TestCase {
 			)
 		);
 
-		$ability = new CreateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildUserData' );
@@ -394,7 +367,7 @@ class CreateUserTest extends TestCase {
 			)
 		);
 
-		$ability = new CreateUser();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildUserData' );

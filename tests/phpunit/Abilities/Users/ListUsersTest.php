@@ -10,11 +10,12 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Users;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Users\ListUsers;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test ListUsers ability functionality.
@@ -27,87 +28,40 @@ use PHPUnit\Framework\TestCase;
  *
  * @package FAWpmcp\Tests\Abilities\Users
  */
-class ListUsersTest extends TestCase {
+class ListUsersTest extends BrainMonkeyTestCase {
+
+	use AbilityTestTrait;
 
 	/**
-	 * Set up Brain\Monkey before each test.
+	 * Get an instance of the ability being tested.
 	 *
-	 * @return void
+	 * @return AbstractAbility
 	 */
-	protected function setUp(): void {
-		parent::setUp();
-		Monkey\setUp();
+	protected function getAbilityInstance(): AbstractAbility {
+		return new ListUsers();
 	}
 
 	/**
-	 * Tear down Brain\Monkey after each test.
+	 * Get expected metadata for the ability.
 	 *
-	 * @return void
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
 	 */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		Mockery::close();
-		parent::tearDown();
-	}
-
-	/**
-	 * Test ability returns correct name.
-	 *
-	 * @return void
-	 */
-	public function testGetName(): void {
-		$ability = new ListUsers();
-		$this->assertEquals( 'fa-wpmcp/list-users', $ability->getName() );
-	}
-
-	/**
-	 * Test ability returns correct category.
-	 *
-	 * @return void
-	 */
-	public function testGetCategory(): void {
-		$ability = new ListUsers();
-		$this->assertEquals( 'users', $ability->getCategory() );
-	}
-
-	/**
-	 * Test ability returns correct label.
-	 *
-	 * @return void
-	 */
-	public function testGetLabel(): void {
-		$ability = new ListUsers();
-		$this->assertEquals( 'List Users', $ability->getLabel() );
-	}
-
-	/**
-	 * Test ability returns correct description.
-	 *
-	 * @return void
-	 */
-	public function testGetDescription(): void {
-		$ability = new ListUsers();
-		$this->assertStringContainsString( 'users', strtolower( $ability->getDescription() ) );
-	}
-
-	/**
-	 * Test ability returns correct operation type.
-	 *
-	 * @return void
-	 */
-	public function testGetOperationType(): void {
-		$ability = new ListUsers();
-		$this->assertEquals( 'read', $ability->getOperationType() );
-	}
-
-	/**
-	 * Test ability returns correct required capability.
-	 *
-	 * @return void
-	 */
-	public function testGetRequiredCapability(): void {
-		$ability = new ListUsers();
-		$this->assertEquals( 'list_users', $ability->getRequiredCapability() );
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                  => 'fa-wpmcp/list-users',
+			'category'              => 'users',
+			'label'                 => 'List Users',
+			'description_contains'  => 'users',
+			'operation_type'        => 'read',
+			'required_capability'   => 'list_users',
+		);
 	}
 
 	/**
@@ -116,7 +70,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testInputSchemaSupportsPagination(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
@@ -132,7 +86,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testInputSchemaSupportsFiltering(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
 		$this->assertArrayHasKey( 'role', $schema['properties'] );
@@ -145,7 +99,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testOutputSchemaStructure(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getOutputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
@@ -160,7 +114,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testBuildQueryArgsDefaultPagination(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildQueryArgs' );
@@ -177,7 +131,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testBuildQueryArgsEnforcesMaxPerPage(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildQueryArgs' );
@@ -193,7 +147,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testBuildQueryArgsWithRoleFilter(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildQueryArgs' );
@@ -209,7 +163,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testBuildQueryArgsWithSearchFilter(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildQueryArgs' );
@@ -226,7 +180,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testBuildQueryArgsWithOrdering(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildQueryArgs' );
@@ -249,7 +203,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testBuildQueryArgsWithPage2(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildQueryArgs' );
@@ -289,7 +243,7 @@ class ListUsersTest extends TestCase {
 			)
 		);
 
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'formatUserItem' );
@@ -311,7 +265,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testBuildQueryArgsIsPure(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'buildQueryArgs' );
@@ -353,7 +307,7 @@ class ListUsersTest extends TestCase {
 			)
 		);
 
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'formatResults' );
@@ -383,7 +337,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testGetTotalUsersWithNoFilters(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'getTotalUsers' );
@@ -408,7 +362,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testGetTotalUsersWithRoleFilter(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'getTotalUsers' );
@@ -433,7 +387,7 @@ class ListUsersTest extends TestCase {
 	 * @return void
 	 */
 	public function testGetTotalUsersWithSearchFilter(): void {
-		$ability = new ListUsers();
+		$ability = $this->getAbilityInstance();
 
 		$reflection = new \ReflectionClass( $ability );
 		$method     = $reflection->getMethod( 'getTotalUsers' );

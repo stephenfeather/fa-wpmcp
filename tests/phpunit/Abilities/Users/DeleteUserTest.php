@@ -10,19 +10,25 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Users;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Users\DeleteUser;
 use FAWpmcp\Exceptions\UserDeletionException;
 use FAWpmcp\Exceptions\UserNotFoundException;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
-use PHPUnit\Framework\TestCase;
 
-final class DeleteUserTest extends TestCase {
+final class DeleteUserTest extends BrainMonkeyTestCase {
 
-	use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+	use AbilityTestTrait;
 
+	/**
+	 * Set up test environment.
+	 *
+	 * @return void
+	 */
 	protected function setUp(): void {
 		parent::setUp();
-		\Brain\Monkey\setUp();
 
 		// Define ABSPATH for require_once in doExecute.
 		if ( ! defined( 'ABSPATH' ) ) {
@@ -30,27 +36,40 @@ final class DeleteUserTest extends TestCase {
 		}
 	}
 
-	protected function tearDown(): void {
-		\Brain\Monkey\tearDown();
-		parent::tearDown();
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new DeleteUser();
 	}
 
-	public function test_ability_metadata(): void {
-		$ability = new DeleteUser();
-		$this->assertEquals( 'fa-wpmcp/delete-user', $ability->getName() );
-		$this->assertEquals( 'users', $ability->getCategory() );
-		$this->assertEquals( 'Delete User', $ability->getLabel() );
-		$this->assertStringContainsString( 'delete', strtolower( $ability->getDescription() ) );
-		$this->assertEquals( 'delete_users', $ability->getRequiredCapability() );
-	}
-
-	public function test_operation_type_is_write(): void {
-		$ability = new DeleteUser();
-		$this->assertEquals( 'write', $ability->getOperationType() );
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                  => 'fa-wpmcp/delete-user',
+			'category'              => 'users',
+			'label'                 => 'Delete User',
+			'description_contains'  => 'delete',
+			'operation_type'        => 'write',
+			'required_capability'   => 'delete_users',
+		);
 	}
 
 	public function test_annotations_mark_destructive(): void {
-		$ability     = new DeleteUser();
+		$ability     = $this->getAbilityInstance();
 		$annotations = $ability->getAnnotations();
 
 		$this->assertTrue( $annotations['destructive'] );
@@ -58,7 +77,7 @@ final class DeleteUserTest extends TestCase {
 	}
 
 	public function test_input_schema_requires_user_id(): void {
-		$ability = new DeleteUser();
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
@@ -69,7 +88,7 @@ final class DeleteUserTest extends TestCase {
 	}
 
 	public function test_output_schema_structure(): void {
-		$ability = new DeleteUser();
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getOutputSchema();
 
 		$this->assertEquals( 'object', $schema['type'] );
@@ -87,7 +106,7 @@ final class DeleteUserTest extends TestCase {
 		Functions\expect( 'get_current_user_id' )->once()->andReturn( 1 );
 		Functions\expect( 'wp_delete_user' )->once()->with( 42, null )->andReturn( true );
 
-		$ability = new DeleteUser();
+		$ability = $this->getAbilityInstance();
 		$result  = $ability->doExecute( array( 'user_id' => 42 ) );
 
 		$this->assertEquals( 42, $result['user_id'] );
@@ -108,7 +127,7 @@ final class DeleteUserTest extends TestCase {
 		Functions\expect( 'get_userdata' )->once()->with( 10 )->andReturn( $reassign_user );
 		Functions\expect( 'wp_delete_user' )->once()->with( 42, 10 )->andReturn( true );
 
-		$ability = new DeleteUser();
+		$ability = $this->getAbilityInstance();
 		$result  = $ability->doExecute(
 			array(
 				'user_id'  => 42,
@@ -128,7 +147,7 @@ final class DeleteUserTest extends TestCase {
 
 		Functions\expect( 'get_userdata' )->once()->with( 999 )->andReturn( false );
 
-		$ability = new DeleteUser();
+		$ability = $this->getAbilityInstance();
 		$ability->doExecute( array( 'user_id' => 999 ) );
 	}
 
@@ -142,7 +161,7 @@ final class DeleteUserTest extends TestCase {
 		Functions\expect( 'get_userdata' )->once()->with( 42 )->andReturn( $user );
 		Functions\expect( 'get_current_user_id' )->once()->andReturn( 42 );
 
-		$ability = new DeleteUser();
+		$ability = $this->getAbilityInstance();
 		$ability->doExecute( array( 'user_id' => 42 ) );
 	}
 
@@ -157,7 +176,7 @@ final class DeleteUserTest extends TestCase {
 		Functions\expect( 'get_current_user_id' )->once()->andReturn( 1 );
 		Functions\expect( 'get_userdata' )->once()->with( 999 )->andReturn( false );
 
-		$ability = new DeleteUser();
+		$ability = $this->getAbilityInstance();
 		$ability->doExecute(
 			array(
 				'user_id'  => 42,
@@ -177,7 +196,7 @@ final class DeleteUserTest extends TestCase {
 		Functions\expect( 'get_current_user_id' )->once()->andReturn( 1 );
 		Functions\expect( 'wp_delete_user' )->once()->with( 42, null )->andReturn( false );
 
-		$ability = new DeleteUser();
+		$ability = $this->getAbilityInstance();
 		$ability->doExecute( array( 'user_id' => 42 ) );
 	}
 }

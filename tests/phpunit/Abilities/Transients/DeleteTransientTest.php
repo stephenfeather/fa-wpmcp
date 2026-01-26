@@ -10,102 +10,62 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Transients;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Transients\DeleteTransient;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test DeleteTransient ability functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Transients
  */
-class DeleteTransientTest extends TestCase {
+class DeleteTransientTest extends BrainMonkeyTestCase {
+	use AbilityTestTrait;
 
 	/**
-	 * Set up Brain\Monkey before each test.
+	 * Get an instance of the ability being tested.
 	 *
-	 * @return void
+	 * @return AbstractAbility
 	 */
-	protected function setUp(): void {
-		parent::setUp();
-		Monkey\setUp();
+	protected function getAbilityInstance(): AbstractAbility {
+		return new DeleteTransient();
 	}
 
 	/**
-	 * Tear down Brain\Monkey after each test.
+	 * Get expected metadata for the ability.
 	 *
-	 * @return void
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
 	 */
-	protected function tearDown(): void {
-		Monkey\tearDown();
-		Mockery::close();
-		parent::tearDown();
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/delete-transient',
+			'category'             => 'transients',
+			'label'                => 'Delete Transient',
+			'description_contains' => 'delete',
+			'operation_type'       => 'delete',
+			'required_capability'  => 'manage_options',
+		);
 	}
 
 	/**
-	 * Test ability returns correct name.
+	 * Test input schema has optional parameters.
 	 *
 	 * @return void
 	 */
-	public function testGetName(): void {
-		$ability = new DeleteTransient();
-		$this->assertEquals( 'fa-wpmcp/delete-transient', $ability->getName() );
-	}
-
-	/**
-	 * Test ability returns correct category.
-	 *
-	 * @return void
-	 */
-	public function testGetCategory(): void {
-		$ability = new DeleteTransient();
-		$this->assertEquals( 'transients', $ability->getCategory() );
-	}
-
-	/**
-	 * Test ability returns correct label.
-	 *
-	 * @return void
-	 */
-	public function testGetLabel(): void {
-		$ability = new DeleteTransient();
-		$this->assertEquals( 'Delete Transient', $ability->getLabel() );
-	}
-
-	/**
-	 * Test ability returns correct operation type.
-	 *
-	 * @return void
-	 */
-	public function testGetOperationType(): void {
-		$ability = new DeleteTransient();
-		$this->assertEquals( 'delete', $ability->getOperationType() );
-	}
-
-	/**
-	 * Test ability returns correct required capability.
-	 *
-	 * @return void
-	 */
-	public function testGetRequiredCapability(): void {
-		$ability = new DeleteTransient();
-		$this->assertEquals( 'manage_options', $ability->getRequiredCapability() );
-	}
-
-	/**
-	 * Test ability returns input schema with optional parameters.
-	 *
-	 * @return void
-	 */
-	public function testGetInputSchema(): void {
-		$ability = new DeleteTransient();
+	public function testInputSchemaHasOptionalParameters(): void {
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getInputSchema();
 
-		$this->assertIsArray( $schema );
-		$this->assertArrayHasKey( 'type', $schema );
-		$this->assertArrayHasKey( 'properties', $schema );
 		$this->assertArrayHasKey( 'key', $schema['properties'] );
 		$this->assertArrayHasKey( 'all', $schema['properties'] );
 		$this->assertArrayHasKey( 'expired', $schema['properties'] );
@@ -113,17 +73,14 @@ class DeleteTransientTest extends TestCase {
 	}
 
 	/**
-	 * Test ability returns output schema.
+	 * Test output schema has deleted_count field.
 	 *
 	 * @return void
 	 */
-	public function testGetOutputSchema(): void {
-		$ability = new DeleteTransient();
+	public function testOutputSchemaHasDeletedCountField(): void {
+		$ability = $this->getAbilityInstance();
 		$schema  = $ability->getOutputSchema();
 
-		$this->assertIsArray( $schema );
-		$this->assertArrayHasKey( 'type', $schema );
-		$this->assertArrayHasKey( 'properties', $schema );
 		$this->assertArrayHasKey( 'deleted_count', $schema['properties'] );
 	}
 
@@ -133,7 +90,7 @@ class DeleteTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteDeletesSingleTransientByKey(): void {
-		$ability = new DeleteTransient();
+		$ability = $this->getAbilityInstance();
 
 		Functions\expect( 'delete_transient' )
 			->once()
@@ -152,7 +109,7 @@ class DeleteTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteReturnsZeroWhenTransientNotFound(): void {
-		$ability = new DeleteTransient();
+		$ability = $this->getAbilityInstance();
 
 		Functions\when( 'delete_transient' )->justReturn( false );
 
@@ -167,7 +124,7 @@ class DeleteTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteUsesDeleteSiteTransientForNetwork(): void {
-		$ability = new DeleteTransient();
+		$ability = $this->getAbilityInstance();
 
 		Functions\expect( 'delete_site_transient' )
 			->once()
@@ -190,7 +147,7 @@ class DeleteTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteDeletesAllTransients(): void {
-		$ability = new DeleteTransient();
+		$ability = $this->getAbilityInstance();
 
 		// Mock global wpdb.
 		global $wpdb;
@@ -220,7 +177,7 @@ class DeleteTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteDeletesExpiredTransients(): void {
-		$ability = new DeleteTransient();
+		$ability = $this->getAbilityInstance();
 
 		// Mock global wpdb.
 		global $wpdb;
@@ -261,7 +218,7 @@ class DeleteTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteDeletesAllNetworkTransients(): void {
-		$ability = new DeleteTransient();
+		$ability = $this->getAbilityInstance();
 
 		// Mock global wpdb.
 		global $wpdb;
@@ -297,7 +254,7 @@ class DeleteTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testExecuteThrowsExceptionWhenNoActionSpecified(): void {
-		$ability = new DeleteTransient();
+		$ability = $this->getAbilityInstance();
 
 		$this->expectException( \InvalidArgumentException::class );
 		$this->expectExceptionMessage( 'Must specify key, all, or expired parameter' );
@@ -311,7 +268,7 @@ class DeleteTransientTest extends TestCase {
 	 * @return void
 	 */
 	public function testGetAnnotations(): void {
-		$ability     = new DeleteTransient();
+		$ability     = $this->getAbilityInstance();
 		$annotations = $ability->getAnnotations();
 
 		$this->assertFalse( $annotations['readonly'] );
