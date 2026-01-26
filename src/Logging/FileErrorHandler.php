@@ -56,16 +56,16 @@ final class FileErrorHandler implements McpErrorHandlerInterface
      *
      * @var string|null
      */
-    private ?string $log_path = null;
+    private ?string $logPath = null;
 
     /**
      * Constructor.
      *
-     * @param string|null $log_path Optional log file path for testing.
+     * @param string|null $logPath Optional log file path for testing.
      */
-    public function __construct(?string $log_path = null)
+    public function __construct(?string $logPath = null)
     {
-        $this->log_path = $log_path;
+        $this->log_path = $logPath;
     }
 
     /**

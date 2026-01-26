@@ -143,7 +143,7 @@ final class GetCronEventAbility extends AbstractAbility
 
         foreach ($cron_array as $timestamp => $hooks) {
             if (isset($hooks[ $hook ])) {
-                foreach ($hooks[ $hook ] as $sig => $event_data) {
+                foreach ($hooks[ $hook ] as $event_data) {
                     $events[] = array(
                         'hook'      => $hook,
                         'timestamp' => (int) $timestamp,

@@ -151,7 +151,7 @@ final class ListCronEventsAbility extends AbstractAbility
                     continue;
                 }
 
-                foreach ($events_data as $sig => $event_data) {
+                foreach ($events_data as $event_data) {
                     $events[] = array(
                         'hook'      => $hook,
                         'timestamp' => (int) $timestamp,

@@ -1,4 +1,5 @@
 # FA WPMCP - WordPress MCP Plugin
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stephenfeather_fa-wpmcp&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=stephenfeather_fa-wpmcp)
 
 WordPress plugin that exposes WordPress functionality to AI agents via the Abilities API and MCP (Model Context Protocol) Adapter. Connect AI assistants like Claude, GPT, or Gemini to your WordPress site for intelligent content management.
 

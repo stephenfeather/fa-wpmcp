@@ -159,7 +159,7 @@ final class RunCronEventAbility extends AbstractAbility
             // Sort by timestamp to get the earliest event first.
             ksort($cron_array);
 
-            foreach ($cron_array as $timestamp => $hooks) {
+            foreach ($cron_array as $hooks) {
                 if (isset($hooks[ $hook ])) {
                     // Get the first event's args.
                     $events     = $hooks[ $hook ];

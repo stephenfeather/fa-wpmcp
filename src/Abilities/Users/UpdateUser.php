@@ -33,16 +33,16 @@ final class UpdateUser extends AbstractAbility
      *
      * @var RolePolicy
      */
-    private RolePolicy $role_policy;
+    private RolePolicy $rolePolicy;
 
     /**
      * Constructor.
      *
-     * @param RolePolicy|null $role_policy Optional role policy instance.
+     * @param RolePolicy|null $rolePolicy Optional role policy instance.
      */
-    public function __construct(?RolePolicy $role_policy = null)
+    public function __construct(?RolePolicy $rolePolicy = null)
     {
-        $this->role_policy = $role_policy ?? new RolePolicy();
+        $this->role_policy = $rolePolicy ?? new RolePolicy();
     }
 
     /**
