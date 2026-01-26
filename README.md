@@ -642,8 +642,8 @@ if (!hash_equals($expected, $signature)) {
 
 Additional ability categories planned for implementation:
 
-- [ ] **Cron Abilities** - WordPress scheduled tasks management
-  - ListCronEvents, GetCronEvent, ScheduleCronEvent, UnscheduleCronEvent, RunCronEvent
+- [x] **Cron Abilities** - WordPress scheduled tasks management ✅
+  - ListCronEvents, GetCronEvent, ScheduleCronEvent, UnscheduleCronEvent, RunCronEvent, ListCronSchedules
 - [ ] **Role Abilities** - User role and capability management
   - ListRoles, GetRole, CreateRole, UpdateRole, DeleteRole
 - [ ] **Cap Abilities** - Fine-grained capability management
@@ -787,4 +787,4 @@ Email: stephen@feather.us
 
 ---
 
-**Version:** 1.0.0 ✅ | **32 Abilities Implemented** | Posts, Comments, Media, Taxonomy, User, Settings, and Plugin management complete
+**Version:** 1.0.0 ✅ | **69 Abilities Implemented** | Posts, Comments, Media, Taxonomy, User, Settings, Plugin, Theme, Privacy, Cache, Maintenance, Transients, PostTypes, and Cron management complete

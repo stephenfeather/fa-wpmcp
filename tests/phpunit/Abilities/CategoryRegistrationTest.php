@@ -43,13 +43,13 @@ final class CategoryRegistrationTest extends TestCase {
 	}
 
 	/**
-	 * Test that all eleven categories are registered.
+	 * Test that all fourteen categories are registered.
 	 *
 	 * @return void
 	 */
-	public function test_registerAbilityCategories_registers_all_eleven_categories(): void {
+	public function test_registerAbilityCategories_registers_all_fourteen_categories(): void {
 		Functions\expect( 'wp_register_ability_category' )
-			->times( 11 );
+			->times( 14 );
 
 		Functions\expect( '__' )
 			->andReturnUsing( fn( $text ) => $text );
@@ -74,6 +74,7 @@ final class CategoryRegistrationTest extends TestCase {
 			'comments',
 			'media',
 			'taxonomies',
+			'post-types',
 			'users',
 			'settings',
 			'plugins',
@@ -81,6 +82,8 @@ final class CategoryRegistrationTest extends TestCase {
 			'privacy',
 			'cache',
 			'maintenance',
+			'transients',
+			'cron',
 		);
 
 		foreach ( $expected_slugs as $slug ) {
@@ -108,7 +111,7 @@ final class CategoryRegistrationTest extends TestCase {
 	 */
 	public function test_registerAbilityCategories_includes_required_fields(): void {
 		Functions\expect( 'wp_register_ability_category' )
-			->times( 11 )
+			->times( 14 )
 			->andReturnUsing(
 				function ( $slug, $args ) {
 					$this->assertIsString( $slug );
@@ -136,10 +139,10 @@ final class CategoryRegistrationTest extends TestCase {
 	 */
 	public function test_registerAbilityCategories_uses_i18n(): void {
 		Functions\expect( 'wp_register_ability_category' )
-			->times( 11 );
+			->times( 14 );
 
 		Functions\expect( '__' )
-			->times( 22 ) // 11 labels + 11 descriptions.
+			->times( 28 ) // 14 labels + 14 descriptions.
 			->with( Mockery::type( 'string' ), 'fa-wpmcp' )
 			->andReturnUsing( fn( $text ) => $text );
 

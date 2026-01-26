@@ -86,6 +86,7 @@ final class Plugin {
 		$this->registerCacheAbilities( $ability_registry );
 		$this->registerMaintenanceAbilities( $ability_registry );
 		$this->registerTransientAbilities( $ability_registry );
+		$this->registerCronAbilities( $ability_registry );
 		$this->registerService( 'ability_registry', $ability_registry );
 
 		// Initialize Admin Settings Page.
@@ -105,7 +106,7 @@ final class Plugin {
 
 		// Activity logger with database repository.
 		global $wpdb;
-		$log_repository = new \FAWpmcp\Logging\LogRepository( $wpdb );
+		$log_repository  = new \FAWpmcp\Logging\LogRepository( $wpdb );
 		$activity_logger = new \FAWpmcp\Logging\ActivityLogger(
 			$log_repository,
 			fn() => wp_generate_uuid4()
@@ -176,6 +177,7 @@ final class Plugin {
 					'cache',
 					'maintenance',
 					'transients',
+					'cron',
 					'site',
 				);
 
@@ -231,43 +233,43 @@ final class Plugin {
 				'label'       => __( 'Posts & Pages', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress posts, pages, and custom post types', 'fa-wpmcp' ),
 			),
-			'comments' => array(
+			'comments'    => array(
 				'label'       => __( 'Comments', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress comments and comment moderation', 'fa-wpmcp' ),
 			),
-			'media' => array(
+			'media'       => array(
 				'label'       => __( 'Media Library', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress media files and attachments', 'fa-wpmcp' ),
 			),
-			'taxonomies' => array(
+			'taxonomies'  => array(
 				'label'       => __( 'Taxonomies', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress terms, categories, and tags', 'fa-wpmcp' ),
 			),
-			'post-types' => array(
+			'post-types'  => array(
 				'label'       => __( 'Post Types', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for inspecting registered WordPress post type definitions', 'fa-wpmcp' ),
 			),
-			'users' => array(
+			'users'       => array(
 				'label'       => __( 'Users', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress user accounts and profiles', 'fa-wpmcp' ),
 			),
-			'settings' => array(
+			'settings'    => array(
 				'label'       => __( 'Settings', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress options and site configuration', 'fa-wpmcp' ),
 			),
-			'plugins' => array(
+			'plugins'     => array(
 				'label'       => __( 'Plugins', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress plugin installation, activation, and updates', 'fa-wpmcp' ),
 			),
-			'themes' => array(
+			'themes'      => array(
 				'label'       => __( 'Themes', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress theme installation, activation, and updates', 'fa-wpmcp' ),
 			),
-			'privacy' => array(
+			'privacy'     => array(
 				'label'       => __( 'Privacy', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress privacy requests (GDPR data export and erasure)', 'fa-wpmcp' ),
 			),
-			'cache' => array(
+			'cache'       => array(
 				'label'       => __( 'Cache', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress object cache operations', 'fa-wpmcp' ),
 			),
@@ -275,9 +277,13 @@ final class Plugin {
 				'label'       => __( 'Maintenance', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress maintenance mode', 'fa-wpmcp' ),
 			),
-			'transients' => array(
+			'transients'  => array(
 				'label'       => __( 'Transients', 'fa-wpmcp' ),
 				'description' => __( 'Abilities for managing WordPress transient cache entries', 'fa-wpmcp' ),
+			),
+			'cron'        => array(
+				'label'       => __( 'Cron', 'fa-wpmcp' ),
+				'description' => __( 'Abilities for managing WordPress cron scheduled events and schedules', 'fa-wpmcp' ),
 			),
 		);
 
@@ -313,9 +319,9 @@ final class Plugin {
 					'input_schema'        => $registration['inputSchema'],
 					'output_schema'       => $registration['outputSchema'],
 					'meta'                => array(
-						'annotations'   => $registration['annotations'],
-						'show_in_rest'  => true,
-						'mcp'           => array(
+						'annotations'  => $registration['annotations'],
+						'show_in_rest' => true,
+						'mcp'          => array(
 							'public' => true,
 							'type'   => 'tool',
 						),
@@ -524,6 +530,21 @@ final class Plugin {
 		$registry->register( new \FAWpmcp\Abilities\Transients\ListTransients() );
 		$registry->register( new \FAWpmcp\Abilities\Transients\SetTransient() );
 		$registry->register( new \FAWpmcp\Abilities\Transients\DeleteTransient() );
+	}
+
+	/**
+	 * Register cron abilities.
+	 *
+	 * @param \FAWpmcp\Abilities\AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private function registerCronAbilities( \FAWpmcp\Abilities\AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Cron\ListCronEventsAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Cron\GetCronEventAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Cron\ScheduleCronEventAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Cron\UnscheduleCronEventAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Cron\RunCronEventAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Cron\ListCronSchedulesAbility() );
 	}
 
 	/**

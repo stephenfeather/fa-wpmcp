@@ -29,6 +29,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ListPostTypes` - List all registered post types
   - `GetPostType` - Get details for a specific post type
 - **MCP Observability Handler** - Structured event logging to PHP error log
+- **Cron Abilities** - WordPress scheduled tasks management:
+  - `ListCronEvents` - List all scheduled WP-Cron events
+  - `GetCronEvent` - Get specific cron event by hook name
+  - `ScheduleCronEvent` - Schedule new recurring or single cron event
+  - `UnscheduleCronEvent` - Remove scheduled cron events
+  - `RunCronEvent` - Manually trigger a cron event hook
+  - `ListCronSchedules` - List available cron recurrence schedules
 
 ## [1.0.0-alpha.4] - 2026-01-25
 
