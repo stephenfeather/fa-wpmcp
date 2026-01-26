@@ -1,0 +1,179 @@
+NAME
+
+  wp comment
+
+DESCRIPTION
+
+  Creates, updates, deletes, and moderates comments.
+
+SYNOPSIS
+
+  wp comment <command>
+
+SUBCOMMANDS
+
+  approve        Approves a comment.
+  count          Counts comments, on whole blog or on a given post.
+  create         Creates a new comment.
+  delete         Deletes a comment.
+  exists         Verifies whether a comment exists.
+  generate       Generates some number of new dummy comments.
+  get            Gets the data of a single comment.
+  list           Gets a list of comments.
+  meta           Adds, updates, deletes, and lists comment custom fields.
+  recount        Recalculates the comment_count value for one or more posts.
+  spam           Marks a comment as spam.
+  status         Gets the status of a comment.
+  trash          Trashes a comment.
+  unapprove      Unapproves a comment.
+  unspam         Unmarks a comment as spam.
+  untrash        Untrashes a comment.
+  update         Updates one or more comments.
+
+EXAMPLES
+
+    # Create a new comment.
+    $ wp comment create --comment_post_ID=15 --comment_content="hello blog" --comment_author="wp-cli"
+    Success: Created comment 932.
+
+    # Update an existing comment.
+    $ wp comment update 123 --comment_author='That Guy'
+    Success: Updated comment 123.
+
+    # Delete an existing comment.
+    $ wp comment delete 1337 --force
+    Success: Deleted comment 1337.
+
+    # Trash all spam comments.
+    $ wp comment delete $(wp comment list --status=spam --format=ids)
+    Success: Trashed comment 264.
+    Success: Trashed comment 262.
+
+GLOBAL PARAMETERS
+
+  --path=<path>
+      Path to the WordPress files.
+
+  --url=<url>
+      Pretend request came from given URL. In multisite, this argument is how the target site is
+      specified.
+
+  --ssh=[<scheme>:][<user>@]<host|container>[:<port>][<path>]
+      Perform operation against a remote server over SSH (or a container using scheme of "docker",
+      "docker-compose", "docker-compose-run", "vagrant").
+
+  --http=<http>
+      Perform operation against a remote WordPress installation over HTTP.
+
+  --user=<id|login|email>
+      Set the WordPress user.
+
+  --skip-plugins[=<plugins>]
+      Skip loading all plugins, or a comma-separated list of plugins. Note: mu-plugins are still loaded.
+
+  --skip-themes[=<themes>]
+      Skip loading all themes, or a comma-separated list of themes.
+
+  --skip-packages
+      Skip loading all installed packages.
+
+  --require=<path>
+      Load PHP file before running the command (may be used more than once).
+
+  --exec=<php-code>
+      Execute PHP code before running the command (may be used more than once).
+
+  --context=<context>
+      Load WordPress in a given context.
+
+  --[no-]color
+      Whether to colorize the output.
+
+  --debug[=<group>]
+      Show all PHP errors and add verbosity to WP-CLI output. Built-in groups include: bootstrap,
+      commandfactory, and help.
+
+  --prompt[=<assoc>]
+      Prompt the user to enter values for all command arguments, or a subset specified as comma-separated
+      values.
+
+  --quiet
+      Suppress informational messages.
+
+i/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
+
+Deprecated: Using null as an array offset is deprecated, use an empty string instead in phar:///opt/homebrew/Cellar/wp-cli/2.12.0/bin/wp/vendor/wp-cli/php-cli-tools/lib/cli/Colors.php on line 95
