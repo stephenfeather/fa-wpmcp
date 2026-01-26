@@ -15,6 +15,6 @@ use RuntimeException;
 /**
  * Exception for cache operation failures.
  */
-class CacheOperationException extends RuntimeException
-{
+class CacheOperationException extends RuntimeException {
+
 }

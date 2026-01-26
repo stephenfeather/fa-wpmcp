@@ -22,194 +22,186 @@ use PHPUnit\Framework\TestCase;
 /**
  * Test WebhookScheduler behavior.
  */
-final class WebhookSchedulerTest extends TestCase
-{
-    use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+final class WebhookSchedulerTest extends TestCase {
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        \Brain\Monkey\setUp();
-    }
+	use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    protected function tearDown(): void
-    {
-        \Brain\Monkey\tearDown();
-        parent::tearDown();
-    }
+	protected function setUp(): void {
+		parent::setUp();
+		\Brain\Monkey\setUp();
+	}
 
-    /**
-     * Test init registers hooks.
-     *
-     * @return void
-     */
-    public function test_init_registers_hooks(): void
-    {
-        $manager = new WebhookManager(
-            Mockery::mock(WebhookQueue::class),
-            Mockery::mock(WebhookSender::class),
-            Mockery::mock(WebhookConfig::class),
-        );
-        $scheduler = new WebhookScheduler($manager);
+	protected function tearDown(): void {
+		\Brain\Monkey\tearDown();
+		parent::tearDown();
+	}
 
-        Functions\expect('add_action')
-            ->once()
-            ->with('fa_wpmcp_process_webhook_queue', Mockery::type('array'));
+	/**
+	 * Test init registers hooks.
+	 *
+	 * @return void
+	 */
+	public function test_init_registers_hooks(): void {
+		$manager = new WebhookManager(
+			Mockery::mock( WebhookQueue::class ),
+			Mockery::mock( WebhookSender::class ),
+			Mockery::mock( WebhookConfig::class ),
+		);
+		$scheduler = new WebhookScheduler( $manager );
 
-        Functions\expect('add_filter')
-            ->once()
-            ->with('cron_schedules', Mockery::type('array'));
+		Functions\expect( 'add_action' )
+			->once()
+			->with( 'fa_wpmcp_process_webhook_queue', Mockery::type( 'array' ) );
 
-        Functions\expect('add_action')
-            ->once()
-            ->with('init', Mockery::type('array'));
+		Functions\expect( 'add_filter' )
+			->once()
+			->with( 'cron_schedules', Mockery::type( 'array' ) );
 
-        $scheduler->init();
-    }
+		Functions\expect( 'add_action' )
+			->once()
+			->with( 'init', Mockery::type( 'array' ) );
 
-    /**
-     * Test scheduleRecurringJob uses WP-Cron when Action Scheduler unavailable.
-     *
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     *
-     * @return void
-     */
-    public function test_scheduleRecurringJob_uses_wp_cron_when_unavailable(): void
-    {
-        $manager = new WebhookManager(
-            Mockery::mock(WebhookQueue::class),
-            Mockery::mock(WebhookSender::class),
-            Mockery::mock(WebhookConfig::class),
-        );
-        $scheduler = new WebhookScheduler($manager);
+		$scheduler->init();
+	}
 
-        Functions\expect('wp_next_scheduled')
-            ->once()
-            ->with('fa_wpmcp_process_webhook_queue')
-            ->andReturn(false);
+	/**
+	 * Test scheduleRecurringJob uses WP-Cron when Action Scheduler unavailable.
+	 *
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 *
+	 * @return void
+	 */
+	public function test_scheduleRecurringJob_uses_wp_cron_when_unavailable(): void {
+		$manager = new WebhookManager(
+			Mockery::mock( WebhookQueue::class ),
+			Mockery::mock( WebhookSender::class ),
+			Mockery::mock( WebhookConfig::class ),
+		);
+		$scheduler = new WebhookScheduler( $manager );
 
-        Functions\expect('wp_schedule_event')
-            ->once()
-            ->with(Mockery::type('int'), 'five_minutes', 'fa_wpmcp_process_webhook_queue')
-            ->andReturn(true);
+		Functions\expect( 'wp_next_scheduled' )
+			->once()
+			->with( 'fa_wpmcp_process_webhook_queue' )
+			->andReturn( false );
 
-        $scheduler->scheduleRecurringJob();
-    }
+		Functions\expect( 'wp_schedule_event' )
+			->once()
+			->with( Mockery::type( 'int' ), 'five_minutes', 'fa_wpmcp_process_webhook_queue' )
+			->andReturn( true );
 
-    /**
-     * Test schedule_with_action_scheduler schedules recurring action.
-     *
-     * @return void
-     */
-    public function test_schedule_with_action_scheduler_schedules_action(): void
-    {
-        Functions\expect('as_has_scheduled_action')
-            ->once()
-            ->andReturn(false);
+		$scheduler->scheduleRecurringJob();
+	}
 
-        Functions\expect('as_schedule_recurring_action')
-            ->once()
-            ->with(
-                Mockery::type('int'),
-                300,
-                'fa_wpmcp_process_webhook_queue',
-                array(),
-                'fa-wpmcp-webhooks',
-                true
-            )
-            ->andReturn(1);
+	/**
+	 * Test schedule_with_action_scheduler schedules recurring action.
+	 *
+	 * @return void
+	 */
+	public function test_schedule_with_action_scheduler_schedules_action(): void {
+		Functions\expect( 'as_has_scheduled_action' )
+			->once()
+			->andReturn( false );
 
-        $manager = new WebhookManager(
-            Mockery::mock(WebhookQueue::class),
-            Mockery::mock(WebhookSender::class),
-            Mockery::mock(WebhookConfig::class),
-        );
-        $scheduler = new WebhookScheduler($manager);
+		Functions\expect( 'as_schedule_recurring_action' )
+			->once()
+			->with(
+				Mockery::type( 'int' ),
+				300,
+				'fa_wpmcp_process_webhook_queue',
+				array(),
+				'fa-wpmcp-webhooks',
+				true
+			)
+			->andReturn( 1 );
 
-        $scheduler->scheduleRecurringJob();
+		$manager = new WebhookManager(
+			Mockery::mock( WebhookQueue::class ),
+			Mockery::mock( WebhookSender::class ),
+			Mockery::mock( WebhookConfig::class ),
+		);
+		$scheduler = new WebhookScheduler( $manager );
 
-        $this->assertTrue(true, 'Action Scheduler scheduling invoked');
-    }
+		$scheduler->scheduleRecurringJob();
 
-    /**
-     * Test schedule_with_action_scheduler exits when already scheduled.
-     *
-     * @return void
-     */
-    public function test_schedule_with_action_scheduler_skips_when_scheduled(): void
-    {
-        Functions\expect('as_has_scheduled_action')
-            ->once()
-            ->andReturn(true);
+		$this->assertTrue( true, 'Action Scheduler scheduling invoked' );
+	}
 
-        Functions\expect('as_schedule_recurring_action')->never();
+	/**
+	 * Test schedule_with_action_scheduler exits when already scheduled.
+	 *
+	 * @return void
+	 */
+	public function test_schedule_with_action_scheduler_skips_when_scheduled(): void {
+		Functions\expect( 'as_has_scheduled_action' )
+			->once()
+			->andReturn( true );
 
-        $manager = new WebhookManager(
-            Mockery::mock(WebhookQueue::class),
-            Mockery::mock(WebhookSender::class),
-            Mockery::mock(WebhookConfig::class),
-        );
-        $scheduler = new WebhookScheduler($manager);
+		Functions\expect( 'as_schedule_recurring_action' )->never();
 
-        $scheduler->scheduleRecurringJob();
+		$manager = new WebhookManager(
+			Mockery::mock( WebhookQueue::class ),
+			Mockery::mock( WebhookSender::class ),
+			Mockery::mock( WebhookConfig::class ),
+		);
+		$scheduler = new WebhookScheduler( $manager );
 
-        $this->assertTrue(true, 'No scheduling when already scheduled');
-    }
+		$scheduler->scheduleRecurringJob();
 
-    /**
-     * Test registerCronInterval adds missing schedule.
-     *
-     * @return void
-     */
-    public function test_registerCronInterval_adds_schedule(): void
-    {
-        Functions\expect('__')
-            ->once()
-            ->with('Every 5 Minutes', 'fa-wpmcp')
-            ->andReturn('Every 5 Minutes');
+		$this->assertTrue( true, 'No scheduling when already scheduled' );
+	}
 
-        $manager = new WebhookManager(
-            Mockery::mock(WebhookQueue::class),
-            Mockery::mock(WebhookSender::class),
-            Mockery::mock(WebhookConfig::class),
-        );
-        $scheduler = new WebhookScheduler($manager);
+	/**
+	 * Test registerCronInterval adds missing schedule.
+	 *
+	 * @return void
+	 */
+	public function test_registerCronInterval_adds_schedule(): void {
+		Functions\expect( '__' )
+			->once()
+			->with( 'Every 5 Minutes', 'fa-wpmcp' )
+			->andReturn( 'Every 5 Minutes' );
 
-        $result = $scheduler->registerCronInterval(array());
+		$manager = new WebhookManager(
+			Mockery::mock( WebhookQueue::class ),
+			Mockery::mock( WebhookSender::class ),
+			Mockery::mock( WebhookConfig::class ),
+		);
+		$scheduler = new WebhookScheduler( $manager );
 
-        $this->assertArrayHasKey('five_minutes', $result);
-        $this->assertSame(300, $result['five_minutes']['interval']);
-    }
+		$result = $scheduler->registerCronInterval( array() );
 
-    /**
-     * Test unschedule removes action scheduler and cron jobs.
-     *
-     * @return void
-     */
-    public function test_unschedule_removes_jobs(): void
-    {
-        Functions\expect('as_unschedule_all_actions')
-            ->once()
-            ->with('fa_wpmcp_process_webhook_queue', array(), 'fa-wpmcp-webhooks');
-        Functions\expect('wp_next_scheduled')
-            ->once()
-            ->with('fa_wpmcp_process_webhook_queue')
-            ->andReturn(123);
+		$this->assertArrayHasKey( 'five_minutes', $result );
+		$this->assertSame( 300, $result['five_minutes']['interval'] );
+	}
 
-        Functions\expect('wp_unschedule_event')
-            ->once()
-            ->with(123, 'fa_wpmcp_process_webhook_queue')
-            ->andReturn(true);
+	/**
+	 * Test unschedule removes action scheduler and cron jobs.
+	 *
+	 * @return void
+	 */
+	public function test_unschedule_removes_jobs(): void {
+		Functions\expect( 'as_unschedule_all_actions' )
+			->once()
+			->with( 'fa_wpmcp_process_webhook_queue', array(), 'fa-wpmcp-webhooks' );
+		Functions\expect( 'wp_next_scheduled' )
+			->once()
+			->with( 'fa_wpmcp_process_webhook_queue' )
+			->andReturn( 123 );
 
-        $manager = new WebhookManager(
-            Mockery::mock(WebhookQueue::class),
-            Mockery::mock(WebhookSender::class),
-            Mockery::mock(WebhookConfig::class),
-        );
-        $scheduler = new WebhookScheduler($manager);
+		Functions\expect( 'wp_unschedule_event' )
+			->once()
+			->with( 123, 'fa_wpmcp_process_webhook_queue' )
+			->andReturn( true );
 
-        $scheduler->unschedule();
-        $this->assertTrue(true, 'Unschedule hooks invoked');
-    }
+		$manager = new WebhookManager(
+			Mockery::mock( WebhookQueue::class ),
+			Mockery::mock( WebhookSender::class ),
+			Mockery::mock( WebhookConfig::class ),
+		);
+		$scheduler = new WebhookScheduler( $manager );
+
+		$scheduler->unschedule();
+		$this->assertTrue( true, 'Unschedule hooks invoked' );
+	}
 }

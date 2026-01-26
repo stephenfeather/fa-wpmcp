@@ -10,287 +10,197 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Cron;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Cron\ListCronEventsAbility;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
-use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test ListCronEventsAbility functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Cron
  */
-class ListCronEventsAbilityTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+final class ListCronEventsAbilityTest extends BrainMonkeyTestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new ListCronEventsAbility();
-        $this->assertEquals('fa-wpmcp/list-cron-events', $ability->getName());
-    }
+	/**
+	 * Get the ability instance for testing.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new ListCronEventsAbility();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new ListCronEventsAbility();
-        $this->assertEquals('cron', $ability->getCategory());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array<string, mixed>
+	 */
+	protected function getExpectedMetadata(): array {
+		return [
+			'name'                 => 'fa-wpmcp/list-cron-events',
+			'category'             => 'cron',
+			'label'                => 'List Cron Events',
+			'description_contains' => 'cron',
+			'operation_type'       => 'read',
+			'required_capability'  => 'manage_options',
+		];
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new ListCronEventsAbility();
-        $this->assertEquals('List Cron Events', $ability->getLabel());
-    }
+	/**
+	 * Test execute returns list of cron events.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsListOfCronEvents(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new ListCronEventsAbility();
-        $this->assertEquals('read', $ability->getOperationType());
-    }
+		$cron_array = array(
+			1706200000 => array(
+				'wp_scheduled_delete' => array(
+					'40cd750bba9870f18aada2478b24840a' => array(
+						'schedule' => 'daily',
+						'args'     => array(),
+					),
+				),
+			),
+			1706210000 => array(
+				'wp_update_plugins' => array(
+					'40cd750bba9870f18aada2478b24840a' => array(
+						'schedule' => 'twicedaily',
+						'args'     => array(),
+					),
+				),
+			),
+		);
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new ListCronEventsAbility();
-        $this->assertEquals('manage_options', $ability->getRequiredCapability());
-    }
+		Functions\when( '_get_cron_array' )->justReturn( $cron_array );
 
-    /**
-     * Test ability returns input schema with optional properties.
-     *
-     * @return void
-     */
-    public function testGetInputSchema(): void
-    {
-        $ability = new ListCronEventsAbility();
-        $schema  = $ability->getInputSchema();
+		$result = $ability->doExecute( array() );
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('hook', $schema['properties']);
-    }
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'events', $result );
+		$this->assertArrayHasKey( 'total', $result );
+		$this->assertCount( 2, $result['events'] );
+		$this->assertEquals( 2, $result['total'] );
+	}
 
-    /**
-     * Test ability returns output schema.
-     *
-     * @return void
-     */
-    public function testGetOutputSchema(): void
-    {
-        $ability = new ListCronEventsAbility();
-        $schema  = $ability->getOutputSchema();
+	/**
+	 * Test execute filters events by hook name pattern.
+	 *
+	 * @return void
+	 */
+	public function testExecuteFiltersEventsByHookPattern(): void {
+		$ability = $this->getAbilityInstance();
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('events', $schema['properties']);
-        $this->assertArrayHasKey('total', $schema['properties']);
-    }
+		$cron_array = array(
+			1706200000 => array(
+				'wp_scheduled_delete' => array(
+					'40cd750bba9870f18aada2478b24840a' => array(
+						'schedule' => 'daily',
+						'args'     => array(),
+					),
+				),
+			),
+			1706210000 => array(
+				'wp_update_plugins' => array(
+					'40cd750bba9870f18aada2478b24840a' => array(
+						'schedule' => 'twicedaily',
+						'args'     => array(),
+					),
+				),
+			),
+		);
 
-    /**
-     * Test execute returns list of cron events.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsListOfCronEvents(): void
-    {
-        $ability = new ListCronEventsAbility();
+		Functions\when( '_get_cron_array' )->justReturn( $cron_array );
 
-        $cron_array = array(
-            1706200000 => array(
-                'wp_scheduled_delete' => array(
-                    '40cd750bba9870f18aada2478b24840a' => array(
-                        'schedule' => 'daily',
-                        'args'     => array(),
-                    ),
-                ),
-            ),
-            1706210000 => array(
-                'wp_update_plugins' => array(
-                    '40cd750bba9870f18aada2478b24840a' => array(
-                        'schedule' => 'twicedaily',
-                        'args'     => array(),
-                    ),
-                ),
-            ),
-        );
+		$result = $ability->doExecute( array( 'hook' => 'wp_scheduled' ) );
 
-        Functions\when('_get_cron_array')->justReturn($cron_array);
+		$this->assertCount( 1, $result['events'] );
+		$this->assertEquals( 'wp_scheduled_delete', $result['events'][0]['hook'] );
+	}
 
-        $result = $ability->doExecute(array());
+	/**
+	 * Test execute returns empty array when no cron events exist.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsEmptyArrayWhenNoCronEvents(): void {
+		$ability = $this->getAbilityInstance();
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('events', $result);
-        $this->assertArrayHasKey('total', $result);
-        $this->assertCount(2, $result['events']);
-        $this->assertEquals(2, $result['total']);
-    }
+		Functions\when( '_get_cron_array' )->justReturn( array() );
 
-    /**
-     * Test execute filters events by hook name pattern.
-     *
-     * @return void
-     */
-    public function testExecuteFiltersEventsByHookPattern(): void
-    {
-        $ability = new ListCronEventsAbility();
+		$result = $ability->doExecute( array() );
 
-        $cron_array = array(
-            1706200000 => array(
-                'wp_scheduled_delete' => array(
-                    '40cd750bba9870f18aada2478b24840a' => array(
-                        'schedule' => 'daily',
-                        'args'     => array(),
-                    ),
-                ),
-            ),
-            1706210000 => array(
-                'wp_update_plugins' => array(
-                    '40cd750bba9870f18aada2478b24840a' => array(
-                        'schedule' => 'twicedaily',
-                        'args'     => array(),
-                    ),
-                ),
-            ),
-        );
+		$this->assertIsArray( $result['events'] );
+		$this->assertEmpty( $result['events'] );
+		$this->assertEquals( 0, $result['total'] );
+	}
 
-        Functions\when('_get_cron_array')->justReturn($cron_array);
+	/**
+	 * Test execute returns event details with correct structure.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsEventDetailsWithCorrectStructure(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(array( 'hook' => 'wp_scheduled' ));
+		$cron_array = array(
+			1706200000 => array(
+				'my_custom_hook' => array(
+					'40cd750bba9870f18aada2478b24840a' => array(
+						'schedule' => 'hourly',
+						'args'     => array( 'param1', 'param2' ),
+					),
+				),
+			),
+		);
 
-        $this->assertCount(1, $result['events']);
-        $this->assertEquals('wp_scheduled_delete', $result['events'][0]['hook']);
-    }
+		Functions\when( '_get_cron_array' )->justReturn( $cron_array );
 
-    /**
-     * Test execute returns empty array when no cron events exist.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsEmptyArrayWhenNoCronEvents(): void
-    {
-        $ability = new ListCronEventsAbility();
+		$result = $ability->doExecute( array() );
 
-        Functions\when('_get_cron_array')->justReturn(array());
+		$this->assertArrayHasKey( 'hook', $result['events'][0] );
+		$this->assertArrayHasKey( 'timestamp', $result['events'][0] );
+		$this->assertArrayHasKey( 'schedule', $result['events'][0] );
+		$this->assertArrayHasKey( 'args', $result['events'][0] );
+		$this->assertEquals( 'my_custom_hook', $result['events'][0]['hook'] );
+		$this->assertEquals( 1706200000, $result['events'][0]['timestamp'] );
+		$this->assertEquals( 'hourly', $result['events'][0]['schedule'] );
+		$this->assertEquals( array( 'param1', 'param2' ), $result['events'][0]['args'] );
+	}
 
-        $result = $ability->doExecute(array());
+	/**
+	 * Test annotations are correct for read-only ability.
+	 *
+	 * @return void
+	 */
+	public function testGetAnnotations(): void {
+		$ability     = new ListCronEventsAbility();
+		$annotations = $ability->getAnnotations();
 
-        $this->assertIsArray($result['events']);
-        $this->assertEmpty($result['events']);
-        $this->assertEquals(0, $result['total']);
-    }
+		$this->assertTrue( $annotations['readonly'] );
+		$this->assertFalse( $annotations['destructive'] );
+		$this->assertTrue( $annotations['idempotent'] );
+	}
 
-    /**
-     * Test execute returns event details with correct structure.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsEventDetailsWithCorrectStructure(): void
-    {
-        $ability = new ListCronEventsAbility();
+	/**
+	 * Test execute handles null cron array.
+	 *
+	 * @return void
+	 */
+	public function testExecuteHandlesNullCronArray(): void {
+		$ability = $this->getAbilityInstance();
 
-        $cron_array = array(
-            1706200000 => array(
-                'my_custom_hook' => array(
-                    '40cd750bba9870f18aada2478b24840a' => array(
-                        'schedule' => 'hourly',
-                        'args'     => array( 'param1', 'param2' ),
-                    ),
-                ),
-            ),
-        );
+		Functions\when( '_get_cron_array' )->justReturn( false );
 
-        Functions\when('_get_cron_array')->justReturn($cron_array);
+		$result = $ability->doExecute( array() );
 
-        $result = $ability->doExecute(array());
-
-        $this->assertArrayHasKey('hook', $result['events'][0]);
-        $this->assertArrayHasKey('timestamp', $result['events'][0]);
-        $this->assertArrayHasKey('schedule', $result['events'][0]);
-        $this->assertArrayHasKey('args', $result['events'][0]);
-        $this->assertEquals('my_custom_hook', $result['events'][0]['hook']);
-        $this->assertEquals(1706200000, $result['events'][0]['timestamp']);
-        $this->assertEquals('hourly', $result['events'][0]['schedule']);
-        $this->assertEquals(array( 'param1', 'param2' ), $result['events'][0]['args']);
-    }
-
-    /**
-     * Test annotations are correct for read-only ability.
-     *
-     * @return void
-     */
-    public function testGetAnnotations(): void
-    {
-        $ability     = new ListCronEventsAbility();
-        $annotations = $ability->getAnnotations();
-
-        $this->assertTrue($annotations['readonly']);
-        $this->assertFalse($annotations['destructive']);
-        $this->assertTrue($annotations['idempotent']);
-    }
-
-    /**
-     * Test execute handles null cron array.
-     *
-     * @return void
-     */
-    public function testExecuteHandlesNullCronArray(): void
-    {
-        $ability = new ListCronEventsAbility();
-
-        Functions\when('_get_cron_array')->justReturn(false);
-
-        $result = $ability->doExecute(array());
-
-        $this->assertIsArray($result['events']);
-        $this->assertEmpty($result['events']);
-        $this->assertEquals(0, $result['total']);
-    }
+		$this->assertIsArray( $result['events'] );
+		$this->assertEmpty( $result['events'] );
+		$this->assertEquals( 0, $result['total'] );
+	}
 }

@@ -19,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class PostDeletionException extends Exception
-{
+class PostDeletionException extends Exception {
+
 }

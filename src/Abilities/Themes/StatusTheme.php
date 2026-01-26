@@ -17,112 +17,104 @@ use FAWpmcp\Abilities\AbstractAbility;
  *
  * @package FAWpmcp\Abilities\Themes
  */
-final class StatusTheme extends AbstractAbility
-{
-    /**
-     * Returns the ability identifier.
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return 'fa-wpmcp/status-theme';
-    }
+final class StatusTheme extends AbstractAbility {
 
-    /**
-     * Returns the ability category.
-     *
-     * @return string
-     */
-    public function getCategory(): string
-    {
-        return 'themes';
-    }
+	/**
+	 * Returns the ability identifier.
+	 *
+	 * @return string
+	 */
+	public function getName(): string {
+		return 'fa-wpmcp/status-theme';
+	}
 
-    /**
-     * Returns the display label.
-     *
-     * @return string
-     */
-    public function getLabel(): string
-    {
-        return 'Theme Status';
-    }
+	/**
+	 * Returns the ability category.
+	 *
+	 * @return string
+	 */
+	public function getCategory(): string {
+		return 'themes';
+	}
 
-    /**
-     * Returns the ability description.
-     *
-     * @return string
-     */
-    public function getDescription(): string
-    {
-        return 'Get status details for a WordPress theme.';
-    }
+	/**
+	 * Returns the display label.
+	 *
+	 * @return string
+	 */
+	public function getLabel(): string {
+		return 'Theme Status';
+	}
 
-    /**
-     * Returns the JSON Schema for input validation.
-     *
-     * @return array
-     */
-    public function getInputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'stylesheet' => array(
-                    'type'        => 'string',
-                    'description' => 'Theme stylesheet name.',
-                ),
-            ),
-            'required'   => array( 'stylesheet' ),
-        );
-    }
+	/**
+	 * Returns the ability description.
+	 *
+	 * @return string
+	 */
+	public function getDescription(): string {
+		return 'Get status details for a WordPress theme.';
+	}
 
-    /**
-     * Returns the JSON Schema for output.
-     *
-     * @return array
-     */
-    public function getOutputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'name'    => array( 'type' => 'string' ),
-                'status'  => array( 'type' => 'string' ),
-                'version' => array( 'type' => 'string' ),
-                'author'  => array( 'type' => 'string' ),
-            ),
-        );
-    }
+	/**
+	 * Returns the JSON Schema for input validation.
+	 *
+	 * @return array
+	 */
+	public function getInputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'stylesheet' => array(
+					'type'        => 'string',
+					'description' => 'Theme stylesheet name.',
+				),
+			),
+			'required'   => array( 'stylesheet' ),
+		);
+	}
 
-    /**
-     * Returns the WordPress capability required.
-     *
-     * @return string
-     */
-    public function getRequiredCapability(): string
-    {
-        return 'switch_themes';
-    }
+	/**
+	 * Returns the JSON Schema for output.
+	 *
+	 * @return array
+	 */
+	public function getOutputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'name'    => array( 'type' => 'string' ),
+				'status'  => array( 'type' => 'string' ),
+				'version' => array( 'type' => 'string' ),
+				'author'  => array( 'type' => 'string' ),
+			),
+		);
+	}
 
-    /**
-     * Executes the ability.
-     *
-     * @param array $input Input parameters.
-     * @return array
-     */
-    public function doExecute(array $input): array
-    {
-        $theme        = wp_get_theme($input['stylesheet']);
-        $active_theme = get_option('stylesheet');
-        $is_active    = $theme->get_stylesheet() === $active_theme;
+	/**
+	 * Returns the WordPress capability required.
+	 *
+	 * @return string
+	 */
+	public function getRequiredCapability(): string {
+		return 'switch_themes';
+	}
 
-        return array(
-            'name'    => $theme->get('Name'),
-            'status'  => $is_active ? 'Active' : 'Inactive',
-            'version' => $theme->get('Version'),
-            'author'  => $theme->get('Author'),
-        );
-    }
+	/**
+	 * Executes the ability.
+	 *
+	 * @param array $input Input parameters.
+	 * @return array
+	 */
+	public function doExecute( array $input ): array {
+		$theme        = wp_get_theme( $input['stylesheet'] );
+		$active_theme = get_option( 'stylesheet' );
+		$is_active    = $theme->get_stylesheet() === $active_theme;
+
+		return array(
+			'name'    => $theme->get( 'Name' ),
+			'status'  => $is_active ? 'Active' : 'Inactive',
+			'version' => $theme->get( 'Version' ),
+			'author'  => $theme->get( 'Author' ),
+		);
+	}
 }

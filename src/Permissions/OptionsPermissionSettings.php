@@ -20,53 +20,51 @@ use FAWpmcp\ValueObjects\PermissionSettings;
  *
  * @package FAWpmcp\Permissions
  */
-final class OptionsPermissionSettings
-{
-    /**
-     * Option name for permission settings.
-     *
-     * @var string
-     */
-    private const OPTION_NAME = 'fa_wpmcp_permissions';
+final class OptionsPermissionSettings {
 
-    /**
-     * Load permission settings from WordPress options.
-     *
-     * Returns default settings if option doesn't exist.
-     *
-     * @return PermissionSettings Permission settings value object.
-     */
-    public static function load(): PermissionSettings
-    {
-        $options = get_option(self::OPTION_NAME, array());
+	/**
+	 * Option name for permission settings.
+	 *
+	 * @var string
+	 */
+	private const OPTION_NAME = 'fa_wpmcp_permissions';
 
-        if (! is_array($options)) {
-            $options = array();
-        }
+	/**
+	 * Load permission settings from WordPress options.
+	 *
+	 * Returns default settings if option doesn't exist.
+	 *
+	 * @return PermissionSettings Permission settings value object.
+	 */
+	public static function load(): PermissionSettings {
+		$options = get_option( self::OPTION_NAME, array() );
 
-        return new PermissionSettings(
-            global_read_enabled: $options['global_read_enabled'] ?? true,
-            global_write_enabled: $options['global_write_enabled'] ?? false,
-            category_settings: $options['category_settings'] ?? array(),
-            ability_settings: $options['ability_settings'] ?? array(),
-        );
-    }
+		if ( ! is_array( $options ) ) {
+			$options = array();
+		}
 
-    /**
-     * Save permission settings to WordPress options.
-     *
-     * @param PermissionSettings $settings Settings to save.
-     * @return void
-     */
-    public static function save(PermissionSettings $settings): void
-    {
-        $options = array(
-            'global_read_enabled'  => $settings->global_read_enabled,
-            'global_write_enabled' => $settings->global_write_enabled,
-            'category_settings'    => $settings->category_settings,
-            'ability_settings'     => $settings->ability_settings,
-        );
+		return new PermissionSettings(
+			global_read_enabled: $options['global_read_enabled'] ?? true,
+			global_write_enabled: $options['global_write_enabled'] ?? false,
+			category_settings: $options['category_settings'] ?? array(),
+			ability_settings: $options['ability_settings'] ?? array(),
+		);
+	}
 
-        update_option(self::OPTION_NAME, $options);
-    }
+	/**
+	 * Save permission settings to WordPress options.
+	 *
+	 * @param PermissionSettings $settings Settings to save.
+	 * @return void
+	 */
+	public static function save( PermissionSettings $settings ): void {
+		$options = array(
+			'global_read_enabled'  => $settings->global_read_enabled,
+			'global_write_enabled' => $settings->global_write_enabled,
+			'category_settings'    => $settings->category_settings,
+			'ability_settings'     => $settings->ability_settings,
+		);
+
+		update_option( self::OPTION_NAME, $options );
+	}
 }

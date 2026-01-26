@@ -10,39 +10,56 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Themes;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Themes\DeleteTheme;
-use Brain\Monkey;
-use PHPUnit\Framework\TestCase;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 
-class DeleteThemeTest extends TestCase
-{
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+/**
+ * Test DeleteTheme ability functionality.
+ *
+ * @package FAWpmcp\Tests\Abilities\Themes
+ */
+class DeleteThemeTest extends BrainMonkeyTestCase {
 
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    public function testGetName(): void
-    {
-        $this->assertEquals('fa-wpmcp/delete-theme', ( new DeleteTheme() )->getName());
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new DeleteTheme();
+	}
 
-    public function testGetOperationType(): void
-    {
-        $this->assertEquals('write', ( new DeleteTheme() )->getOperationType());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                  => 'fa-wpmcp/delete-theme',
+			'category'              => 'themes',
+			'label'                 => 'Delete Theme',
+			'description_contains'  => 'delete a wordpress theme',
+			'operation_type'        => 'write',
+			'required_capability'   => 'delete_themes',
+		);
+	}
 
-    public function testExecuteThrowsNotImplementedException(): void
-    {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Theme deletion is not yet implemented');
+	public function testExecuteThrowsNotImplementedException(): void {
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'Theme deletion is not yet implemented' );
 
-        ( new DeleteTheme() )->doExecute(array( 'stylesheet' => 'twentytwentythree' ));
-    }
+		$this->getAbilityInstance()->doExecute( array( 'stylesheet' => 'twentytwentythree' ) );
+	}
 }

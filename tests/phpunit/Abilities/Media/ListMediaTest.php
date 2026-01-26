@@ -10,214 +10,149 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Media;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Media\ListMedia;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test ListMedia ability functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Media
  */
-class ListMediaTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class ListMediaTest extends BrainMonkeyTestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new ListMedia();
-        $this->assertEquals('fa-wpmcp/list-media', $ability->getName());
-    }
+	protected function getAbilityInstance(): AbstractAbility {
+		return new ListMedia();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new ListMedia();
-        $this->assertEquals('media', $ability->getCategory());
-    }
+	protected function getExpectedMetadata(): array {
+		return [
+			'name'                 => 'fa-wpmcp/list-media',
+			'category'             => 'media',
+			'label'                => 'List Media',
+			'description_contains' => 'paginated',
+			'required_capability'  => 'upload_files',
+			'operation_type'       => 'read',
+		];
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new ListMedia();
-        $this->assertEquals('List Media', $ability->getLabel());
-    }
+	/**
+	 * Test ability returns input schema.
+	 *
+	 * @return void
+	 */
+	public function testGetInputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getInputSchema();
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new ListMedia();
-        $this->assertEquals('read', $ability->getOperationType());
-    }
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'page', $schema['properties'] );
+		$this->assertArrayHasKey( 'per_page', $schema['properties'] );
+	}
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new ListMedia();
-        $this->assertEquals('upload_files', $ability->getRequiredCapability());
-    }
+	/**
+	 * Test ability returns output schema.
+	 *
+	 * @return void
+	 */
+	public function testGetOutputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getOutputSchema();
 
-    /**
-     * Test ability returns input schema.
-     *
-     * @return void
-     */
-    public function testGetInputSchema(): void
-    {
-        $ability = new ListMedia();
-        $schema  = $ability->getInputSchema();
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'media', $schema['properties'] );
+	}
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('page', $schema['properties']);
-        $this->assertArrayHasKey('per_page', $schema['properties']);
-    }
+	/**
+	 * Test execute returns media list.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsMediaList(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test ability returns output schema.
-     *
-     * @return void
-     */
-    public function testGetOutputSchema(): void
-    {
-        $ability = new ListMedia();
-        $schema  = $ability->getOutputSchema();
+		// Mock WP_Query.
+		$mock_query              = Mockery::mock( 'WP_Query' );
+		$mock_query->posts       = array( $this->createMockAttachment( 1 ) );
+		$mock_query->found_posts = 1;
+		$mock_query->max_num_pages = 1;
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('media', $schema['properties']);
-    }
+		// Mock WordPress functions.
+		Functions\when( 'wp_reset_postdata' )->justReturn( null );
+		Functions\when( 'wp_get_attachment_metadata' )->justReturn( array() );
+		Functions\when( 'get_attached_file' )->justReturn( 'file.jpg' );
+		Functions\when( 'wp_get_attachment_url' )->justReturn( 'https://example.com/file.jpg' );
+		Functions\when( 'get_post_meta' )->justReturn( '' );
+		Functions\when( 'get_the_author_meta' )->justReturn( 'Test Author' );
 
-    /**
-     * Test execute returns media list.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsMediaList(): void
-    {
-        $ability = new ListMedia();
+		// Use reflection to inject mock query.
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'formatResults' );
 
-        // Mock WP_Query.
-        $mock_query              = Mockery::mock('WP_Query');
-        $mock_query->posts       = array( $this->createMockAttachment(1) );
-        $mock_query->found_posts = 1;
-        $mock_query->max_num_pages = 1;
+		$result = $method->invoke( $ability, $mock_query, array( 'page' => 1 ) );
 
-        // Mock WordPress functions.
-        Functions\when('wp_reset_postdata')->justReturn(null);
-        Functions\when('wp_get_attachment_metadata')->justReturn(array());
-        Functions\when('get_attached_file')->justReturn('file.jpg');
-        Functions\when('wp_get_attachment_url')->justReturn('https://example.com/file.jpg');
-        Functions\when('get_post_meta')->justReturn('');
-        Functions\when('get_the_author_meta')->justReturn('Test Author');
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'media', $result );
+		$this->assertArrayHasKey( 'total', $result );
+		$this->assertCount( 1, $result['media'] );
+	}
 
-        // Use reflection to inject mock query.
-        $reflection = new \ReflectionClass($ability);
-        $method     = $reflection->getMethod('formatResults');
+	/**
+	 * Test buildQueryArgs applies filters and caps per_page.
+	 *
+	 * @return void
+	 */
+	public function testBuildQueryArgsAppliesFiltersAndCapsPerPage(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $method->invoke($ability, $mock_query, array( 'page' => 1 ));
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'buildQueryArgs' );
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('media', $result);
-        $this->assertArrayHasKey('total', $result);
-        $this->assertCount(1, $result['media']);
-    }
+		$args = $method->invoke(
+			$ability,
+			array(
+				'page'      => 3,
+				'per_page'  => 500,
+				'mime_type' => 'image/jpeg',
+				'search'    => 'logo',
+				'orderby'   => 'title',
+				'order'     => 'ASC',
+			)
+		);
 
-    /**
-     * Test buildQueryArgs applies filters and caps per_page.
-     *
-     * @return void
-     */
-    public function testBuildQueryArgsAppliesFiltersAndCapsPerPage(): void
-    {
-        $ability = new ListMedia();
+		$this->assertSame( 3, $args['paged'] );
+		$this->assertSame( 100, $args['posts_per_page'] );
+		$this->assertSame( 'image/jpeg', $args['post_mime_type'] );
+		$this->assertSame( 'logo', $args['s'] );
+		$this->assertSame( 'title', $args['orderby'] );
+		$this->assertSame( 'ASC', $args['order'] );
+	}
 
-        $reflection = new \ReflectionClass($ability);
-        $method     = $reflection->getMethod('buildQueryArgs');
-
-        $args = $method->invoke(
-            $ability,
-            array(
-                'page'      => 3,
-                'per_page'  => 500,
-                'mime_type' => 'image/jpeg',
-                'search'    => 'logo',
-                'orderby'   => 'title',
-                'order'     => 'ASC',
-            )
-        );
-
-        $this->assertSame(3, $args['paged']);
-        $this->assertSame(100, $args['posts_per_page']);
-        $this->assertSame('image/jpeg', $args['post_mime_type']);
-        $this->assertSame('logo', $args['s']);
-        $this->assertSame('title', $args['orderby']);
-        $this->assertSame('ASC', $args['order']);
-    }
-
-    /**
-     * Create a mock attachment post.
-     *
-     * @param int $id Attachment ID.
-     * @return \WP_Post Mock WP_Post object.
-     */
-    private function createMockAttachment(int $id): \WP_Post
-    {
-        $post = Mockery::mock(\WP_Post::class);
-        $post->ID             = $id;
-        $post->post_title     = 'Test Image';
-        $post->post_mime_type = 'image/jpeg';
-        $post->post_date      = '2024-01-01 00:00:00';
-        $post->post_modified  = '2024-01-01 00:00:00';
-        $post->post_author    = 1;
-        $post->post_excerpt   = 'Test caption';
-        $post->post_content   = 'Test description';
-        return $post;
-    }
+	/**
+	 * Create a mock attachment post.
+	 *
+	 * @param int $id Attachment ID.
+	 * @return \WP_Post Mock WP_Post object.
+	 */
+	private function createMockAttachment( int $id ): \WP_Post {
+		$post = Mockery::mock( \WP_Post::class );
+		$post->ID             = $id;
+		$post->post_title     = 'Test Image';
+		$post->post_mime_type = 'image/jpeg';
+		$post->post_date      = '2024-01-01 00:00:00';
+		$post->post_modified  = '2024-01-01 00:00:00';
+		$post->post_author    = 1;
+		$post->post_excerpt   = 'Test caption';
+		$post->post_content   = 'Test description';
+		return $post;
+	}
 }

@@ -10,37 +10,54 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Themes;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Themes\UpdateTheme;
-use Brain\Monkey;
-use PHPUnit\Framework\TestCase;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 
-class UpdateThemeTest extends TestCase
-{
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+/**
+ * Test UpdateTheme ability functionality.
+ *
+ * @package FAWpmcp\Tests\Abilities\Themes
+ */
+class UpdateThemeTest extends BrainMonkeyTestCase {
 
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    public function testGetName(): void
-    {
-        $this->assertEquals('fa-wpmcp/update-theme', ( new UpdateTheme() )->getName());
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new UpdateTheme();
+	}
 
-    public function testGetOperationType(): void
-    {
-        $this->assertEquals('write', ( new UpdateTheme() )->getOperationType());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                  => 'fa-wpmcp/update-theme',
+			'category'              => 'themes',
+			'label'                 => 'Update Theme',
+			'description_contains'  => 'update a wordpress theme',
+			'operation_type'        => 'write',
+			'required_capability'   => 'update_themes',
+		);
+	}
 
-    public function testExecuteReturnsSuccess(): void
-    {
-        $result = ( new UpdateTheme() )->doExecute(array( 'stylesheet' => 'twentytwentyfour' ));
-        $this->assertTrue($result['success']);
-    }
+	public function testExecuteReturnsSuccess(): void {
+		$result = $this->getAbilityInstance()->doExecute( array( 'stylesheet' => 'twentytwentyfour' ) );
+		$this->assertTrue( $result['success'] );
+	}
 }

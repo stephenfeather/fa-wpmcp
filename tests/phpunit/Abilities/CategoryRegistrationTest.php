@@ -21,146 +21,141 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers FAWpmcp\Plugin::registerAbilityCategories
  */
-final class CategoryRegistrationTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+final class CategoryRegistrationTest extends TestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	/**
+	 * Set up Brain\Monkey before each test.
+	 *
+	 * @return void
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+		Monkey\setUp();
+	}
 
-    /**
-     * Test that all fifteen categories are registered.
-     *
-     * @return void
-     */
-    public function test_registerAbilityCategories_registers_all_fifteen_categories(): void
-    {
-        Functions\expect('wp_register_ability_category')
-            ->times(15);
+	/**
+	 * Tear down Brain\Monkey after each test.
+	 *
+	 * @return void
+	 */
+	protected function tearDown(): void {
+		Monkey\tearDown();
+		Mockery::close();
+		parent::tearDown();
+	}
 
-        Functions\expect('__')
-            ->andReturnUsing(fn($text) => $text);
+	/**
+	 * Test that all sixteen categories are registered.
+	 *
+	 * @return void
+	 */
+	public function test_registerAbilityCategories_registers_all_sixteen_categories(): void {
+		Functions\expect( 'wp_register_ability_category' )
+			->times( 16 );
 
-        $plugin = Plugin::getInstance();
-        $reflection = new \ReflectionClass($plugin);
-        $method = $reflection->getMethod('registerAbilityCategories');
-        $method->invoke($plugin);
+		Functions\expect( '__' )
+			->andReturnUsing( fn( $text ) => $text );
 
-        // Assertion to avoid risky test warning.
-        $this->assertTrue(true);
-    }
+		$plugin = Plugin::getInstance();
+		$reflection = new \ReflectionClass( $plugin );
+		$method = $reflection->getMethod( 'registerAbilityCategories' );
+		$method->invoke( $plugin );
 
-    /**
-     * Test that category slugs follow WordPress naming conventions.
-     *
-     * @return void
-     */
-    public function test_registerAbilityCategories_validates_category_slugs(): void
-    {
-        $expected_slugs = array(
-            'posts-pages',
-            'comments',
-            'media',
-            'taxonomies',
-            'post-types',
-            'users',
-            'settings',
-            'plugins',
-            'themes',
-            'privacy',
-            'cache',
-            'maintenance',
-            'transients',
-            'cron',
-            'role',
-        );
+		// Assertion to avoid risky test warning.
+		$this->assertTrue( true );
+	}
 
-        foreach ($expected_slugs as $slug) {
-            Functions\expect('wp_register_ability_category')
-                ->once()
-                ->with($slug, Mockery::type('array'));
-        }
+	/**
+	 * Test that category slugs follow WordPress naming conventions.
+	 *
+	 * @return void
+	 */
+	public function test_registerAbilityCategories_validates_category_slugs(): void {
+		$expected_slugs = array(
+			'posts-pages',
+			'comments',
+			'media',
+			'taxonomies',
+			'post-types',
+			'users',
+			'settings',
+			'plugins',
+			'themes',
+			'privacy',
+			'cache',
+			'maintenance',
+			'transients',
+			'cron',
+			'role',
+			'menu',
+		);
 
-        Functions\expect('__')
-            ->andReturnUsing(fn($text) => $text);
+		foreach ( $expected_slugs as $slug ) {
+			Functions\expect( 'wp_register_ability_category' )
+				->once()
+				->with( $slug, Mockery::type( 'array' ) );
+		}
 
-        $plugin = Plugin::getInstance();
-        $reflection = new \ReflectionClass($plugin);
-        $method = $reflection->getMethod('registerAbilityCategories');
-        $method->invoke($plugin);
+		Functions\expect( '__' )
+			->andReturnUsing( fn( $text ) => $text );
 
-        // Assertion to avoid risky test warning.
-        $this->assertTrue(true);
-    }
+		$plugin = Plugin::getInstance();
+		$reflection = new \ReflectionClass( $plugin );
+		$method = $reflection->getMethod( 'registerAbilityCategories' );
+		$method->invoke( $plugin );
 
-    /**
-     * Test that all categories include required fields.
-     *
-     * @return void
-     */
-    public function test_registerAbilityCategories_includes_required_fields(): void
-    {
-        Functions\expect('wp_register_ability_category')
-            ->times(15)
-            ->andReturnUsing(
-                function ($slug, $args) {
-                    $this->assertIsString($slug);
-                    $this->assertIsArray($args);
-                    $this->assertArrayHasKey('label', $args);
-                    $this->assertArrayHasKey('description', $args);
-                    $this->assertNotEmpty($args['label']);
-                    $this->assertNotEmpty($args['description']);
-                }
-            );
+		// Assertion to avoid risky test warning.
+		$this->assertTrue( true );
+	}
 
-        Functions\expect('__')
-            ->andReturnUsing(fn($text) => $text);
+	/**
+	 * Test that all categories include required fields.
+	 *
+	 * @return void
+	 */
+	public function test_registerAbilityCategories_includes_required_fields(): void {
+		Functions\expect( 'wp_register_ability_category' )
+			->times( 16 )
+			->andReturnUsing(
+				function ( $slug, $args ) {
+					$this->assertIsString( $slug );
+					$this->assertIsArray( $args );
+					$this->assertArrayHasKey( 'label', $args );
+					$this->assertArrayHasKey( 'description', $args );
+					$this->assertNotEmpty( $args['label'] );
+					$this->assertNotEmpty( $args['description'] );
+				}
+			);
 
-        $plugin = Plugin::getInstance();
-        $reflection = new \ReflectionClass($plugin);
-        $method = $reflection->getMethod('registerAbilityCategories');
-        $method->invoke($plugin);
-    }
+		Functions\expect( '__' )
+			->andReturnUsing( fn( $text ) => $text );
 
-    /**
-     * Test that categories are registered with proper i18n support.
-     *
-     * @return void
-     */
-    public function test_registerAbilityCategories_uses_i18n(): void
-    {
-        Functions\expect('wp_register_ability_category')
-            ->times(15);
+		$plugin = Plugin::getInstance();
+		$reflection = new \ReflectionClass( $plugin );
+		$method = $reflection->getMethod( 'registerAbilityCategories' );
+		$method->invoke( $plugin );
+	}
 
-        Functions\expect('__')
-            ->times(30) // 15 labels + 15 descriptions.
-            ->with(Mockery::type('string'), 'fa-wpmcp')
-            ->andReturnUsing(fn($text) => $text);
+	/**
+	 * Test that categories are registered with proper i18n support.
+	 *
+	 * @return void
+	 */
+	public function test_registerAbilityCategories_uses_i18n(): void {
+		Functions\expect( 'wp_register_ability_category' )
+			->times( 16 );
 
-        $plugin = Plugin::getInstance();
-        $reflection = new \ReflectionClass($plugin);
-        $method = $reflection->getMethod('registerAbilityCategories');
-        $method->invoke($plugin);
+		Functions\expect( '__' )
+			->times( 32 ) // 16 labels + 16 descriptions.
+			->with( Mockery::type( 'string' ), 'fa-wpmcp' )
+			->andReturnUsing( fn( $text ) => $text );
 
-        // Assertion to avoid risky test warning.
-        $this->assertTrue(true);
-    }
+		$plugin = Plugin::getInstance();
+		$reflection = new \ReflectionClass( $plugin );
+		$method = $reflection->getMethod( 'registerAbilityCategories' );
+		$method->invoke( $plugin );
+
+		// Assertion to avoid risky test warning.
+		$this->assertTrue( true );
+	}
 }

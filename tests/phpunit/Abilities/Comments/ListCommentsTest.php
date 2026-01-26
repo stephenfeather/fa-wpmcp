@@ -10,9 +10,11 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Comments;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Comments\ListComments;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
-use PHPUnit\Framework\TestCase;
 use Mockery;
 
 /**
@@ -20,228 +22,214 @@ use Mockery;
  *
  * @package FAWpmcp\Tests\Abilities\Comments
  */
-final class ListCommentsTest extends TestCase
-{
-    use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+final class ListCommentsTest extends BrainMonkeyTestCase {
 
-    /**
-     * Set up test environment.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        \Brain\Monkey\setUp();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Tear down test environment.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        \Brain\Monkey\tearDown();
-        parent::tearDown();
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new ListComments();
+	}
 
-    /**
-     * Test ability metadata.
-     *
-     * @return void
-     */
-    public function test_ability_metadata(): void
-    {
-        $ability = new ListComments();
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
+	 */
+	protected function getExpectedMetadata(): array {
+		return [
+			'name'                 => 'fa-wpmcp/list-comments',
+			'category'             => 'comments',
+			'label'                => 'List Comments',
+			'description_contains' => 'comment',
+			'operation_type'       => 'read',
+			'required_capability'  => 'read',
+		];
+	}
 
-        $this->assertEquals('fa-wpmcp/list-comments', $ability->getName());
-        $this->assertEquals('comments', $ability->getCategory());
-        $this->assertEquals('List Comments', $ability->getLabel());
-        $this->assertEquals('read', $ability->getRequiredCapability());
-        $this->assertStringContainsString('comment', strtolower($ability->getDescription()));
-    }
+	/**
+	 * Test input schema has pagination and filter properties.
+	 *
+	 * @return void
+	 */
+	public function testInputSchemaHasFilterProperties(): void {
+		$schema = $this->getAbilityInstance()->getInputSchema();
 
-    /**
-     * Test schema structures.
-     *
-     * @return void
-     */
-    public function test_schema_structures(): void
-    {
-        $ability      = new ListComments();
-        $input_schema = $ability->getInputSchema();
+		$this->assertArrayHasKey( 'page', $schema['properties'] );
+		$this->assertArrayHasKey( 'per_page', $schema['properties'] );
+		$this->assertArrayHasKey( 'post_id', $schema['properties'] );
+		$this->assertArrayHasKey( 'status', $schema['properties'] );
+	}
 
-        $this->assertEquals('object', $input_schema['type']);
-        $this->assertArrayHasKey('page', $input_schema['properties']);
-        $this->assertArrayHasKey('per_page', $input_schema['properties']);
-        $this->assertArrayHasKey('post_id', $input_schema['properties']);
-        $this->assertArrayHasKey('status', $input_schema['properties']);
+	/**
+	 * Test output schema includes comments array and pagination info.
+	 *
+	 * @return void
+	 */
+	public function testOutputSchemaStructure(): void {
+		$schema = $this->getAbilityInstance()->getOutputSchema();
 
-        $output_schema = $ability->getOutputSchema();
-        $this->assertEquals('object', $output_schema['type']);
-        $this->assertArrayHasKey('comments', $output_schema['properties']);
-        $this->assertArrayHasKey('total', $output_schema['properties']);
-        $this->assertArrayHasKey('page', $output_schema['properties']);
-        $this->assertArrayHasKey('per_page', $output_schema['properties']);
-    }
+		$this->assertArrayHasKey( 'comments', $schema['properties'] );
+		$this->assertArrayHasKey( 'total', $schema['properties'] );
+		$this->assertArrayHasKey( 'page', $schema['properties'] );
+		$this->assertArrayHasKey( 'per_page', $schema['properties'] );
+	}
 
-    /**
-     * Test lists comments with pagination.
-     *
-     * @return void
-     */
-    public function test_lists_comments_with_pagination(): void
-    {
-        $mock_comments = array(
-            (object) array(
-                'comment_ID'           => 1,
-                'comment_post_ID'      => 10,
-                'comment_author'       => 'John Doe',
-                'comment_author_email' => 'john@example.com',
-                'comment_content'      => 'Great post!',
-                'comment_date'         => '2026-01-21 10:00:00',
-                'comment_approved'     => '1',
-            ),
-        );
+	/**
+	 * Test lists comments with pagination.
+	 *
+	 * @return void
+	 */
+	public function testListsCommentsWithPagination(): void {
+		$mock_comments = [
+			(object) [
+				'comment_ID'           => 1,
+				'comment_post_ID'      => 10,
+				'comment_author'       => 'John Doe',
+				'comment_author_email' => 'john@example.com',
+				'comment_content'      => 'Great post!',
+				'comment_date'         => '2026-01-21 10:00:00',
+				'comment_approved'     => '1',
+			],
+		];
 
-        Functions\expect('get_comments')
-            ->once()
-            ->andReturn($mock_comments);
+		Functions\expect( 'get_comments' )
+			->once()
+			->andReturn( $mock_comments );
 
-        Functions\expect('wp_count_comments')
-            ->once()
-            ->andReturn((object) array( 'approved' => '10' ));
+		Functions\expect( 'wp_count_comments' )
+			->once()
+			->andReturn( (object) [ 'approved' => '10' ] );
 
-        Functions\expect('get_comment_link')
-            ->once()
-            ->andReturn('https://example.com/post#comment-1');
+		Functions\expect( 'get_comment_link' )
+			->once()
+			->andReturn( 'https://example.com/post#comment-1' );
 
-        $ability = new ListComments();
-        $result  = $ability->doExecute(
-            array(
-                'page'     => 1,
-                'per_page' => 10,
-            )
-        );
+		$result = $this->getAbilityInstance()->doExecute(
+			[
+				'page'     => 1,
+				'per_page' => 10,
+			]
+		);
 
-        $this->assertArrayHasKey('comments', $result);
-        $this->assertArrayHasKey('total', $result);
-        $this->assertEquals(10, $result['total']);
-    }
+		$this->assertArrayHasKey( 'comments', $result );
+		$this->assertArrayHasKey( 'total', $result );
+		$this->assertEquals( 10, $result['total'] );
+	}
 
-    /**
-     * Test filters by post ID.
-     *
-     * @return void
-     */
-    public function test_filters_by_post_id(): void
-    {
-        Functions\expect('get_comments')
-            ->once()
-            ->with(
-                Mockery::on(
-                    function ($args) {
-                        return $args['post_id'] === 42;
-                    }
-                )
-            )
-            ->andReturn(array());
+	/**
+	 * Test filters by post ID.
+	 *
+	 * @return void
+	 */
+	public function testFiltersByPostId(): void {
+		Functions\expect( 'get_comments' )
+			->once()
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return $args['post_id'] === 42;
+					}
+				)
+			)
+			->andReturn( [] );
 
-        Functions\expect('wp_count_comments')
-            ->with(42)
-            ->andReturn((object) array( 'approved' => '0' ));
+		Functions\expect( 'wp_count_comments' )
+			->with( 42 )
+			->andReturn( (object) [ 'approved' => '0' ] );
 
-        $ability = new ListComments();
-        $ability->doExecute(array( 'post_id' => 42 ));
+		$this->getAbilityInstance()->doExecute( [ 'post_id' => 42 ] );
 
-        $this->assertTrue(true);
-    }
+		$this->assertTrue( true );
+	}
 
-    /**
-     * Test filters by status.
-     *
-     * @return void
-     */
-    public function test_filters_by_status(): void
-    {
-        Functions\expect('get_comments')
-            ->once()
-            ->with(
-                Mockery::on(
-                    function ($args) {
-                        return $args['status'] === 'hold';
-                    }
-                )
-            )
-            ->andReturn(array());
+	/**
+	 * Test filters by status.
+	 *
+	 * @return void
+	 */
+	public function testFiltersByStatus(): void {
+		Functions\expect( 'get_comments' )
+			->once()
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return $args['status'] === 'hold';
+					}
+				)
+			)
+			->andReturn( [] );
 
-        Functions\expect('wp_count_comments')
-            ->andReturn((object) array( 'moderated' => '5' ));
+		Functions\expect( 'wp_count_comments' )
+			->andReturn( (object) [ 'moderated' => '5' ] );
 
-        $ability = new ListComments();
-        $result  = $ability->doExecute(array( 'status' => 'hold' ));
+		$result = $this->getAbilityInstance()->doExecute( [ 'status' => 'hold' ] );
 
-        $this->assertEquals(5, $result['total']);
-    }
+		$this->assertEquals( 5, $result['total'] );
+	}
 
-    /**
-     * Test returns total for all statuses.
-     *
-     * @return void
-     */
-    public function test_counts_all_status(): void
-    {
-        Functions\expect('get_comments')
-            ->once()
-            ->andReturn(array());
+	/**
+	 * Test returns total for all statuses.
+	 *
+	 * @return void
+	 */
+	public function testCountsAllStatus(): void {
+		Functions\expect( 'get_comments' )
+			->once()
+			->andReturn( [] );
 
-        Functions\expect('wp_count_comments')
-            ->andReturn((object) array( 'total_comments' => '12' ));
+		Functions\expect( 'wp_count_comments' )
+			->andReturn( (object) [ 'total_comments' => '12' ] );
 
-        $ability = new ListComments();
-        $result  = $ability->doExecute(array( 'status' => 'all' ));
+		$result = $this->getAbilityInstance()->doExecute( [ 'status' => 'all' ] );
 
-        $this->assertEquals(12, $result['total']);
-    }
+		$this->assertEquals( 12, $result['total'] );
+	}
 
-    /**
-     * Test returns spam count when status is spam.
-     *
-     * @return void
-     */
-    public function test_counts_spam_status(): void
-    {
-        Functions\expect('get_comments')
-            ->once()
-            ->andReturn(array());
+	/**
+	 * Test returns spam count when status is spam.
+	 *
+	 * @return void
+	 */
+	public function testCountsSpamStatus(): void {
+		Functions\expect( 'get_comments' )
+			->once()
+			->andReturn( [] );
 
-        Functions\expect('wp_count_comments')
-            ->andReturn((object) array( 'spam' => '3' ));
+		Functions\expect( 'wp_count_comments' )
+			->andReturn( (object) [ 'spam' => '3' ] );
 
-        $ability = new ListComments();
-        $result  = $ability->doExecute(array( 'status' => 'spam' ));
+		$result = $this->getAbilityInstance()->doExecute( [ 'status' => 'spam' ] );
 
-        $this->assertEquals(3, $result['total']);
-    }
+		$this->assertEquals( 3, $result['total'] );
+	}
 
-    /**
-     * Test returns trash count when status is trash.
-     *
-     * @return void
-     */
-    public function test_counts_trash_status(): void
-    {
-        Functions\expect('get_comments')
-            ->once()
-            ->andReturn(array());
+	/**
+	 * Test returns trash count when status is trash.
+	 *
+	 * @return void
+	 */
+	public function testCountsTrashStatus(): void {
+		Functions\expect( 'get_comments' )
+			->once()
+			->andReturn( [] );
 
-        Functions\expect('wp_count_comments')
-            ->andReturn((object) array( 'trash' => '2' ));
+		Functions\expect( 'wp_count_comments' )
+			->andReturn( (object) [ 'trash' => '2' ] );
 
-        $ability = new ListComments();
-        $result  = $ability->doExecute(array( 'status' => 'trash' ));
+		$result = $this->getAbilityInstance()->doExecute( [ 'status' => 'trash' ] );
 
-        $this->assertEquals(2, $result['total']);
-    }
+		$this->assertEquals( 2, $result['total'] );
+	}
 }

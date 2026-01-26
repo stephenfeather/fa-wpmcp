@@ -19,6 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class PrivacyRequestException extends RuntimeException
-{
+class PrivacyRequestException extends RuntimeException {
+
 }

@@ -22,142 +22,133 @@ use FAWpmcp\Exceptions\OptionException;
  *
  * @package FAWpmcp\Abilities\Settings
  */
-final class UpdateOption extends AbstractAbility
-{
-    /**
-     * Returns the ability identifier.
-     *
-     * @return string Ability name.
-     */
-    public function getName(): string
-    {
-        return 'fa-wpmcp/update-option';
-    }
+final class UpdateOption extends AbstractAbility {
 
-    /**
-     * Returns the ability category.
-     *
-     * @return string Category name.
-     */
-    public function getCategory(): string
-    {
-        return 'settings';
-    }
+	/**
+	 * Returns the ability identifier.
+	 *
+	 * @return string Ability name.
+	 */
+	public function getName(): string {
+		return 'fa-wpmcp/update-option';
+	}
 
-    /**
-     * Returns the display label.
-     *
-     * @return string Ability label.
-     */
-    public function getLabel(): string
-    {
-        return 'Update Option';
-    }
+	/**
+	 * Returns the ability category.
+	 *
+	 * @return string Category name.
+	 */
+	public function getCategory(): string {
+		return 'settings';
+	}
 
-    /**
-     * Returns the ability description.
-     *
-     * @return string Description.
-     */
-    public function getDescription(): string
-    {
-        return 'Update or create a WordPress option with optional autoload setting.';
-    }
+	/**
+	 * Returns the display label.
+	 *
+	 * @return string Ability label.
+	 */
+	public function getLabel(): string {
+		return 'Update Option';
+	}
 
-    /**
-     * Returns the operation type.
-     *
-     * @return string Operation type.
-     */
-    public function getOperationType(): string
-    {
-        return 'write';
-    }
+	/**
+	 * Returns the ability description.
+	 *
+	 * @return string Description.
+	 */
+	public function getDescription(): string {
+		return 'Update or create a WordPress option with optional autoload setting.';
+	}
 
-    /**
-     * Returns the JSON Schema for input validation.
-     *
-     * @return array<string, mixed> JSON Schema array.
-     */
-    public function getInputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'option_name' => array(
-                    'type'        => 'string',
-                    'description' => 'The name of the option to update.',
-                ),
-                'value'       => array(
-                    'description' => 'The value to set for the option.',
-                ),
-                'autoload'    => array(
-                    'type'        => 'string',
-                    'description' => 'Whether to autoload the option (yes or no).',
-                    'enum'        => array( 'yes', 'no' ),
-                ),
-            ),
-            'required'   => array( 'option_name', 'value' ),
-        );
-    }
+	/**
+	 * Returns the operation type.
+	 *
+	 * @return string Operation type.
+	 */
+	public function getOperationType(): string {
+		return 'write';
+	}
 
-    /**
-     * Returns the JSON Schema for output.
-     *
-     * @return array<string, mixed> JSON Schema array.
-     */
-    public function getOutputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'option_name' => array(
-                    'type'        => 'string',
-                    'description' => 'The name of the option.',
-                ),
-                'updated'     => array(
-                    'type'        => 'boolean',
-                    'description' => 'Whether the option was successfully updated.',
-                ),
-            ),
-        );
-    }
+	/**
+	 * Returns the JSON Schema for input validation.
+	 *
+	 * @return array<string, mixed> JSON Schema array.
+	 */
+	public function getInputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'option_name' => array(
+					'type'        => 'string',
+					'description' => 'The name of the option to update.',
+				),
+				'value'       => array(
+					'description' => 'The value to set for the option.',
+				),
+				'autoload'    => array(
+					'type'        => 'string',
+					'description' => 'Whether to autoload the option (yes or no).',
+					'enum'        => array( 'yes', 'no' ),
+				),
+			),
+			'required'   => array( 'option_name', 'value' ),
+		);
+	}
 
-    /**
-     * Returns the WordPress capability required.
-     *
-     * @return string WordPress capability name.
-     */
-    public function getRequiredCapability(): string
-    {
-        return 'manage_options';
-    }
+	/**
+	 * Returns the JSON Schema for output.
+	 *
+	 * @return array<string, mixed> JSON Schema array.
+	 */
+	public function getOutputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'option_name' => array(
+					'type'        => 'string',
+					'description' => 'The name of the option.',
+				),
+				'updated'     => array(
+					'type'        => 'boolean',
+					'description' => 'Whether the option was successfully updated.',
+				),
+			),
+		);
+	}
 
-    /**
-     * Executes the ability.
-     *
-     * @param array<string, mixed> $input Validated input data.
-     * @return array<string, mixed> Update result.
-     * @throws OptionException If option name is invalid or protected.
-     */
-    public function doExecute(array $input): array
-    {
-        $option_name = sanitize_key($input['option_name']);
-        $value       = $input['value'];
-        $autoload    = $input['autoload'] ?? null;
+	/**
+	 * Returns the WordPress capability required.
+	 *
+	 * @return string WordPress capability name.
+	 */
+	public function getRequiredCapability(): string {
+		return 'manage_options';
+	}
 
-        // Validate option name length (MySQL utf8mb4 index limit).
-        if (strlen($option_name) > 191) {
-            throw new OptionException('Option name exceeds maximum length of 191 characters.');
-        }
+	/**
+	 * Executes the ability.
+	 *
+	 * @param array<string, mixed> $input Validated input data.
+	 * @return array<string, mixed> Update result.
+	 * @throws OptionException If option name is invalid or protected.
+	 */
+	public function doExecute( array $input ): array {
+		$option_name = sanitize_key( $input['option_name'] );
+		$value       = $input['value'];
+		$autoload    = $input['autoload'] ?? null;
 
-        OptionAccessPolicy::assertAllowed($option_name);
+		// Validate option name length (MySQL utf8mb4 index limit).
+		if ( strlen( $option_name ) > 191 ) {
+			throw new OptionException( 'Option name exceeds maximum length of 191 characters.' );
+		}
 
-        $updated = update_option($option_name, $value, $autoload);
+		OptionAccessPolicy::assertAllowed( $option_name );
 
-        return array(
-            'option_name' => $option_name,
-            'updated'     => $updated,
-        );
-    }
+		$updated = update_option( $option_name, $value, $autoload );
+
+		return array(
+			'option_name' => $option_name,
+			'updated'     => $updated,
+		);
+	}
 }

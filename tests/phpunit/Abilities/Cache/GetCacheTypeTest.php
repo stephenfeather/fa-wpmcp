@@ -10,123 +10,101 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Cache;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Cache\GetCacheType;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
-use PHPUnit\Framework\TestCase;
 
-final class GetCacheTypeTest extends TestCase
-{
-    use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+final class GetCacheTypeTest extends BrainMonkeyTestCase {
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        \Brain\Monkey\setUp();
-        // Define WP_CONTENT_DIR if not defined.
-        if (! defined('WP_CONTENT_DIR')) {
-            define('WP_CONTENT_DIR', sys_get_temp_dir());
-        }
-    }
+	use AbilityTestTrait;
 
-    protected function tearDown(): void
-    {
-        \Brain\Monkey\tearDown();
-        parent::tearDown();
-    }
+	protected function setUp(): void {
+		parent::setUp();
+		// Define WP_CONTENT_DIR if not defined.
+		if ( ! defined( 'WP_CONTENT_DIR' ) ) {
+			define( 'WP_CONTENT_DIR', sys_get_temp_dir() );
+		}
+	}
 
-    public function test_ability_metadata(): void
-    {
-        $ability = new GetCacheType();
-        $this->assertEquals('fa-wpmcp/get-cache-type', $ability->getName());
-        $this->assertEquals('cache', $ability->getCategory());
-        $this->assertEquals('Get Cache Type', $ability->getLabel());
-        $this->assertStringContainsString('cache', strtolower($ability->getDescription()));
-        $this->assertEquals('manage_options', $ability->getRequiredCapability());
-    }
+	protected function getAbilityInstance(): AbstractAbility {
+		return new GetCacheType();
+	}
 
-    public function test_operation_type_is_read(): void
-    {
-        $ability = new GetCacheType();
-        $this->assertEquals('read', $ability->getOperationType());
-    }
+	protected function getExpectedMetadata(): array {
+		return [
+			'name'                 => 'fa-wpmcp/get-cache-type',
+			'category'             => 'cache',
+			'label'                => 'Get Cache Type',
+			'description_contains' => 'cache',
+			'operation_type'       => 'read',
+			'required_capability'  => 'manage_options',
+		];
+	}
 
-    public function test_input_schema_has_no_required_fields(): void
-    {
-        $ability = new GetCacheType();
-        $schema  = $ability->getInputSchema();
+	public function test_output_schema_structure(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getOutputSchema();
 
-        $this->assertEquals('object', $schema['type']);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayNotHasKey('required', $schema);
-    }
+		$this->assertEquals( 'object', $schema['type'] );
+		$this->assertArrayHasKey( 'type', $schema['properties'] );
+		$this->assertArrayHasKey( 'persistent', $schema['properties'] );
+		$this->assertArrayHasKey( 'drop_in', $schema['properties'] );
+		$this->assertArrayHasKey( 'drop_in_path', $schema['properties'] );
+	}
 
-    public function test_output_schema_structure(): void
-    {
-        $ability = new GetCacheType();
-        $schema  = $ability->getOutputSchema();
+	public function test_returns_default_type_without_external_cache(): void {
+		Functions\expect( 'wp_using_ext_object_cache' )->twice()->andReturn( false );
 
-        $this->assertEquals('object', $schema['type']);
-        $this->assertArrayHasKey('type', $schema['properties']);
-        $this->assertArrayHasKey('persistent', $schema['properties']);
-        $this->assertArrayHasKey('drop_in', $schema['properties']);
-        $this->assertArrayHasKey('drop_in_path', $schema['properties']);
-    }
+		$ability = $this->getAbilityInstance();
+		$result  = $ability->doExecute( array() );
 
-    public function test_returns_default_type_without_external_cache(): void
-    {
-        Functions\expect('wp_using_ext_object_cache')->twice()->andReturn(false);
+		$this->assertEquals( 'default', $result['type'] );
+		$this->assertFalse( $result['persistent'] );
+	}
 
-        $ability = new GetCacheType();
-        $result  = $ability->doExecute(array());
+	public function test_detects_redis_from_class_name(): void {
+		global $wp_object_cache;
 
-        $this->assertEquals('default', $result['type']);
-        $this->assertFalse($result['persistent']);
-    }
+		// Create a mock Redis cache class.
+		$wp_object_cache = new class() {
+		};
 
-    public function test_detects_redis_from_class_name(): void
-    {
-        global $wp_object_cache;
+		// Override get_class to return a Redis class name.
+		Functions\expect( 'wp_using_ext_object_cache' )->twice()->andReturn( true );
 
-        // Create a mock Redis cache class.
-        $wp_object_cache = new class () {
-        };
+		// We need to use a real Redis class mock.
+		$redis_cache                = \Mockery::mock( 'WP_Object_Cache_Redis' );
+		$GLOBALS['wp_object_cache'] = $redis_cache;
 
-        // Override get_class to return a Redis class name.
-        Functions\expect('wp_using_ext_object_cache')->twice()->andReturn(true);
+		$ability = $this->getAbilityInstance();
+		$result  = $ability->doExecute( array() );
 
-        // We need to use a real Redis class mock.
-        $redis_cache                = \Mockery::mock('WP_Object_Cache_Redis');
-        $GLOBALS['wp_object_cache'] = $redis_cache;
+		// Since we can't easily override get_class, we check the flow.
+		$this->assertTrue( $result['persistent'] );
+		$this->assertContains( $result['type'], array( 'redis', 'unknown' ) );
 
-        $ability = new GetCacheType();
-        $result  = $ability->doExecute(array());
+		// Clean up.
+		$wp_object_cache = null;
+	}
 
-        // Since we can't easily override get_class, we check the flow.
-        $this->assertTrue($result['persistent']);
-        $this->assertContains($result['type'], array( 'redis', 'unknown' ));
+	public function test_returns_persistent_true_for_external_cache(): void {
+		Functions\expect( 'wp_using_ext_object_cache' )->twice()->andReturn( true );
 
-        // Clean up.
-        $wp_object_cache = null;
-    }
+		$ability = $this->getAbilityInstance();
+		$result  = $ability->doExecute( array() );
 
-    public function test_returns_persistent_true_for_external_cache(): void
-    {
-        Functions\expect('wp_using_ext_object_cache')->twice()->andReturn(true);
+		$this->assertTrue( $result['persistent'] );
+	}
 
-        $ability = new GetCacheType();
-        $result  = $ability->doExecute(array());
+	public function test_returns_drop_in_false_when_no_file(): void {
+		Functions\expect( 'wp_using_ext_object_cache' )->twice()->andReturn( false );
 
-        $this->assertTrue($result['persistent']);
-    }
+		$ability = $this->getAbilityInstance();
+		$result  = $ability->doExecute( array() );
 
-    public function test_returns_drop_in_false_when_no_file(): void
-    {
-        Functions\expect('wp_using_ext_object_cache')->twice()->andReturn(false);
-
-        $ability = new GetCacheType();
-        $result  = $ability->doExecute(array());
-
-        // The drop-in check uses file_exists on the temp dir path.
-        $this->assertIsBool($result['drop_in']);
-    }
+		// The drop-in check uses file_exists on the temp dir path.
+		$this->assertIsBool( $result['drop_in'] );
+	}
 }

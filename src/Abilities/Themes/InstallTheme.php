@@ -45,113 +45,104 @@ use FAWpmcp\Exceptions\ThemeInstallationException;
  *
  * @package FAWpmcp\Abilities\Themes
  */
-final class InstallTheme extends AbstractAbility
-{
-    /**
-     * Returns the ability identifier.
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return 'fa-wpmcp/install-theme';
-    }
+final class InstallTheme extends AbstractAbility {
 
-    /**
-     * Returns the ability category.
-     *
-     * @return string
-     */
-    public function getCategory(): string
-    {
-        return 'themes';
-    }
+	/**
+	 * Returns the ability identifier.
+	 *
+	 * @return string
+	 */
+	public function getName(): string {
+		return 'fa-wpmcp/install-theme';
+	}
 
-    /**
-     * Returns the display label.
-     *
-     * @return string
-     */
-    public function getLabel(): string
-    {
-        return 'Install Theme';
-    }
+	/**
+	 * Returns the ability category.
+	 *
+	 * @return string
+	 */
+	public function getCategory(): string {
+		return 'themes';
+	}
 
-    /**
-     * Returns the ability description.
-     *
-     * @return string
-     */
-    public function getDescription(): string
-    {
-        return 'Install a WordPress theme from WordPress.org.';
-    }
+	/**
+	 * Returns the display label.
+	 *
+	 * @return string
+	 */
+	public function getLabel(): string {
+		return 'Install Theme';
+	}
 
-    /**
-     * Returns the JSON Schema for input validation.
-     *
-     * @return array
-     */
-    public function getInputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'slug' => array(
-                    'type'        => 'string',
-                    'description' => 'Theme slug from WordPress.org.',
-                ),
-            ),
-            'required'   => array( 'slug' ),
-        );
-    }
+	/**
+	 * Returns the ability description.
+	 *
+	 * @return string
+	 */
+	public function getDescription(): string {
+		return 'Install a WordPress theme from WordPress.org.';
+	}
 
-    /**
-     * Returns the JSON Schema for output.
-     *
-     * @return array
-     */
-    public function getOutputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'success' => array( 'type' => 'boolean' ),
-            ),
-        );
-    }
+	/**
+	 * Returns the JSON Schema for input validation.
+	 *
+	 * @return array
+	 */
+	public function getInputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'slug' => array(
+					'type'        => 'string',
+					'description' => 'Theme slug from WordPress.org.',
+				),
+			),
+			'required'   => array( 'slug' ),
+		);
+	}
 
-    /**
-     * Returns the WordPress capability required.
-     *
-     * @return string
-     */
-    public function getRequiredCapability(): string
-    {
-        return 'install_themes';
-    }
+	/**
+	 * Returns the JSON Schema for output.
+	 *
+	 * @return array
+	 */
+	public function getOutputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'success' => array( 'type' => 'boolean' ),
+			),
+		);
+	}
 
-    /**
-     * Returns the operation type.
-     *
-     * @return string
-     */
-    public function getOperationType(): string
-    {
-        return 'write';
-    }
+	/**
+	 * Returns the WordPress capability required.
+	 *
+	 * @return string
+	 */
+	public function getRequiredCapability(): string {
+		return 'install_themes';
+	}
 
-    /**
-     * Executes the ability.
-     *
-     * @param array $input Input parameters.
-     * @return array
-     * @throws ThemeInstallationException Always thrown as this ability is not yet implemented.
-     */
-    public function doExecute(array $input): array
-    {
-        throw new ThemeInstallationException(
-            'Theme installation is not yet implemented. This ability requires WordPress Theme_Upgrader integration.'
-        );
-    }
+	/**
+	 * Returns the operation type.
+	 *
+	 * @return string
+	 */
+	public function getOperationType(): string {
+		return 'write';
+	}
+
+	/**
+	 * Executes the ability.
+	 *
+	 * @param array $input Input parameters.
+	 * @return array
+	 * @throws ThemeInstallationException Always thrown as this ability is not yet implemented.
+	 */
+	public function doExecute( array $input ): array {
+		throw new ThemeInstallationException(
+			'Theme installation is not yet implemented. This ability requires WordPress Theme_Upgrader integration.'
+		);
+	}
 }

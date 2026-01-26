@@ -19,6 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class OptionException extends RuntimeException
-{
+class OptionException extends RuntimeException {
+
 }

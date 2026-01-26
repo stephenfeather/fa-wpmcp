@@ -19,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class MediaDeletionException extends Exception
-{
+class MediaDeletionException extends Exception {
+
 }

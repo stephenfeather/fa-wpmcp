@@ -20,124 +20,123 @@ use FAWpmcp\Http\PrivacyRedactor;
  *
  * @package FAWpmcp\Logging
  */
-final class ActivityLogger implements ActivityLoggerInterface
-{
-    /**
-     * UUID generator callable.
-     *
-     * @var callable():string
-     */
-    private $uuidGenerator;
+final class ActivityLogger implements ActivityLoggerInterface {
 
-    /**
-     * Constructor.
-     *
-     * @param LogRepository $repository     Log repository for database operations.
-     * @param callable      $uuidGenerator UUID generator function.
-     */
-    public function __construct(
-        private readonly LogRepository $repository,
-        callable $uuidGenerator
-    ) {
-        $this->uuidGenerator = $uuidGenerator;
-    }
+	/**
+	 * UUID generator callable.
+	 *
+	 * @var callable():string
+	 */
+	private $uuidGenerator;
 
-    /**
-     * Log before ability execution.
-     *
-     * Creates initial log entry with input data.
-     * Returns correlation ID for tracking.
-     *
-     * @param string     $ability_name     Ability name.
-     * @param string     $ability_category Ability category.
-     * @param string     $operation_type   Operation type ('read' or 'write').
-     * @param int        $user_id          User ID.
-     * @param string     $user_login       User login.
-     * @param string     $ip_address       IP address.
-     * @param array|null $input            Input data.
-     * @return string Correlation ID.
-     */
-    public function logBeforeExecute(
-        string $ability_name,
-        string $ability_category,
-        string $operation_type,
-        int $user_id,
-        string $user_login,
-        string $ip_address,
-        ?array $input = null
-    ): string {
-        $correlation_id = ( $this->uuidGenerator )();
+	/**
+	 * Constructor.
+	 *
+	 * @param LogRepository $repository     Log repository for database operations.
+	 * @param callable      $uuidGenerator UUID generator function.
+	 */
+	public function __construct(
+		private readonly LogRepository $repository,
+		callable $uuidGenerator
+	) {
+		$this->uuidGenerator = $uuidGenerator;
+	}
 
-        // Redact sensitive fields from input before logging (pure function).
-        $redacted_input = null !== $input ? PrivacyRedactor::redact($input) : null;
+	/**
+	 * Log before ability execution.
+	 *
+	 * Creates initial log entry with input data.
+	 * Returns correlation ID for tracking.
+	 *
+	 * @param string     $ability_name     Ability name.
+	 * @param string     $ability_category Ability category.
+	 * @param string     $operation_type   Operation type ('read' or 'write').
+	 * @param int        $user_id          User ID.
+	 * @param string     $user_login       User login.
+	 * @param string     $ip_address       IP address.
+	 * @param array|null $input            Input data.
+	 * @return string Correlation ID.
+	 */
+	public function logBeforeExecute(
+		string $ability_name,
+		string $ability_category,
+		string $operation_type,
+		int $user_id,
+		string $user_login,
+		string $ip_address,
+		?array $input = null
+	): string {
+		$correlation_id = ( $this->uuidGenerator )();
 
-        $entry = LogEntryBuilder::create()
-            ->withCorrelationId($correlation_id)
-            ->withUser($user_id, $user_login)
-            ->withIpAddress($ip_address)
-            ->withAbility($ability_name, $ability_category, $operation_type)
-            ->withInput($redacted_input)
-            ->build();
+		// Redact sensitive fields from input before logging (pure function).
+		$redacted_input = null !== $input ? PrivacyRedactor::redact( $input ) : null;
 
-        // Side effect: database write.
-        $this->repository->insert($entry);
+		$entry = LogEntryBuilder::create()
+			->withCorrelationId( $correlation_id )
+			->withUser( $user_id, $user_login )
+			->withIpAddress( $ip_address )
+			->withAbility( $ability_name, $ability_category, $operation_type )
+			->withInput( $redacted_input )
+			->build();
 
-        return $correlation_id;
-    }
+		// Side effect: database write.
+		$this->repository->insert( $entry );
 
-    /**
-     * Log after ability execution.
-     *
-     * Updates existing log entry with output data and result.
-     * Calculates execution time from start time.
-     *
-     * @param string      $correlation_id Correlation ID from logBeforeExecute.
-     * @param array|null  $output         Output data.
-     * @param bool        $success        Whether execution succeeded.
-     * @param string|null $error_message  Error message if failed.
-     * @param float       $start_time     Start time from microtime(true).
-     * @return void
-     */
-    public function logAfterExecute(
-        string $correlation_id,
-        ?array $output,
-        bool $success,
-        ?string $error_message = null,
-        float $start_time = 0.0
-    ): void {
-        $execution_time_ms = $this->calculateExecutionTime($start_time);
+		return $correlation_id;
+	}
 
-        // Redact sensitive fields from output before logging (pure function).
-        $redacted_output = null !== $output ? PrivacyRedactor::redact($output) : null;
+	/**
+	 * Log after ability execution.
+	 *
+	 * Updates existing log entry with output data and result.
+	 * Calculates execution time from start time.
+	 *
+	 * @param string      $correlation_id Correlation ID from logBeforeExecute.
+	 * @param array|null  $output         Output data.
+	 * @param bool        $success        Whether execution succeeded.
+	 * @param string|null $error_message  Error message if failed.
+	 * @param float       $start_time     Start time from microtime(true).
+	 * @return void
+	 */
+	public function logAfterExecute(
+		string $correlation_id,
+		?array $output,
+		bool $success,
+		?string $error_message = null,
+		float $start_time = 0.0
+	): void {
+		$execution_time_ms = $this->calculateExecutionTime( $start_time );
 
-        $update_data = array(
-            'output_data'       => $redacted_output,
-            'success'           => $success,
-            'error_message'     => $error_message,
-            'execution_time_ms' => $execution_time_ms,
-        );
+		// Redact sensitive fields from output before logging (pure function).
+		$redacted_output = null !== $output ? PrivacyRedactor::redact( $output ) : null;
 
-        // Side effect: database write.
-        $this->repository->updateByCorrelationId($correlation_id, $update_data);
-    }
+		$update_data = array(
+			'output_data'       => $redacted_output,
+			'success'           => $success,
+			'error_message'     => $error_message,
+			'execution_time_ms' => $execution_time_ms,
+		);
 
-    /**
-     * Calculate execution time in milliseconds.
-     *
-     * Pure function: calculates time difference.
-     *
-     * @param float $start_time Start time from microtime(true).
-     * @return int Execution time in milliseconds.
-     */
-    private function calculateExecutionTime(float $start_time): int
-    {
-        if (0.0 === $start_time) {
-            return 0;
-        }
+		// Side effect: database write.
+		$this->repository->updateByCorrelationId( $correlation_id, $update_data );
+	}
 
-        $end_time = microtime(true);
-        $diff     = $end_time - $start_time;
+	/**
+	 * Calculate execution time in milliseconds.
+	 *
+	 * Pure function: calculates time difference.
+	 *
+	 * @param float $start_time Start time from microtime(true).
+	 * @return int Execution time in milliseconds.
+	 */
+	private function calculateExecutionTime( float $start_time ): int {
+		if ( 0.0 === $start_time ) {
+			return 0;
+		}
 
-        return (int) round($diff * 1000); // Convert to milliseconds.
-    }
+		$end_time = microtime( true );
+		$diff     = $end_time - $start_time;
+
+		return (int) round( $diff * 1000 ); // Convert to milliseconds.
+	}
 }

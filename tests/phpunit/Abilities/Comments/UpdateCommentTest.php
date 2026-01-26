@@ -10,90 +10,117 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Comments;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Comments\UpdateComment;
 use FAWpmcp\Exceptions\CommentUpdateException;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
-use PHPUnit\Framework\TestCase;
 
-final class UpdateCommentTest extends TestCase
-{
-    use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+/**
+ * Test UpdateComment ability.
+ *
+ * @package FAWpmcp\Tests\Abilities\Comments
+ */
+final class UpdateCommentTest extends BrainMonkeyTestCase {
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        \Brain\Monkey\setUp();
-    }
+	use AbilityTestTrait;
 
-    protected function tearDown(): void
-    {
-        \Brain\Monkey\tearDown();
-        parent::tearDown();
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new UpdateComment();
+	}
 
-    public function test_ability_metadata(): void
-    {
-        $ability = new UpdateComment();
-        $this->assertEquals('fa-wpmcp/update-comment', $ability->getName());
-        $this->assertEquals('comments', $ability->getCategory());
-        $this->assertEquals('Update Comment', $ability->getLabel());
-        $this->assertStringContainsString('comment', strtolower($ability->getDescription()));
-        $this->assertEquals('moderate_comments', $ability->getRequiredCapability());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
+	 */
+	protected function getExpectedMetadata(): array {
+		return [
+			'name'                 => 'fa-wpmcp/update-comment',
+			'category'             => 'comments',
+			'label'                => 'Update Comment',
+			'description_contains' => 'comment',
+			'operation_type'       => 'write',
+			'required_capability'  => 'moderate_comments',
+		];
+	}
 
-    public function test_input_schema_requires_fields(): void
-    {
-        $ability = new UpdateComment();
-        $schema  = $ability->getInputSchema();
+	/**
+	 * Test input schema requires comment_id and status.
+	 *
+	 * @return void
+	 */
+	public function testInputSchemaRequiresFields(): void {
+		$schema = $this->getAbilityInstance()->getInputSchema();
 
-        $this->assertEquals('object', $schema['type']);
-        $this->assertArrayHasKey('comment_id', $schema['properties']);
-        $this->assertArrayHasKey('status', $schema['properties']);
-        $this->assertContains('comment_id', $schema['required']);
-        $this->assertContains('status', $schema['required']);
-        $this->assertContains('approve', $schema['properties']['status']['enum']);
-    }
+		$this->assertArrayHasKey( 'comment_id', $schema['properties'] );
+		$this->assertArrayHasKey( 'status', $schema['properties'] );
+		$this->assertContains( 'comment_id', $schema['required'] );
+		$this->assertContains( 'status', $schema['required'] );
+		$this->assertContains( 'approve', $schema['properties']['status']['enum'] );
+	}
 
-    public function test_output_schema_structure(): void
-    {
-        $ability = new UpdateComment();
-        $schema  = $ability->getOutputSchema();
+	/**
+	 * Test output schema includes comment_id, status, and link.
+	 *
+	 * @return void
+	 */
+	public function testOutputSchemaStructure(): void {
+		$schema = $this->getAbilityInstance()->getOutputSchema();
 
-        $this->assertEquals('object', $schema['type']);
-        $this->assertArrayHasKey('comment_id', $schema['properties']);
-        $this->assertArrayHasKey('status', $schema['properties']);
-        $this->assertArrayHasKey('link', $schema['properties']);
-    }
+		$this->assertArrayHasKey( 'comment_id', $schema['properties'] );
+		$this->assertArrayHasKey( 'status', $schema['properties'] );
+		$this->assertArrayHasKey( 'link', $schema['properties'] );
+	}
 
-    public function test_updates_comment_status(): void
-    {
-        Functions\expect('wp_set_comment_status')->once()->andReturn(true);
-        Functions\expect('get_comment_link')->once()->andReturn('https://example.com/post#comment-42');
+	/**
+	 * Test updates comment status successfully.
+	 *
+	 * @return void
+	 */
+	public function testUpdatesCommentStatus(): void {
+		Functions\expect( 'wp_set_comment_status' )->once()->andReturn( true );
+		Functions\expect( 'get_comment_link' )->once()->andReturn( 'https://example.com/post#comment-42' );
 
-        $ability = new UpdateComment();
-        $result  = $ability->doExecute(
-            array(
-                'comment_id' => 42,
-                'status'     => 'approve',
-            )
-        );
+		$result = $this->getAbilityInstance()->doExecute(
+			[
+				'comment_id' => 42,
+				'status'     => 'approve',
+			]
+		);
 
-        $this->assertEquals(42, $result['comment_id']);
-    }
+		$this->assertEquals( 42, $result['comment_id'] );
+	}
 
-    public function test_throws_exception_when_update_fails(): void
-    {
-        $this->expectException(CommentUpdateException::class);
-        $this->expectExceptionMessage('Failed to update comment status');
+	/**
+	 * Test throws exception when update fails.
+	 *
+	 * @return void
+	 */
+	public function testThrowsExceptionWhenUpdateFails(): void {
+		$this->expectException( CommentUpdateException::class );
+		$this->expectExceptionMessage( 'Failed to update comment status' );
 
-        Functions\expect('wp_set_comment_status')->once()->andReturn(false);
+		Functions\expect( 'wp_set_comment_status' )->once()->andReturn( false );
 
-        $ability = new UpdateComment();
-        $ability->doExecute(
-            array(
-                'comment_id' => 42,
-                'status'     => 'trash',
-            )
-        );
-    }
+		$this->getAbilityInstance()->doExecute(
+			[
+				'comment_id' => 42,
+				'status'     => 'trash',
+			]
+		);
+	}
 }

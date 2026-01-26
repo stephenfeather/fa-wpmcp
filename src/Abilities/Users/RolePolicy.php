@@ -21,146 +21,140 @@ use FAWpmcp\Exceptions\RoleNotAllowedException;
  *
  * @package FAWpmcp\Abilities\Users
  */
-final class RolePolicy
-{
-    /**
-     * WordPress option name for max API role configuration.
-     *
-     * @var string
-     */
-    public const OPTION_NAME = 'fa_wpmcp_max_api_role';
+final class RolePolicy {
 
-    /**
-     * Default maximum role (editor) - prevents admin creation by default.
-     *
-     * @var string
-     */
-    public const DEFAULT_MAX_ROLE = 'editor';
+	/**
+	 * WordPress option name for max API role configuration.
+	 *
+	 * @var string
+	 */
+	public const OPTION_NAME = 'fa_wpmcp_max_api_role';
 
-    /**
-     * Role hierarchy from highest to lowest privilege.
-     *
-     * @var array<string, int>
-     */
-    private const ROLE_HIERARCHY = array(
-        'administrator' => 5,
-        'editor'        => 4,
-        'author'        => 3,
-        'contributor'   => 2,
-        'subscriber'    => 1,
-    );
+	/**
+	 * Default maximum role (editor) - prevents admin creation by default.
+	 *
+	 * @var string
+	 */
+	public const DEFAULT_MAX_ROLE = 'editor';
 
-    /**
-     * All standard WordPress roles.
-     *
-     * @var array<string>
-     */
-    public const ALL_ROLES = array(
-        'administrator',
-        'editor',
-        'author',
-        'contributor',
-        'subscriber',
-    );
+	/**
+	 * Role hierarchy from highest to lowest privilege.
+	 *
+	 * @var array<string, int>
+	 */
+	private const ROLE_HIERARCHY = array(
+		'administrator' => 5,
+		'editor'        => 4,
+		'author'        => 3,
+		'contributor'   => 2,
+		'subscriber'    => 1,
+	);
 
-    /**
-     * Get the configured maximum role level.
-     *
-     * @return string The maximum role that can be assigned via API.
-     */
-    public function getMaxRole(): string
-    {
-        $max_role = \get_option(self::OPTION_NAME, self::DEFAULT_MAX_ROLE);
+	/**
+	 * All standard WordPress roles.
+	 *
+	 * @var array<string>
+	 */
+	public const ALL_ROLES = array(
+		'administrator',
+		'editor',
+		'author',
+		'contributor',
+		'subscriber',
+	);
 
-        // Validate the stored option is a valid role.
-        if (! isset(self::ROLE_HIERARCHY[ $max_role ])) {
-            return self::DEFAULT_MAX_ROLE;
-        }
+	/**
+	 * Get the configured maximum role level.
+	 *
+	 * @return string The maximum role that can be assigned via API.
+	 */
+	public function getMaxRole(): string {
+		$max_role = \get_option( self::OPTION_NAME, self::DEFAULT_MAX_ROLE );
 
-        return $max_role;
-    }
+		// Validate the stored option is a valid role.
+		if ( ! isset( self::ROLE_HIERARCHY[ $max_role ] ) ) {
+			return self::DEFAULT_MAX_ROLE;
+		}
 
-    /**
-     * Get the list of roles allowed for API assignment.
-     *
-     * @return array<string> Roles that can be assigned via API.
-     */
-    public function getAllowedRoles(): array
-    {
-        $max_role  = $this->getMaxRole();
-        $max_level = self::ROLE_HIERARCHY[ $max_role ];
+		return $max_role;
+	}
 
-        return array_filter(
-            self::ALL_ROLES,
-            function (string $role) use ($max_level): bool {
-                return self::ROLE_HIERARCHY[ $role ] <= $max_level;
-            }
-        );
-    }
+	/**
+	 * Get the list of roles allowed for API assignment.
+	 *
+	 * @return array<string> Roles that can be assigned via API.
+	 */
+	public function getAllowedRoles(): array {
+		$max_role  = $this->getMaxRole();
+		$max_level = self::ROLE_HIERARCHY[ $max_role ];
 
-    /**
-     * Check if a role is allowed for API assignment.
-     *
-     * @param string $role The role to check.
-     * @return bool True if allowed, false otherwise.
-     */
-    public function isRoleAllowed(string $role): bool
-    {
-        // Unknown roles are allowed (custom roles).
-        if (! isset(self::ROLE_HIERARCHY[ $role ])) {
-            return true;
-        }
+		return array_filter(
+			self::ALL_ROLES,
+			function ( string $role ) use ( $max_level ): bool {
+				return self::ROLE_HIERARCHY[ $role ] <= $max_level;
+			}
+		);
+	}
 
-        $max_role  = $this->getMaxRole();
-        $max_level = self::ROLE_HIERARCHY[ $max_role ];
+	/**
+	 * Check if a role is allowed for API assignment.
+	 *
+	 * @param string $role The role to check.
+	 * @return bool True if allowed, false otherwise.
+	 */
+	public function isRoleAllowed( string $role ): bool {
+		// Unknown roles are allowed (custom roles).
+		if ( ! isset( self::ROLE_HIERARCHY[ $role ] ) ) {
+			return true;
+		}
 
-        return self::ROLE_HIERARCHY[ $role ] <= $max_level;
-    }
+		$max_role  = $this->getMaxRole();
+		$max_level = self::ROLE_HIERARCHY[ $max_role ];
 
-    /**
-     * Validate a role and throw if not allowed.
-     *
-     * @param string $role The role to validate.
-     * @return string The validated role.
-     * @throws RoleNotAllowedException If role exceeds max allowed.
-     */
-    public function validateRole(string $role): string
-    {
-        if (! $this->isRoleAllowed($role)) {
-            $max_role = $this->getMaxRole();
-            throw new RoleNotAllowedException(
-                sprintf(
-                    'Role "%s" cannot be assigned via API. Maximum allowed role is "%s". ' .
-                    'To allow higher roles, update the %s option in WordPress settings.',
-                    $role,
-                    $max_role,
-                    self::OPTION_NAME
-                )
-            );
-        }
+		return self::ROLE_HIERARCHY[ $role ] <= $max_level;
+	}
 
-        return $role;
-    }
+	/**
+	 * Validate a role and throw if not allowed.
+	 *
+	 * @param string $role The role to validate.
+	 * @return string The validated role.
+	 * @throws RoleNotAllowedException If role exceeds max allowed.
+	 */
+	public function validateRole( string $role ): string {
+		if ( ! $this->isRoleAllowed( $role ) ) {
+			$max_role = $this->getMaxRole();
+			throw new RoleNotAllowedException(
+				sprintf(
+					'Role "%s" cannot be assigned via API. Maximum allowed role is "%s". ' .
+					'To allow higher roles, update the %s option in WordPress settings.',
+					$role,
+					$max_role,
+					self::OPTION_NAME
+				)
+			);
+		}
 
-    /**
-     * Get role level for comparison.
-     *
-     * @param string $role The role name.
-     * @return int The role level (higher = more privileged).
-     */
-    public function getRoleLevel(string $role): int
-    {
-        return self::ROLE_HIERARCHY[ $role ] ?? 0;
-    }
+		return $role;
+	}
 
-    /**
-     * Check if a role is a standard WordPress role.
-     *
-     * @param string $role The role to check.
-     * @return bool True if standard role, false if custom.
-     */
-    public function isStandardRole(string $role): bool
-    {
-        return isset(self::ROLE_HIERARCHY[ $role ]);
-    }
+	/**
+	 * Get role level for comparison.
+	 *
+	 * @param string $role The role name.
+	 * @return int The role level (higher = more privileged).
+	 */
+	public function getRoleLevel( string $role ): int {
+		return self::ROLE_HIERARCHY[ $role ] ?? 0;
+	}
+
+	/**
+	 * Check if a role is a standard WordPress role.
+	 *
+	 * @param string $role The role to check.
+	 * @return bool True if standard role, false if custom.
+	 */
+	public function isStandardRole( string $role ): bool {
+		return isset( self::ROLE_HIERARCHY[ $role ] );
+	}
 }

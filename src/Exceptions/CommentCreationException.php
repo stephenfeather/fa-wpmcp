@@ -19,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class CommentCreationException extends Exception
-{
+class CommentCreationException extends Exception {
+
 }

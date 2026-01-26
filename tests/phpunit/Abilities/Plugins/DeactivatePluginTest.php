@@ -10,34 +10,44 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Plugins;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Plugins\DeactivatePlugin;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
-use Mockery;
-use PHPUnit\Framework\TestCase;
 
-class DeactivatePluginTest extends TestCase
-{
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
-    public function testGetName(): void
-    {
-        $this->assertEquals('fa-wpmcp/deactivate-plugin', ( new DeactivatePlugin() )->getName());
-    }
-    public function testExecuteDeactivatesPlugin(): void
-    {
-        Functions\expect('deactivate_plugins')->once()->with('test/test.php');
-        $result = ( new DeactivatePlugin() )->doExecute(array( 'plugin' => 'test/test.php' ));
-        $this->assertEquals('test/test.php', $result['plugin']);
-        $this->assertTrue($result['deactivated']);
-    }
+class DeactivatePluginTest extends BrainMonkeyTestCase {
+	use AbilityTestTrait;
+
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new DeactivatePlugin();
+	}
+
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/deactivate-plugin',
+			'category'             => 'plugins',
+			'label'                => 'Deactivate Plugin',
+			'description_contains' => 'deactivate a wordpress plugin',
+			'operation_type'       => 'write',
+			'required_capability'  => 'activate_plugins',
+		);
+	}
+
+	public function testExecuteDeactivatesPlugin(): void {
+		Functions\expect( 'deactivate_plugins' )->once()->with( 'test/test.php' );
+		$result = $this->getAbilityInstance()->doExecute( array( 'plugin' => 'test/test.php' ) );
+		$this->assertEquals( 'test/test.php', $result['plugin'] );
+		$this->assertTrue( $result['deactivated'] );
+	}
 }

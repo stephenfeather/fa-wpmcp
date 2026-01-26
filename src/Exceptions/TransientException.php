@@ -19,6 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class TransientException extends RuntimeException
-{
+class TransientException extends RuntimeException {
+
 }

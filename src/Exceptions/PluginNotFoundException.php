@@ -13,6 +13,6 @@ namespace FAWpmcp\Exceptions;
 /**
  * Exception thrown when a requested plugin is not found.
  */
-class PluginNotFoundException extends \Exception
-{
+class PluginNotFoundException extends \Exception {
+
 }

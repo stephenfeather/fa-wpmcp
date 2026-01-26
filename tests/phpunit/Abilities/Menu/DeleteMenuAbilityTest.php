@@ -10,275 +10,216 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Menu;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Menu\DeleteMenuAbility;
 use FAWpmcp\Exceptions\MenuNotFoundException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test DeleteMenuAbility functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Menu
  */
-class DeleteMenuAbilityTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class DeleteMenuAbilityTest extends BrainMonkeyTestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new DeleteMenuAbility();
-        $this->assertEquals('fa-wpmcp/delete-menu', $ability->getName());
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new DeleteMenuAbility();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new DeleteMenuAbility();
-        $this->assertEquals('menu', $ability->getCategory());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array<string, string>
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/delete-menu',
+			'category'             => 'menu',
+			'label'                => 'Delete Menu',
+			'description_contains' => 'delete',
+			'operation_type'       => 'write',
+			'required_capability'  => 'edit_theme_options',
+		);
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new DeleteMenuAbility();
-        $this->assertEquals('Delete Menu', $ability->getLabel());
-    }
+	/**
+	 * Test ability returns input schema with required menu field.
+	 *
+	 * @return void
+	 */
+	public function testGetInputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getInputSchema();
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new DeleteMenuAbility();
-        $this->assertEquals('write', $ability->getOperationType());
-    }
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'required', $schema );
+		$this->assertArrayHasKey( 'menu', $schema['properties'] );
+		$this->assertContains( 'menu', $schema['required'] );
+	}
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new DeleteMenuAbility();
-        $this->assertEquals('edit_theme_options', $ability->getRequiredCapability());
-    }
+	/**
+	 * Test ability returns output schema.
+	 *
+	 * @return void
+	 */
+	public function testGetOutputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getOutputSchema();
 
-    /**
-     * Test ability returns input schema with required menu field.
-     *
-     * @return void
-     */
-    public function testGetInputSchema(): void
-    {
-        $ability = new DeleteMenuAbility();
-        $schema  = $ability->getInputSchema();
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'deleted', $schema['properties'] );
+		$this->assertArrayHasKey( 'menu', $schema['properties'] );
+	}
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('required', $schema);
-        $this->assertArrayHasKey('menu', $schema['properties']);
-        $this->assertContains('menu', $schema['required']);
-    }
+	/**
+	 * Test execute deletes menu by ID successfully.
+	 *
+	 * @return void
+	 */
+	public function testExecuteDeletesMenuByIDSuccessfully(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test ability returns output schema.
-     *
-     * @return void
-     */
-    public function testGetOutputSchema(): void
-    {
-        $ability = new DeleteMenuAbility();
-        $schema  = $ability->getOutputSchema();
+		$menu = Mockery::mock( 'WP_Term' );
+		$menu->term_id = 10;
+		$menu->name = 'Test Menu';
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('deleted', $schema['properties']);
-        $this->assertArrayHasKey('menu', $schema['properties']);
-    }
+		Functions\when( 'wp_get_nav_menu_object' )->justReturn( $menu );
+		Functions\when( 'wp_delete_nav_menu' )->justReturn( true );
 
-    /**
-     * Test execute deletes menu by ID successfully.
-     *
-     * @return void
-     */
-    public function testExecuteDeletesMenuByIDSuccessfully(): void
-    {
-        $ability = new DeleteMenuAbility();
+		$result = $ability->doExecute( array( 'menu' => 10 ) );
 
-        $menu = Mockery::mock('WP_Term');
-        $menu->term_id = 10;
-        $menu->name = 'Test Menu';
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'deleted', $result );
+		$this->assertArrayHasKey( 'menu', $result );
+		$this->assertTrue( $result['deleted'] );
+		$this->assertEquals( 10, $result['menu'] );
+	}
 
-        Functions\when('wp_get_nav_menu_object')->justReturn($menu);
-        Functions\when('wp_delete_nav_menu')->justReturn(true);
+	/**
+	 * Test execute deletes menu by slug successfully.
+	 *
+	 * @return void
+	 */
+	public function testExecuteDeletesMenuBySlugSuccessfully(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(array( 'menu' => 10 ));
+		$menu = Mockery::mock( 'WP_Term' );
+		$menu->term_id = 10;
+		$menu->name = 'Test Menu';
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('deleted', $result);
-        $this->assertArrayHasKey('menu', $result);
-        $this->assertTrue($result['deleted']);
-        $this->assertEquals(10, $result['menu']);
-    }
+		Functions\when( 'wp_get_nav_menu_object' )->justReturn( $menu );
+		Functions\when( 'wp_delete_nav_menu' )->justReturn( true );
 
-    /**
-     * Test execute deletes menu by slug successfully.
-     *
-     * @return void
-     */
-    public function testExecuteDeletesMenuBySlugSuccessfully(): void
-    {
-        $ability = new DeleteMenuAbility();
+		$result = $ability->doExecute( array( 'menu' => 'test-menu' ) );
 
-        $menu = Mockery::mock('WP_Term');
-        $menu->term_id = 10;
-        $menu->name = 'Test Menu';
+		$this->assertTrue( $result['deleted'] );
+		$this->assertEquals( 10, $result['menu'] );
+	}
 
-        Functions\when('wp_get_nav_menu_object')->justReturn($menu);
-        Functions\when('wp_delete_nav_menu')->justReturn(true);
+	/**
+	 * Test execute throws exception when menu not found.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenMenuNotFound(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(array( 'menu' => 'test-menu' ));
+		Functions\when( 'wp_get_nav_menu_object' )->justReturn( false );
 
-        $this->assertTrue($result['deleted']);
-        $this->assertEquals(10, $result['menu']);
-    }
+		$this->expectException( MenuNotFoundException::class );
+		$this->expectExceptionMessage( 'Menu "nonexistent" not found.' );
 
-    /**
-     * Test execute throws exception when menu not found.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionWhenMenuNotFound(): void
-    {
-        $ability = new DeleteMenuAbility();
+		$ability->doExecute( array( 'menu' => 'nonexistent' ) );
+	}
 
-        Functions\when('wp_get_nav_menu_object')->justReturn(false);
+	/**
+	 * Test execute throws exception when menu ID not found.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenMenuIDNotFound(): void {
+		$ability = $this->getAbilityInstance();
 
-        $this->expectException(MenuNotFoundException::class);
-        $this->expectExceptionMessage('Menu "nonexistent" not found.');
+		Functions\when( 'wp_get_nav_menu_object' )->justReturn( false );
 
-        $ability->doExecute(array( 'menu' => 'nonexistent' ));
-    }
+		$this->expectException( MenuNotFoundException::class );
+		$this->expectExceptionMessage( 'Menu "999" not found.' );
 
-    /**
-     * Test execute throws exception when menu ID not found.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionWhenMenuIDNotFound(): void
-    {
-        $ability = new DeleteMenuAbility();
+		$ability->doExecute( array( 'menu' => 999 ) );
+	}
 
-        Functions\when('wp_get_nav_menu_object')->justReturn(false);
+	/**
+	 * Test annotations are correct for destructive write ability.
+	 *
+	 * @return void
+	 */
+	public function testGetAnnotations(): void {
+		$ability     = new DeleteMenuAbility();
+		$annotations = $ability->getAnnotations();
 
-        $this->expectException(MenuNotFoundException::class);
-        $this->expectExceptionMessage('Menu "999" not found.');
+		$this->assertFalse( $annotations['readonly'] );
+		$this->assertTrue( $annotations['destructive'] );
+		$this->assertFalse( $annotations['idempotent'] );
+	}
 
-        $ability->doExecute(array( 'menu' => 999 ));
-    }
+	/**
+	 * Test execute returns menu name in result.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsMenuNameInResult(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test annotations are correct for destructive write ability.
-     *
-     * @return void
-     */
-    public function testGetAnnotations(): void
-    {
-        $ability     = new DeleteMenuAbility();
-        $annotations = $ability->getAnnotations();
+		$menu = Mockery::mock( 'WP_Term' );
+		$menu->term_id = 10;
+		$menu->name = 'My Custom Menu';
 
-        $this->assertFalse($annotations['readonly']);
-        $this->assertTrue($annotations['destructive']);
-        $this->assertFalse($annotations['idempotent']);
-    }
+		Functions\when( 'wp_get_nav_menu_object' )->justReturn( $menu );
+		Functions\when( 'wp_delete_nav_menu' )->justReturn( true );
 
-    /**
-     * Test execute returns menu name in result.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsMenuNameInResult(): void
-    {
-        $ability = new DeleteMenuAbility();
+		$result = $ability->doExecute( array( 'menu' => 10 ) );
 
-        $menu = Mockery::mock('WP_Term');
-        $menu->term_id = 10;
-        $menu->name = 'My Custom Menu';
+		$this->assertArrayHasKey( 'name', $result );
+		$this->assertEquals( 'My Custom Menu', $result['name'] );
+	}
 
-        Functions\when('wp_get_nav_menu_object')->justReturn($menu);
-        Functions\when('wp_delete_nav_menu')->justReturn(true);
+	/**
+	 * Test execute handles wp_delete_nav_menu returning WP_Error.
+	 *
+	 * @return void
+	 */
+	public function testExecuteHandlesWpError(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(array( 'menu' => 10 ));
+		$menu = Mockery::mock( 'WP_Term' );
+		$menu->term_id = 10;
+		$menu->name = 'Test Menu';
 
-        $this->assertArrayHasKey('name', $result);
-        $this->assertEquals('My Custom Menu', $result['name']);
-    }
+		$wp_error = Mockery::mock( 'WP_Error' );
+		$wp_error->shouldReceive( 'get_error_message' )
+			->andReturn( 'Failed to delete menu.' );
 
-    /**
-     * Test execute handles wp_delete_nav_menu returning WP_Error.
-     *
-     * @return void
-     */
-    public function testExecuteHandlesWpError(): void
-    {
-        $ability = new DeleteMenuAbility();
+		Functions\when( 'wp_get_nav_menu_object' )->justReturn( $menu );
+		Functions\when( 'wp_delete_nav_menu' )->justReturn( $wp_error );
+		Functions\when( 'is_wp_error' )->justReturn( true );
 
-        $menu = Mockery::mock('WP_Term');
-        $menu->term_id = 10;
-        $menu->name = 'Test Menu';
+		$this->expectException( MenuNotFoundException::class );
+		$this->expectExceptionMessage( 'Failed to delete menu: Failed to delete menu.' );
 
-        $wp_error = Mockery::mock('WP_Error');
-        $wp_error->shouldReceive('get_error_message')
-            ->andReturn('Failed to delete menu.');
-
-        Functions\when('wp_get_nav_menu_object')->justReturn($menu);
-        Functions\when('wp_delete_nav_menu')->justReturn($wp_error);
-        Functions\when('is_wp_error')->justReturn(true);
-
-        $this->expectException(MenuNotFoundException::class);
-        $this->expectExceptionMessage('Failed to delete menu: Failed to delete menu.');
-
-        $ability->doExecute(array( 'menu' => 10 ));
-    }
+		$ability->doExecute( array( 'menu' => 10 ) );
+	}
 }

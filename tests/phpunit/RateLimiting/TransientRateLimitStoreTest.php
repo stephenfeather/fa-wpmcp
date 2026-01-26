@@ -17,88 +17,82 @@ use PHPUnit\Framework\TestCase;
 /**
  * Test TransientRateLimitStore behavior.
  */
-final class TransientRateLimitStoreTest extends TestCase
-{
-    use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+final class TransientRateLimitStoreTest extends TestCase {
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        \Brain\Monkey\setUp();
-    }
+	use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    protected function tearDown(): void
-    {
-        \Brain\Monkey\tearDown();
-        parent::tearDown();
-    }
+	protected function setUp(): void {
+		parent::setUp();
+		\Brain\Monkey\setUp();
+	}
 
-    /**
-     * Test get returns 0 when transient missing or non-numeric.
-     *
-     * @return void
-     */
-    public function test_get_returns_zero_when_missing_or_non_numeric(): void
-    {
-        Functions\expect('get_transient')
-            ->once()
-            ->with('rate-key')
-            ->andReturn(false);
+	protected function tearDown(): void {
+		\Brain\Monkey\tearDown();
+		parent::tearDown();
+	}
 
-        $store = new TransientRateLimitStore();
-        $this->assertSame(0, $store->get('rate-key'));
-    }
+	/**
+	 * Test get returns 0 when transient missing or non-numeric.
+	 *
+	 * @return void
+	 */
+	public function test_get_returns_zero_when_missing_or_non_numeric(): void {
+		Functions\expect( 'get_transient' )
+			->once()
+			->with( 'rate-key' )
+			->andReturn( false );
 
-    /**
-     * Test get returns integer value.
-     *
-     * @return void
-     */
-    public function test_get_returns_integer_value(): void
-    {
-        Functions\expect('get_transient')
-            ->once()
-            ->with('rate-key')
-            ->andReturn('3');
+		$store = new TransientRateLimitStore();
+		$this->assertSame( 0, $store->get( 'rate-key' ) );
+	}
 
-        $store = new TransientRateLimitStore();
-        $this->assertSame(3, $store->get('rate-key'));
-    }
+	/**
+	 * Test get returns integer value.
+	 *
+	 * @return void
+	 */
+	public function test_get_returns_integer_value(): void {
+		Functions\expect( 'get_transient' )
+			->once()
+			->with( 'rate-key' )
+			->andReturn( '3' );
 
-    /**
-     * Test increment sets transient and returns incremented value.
-     *
-     * @return void
-     */
-    public function test_increment_sets_transient(): void
-    {
-        Functions\expect('get_transient')
-            ->once()
-            ->with('rate-key')
-            ->andReturn(2);
+		$store = new TransientRateLimitStore();
+		$this->assertSame( 3, $store->get( 'rate-key' ) );
+	}
 
-        Functions\expect('set_transient')
-            ->once()
-            ->with('rate-key', 3, 60)
-            ->andReturn(true);
+	/**
+	 * Test increment sets transient and returns incremented value.
+	 *
+	 * @return void
+	 */
+	public function test_increment_sets_transient(): void {
+		Functions\expect( 'get_transient' )
+			->once()
+			->with( 'rate-key' )
+			->andReturn( 2 );
 
-        $store = new TransientRateLimitStore();
-        $this->assertSame(3, $store->increment('rate-key', 60));
-    }
+		Functions\expect( 'set_transient' )
+			->once()
+			->with( 'rate-key', 3, 60 )
+			->andReturn( true );
 
-    /**
-     * Test delete removes transient.
-     *
-     * @return void
-     */
-    public function test_delete_removes_transient(): void
-    {
-        Functions\expect('delete_transient')
-            ->once()
-            ->with('rate-key')
-            ->andReturn(true);
+		$store = new TransientRateLimitStore();
+		$this->assertSame( 3, $store->increment( 'rate-key', 60 ) );
+	}
 
-        $store = new TransientRateLimitStore();
-        $this->assertTrue($store->delete('rate-key'));
-    }
+	/**
+	 * Test delete removes transient.
+	 *
+	 * @return void
+	 */
+	public function test_delete_removes_transient(): void {
+		Functions\expect( 'delete_transient' )
+			->once()
+			->with( 'rate-key' )
+			->andReturn( true );
+
+		$store = new TransientRateLimitStore();
+		$this->assertTrue( $store->delete( 'rate-key' ) );
+	}
 }

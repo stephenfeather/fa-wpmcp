@@ -19,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class TermDeletionException extends Exception
-{
+class TermDeletionException extends Exception {
+
 }

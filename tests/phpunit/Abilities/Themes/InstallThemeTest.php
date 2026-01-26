@@ -10,39 +10,56 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Themes;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Themes\InstallTheme;
-use Brain\Monkey;
-use PHPUnit\Framework\TestCase;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 
-class InstallThemeTest extends TestCase
-{
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+/**
+ * Test InstallTheme ability functionality.
+ *
+ * @package FAWpmcp\Tests\Abilities\Themes
+ */
+class InstallThemeTest extends BrainMonkeyTestCase {
 
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    public function testGetName(): void
-    {
-        $this->assertEquals('fa-wpmcp/install-theme', ( new InstallTheme() )->getName());
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new InstallTheme();
+	}
 
-    public function testGetOperationType(): void
-    {
-        $this->assertEquals('write', ( new InstallTheme() )->getOperationType());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                  => 'fa-wpmcp/install-theme',
+			'category'              => 'themes',
+			'label'                 => 'Install Theme',
+			'description_contains'  => 'install a wordpress theme',
+			'operation_type'        => 'write',
+			'required_capability'   => 'install_themes',
+		);
+	}
 
-    public function testExecuteThrowsNotImplementedException(): void
-    {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Theme installation is not yet implemented');
+	public function testExecuteThrowsNotImplementedException(): void {
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'Theme installation is not yet implemented' );
 
-        ( new InstallTheme() )->doExecute(array( 'slug' => 'twentytwentyfour' ));
-    }
+		$this->getAbilityInstance()->doExecute( array( 'slug' => 'twentytwentyfour' ) );
+	}
 }

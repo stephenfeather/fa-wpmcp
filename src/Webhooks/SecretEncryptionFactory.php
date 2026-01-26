@@ -22,32 +22,31 @@ use FAWpmcp\Exceptions\EncryptionException;
  *
  * @since 1.0.0-alpha.4
  */
-final class SecretEncryptionFactory
-{
-    /**
-     * Create a SecretEncryption instance
-     *
-     * Selects the best available encryption implementation:
-     * - Prefers libsodium if available (more modern, better performance)
-     * - Falls back to OpenSSL if sodium not available
-     *
-     * @return SecretEncryption The encryption instance.
-     * @throws EncryptionException If no encryption extension available.
-     */
-    public static function create(): SecretEncryption
-    {
-        // Prefer libsodium (modern, faster, simpler API).
-        if (extension_loaded('sodium')) {
-            return new SodiumSecretEncryption();
-        }
+final class SecretEncryptionFactory {
 
-        // Fallback to OpenSSL (widely available).
-        if (extension_loaded('openssl')) {
-            return new OpenSslSecretEncryption();
-        }
+	/**
+	 * Create a SecretEncryption instance
+	 *
+	 * Selects the best available encryption implementation:
+	 * - Prefers libsodium if available (more modern, better performance)
+	 * - Falls back to OpenSSL if sodium not available
+	 *
+	 * @return SecretEncryption The encryption instance.
+	 * @throws EncryptionException If no encryption extension available.
+	 */
+	public static function create(): SecretEncryption {
+		// Prefer libsodium (modern, faster, simpler API).
+		if ( extension_loaded( 'sodium' ) ) {
+			return new SodiumSecretEncryption();
+		}
 
-        throw new EncryptionException(
-            'No encryption extension available. Install libsodium or enable OpenSSL.'
-        );
-    }
+		// Fallback to OpenSSL (widely available).
+		if ( extension_loaded( 'openssl' ) ) {
+			return new OpenSslSecretEncryption();
+		}
+
+		throw new EncryptionException(
+			'No encryption extension available. Install libsodium or enable OpenSSL.'
+		);
+	}
 }

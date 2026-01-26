@@ -20,6 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class MediaNotFoundException extends Exception
-{
+class MediaNotFoundException extends Exception {
+
 }

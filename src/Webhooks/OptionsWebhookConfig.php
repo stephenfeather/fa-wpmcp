@@ -16,78 +16,75 @@ namespace FAWpmcp\Webhooks;
  * Uses WordPress options API for storing webhook settings.
  * Encrypts webhook secrets at rest for security.
  */
-final class OptionsWebhookConfig implements WebhookConfig
-{
-    /**
-     * Secret encryption implementation
-     *
-     * @var SecretEncryption
-     */
-    private SecretEncryption $encryption;
+final class OptionsWebhookConfig implements WebhookConfig {
 
-    /**
-     * Constructor
-     *
-     * @param SecretEncryption|null $encryption Optional encryption implementation (auto-detects if not provided).
-     */
-    public function __construct(?SecretEncryption $encryption = null)
-    {
-        $this->encryption = $encryption ?? SecretEncryptionFactory::create();
-    }
+	/**
+	 * Secret encryption implementation
+	 *
+	 * @var SecretEncryption
+	 */
+	private SecretEncryption $encryption;
 
-    /**
-     * Get subscribed URLs for an event.
-     *
-     * @param string $event Event name.
-     *
-     * @return array<int, string> Array of webhook URLs.
-     */
-    public function getSubscribedUrls(string $event): array
-    {
-        $all_urls = get_option('fa_wpmcp_webhook_urls', array());
+	/**
+	 * Constructor
+	 *
+	 * @param SecretEncryption|null $encryption Optional encryption implementation (auto-detects if not provided).
+	 */
+	public function __construct( ?SecretEncryption $encryption = null ) {
+		$this->encryption = $encryption ?? SecretEncryptionFactory::create();
+	}
 
-        // Validate we have proper structure: array -> event key exists -> event value is array.
-        if (! is_array($all_urls) || ! isset($all_urls[ $event ]) || ! is_array($all_urls[ $event ])) {
-            return array();
-        }
+	/**
+	 * Get subscribed URLs for an event.
+	 *
+	 * @param string $event Event name.
+	 *
+	 * @return array<int, string> Array of webhook URLs.
+	 */
+	public function getSubscribedUrls( string $event ): array {
+		$all_urls = get_option( 'fa_wpmcp_webhook_urls', array() );
 
-        return array_values($all_urls[ $event ]);
-    }
+		// Validate we have proper structure: array -> event key exists -> event value is array.
+		if ( ! is_array( $all_urls ) || ! isset( $all_urls[ $event ] ) || ! is_array( $all_urls[ $event ] ) ) {
+			return array();
+		}
 
-    /**
-     * Get webhook secret for HMAC signing.
-     *
-     * Auto-generates and stores encrypted secret if none exists.
-     * Lazily encrypts plain text secrets on first read (migration).
-     *
-     * @return string Decrypted secret key.
-     */
-    public function getSecret(): string
-    {
-        $stored = get_option('fa_wpmcp_webhook_secret');
+		return array_values( $all_urls[ $event ] );
+	}
 
-        if ($stored && is_string($stored)) {
-            // Check if already encrypted.
-            if ($this->encryption->isEncrypted($stored)) {
-                // Decrypt and return.
-                return $this->encryption->decrypt($stored);
-            }
+	/**
+	 * Get webhook secret for HMAC signing.
+	 *
+	 * Auto-generates and stores encrypted secret if none exists.
+	 * Lazily encrypts plain text secrets on first read (migration).
+	 *
+	 * @return string Decrypted secret key.
+	 */
+	public function getSecret(): string {
+		$stored = get_option( 'fa_wpmcp_webhook_secret' );
 
-            // Lazy migration: encrypt plain text secret.
-            $encrypted = $this->encryption->encrypt($stored);
-            update_option('fa_wpmcp_webhook_secret', $encrypted);
-            return $stored;
-        }
+		if ( $stored && is_string( $stored ) ) {
+			// Check if already encrypted.
+			if ( $this->encryption->isEncrypted( $stored ) ) {
+				// Decrypt and return.
+				return $this->encryption->decrypt( $stored );
+			}
 
-        // Generate new secret (32 bytes = 64 hex chars).
-        $secret = bin2hex(random_bytes(32));
+			// Lazy migration: encrypt plain text secret.
+			$encrypted = $this->encryption->encrypt( $stored );
+			update_option( 'fa_wpmcp_webhook_secret', $encrypted );
+			return $stored;
+		}
 
-        // Store encrypted for security.
-        update_option(
-            'fa_wpmcp_webhook_secret',
-            $this->encryption->encrypt($secret)
-        );
+		// Generate new secret (32 bytes = 64 hex chars).
+		$secret = bin2hex( random_bytes( 32 ) );
 
-        return $secret;
-    }
+		// Store encrypted for security.
+		update_option(
+			'fa_wpmcp_webhook_secret',
+			$this->encryption->encrypt( $secret )
+		);
+
+		return $secret;
+	}
 }

@@ -42,129 +42,119 @@ use FAWpmcp\Exceptions\PluginDeletionException;
  * - Handling of plugin data cleanup (options, tables)
  * - Override getAnnotations() to set destructive=true, idempotent=false
  */
-final class DeletePlugin extends AbstractAbility
-{
-    /**
-     * Returns the ability identifier.
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return 'fa-wpmcp/delete-plugin';
-    }
+final class DeletePlugin extends AbstractAbility {
 
-    /**
-     * Returns the ability category.
-     *
-     * @return string
-     */
-    public function getCategory(): string
-    {
-        return 'plugins';
-    }
+	/**
+	 * Returns the ability identifier.
+	 *
+	 * @return string
+	 */
+	public function getName(): string {
+		return 'fa-wpmcp/delete-plugin';
+	}
 
-    /**
-     * Returns the display label.
-     *
-     * @return string
-     */
-    public function getLabel(): string
-    {
-        return 'Delete Plugin';
-    }
+	/**
+	 * Returns the ability category.
+	 *
+	 * @return string
+	 */
+	public function getCategory(): string {
+		return 'plugins';
+	}
 
-    /**
-     * Returns the ability description.
-     *
-     * @return string
-     */
-    public function getDescription(): string
-    {
-        return 'Delete a WordPress plugin.';
-    }
+	/**
+	 * Returns the display label.
+	 *
+	 * @return string
+	 */
+	public function getLabel(): string {
+		return 'Delete Plugin';
+	}
 
-    /**
-     * Returns the operation type.
-     *
-     * @return string
-     */
-    public function getOperationType(): string
-    {
-        return 'write';
-    }
+	/**
+	 * Returns the ability description.
+	 *
+	 * @return string
+	 */
+	public function getDescription(): string {
+		return 'Delete a WordPress plugin.';
+	}
 
-    /**
-     * Returns the JSON Schema for input validation.
-     *
-     * @return array
-     */
-    public function getInputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'plugin' => array(
-                    'type'        => 'string',
-                    'description' => 'Plugin file path.',
-                ),
-            ),
-            'required'   => array( 'plugin' ),
-        );
-    }
+	/**
+	 * Returns the operation type.
+	 *
+	 * @return string
+	 */
+	public function getOperationType(): string {
+		return 'write';
+	}
 
-    /**
-     * Returns the JSON Schema for output.
-     *
-     * @return array
-     */
-    public function getOutputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'plugin'  => array( 'type' => 'string' ),
-                'deleted' => array( 'type' => 'boolean' ),
-            ),
-        );
-    }
+	/**
+	 * Returns the JSON Schema for input validation.
+	 *
+	 * @return array
+	 */
+	public function getInputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'plugin' => array(
+					'type'        => 'string',
+					'description' => 'Plugin file path.',
+				),
+			),
+			'required'   => array( 'plugin' ),
+		);
+	}
 
-    /**
-     * Returns the WordPress capability required.
-     *
-     * @return string
-     */
-    public function getRequiredCapability(): string
-    {
-        return 'delete_plugins';
-    }
+	/**
+	 * Returns the JSON Schema for output.
+	 *
+	 * @return array
+	 */
+	public function getOutputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'plugin'  => array( 'type' => 'string' ),
+				'deleted' => array( 'type' => 'boolean' ),
+			),
+		);
+	}
 
-    /**
-     * Get ability annotations.
-     *
-     * Marks this ability as destructive and non-idempotent.
-     *
-     * @return array<string, mixed> Annotations array.
-     */
-    public function getAnnotations(): array
-    {
-        $annotations                = parent::getAnnotations();
-        $annotations['destructive'] = true;
-        $annotations['idempotent']  = false;
-        return $annotations;
-    }
+	/**
+	 * Returns the WordPress capability required.
+	 *
+	 * @return string
+	 */
+	public function getRequiredCapability(): string {
+		return 'delete_plugins';
+	}
 
-    /**
-     * Executes the ability.
-     *
-     * @param array $input Input parameters.
-     * @return array
-     * @throws PluginDeletionException Always, as this ability is not yet implemented.
-     */
-    public function doExecute(array $input): array
-    {
-        throw new PluginDeletionException(
-            'Plugin deletion is not yet implemented. This ability requires WordPress delete_plugins() integration.'
-        );
-    }
+	/**
+	 * Get ability annotations.
+	 *
+	 * Marks this ability as destructive and non-idempotent.
+	 *
+	 * @return array<string, mixed> Annotations array.
+	 */
+	public function getAnnotations(): array {
+		$annotations                = parent::getAnnotations();
+		$annotations['destructive'] = true;
+		$annotations['idempotent']  = false;
+		return $annotations;
+	}
+
+	/**
+	 * Executes the ability.
+	 *
+	 * @param array $input Input parameters.
+	 * @return array
+	 * @throws PluginDeletionException Always, as this ability is not yet implemented.
+	 */
+	public function doExecute( array $input ): array {
+		throw new PluginDeletionException(
+			'Plugin deletion is not yet implemented. This ability requires WordPress delete_plugins() integration.'
+		);
+	}
 }

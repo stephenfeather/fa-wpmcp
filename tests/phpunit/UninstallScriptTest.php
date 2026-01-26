@@ -17,190 +17,185 @@ use PHPUnit\Framework\TestCase;
 /**
  * Execute uninstall.php to cover cleanup branches.
  */
-final class UninstallScriptTest extends TestCase
-{
-    use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+final class UninstallScriptTest extends TestCase {
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        \Brain\Monkey\setUp();
-    }
+	use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    protected function tearDown(): void
-    {
-        \Brain\Monkey\tearDown();
-        unset($GLOBALS['wpdb']);
-        parent::tearDown();
-    }
+	protected function setUp(): void {
+		parent::setUp();
+		\Brain\Monkey\setUp();
+	}
 
-    /**
-     * Test uninstall returns early when preservation constant is set.
-     *
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     *
-     * @return void
-     */
-    public function test_uninstall_returns_when_preserve_enabled(): void
-    {
-        define('WP_UNINSTALL_PLUGIN', true);
-        define('FA_WPMCP_PRESERVE_DATA_ON_UNINSTALL', true);
+	protected function tearDown(): void {
+		\Brain\Monkey\tearDown();
+		unset( $GLOBALS['wpdb'] );
+		parent::tearDown();
+	}
 
-        $wpdb = Mockery::mock('wpdb');
-        $wpdb->prefix = 'wp_';
-        $wpdb->options = 'wp_options';
-        $wpdb->usermeta = 'wp_usermeta';
-        $wpdb->sitemeta = 'wp_sitemeta';
-        $wpdb->shouldNotReceive('query');
-        $GLOBALS['wpdb'] = $wpdb;
+	/**
+	 * Test uninstall returns early when preservation constant is set.
+	 *
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 *
+	 * @return void
+	 */
+	public function test_uninstall_returns_when_preserve_enabled(): void {
+		define( 'WP_UNINSTALL_PLUGIN', true );
+		define( 'FA_WPMCP_PRESERVE_DATA_ON_UNINSTALL', true );
 
-        Functions\expect('wp_clear_scheduled_hook')->never();
-        Functions\expect('is_multisite')->never();
+		$wpdb = Mockery::mock( 'wpdb' );
+		$wpdb->prefix = 'wp_';
+		$wpdb->options = 'wp_options';
+		$wpdb->usermeta = 'wp_usermeta';
+		$wpdb->sitemeta = 'wp_sitemeta';
+		$wpdb->shouldNotReceive( 'query' );
+		$GLOBALS['wpdb'] = $wpdb;
 
-        require dirname(__DIR__, 2) . '/uninstall.php';
+		Functions\expect( 'wp_clear_scheduled_hook' )->never();
+		Functions\expect( 'is_multisite' )->never();
 
-        $this->assertTrue(true);
-    }
+		require dirname( __DIR__, 2 ) . '/uninstall.php';
 
-    /**
-     * Test uninstall cleanup on single site without Action Scheduler.
-     *
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     *
-     * @return void
-     */
-    public function test_uninstall_cleans_single_site_without_action_scheduler(): void
-    {
-        define('WP_UNINSTALL_PLUGIN', true);
+		$this->assertTrue( true );
+	}
 
-        $wpdb = Mockery::mock('wpdb');
-        $wpdb->prefix = 'wp_';
-        $wpdb->options = 'wp_options';
-        $wpdb->usermeta = 'wp_usermeta';
-        $wpdb->sitemeta = 'wp_sitemeta';
+	/**
+	 * Test uninstall cleanup on single site without Action Scheduler.
+	 *
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 *
+	 * @return void
+	 */
+	public function test_uninstall_cleans_single_site_without_action_scheduler(): void {
+		define( 'WP_UNINSTALL_PLUGIN', true );
 
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with('DROP TABLE IF EXISTS wp_fa_wpmcp_activity_log')
-            ->andReturn(true);
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with('DROP TABLE IF EXISTS wp_fa_wpmcp_webhook_queue')
-            ->andReturn(true);
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with("DELETE FROM wp_options WHERE option_name LIKE 'fa_wpmcp_%'")
-            ->andReturn(true);
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with("DELETE FROM wp_options WHERE option_name LIKE '_transient_fa_wpmcp_%'")
-            ->andReturn(true);
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with("DELETE FROM wp_options WHERE option_name LIKE '_transient_timeout_fa_wpmcp_%'")
-            ->andReturn(true);
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with("DELETE FROM wp_usermeta WHERE meta_key LIKE 'fa_wpmcp_%'")
-            ->andReturn(true);
+		$wpdb = Mockery::mock( 'wpdb' );
+		$wpdb->prefix = 'wp_';
+		$wpdb->options = 'wp_options';
+		$wpdb->usermeta = 'wp_usermeta';
+		$wpdb->sitemeta = 'wp_sitemeta';
 
-        $GLOBALS['wpdb'] = $wpdb;
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( 'DROP TABLE IF EXISTS wp_fa_wpmcp_activity_log' )
+			->andReturn( true );
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( 'DROP TABLE IF EXISTS wp_fa_wpmcp_webhook_queue' )
+			->andReturn( true );
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( "DELETE FROM wp_options WHERE option_name LIKE 'fa_wpmcp_%'" )
+			->andReturn( true );
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( "DELETE FROM wp_options WHERE option_name LIKE '_transient_fa_wpmcp_%'" )
+			->andReturn( true );
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( "DELETE FROM wp_options WHERE option_name LIKE '_transient_timeout_fa_wpmcp_%'" )
+			->andReturn( true );
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( "DELETE FROM wp_usermeta WHERE meta_key LIKE 'fa_wpmcp_%'" )
+			->andReturn( true );
 
-        Functions\expect('is_multisite')
-            ->once()
-            ->andReturn(false);
+		$GLOBALS['wpdb'] = $wpdb;
 
-        Functions\expect('wp_clear_scheduled_hook')
-            ->once()
-            ->with('fa_wpmcp_process_webhook_queue')
-            ->andReturn(1);
-        Functions\expect('wp_clear_scheduled_hook')
-            ->once()
-            ->with('fa_wpmcp_cleanup_old_logs')
-            ->andReturn(1);
+		Functions\expect( 'is_multisite' )
+			->once()
+			->andReturn( false );
 
-        require dirname(__DIR__, 2) . '/uninstall.php';
+		Functions\expect( 'wp_clear_scheduled_hook' )
+			->once()
+			->with( 'fa_wpmcp_process_webhook_queue' )
+			->andReturn( 1 );
+		Functions\expect( 'wp_clear_scheduled_hook' )
+			->once()
+			->with( 'fa_wpmcp_cleanup_old_logs' )
+			->andReturn( 1 );
 
-        $this->assertTrue(true);
-    }
+		require dirname( __DIR__, 2 ) . '/uninstall.php';
 
-    /**
-     * Test uninstall cleanup on multisite with Action Scheduler available.
-     *
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     *
-     * @return void
-     */
-    public function test_uninstall_cleans_multisite_with_action_scheduler(): void
-    {
-        define('WP_UNINSTALL_PLUGIN', true);
+		$this->assertTrue( true );
+	}
 
-        // Define Action Scheduler function so function_exists() returns true.
-        if (! function_exists('as_unschedule_all_actions')) {
-            eval(
-                'namespace { function as_unschedule_all_actions( $hook ) { $GLOBALS["as_calls"][] = $hook; } }'
-            );
-        }
-        $GLOBALS['as_calls'] = array();
+	/**
+	 * Test uninstall cleanup on multisite with Action Scheduler available.
+	 *
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 *
+	 * @return void
+	 */
+	public function test_uninstall_cleans_multisite_with_action_scheduler(): void {
+		define( 'WP_UNINSTALL_PLUGIN', true );
 
-        $wpdb = Mockery::mock('wpdb');
-        $wpdb->prefix = 'wp_';
-        $wpdb->options = 'wp_options';
-        $wpdb->usermeta = 'wp_usermeta';
-        $wpdb->sitemeta = 'wp_sitemeta';
+		// Define Action Scheduler function so function_exists() returns true.
+		if ( ! function_exists( 'as_unschedule_all_actions' ) ) {
+			eval(
+				'namespace { function as_unschedule_all_actions( $hook ) { $GLOBALS["as_calls"][] = $hook; } }'
+			);
+		}
+		$GLOBALS['as_calls'] = array();
 
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with('DROP TABLE IF EXISTS wp_fa_wpmcp_activity_log')
-            ->andReturn(true);
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with('DROP TABLE IF EXISTS wp_fa_wpmcp_webhook_queue')
-            ->andReturn(true);
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with("DELETE FROM wp_options WHERE option_name LIKE 'fa_wpmcp_%'")
-            ->andReturn(true);
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with("DELETE FROM wp_options WHERE option_name LIKE '_transient_fa_wpmcp_%'")
-            ->andReturn(true);
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with("DELETE FROM wp_options WHERE option_name LIKE '_transient_timeout_fa_wpmcp_%'")
-            ->andReturn(true);
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with("DELETE FROM wp_usermeta WHERE meta_key LIKE 'fa_wpmcp_%'")
-            ->andReturn(true);
-        $wpdb->shouldReceive('query')
-            ->once()
-            ->with("DELETE FROM wp_sitemeta WHERE meta_key LIKE 'fa_wpmcp_%'")
-            ->andReturn(true);
+		$wpdb = Mockery::mock( 'wpdb' );
+		$wpdb->prefix = 'wp_';
+		$wpdb->options = 'wp_options';
+		$wpdb->usermeta = 'wp_usermeta';
+		$wpdb->sitemeta = 'wp_sitemeta';
 
-        $GLOBALS['wpdb'] = $wpdb;
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( 'DROP TABLE IF EXISTS wp_fa_wpmcp_activity_log' )
+			->andReturn( true );
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( 'DROP TABLE IF EXISTS wp_fa_wpmcp_webhook_queue' )
+			->andReturn( true );
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( "DELETE FROM wp_options WHERE option_name LIKE 'fa_wpmcp_%'" )
+			->andReturn( true );
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( "DELETE FROM wp_options WHERE option_name LIKE '_transient_fa_wpmcp_%'" )
+			->andReturn( true );
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( "DELETE FROM wp_options WHERE option_name LIKE '_transient_timeout_fa_wpmcp_%'" )
+			->andReturn( true );
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( "DELETE FROM wp_usermeta WHERE meta_key LIKE 'fa_wpmcp_%'" )
+			->andReturn( true );
+		$wpdb->shouldReceive( 'query' )
+			->once()
+			->with( "DELETE FROM wp_sitemeta WHERE meta_key LIKE 'fa_wpmcp_%'" )
+			->andReturn( true );
 
-        Functions\expect('is_multisite')
-            ->once()
-            ->andReturn(true);
+		$GLOBALS['wpdb'] = $wpdb;
 
-        Functions\expect('wp_clear_scheduled_hook')
-            ->once()
-            ->with('fa_wpmcp_process_webhook_queue')
-            ->andReturn(1);
-        Functions\expect('wp_clear_scheduled_hook')
-            ->once()
-            ->with('fa_wpmcp_cleanup_old_logs')
-            ->andReturn(1);
+		Functions\expect( 'is_multisite' )
+			->once()
+			->andReturn( true );
 
-        require dirname(__DIR__, 2) . '/uninstall.php';
+		Functions\expect( 'wp_clear_scheduled_hook' )
+			->once()
+			->with( 'fa_wpmcp_process_webhook_queue' )
+			->andReturn( 1 );
+		Functions\expect( 'wp_clear_scheduled_hook' )
+			->once()
+			->with( 'fa_wpmcp_cleanup_old_logs' )
+			->andReturn( 1 );
 
-        $this->assertSame(
-            array( 'fa_wpmcp_process_webhook', 'fa_wpmcp_retry_webhook' ),
-            $GLOBALS['as_calls']
-        );
-    }
+		require dirname( __DIR__, 2 ) . '/uninstall.php';
+
+		$this->assertSame(
+			array( 'fa_wpmcp_process_webhook', 'fa_wpmcp_retry_webhook' ),
+			$GLOBALS['as_calls']
+		);
+	}
 }

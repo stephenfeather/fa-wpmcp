@@ -10,291 +10,231 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Role;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Role\DeleteRoleAbility;
 use FAWpmcp\Exceptions\RoleNotFoundException;
 use FAWpmcp\Exceptions\RoleDeletionException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test DeleteRoleAbility functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Role
  */
-class DeleteRoleAbilityTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class DeleteRoleAbilityTest extends BrainMonkeyTestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new DeleteRoleAbility();
-        $this->assertEquals('fa-wpmcp/delete-role', $ability->getName());
-    }
+	/**
+	 * Get the ability instance to test.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new DeleteRoleAbility();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new DeleteRoleAbility();
-        $this->assertEquals('role', $ability->getCategory());
-    }
+	/**
+	 * Get the expected metadata for this ability.
+	 *
+	 * @return array<string, mixed>
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/delete-role',
+			'category'             => 'role',
+			'label'                => 'Delete Role',
+			'description_contains' => 'delete',
+			'operation_type'       => 'write',
+			'required_capability'  => 'delete_users',
+		);
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new DeleteRoleAbility();
-        $this->assertEquals('Delete Role', $ability->getLabel());
-    }
+	/**
+	 * Test ability returns input schema with required role field.
+	 *
+	 * @return void
+	 */
+	public function testGetInputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getInputSchema();
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new DeleteRoleAbility();
-        $this->assertEquals('write', $ability->getOperationType());
-    }
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'required', $schema );
+		$this->assertArrayHasKey( 'role', $schema['properties'] );
+		$this->assertContains( 'role', $schema['required'] );
+	}
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new DeleteRoleAbility();
-        $this->assertEquals('delete_users', $ability->getRequiredCapability());
-    }
+	/**
+	 * Test ability returns output schema.
+	 *
+	 * @return void
+	 */
+	public function testGetOutputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getOutputSchema();
 
-    /**
-     * Test ability returns input schema with required role field.
-     *
-     * @return void
-     */
-    public function testGetInputSchema(): void
-    {
-        $ability = new DeleteRoleAbility();
-        $schema  = $ability->getInputSchema();
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'deleted', $schema['properties'] );
+		$this->assertArrayHasKey( 'role', $schema['properties'] );
+	}
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('required', $schema);
-        $this->assertArrayHasKey('role', $schema['properties']);
-        $this->assertContains('role', $schema['required']);
-    }
+	/**
+	 * Test execute deletes custom role successfully.
+	 *
+	 * @return void
+	 */
+	public function testExecuteDeletesCustomRoleSuccessfully(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test ability returns output schema.
-     *
-     * @return void
-     */
-    public function testGetOutputSchema(): void
-    {
-        $ability = new DeleteRoleAbility();
-        $schema  = $ability->getOutputSchema();
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'custom_role';
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('deleted', $schema['properties']);
-        $this->assertArrayHasKey('role', $schema['properties']);
-    }
+		Functions\when( 'get_role' )->justReturn( $mock_role );
 
-    /**
-     * Test execute deletes custom role successfully.
-     *
-     * @return void
-     */
-    public function testExecuteDeletesCustomRoleSuccessfully(): void
-    {
-        $ability = new DeleteRoleAbility();
+		$mock_roles = Mockery::mock( 'WP_Roles' );
+		$mock_roles->shouldReceive( 'remove_role' )
+			->once()
+			->with( 'custom_role' );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'custom_role';
+		Functions\when( 'wp_roles' )->justReturn( $mock_roles );
 
-        Functions\when('get_role')->justReturn($mock_role);
+		$result = $ability->doExecute( array( 'role' => 'custom_role' ) );
 
-        $mock_roles = Mockery::mock('WP_Roles');
-        $mock_roles->shouldReceive('remove_role')
-            ->once()
-            ->with('custom_role');
+		$this->assertIsArray( $result );
+		$this->assertTrue( $result['deleted'] );
+		$this->assertEquals( 'custom_role', $result['role'] );
+	}
 
-        Functions\when('wp_roles')->justReturn($mock_roles);
+	/**
+	 * Test execute throws exception when role not found.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenRoleNotFound(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(array( 'role' => 'custom_role' ));
+		Functions\when( 'get_role' )->justReturn( null );
 
-        $this->assertIsArray($result);
-        $this->assertTrue($result['deleted']);
-        $this->assertEquals('custom_role', $result['role']);
-    }
+		$this->expectException( RoleNotFoundException::class );
+		$this->expectExceptionMessage( 'Role "nonexistent" not found.' );
 
-    /**
-     * Test execute throws exception when role not found.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionWhenRoleNotFound(): void
-    {
-        $ability = new DeleteRoleAbility();
+		$ability->doExecute( array( 'role' => 'nonexistent' ) );
+	}
 
-        Functions\when('get_role')->justReturn(null);
+	/**
+	 * Test execute throws exception when trying to delete administrator role.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenDeletingAdministratorRole(): void {
+		$ability = $this->getAbilityInstance();
 
-        $this->expectException(RoleNotFoundException::class);
-        $this->expectExceptionMessage('Role "nonexistent" not found.');
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'administrator';
 
-        $ability->doExecute(array( 'role' => 'nonexistent' ));
-    }
+		Functions\when( 'get_role' )->justReturn( $mock_role );
 
-    /**
-     * Test execute throws exception when trying to delete administrator role.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionWhenDeletingAdministratorRole(): void
-    {
-        $ability = new DeleteRoleAbility();
+		$this->expectException( RoleDeletionException::class );
+		$this->expectExceptionMessage( 'Cannot delete default WordPress role "administrator".' );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'administrator';
+		$ability->doExecute( array( 'role' => 'administrator' ) );
+	}
 
-        Functions\when('get_role')->justReturn($mock_role);
+	/**
+	 * Test execute throws exception when trying to delete editor role.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenDeletingEditorRole(): void {
+		$ability = $this->getAbilityInstance();
 
-        $this->expectException(RoleDeletionException::class);
-        $this->expectExceptionMessage('Cannot delete default WordPress role "administrator".');
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'editor';
 
-        $ability->doExecute(array( 'role' => 'administrator' ));
-    }
+		Functions\when( 'get_role' )->justReturn( $mock_role );
 
-    /**
-     * Test execute throws exception when trying to delete editor role.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionWhenDeletingEditorRole(): void
-    {
-        $ability = new DeleteRoleAbility();
+		$this->expectException( RoleDeletionException::class );
+		$this->expectExceptionMessage( 'Cannot delete default WordPress role "editor".' );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'editor';
+		$ability->doExecute( array( 'role' => 'editor' ) );
+	}
 
-        Functions\when('get_role')->justReturn($mock_role);
+	/**
+	 * Test execute throws exception when trying to delete author role.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenDeletingAuthorRole(): void {
+		$ability = $this->getAbilityInstance();
 
-        $this->expectException(RoleDeletionException::class);
-        $this->expectExceptionMessage('Cannot delete default WordPress role "editor".');
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'author';
 
-        $ability->doExecute(array( 'role' => 'editor' ));
-    }
+		Functions\when( 'get_role' )->justReturn( $mock_role );
 
-    /**
-     * Test execute throws exception when trying to delete author role.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionWhenDeletingAuthorRole(): void
-    {
-        $ability = new DeleteRoleAbility();
+		$this->expectException( RoleDeletionException::class );
+		$this->expectExceptionMessage( 'Cannot delete default WordPress role "author".' );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'author';
+		$ability->doExecute( array( 'role' => 'author' ) );
+	}
 
-        Functions\when('get_role')->justReturn($mock_role);
+	/**
+	 * Test execute throws exception when trying to delete contributor role.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenDeletingContributorRole(): void {
+		$ability = $this->getAbilityInstance();
 
-        $this->expectException(RoleDeletionException::class);
-        $this->expectExceptionMessage('Cannot delete default WordPress role "author".');
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'contributor';
 
-        $ability->doExecute(array( 'role' => 'author' ));
-    }
+		Functions\when( 'get_role' )->justReturn( $mock_role );
 
-    /**
-     * Test execute throws exception when trying to delete contributor role.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionWhenDeletingContributorRole(): void
-    {
-        $ability = new DeleteRoleAbility();
+		$this->expectException( RoleDeletionException::class );
+		$this->expectExceptionMessage( 'Cannot delete default WordPress role "contributor".' );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'contributor';
+		$ability->doExecute( array( 'role' => 'contributor' ) );
+	}
 
-        Functions\when('get_role')->justReturn($mock_role);
+	/**
+	 * Test execute throws exception when trying to delete subscriber role.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenDeletingSubscriberRole(): void {
+		$ability = $this->getAbilityInstance();
 
-        $this->expectException(RoleDeletionException::class);
-        $this->expectExceptionMessage('Cannot delete default WordPress role "contributor".');
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'subscriber';
 
-        $ability->doExecute(array( 'role' => 'contributor' ));
-    }
+		Functions\when( 'get_role' )->justReturn( $mock_role );
 
-    /**
-     * Test execute throws exception when trying to delete subscriber role.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionWhenDeletingSubscriberRole(): void
-    {
-        $ability = new DeleteRoleAbility();
+		$this->expectException( RoleDeletionException::class );
+		$this->expectExceptionMessage( 'Cannot delete default WordPress role "subscriber".' );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'subscriber';
+		$ability->doExecute( array( 'role' => 'subscriber' ) );
+	}
 
-        Functions\when('get_role')->justReturn($mock_role);
+	/**
+	 * Test annotations indicate destructive write operation.
+	 *
+	 * @return void
+	 */
+	public function testGetAnnotations(): void {
+		$ability     = new DeleteRoleAbility();
+		$annotations = $ability->getAnnotations();
 
-        $this->expectException(RoleDeletionException::class);
-        $this->expectExceptionMessage('Cannot delete default WordPress role "subscriber".');
-
-        $ability->doExecute(array( 'role' => 'subscriber' ));
-    }
-
-    /**
-     * Test annotations indicate destructive write operation.
-     *
-     * @return void
-     */
-    public function testGetAnnotations(): void
-    {
-        $ability     = new DeleteRoleAbility();
-        $annotations = $ability->getAnnotations();
-
-        $this->assertFalse($annotations['readonly']);
-        $this->assertTrue($annotations['destructive']);
-        $this->assertFalse($annotations['idempotent']);
-    }
+		$this->assertFalse( $annotations['readonly'] );
+		$this->assertTrue( $annotations['destructive'] );
+		$this->assertFalse( $annotations['idempotent'] );
+	}
 }

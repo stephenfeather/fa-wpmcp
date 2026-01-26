@@ -27,403 +27,386 @@ use PHPUnit\Framework\TestCase;
  *
  * @package FAWpmcp\Tests\Abilities\Users
  */
-class CreateUserTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
+class CreateUserTest extends TestCase {
 
-        // Default mock for RolePolicy's get_option call.
-        // Tests can override this as needed.
-        Functions\when('get_option')
-            ->alias(
-                function ($option, $default = false) {
-                    if ('fa_wpmcp_max_api_role' === $option) {
-                        return 'editor'; // Default max role for tests.
-                    }
-                    return $default;
-                }
-            );
-    }
+	/**
+	 * Set up Brain\Monkey before each test.
+	 *
+	 * @return void
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+		Monkey\setUp();
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+		// Default mock for RolePolicy's get_option call.
+		// Tests can override this as needed.
+		Functions\when( 'get_option' )
+			->alias(
+				function ( $option, $default = false ) {
+					if ( 'fa_wpmcp_max_api_role' === $option ) {
+						return 'editor'; // Default max role for tests.
+					}
+					return $default;
+				}
+			);
+	}
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new CreateUser();
-        $this->assertEquals('fa-wpmcp/create-user', $ability->getName());
-    }
+	/**
+	 * Tear down Brain\Monkey after each test.
+	 *
+	 * @return void
+	 */
+	protected function tearDown(): void {
+		Monkey\tearDown();
+		Mockery::close();
+		parent::tearDown();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new CreateUser();
-        $this->assertEquals('users', $ability->getCategory());
-    }
+	/**
+	 * Test ability returns correct name.
+	 *
+	 * @return void
+	 */
+	public function testGetName(): void {
+		$ability = new CreateUser();
+		$this->assertEquals( 'fa-wpmcp/create-user', $ability->getName() );
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new CreateUser();
-        $this->assertEquals('Create User', $ability->getLabel());
-    }
+	/**
+	 * Test ability returns correct category.
+	 *
+	 * @return void
+	 */
+	public function testGetCategory(): void {
+		$ability = new CreateUser();
+		$this->assertEquals( 'users', $ability->getCategory() );
+	}
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new CreateUser();
-        $this->assertEquals('write', $ability->getOperationType());
-    }
+	/**
+	 * Test ability returns correct label.
+	 *
+	 * @return void
+	 */
+	public function testGetLabel(): void {
+		$ability = new CreateUser();
+		$this->assertEquals( 'Create User', $ability->getLabel() );
+	}
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new CreateUser();
-        $this->assertEquals('create_users', $ability->getRequiredCapability());
-    }
+	/**
+	 * Test ability returns correct operation type.
+	 *
+	 * @return void
+	 */
+	public function testGetOperationType(): void {
+		$ability = new CreateUser();
+		$this->assertEquals( 'write', $ability->getOperationType() );
+	}
 
-    /**
-     * Test input schema requires username and email.
-     *
-     * @return void
-     */
-    public function testInputSchemaRequiresUsernameAndEmail(): void
-    {
-        $ability = new CreateUser();
-        $schema  = $ability->getInputSchema();
+	/**
+	 * Test ability returns correct required capability.
+	 *
+	 * @return void
+	 */
+	public function testGetRequiredCapability(): void {
+		$ability = new CreateUser();
+		$this->assertEquals( 'create_users', $ability->getRequiredCapability() );
+	}
 
-        $this->assertArrayHasKey('required', $schema);
-        $this->assertContains('username', $schema['required']);
-        $this->assertContains('email', $schema['required']);
-    }
+	/**
+	 * Test input schema requires username and email.
+	 *
+	 * @return void
+	 */
+	public function testInputSchemaRequiresUsernameAndEmail(): void {
+		$ability = new CreateUser();
+		$schema  = $ability->getInputSchema();
 
-    /**
-     * Test input schema supports optional fields.
-     *
-     * @return void
-     */
-    public function testInputSchemaSupportsOptionalFields(): void
-    {
-        $ability = new CreateUser();
-        $schema  = $ability->getInputSchema();
+		$this->assertArrayHasKey( 'required', $schema );
+		$this->assertContains( 'username', $schema['required'] );
+		$this->assertContains( 'email', $schema['required'] );
+	}
 
-        $this->assertArrayHasKey('password', $schema['properties']);
-        $this->assertArrayHasKey('role', $schema['properties']);
-        $this->assertArrayHasKey('first_name', $schema['properties']);
-        $this->assertArrayHasKey('last_name', $schema['properties']);
-        $this->assertArrayHasKey('display_name', $schema['properties']);
-    }
+	/**
+	 * Test input schema supports optional fields.
+	 *
+	 * @return void
+	 */
+	public function testInputSchemaSupportsOptionalFields(): void {
+		$ability = new CreateUser();
+		$schema  = $ability->getInputSchema();
 
-    /**
-     * Test build user data with minimal input.
-     *
-     * @return void
-     */
-    public function testBuildUserDataWithMinimalInput(): void
-    {
-        Functions\stubs(
-            array(
-                'sanitize_user'  => function ($v) {
-                    return $v;
-                },
-                'sanitize_email' => function ($v) {
-                    return $v;
-                },
-            )
-        );
+		$this->assertArrayHasKey( 'password', $schema['properties'] );
+		$this->assertArrayHasKey( 'role', $schema['properties'] );
+		$this->assertArrayHasKey( 'first_name', $schema['properties'] );
+		$this->assertArrayHasKey( 'last_name', $schema['properties'] );
+		$this->assertArrayHasKey( 'display_name', $schema['properties'] );
+	}
 
-        $ability = new CreateUser();
+	/**
+	 * Test build user data with minimal input.
+	 *
+	 * @return void
+	 */
+	public function testBuildUserDataWithMinimalInput(): void {
+		Functions\stubs(
+			array(
+				'sanitize_user'  => function ( $v ) {
+					return $v;
+				},
+				'sanitize_email' => function ( $v ) {
+					return $v;
+				},
+			)
+		);
 
-        $reflection = new \ReflectionClass($ability);
-        $method     = $reflection->getMethod('buildUserData');
+		$ability = new CreateUser();
 
-        $input = array(
-            'username' => 'testuser',
-            'email'    => 'test@example.com',
-        );
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'buildUserData' );
 
-        $result = $method->invoke($ability, $input);
+		$input = array(
+			'username' => 'testuser',
+			'email'    => 'test@example.com',
+		);
 
-        $this->assertEquals('testuser', $result['user_login']);
-        $this->assertEquals('test@example.com', $result['user_email']);
-        $this->assertEquals('subscriber', $result['role']);
-        $this->assertEquals('testuser', $result['display_name']);
-    }
+		$result = $method->invoke( $ability, $input );
 
-    /**
-     * Test build user data with all fields.
-     *
-     * @return void
-     */
-    public function testBuildUserDataWithAllFields(): void
-    {
-        Functions\stubs(
-            array(
-                'sanitize_user'           => function ($v) {
-                    return $v;
-                },
-                'sanitize_email'          => function ($v) {
-                    return $v;
-                },
-                'sanitize_text_field'     => function ($v) {
-                    return $v;
-                },
-                'sanitize_textarea_field' => function ($v) {
-                    return $v;
-                },
-                'esc_url_raw'             => function ($v) {
-                    return $v;
-                },
-            )
-        );
+		$this->assertEquals( 'testuser', $result['user_login'] );
+		$this->assertEquals( 'test@example.com', $result['user_email'] );
+		$this->assertEquals( 'subscriber', $result['role'] );
+		$this->assertEquals( 'testuser', $result['display_name'] );
+	}
 
-        $ability = new CreateUser();
+	/**
+	 * Test build user data with all fields.
+	 *
+	 * @return void
+	 */
+	public function testBuildUserDataWithAllFields(): void {
+		Functions\stubs(
+			array(
+				'sanitize_user'           => function ( $v ) {
+					return $v;
+				},
+				'sanitize_email'          => function ( $v ) {
+					return $v;
+				},
+				'sanitize_text_field'     => function ( $v ) {
+					return $v;
+				},
+				'sanitize_textarea_field' => function ( $v ) {
+					return $v;
+				},
+				'esc_url_raw'             => function ( $v ) {
+					return $v;
+				},
+			)
+		);
 
-        $reflection = new \ReflectionClass($ability);
-        $method     = $reflection->getMethod('buildUserData');
+		$ability = new CreateUser();
 
-        $input = array(
-            'username'     => 'johndoe',
-            'email'        => 'john@example.com',
-            'password'     => 'securepass123',
-            'role'         => 'editor',
-            'first_name'   => 'John',
-            'last_name'    => 'Doe',
-            'display_name' => 'John D.',
-            'website'      => 'https://johndoe.com',
-            'description'  => 'Test user bio',
-        );
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'buildUserData' );
 
-        $result = $method->invoke($ability, $input);
+		$input = array(
+			'username'     => 'johndoe',
+			'email'        => 'john@example.com',
+			'password'     => 'securepass123',
+			'role'         => 'editor',
+			'first_name'   => 'John',
+			'last_name'    => 'Doe',
+			'display_name' => 'John D.',
+			'website'      => 'https://johndoe.com',
+			'description'  => 'Test user bio',
+		);
 
-        $this->assertEquals('johndoe', $result['user_login']);
-        $this->assertEquals('john@example.com', $result['user_email']);
-        $this->assertEquals('securepass123', $result['user_pass']);
-        $this->assertEquals('editor', $result['role']);
-        $this->assertEquals('John', $result['first_name']);
-        $this->assertEquals('Doe', $result['last_name']);
-        $this->assertEquals('John D.', $result['display_name']);
-        $this->assertEquals('https://johndoe.com', $result['user_url']);
-        $this->assertEquals('Test user bio', $result['description']);
-    }
+		$result = $method->invoke( $ability, $input );
 
-    /**
-     * Test validate role with valid role.
-     *
-     * @return void
-     */
-    public function testValidateRoleWithValidRole(): void
-    {
-        $ability = new CreateUser();
+		$this->assertEquals( 'johndoe', $result['user_login'] );
+		$this->assertEquals( 'john@example.com', $result['user_email'] );
+		$this->assertEquals( 'securepass123', $result['user_pass'] );
+		$this->assertEquals( 'editor', $result['role'] );
+		$this->assertEquals( 'John', $result['first_name'] );
+		$this->assertEquals( 'Doe', $result['last_name'] );
+		$this->assertEquals( 'John D.', $result['display_name'] );
+		$this->assertEquals( 'https://johndoe.com', $result['user_url'] );
+		$this->assertEquals( 'Test user bio', $result['description'] );
+	}
 
-        $reflection = new \ReflectionClass($ability);
-        $method     = $reflection->getMethod('validateRole');
+	/**
+	 * Test validate role with valid role.
+	 *
+	 * @return void
+	 */
+	public function testValidateRoleWithValidRole(): void {
+		$ability = new CreateUser();
 
-        $result = $method->invoke($ability, 'editor');
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'validateRole' );
 
-        $this->assertEquals('editor', $result);
-    }
+		$result = $method->invoke( $ability, 'editor' );
 
-    /**
-     * Test validate role with invalid role.
-     *
-     * @return void
-     */
-    public function testValidateRoleWithInvalidRole(): void
-    {
-        $ability = new CreateUser();
+		$this->assertEquals( 'editor', $result );
+	}
 
-        $reflection = new \ReflectionClass($ability);
-        $method     = $reflection->getMethod('validateRole');
+	/**
+	 * Test validate role with invalid role.
+	 *
+	 * @return void
+	 */
+	public function testValidateRoleWithInvalidRole(): void {
+		$ability = new CreateUser();
 
-        $result = $method->invoke($ability, 'invalid_role');
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'validateRole' );
 
-        $this->assertEquals('subscriber', $result);
-    }
+		$result = $method->invoke( $ability, 'invalid_role' );
 
-    /**
-     * Test execute with successful user creation.
-     *
-     * @return void
-     */
-    public function testExecuteWithSuccessfulCreation(): void
-    {
-        Functions\stubs(
-            array(
-                'sanitize_user'  => function ($v) {
-                    return $v;
-                },
-                'sanitize_email' => function ($v) {
-                    return $v;
-                },
-            )
-        );
+		$this->assertEquals( 'subscriber', $result );
+	}
 
-        Functions\expect('wp_insert_user')->andReturn(42);
+	/**
+	 * Test execute with successful user creation.
+	 *
+	 * @return void
+	 */
+	public function testExecuteWithSuccessfulCreation(): void {
+		Functions\stubs(
+			array(
+				'sanitize_user'  => function ( $v ) {
+					return $v;
+				},
+				'sanitize_email' => function ( $v ) {
+					return $v;
+				},
+			)
+		);
+
+		Functions\expect( 'wp_insert_user' )->andReturn( 42 );
 
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Test mock.
-        $mock_user             = Mockery::mock(\WP_User::class);
-        $mock_user->user_login = 'testuser';
-        $mock_user->user_email = 'test@example.com';
+		$mock_user             = Mockery::mock( \WP_User::class );
+		$mock_user->user_login = 'testuser';
+		$mock_user->user_email = 'test@example.com';
 
-        Functions\expect('get_userdata')->with(42)->andReturn($mock_user);
-        Functions\expect('get_edit_user_link')->with(42)->andReturn('https://example.com/wp-admin/user-edit.php?user_id=42');
+		Functions\expect( 'get_userdata' )->with( 42 )->andReturn( $mock_user );
+		Functions\expect( 'get_edit_user_link' )->with( 42 )->andReturn( 'https://example.com/wp-admin/user-edit.php?user_id=42' );
 
-        $ability = new CreateUser();
-        $result  = $ability->doExecute(
-            array(
-                'username' => 'testuser',
-                'email'    => 'test@example.com',
-            )
-        );
+		$ability = new CreateUser();
+		$result  = $ability->doExecute(
+			array(
+				'username' => 'testuser',
+				'email'    => 'test@example.com',
+			)
+		);
 
-        $this->assertEquals(42, $result['user_id']);
-        $this->assertEquals('testuser', $result['username']);
-        $this->assertEquals('test@example.com', $result['email']);
-    }
+		$this->assertEquals( 42, $result['user_id'] );
+		$this->assertEquals( 'testuser', $result['username'] );
+		$this->assertEquals( 'test@example.com', $result['email'] );
+	}
 
-    /**
-     * Test execute throws exception on WP_Error.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionOnWpError(): void
-    {
-        Functions\stubs(
-            array(
-                'sanitize_user'  => function ($v) {
-                    return $v;
-                },
-                'sanitize_email' => function ($v) {
-                    return $v;
-                },
-            )
-        );
+	/**
+	 * Test execute throws exception on WP_Error.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionOnWpError(): void {
+		Functions\stubs(
+			array(
+				'sanitize_user'  => function ( $v ) {
+					return $v;
+				},
+				'sanitize_email' => function ( $v ) {
+					return $v;
+				},
+			)
+		);
 
-        $wp_error = Mockery::mock('WP_Error');
-        $wp_error->shouldReceive('get_error_message')->andReturn('Username already exists');
+		$wp_error = Mockery::mock( 'WP_Error' );
+		$wp_error->shouldReceive( 'get_error_message' )->andReturn( 'Username already exists' );
 
-        Functions\expect('wp_insert_user')->andReturn($wp_error);
-        Functions\expect('is_wp_error')->with($wp_error)->andReturn(true);
+		Functions\expect( 'wp_insert_user' )->andReturn( $wp_error );
+		Functions\expect( 'is_wp_error' )->with( $wp_error )->andReturn( true );
 
-        $ability = new CreateUser();
+		$ability = new CreateUser();
 
-        $this->expectException(UserCreationException::class);
-        $this->expectExceptionMessage('Username already exists');
+		$this->expectException( UserCreationException::class );
+		$this->expectExceptionMessage( 'Username already exists' );
 
-        $ability->doExecute(
-            array(
-                'username' => 'duplicate',
-                'email'    => 'duplicate@example.com',
-            )
-        );
-    }
+		$ability->doExecute(
+			array(
+				'username' => 'duplicate',
+				'email'    => 'duplicate@example.com',
+			)
+		);
+	}
 
-    /**
-     * Test build user data is a pure function.
-     *
-     * @return void
-     */
-    public function testBuildUserDataIsPure(): void
-    {
-        Functions\stubs(
-            array(
-                'sanitize_user'  => function ($v) {
-                    return $v;
-                },
-                'sanitize_email' => function ($v) {
-                    return $v;
-                },
-            )
-        );
+	/**
+	 * Test build user data is a pure function.
+	 *
+	 * @return void
+	 */
+	public function testBuildUserDataIsPure(): void {
+		Functions\stubs(
+			array(
+				'sanitize_user'  => function ( $v ) {
+					return $v;
+				},
+				'sanitize_email' => function ( $v ) {
+					return $v;
+				},
+			)
+		);
 
-        $ability = new CreateUser();
+		$ability = new CreateUser();
 
-        $reflection = new \ReflectionClass($ability);
-        $method     = $reflection->getMethod('buildUserData');
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'buildUserData' );
 
-        $input = array(
-            'username' => 'testuser',
-            'email'    => 'test@example.com',
-            'role'     => 'author',
-        );
+		$input = array(
+			'username' => 'testuser',
+			'email'    => 'test@example.com',
+			'role'     => 'author',
+		);
 
-        // Call twice with same input.
-        $result1 = $method->invoke($ability, $input);
-        $result2 = $method->invoke($ability, $input);
+		// Call twice with same input.
+		$result1 = $method->invoke( $ability, $input );
+		$result2 = $method->invoke( $ability, $input );
 
-        // Pure function should return identical results.
-        $this->assertEquals($result1, $result2);
-    }
+		// Pure function should return identical results.
+		$this->assertEquals( $result1, $result2 );
+	}
 
-    /**
-     * Test build user data does not include password if empty.
-     *
-     * @return void
-     */
-    public function testBuildUserDataDoesNotIncludeEmptyPassword(): void
-    {
-        Functions\stubs(
-            array(
-                'sanitize_user'  => function ($v) {
-                    return $v;
-                },
-                'sanitize_email' => function ($v) {
-                    return $v;
-                },
-            )
-        );
+	/**
+	 * Test build user data does not include password if empty.
+	 *
+	 * @return void
+	 */
+	public function testBuildUserDataDoesNotIncludeEmptyPassword(): void {
+		Functions\stubs(
+			array(
+				'sanitize_user'  => function ( $v ) {
+					return $v;
+				},
+				'sanitize_email' => function ( $v ) {
+					return $v;
+				},
+			)
+		);
 
-        $ability = new CreateUser();
+		$ability = new CreateUser();
 
-        $reflection = new \ReflectionClass($ability);
-        $method     = $reflection->getMethod('buildUserData');
+		$reflection = new \ReflectionClass( $ability );
+		$method     = $reflection->getMethod( 'buildUserData' );
 
-        $input = array(
-            'username' => 'testuser',
-            'email'    => 'test@example.com',
-            'password' => '',
-        );
+		$input = array(
+			'username' => 'testuser',
+			'email'    => 'test@example.com',
+			'password' => '',
+		);
 
-        $result = $method->invoke($ability, $input);
+		$result = $method->invoke( $ability, $input );
 
-        $this->assertArrayNotHasKey('user_pass', $result);
-    }
+		$this->assertArrayNotHasKey( 'user_pass', $result );
+	}
 }

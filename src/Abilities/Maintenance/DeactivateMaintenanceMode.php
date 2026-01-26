@@ -20,156 +20,146 @@ use FAWpmcp\Exceptions\MaintenanceModeException;
  *
  * @package FAWpmcp\Abilities\Maintenance
  */
-final class DeactivateMaintenanceMode extends AbstractAbility
-{
-    /**
-     * Get the unique ability name.
-     *
-     * @return string Ability name.
-     */
-    public function getName(): string
-    {
-        return 'fa-wpmcp/deactivate-maintenance-mode';
-    }
+final class DeactivateMaintenanceMode extends AbstractAbility {
 
-    /**
-     * Get the ability category.
-     *
-     * @return string Category name.
-     */
-    public function getCategory(): string
-    {
-        return 'maintenance';
-    }
+	/**
+	 * Get the unique ability name.
+	 *
+	 * @return string Ability name.
+	 */
+	public function getName(): string {
+		return 'fa-wpmcp/deactivate-maintenance-mode';
+	}
 
-    /**
-     * Get the human-readable label.
-     *
-     * @return string Ability label.
-     */
-    public function getLabel(): string
-    {
-        return 'Deactivate Maintenance Mode';
-    }
+	/**
+	 * Get the ability category.
+	 *
+	 * @return string Category name.
+	 */
+	public function getCategory(): string {
+		return 'maintenance';
+	}
 
-    /**
-     * Get the ability description.
-     *
-     * @return string Description.
-     */
-    public function getDescription(): string
-    {
-        return 'Deactivate WordPress maintenance mode. Site will be accessible to visitors again.';
-    }
+	/**
+	 * Get the human-readable label.
+	 *
+	 * @return string Ability label.
+	 */
+	public function getLabel(): string {
+		return 'Deactivate Maintenance Mode';
+	}
 
-    /**
-     * Get the input schema.
-     *
-     * @return array<string, mixed> JSON Schema array.
-     */
-    public function getInputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => new \stdClass(),
-        );
-    }
+	/**
+	 * Get the ability description.
+	 *
+	 * @return string Description.
+	 */
+	public function getDescription(): string {
+		return 'Deactivate WordPress maintenance mode. Site will be accessible to visitors again.';
+	}
 
-    /**
-     * Get the output schema.
-     *
-     * @return array<string, mixed> JSON Schema array.
-     */
-    public function getOutputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'deactivated' => array(
-                    'type'        => 'boolean',
-                    'description' => 'Whether maintenance mode was successfully deactivated.',
-                ),
-                'was_active'  => array(
-                    'type'        => 'boolean',
-                    'description' => 'Whether maintenance mode was active before this call.',
-                ),
-                'message'     => array(
-                    'type'        => 'string',
-                    'description' => 'Status message.',
-                ),
-            ),
-        );
-    }
+	/**
+	 * Get the input schema.
+	 *
+	 * @return array<string, mixed> JSON Schema array.
+	 */
+	public function getInputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => new \stdClass(),
+		);
+	}
 
-    /**
-     * Get the required WordPress capability.
-     *
-     * @return string WordPress capability name.
-     */
-    public function getRequiredCapability(): string
-    {
-        return 'manage_options';
-    }
+	/**
+	 * Get the output schema.
+	 *
+	 * @return array<string, mixed> JSON Schema array.
+	 */
+	public function getOutputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'deactivated' => array(
+					'type'        => 'boolean',
+					'description' => 'Whether maintenance mode was successfully deactivated.',
+				),
+				'was_active'  => array(
+					'type'        => 'boolean',
+					'description' => 'Whether maintenance mode was active before this call.',
+				),
+				'message'     => array(
+					'type'        => 'string',
+					'description' => 'Status message.',
+				),
+			),
+		);
+	}
 
-    /**
-     * Get the operation type.
-     *
-     * @return string Operation type ('read' or 'write').
-     */
-    public function getOperationType(): string
-    {
-        return 'write';
-    }
+	/**
+	 * Get the required WordPress capability.
+	 *
+	 * @return string WordPress capability name.
+	 */
+	public function getRequiredCapability(): string {
+		return 'manage_options';
+	}
 
-    /**
-     * Get ability annotations.
-     *
-     * @return array<string, mixed> Annotations array.
-     */
-    public function getAnnotations(): array
-    {
-        $annotations               = parent::getAnnotations();
-        $annotations['mcp.public'] = true;
-        $annotations['idempotent'] = true;
-        return $annotations;
-    }
+	/**
+	 * Get the operation type.
+	 *
+	 * @return string Operation type ('read' or 'write').
+	 */
+	public function getOperationType(): string {
+		return 'write';
+	}
 
-    /**
-     * Execute the ability.
-     *
-     * @param array<string, mixed> $input Validated input data.
-     * @return array<string, mixed> Deactivation result.
-     * @throws MaintenanceModeException If deactivation fails.
-     */
-    public function doExecute(array $input): array
-    {
-        $maintenance_file = ABSPATH . '.maintenance';
+	/**
+	 * Get ability annotations.
+	 *
+	 * @return array<string, mixed> Annotations array.
+	 */
+	public function getAnnotations(): array {
+		$annotations               = parent::getAnnotations();
+		$annotations['mcp.public'] = true;
+		$annotations['idempotent'] = true;
+		return $annotations;
+	}
 
-        // Check if maintenance mode was active.
-        $was_active = file_exists($maintenance_file);
+	/**
+	 * Execute the ability.
+	 *
+	 * @param array<string, mixed> $input Validated input data.
+	 * @return array<string, mixed> Deactivation result.
+	 * @throws MaintenanceModeException If deactivation fails.
+	 */
+	public function doExecute( array $input ): array {
+		$maintenance_file = ABSPATH . '.maintenance';
 
-        if (! $was_active) {
-            return array(
-                'deactivated' => true,
-                'was_active'  => false,
-                'message'     => 'Maintenance mode was not active.',
-            );
-        }
+		// Check if maintenance mode was active.
+		$was_active = file_exists( $maintenance_file );
 
-        // Remove the maintenance file.
+		if ( ! $was_active ) {
+			return array(
+				'deactivated' => true,
+				'was_active'  => false,
+				'message'     => 'Maintenance mode was not active.',
+			);
+		}
+
+		// Remove the maintenance file.
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
-        $result = unlink($maintenance_file);
+		$result = unlink( $maintenance_file );
 
-        if (false === $result) {
-            throw new MaintenanceModeException(
-                'Failed to remove maintenance file. Check file system permissions.'
-            );
-        }
+		if ( false === $result ) {
+			throw new MaintenanceModeException(
+				'Failed to remove maintenance file. Check file system permissions.'
+			);
+		}
 
-        return array(
-            'deactivated' => true,
-            'was_active'  => true,
-            'message'     => 'Maintenance mode deactivated. Site is now accessible.',
-        );
-    }
+		return array(
+			'deactivated' => true,
+			'was_active'  => true,
+			'message'     => 'Maintenance mode deactivated. Site is now accessible.',
+		);
+	}
 }

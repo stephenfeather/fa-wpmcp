@@ -41,114 +41,105 @@ use FAWpmcp\Exceptions\PluginInstallationException;
  * - Handling of plugin dependencies
  * - Compatibility checking against WordPress version
  */
-final class InstallPlugin extends AbstractAbility
-{
-    /**
-     * Returns the ability identifier.
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return 'fa-wpmcp/install-plugin';
-    }
+final class InstallPlugin extends AbstractAbility {
 
-    /**
-     * Returns the ability category.
-     *
-     * @return string
-     */
-    public function getCategory(): string
-    {
-        return 'plugins';
-    }
+	/**
+	 * Returns the ability identifier.
+	 *
+	 * @return string
+	 */
+	public function getName(): string {
+		return 'fa-wpmcp/install-plugin';
+	}
 
-    /**
-     * Returns the display label.
-     *
-     * @return string
-     */
-    public function getLabel(): string
-    {
-        return 'Install Plugin';
-    }
+	/**
+	 * Returns the ability category.
+	 *
+	 * @return string
+	 */
+	public function getCategory(): string {
+		return 'plugins';
+	}
 
-    /**
-     * Returns the ability description.
-     *
-     * @return string
-     */
-    public function getDescription(): string
-    {
-        return 'Install a WordPress plugin from WordPress.org or zip URL.';
-    }
+	/**
+	 * Returns the display label.
+	 *
+	 * @return string
+	 */
+	public function getLabel(): string {
+		return 'Install Plugin';
+	}
 
-    /**
-     * Returns the operation type.
-     *
-     * @return string
-     */
-    public function getOperationType(): string
-    {
-        return 'write';
-    }
+	/**
+	 * Returns the ability description.
+	 *
+	 * @return string
+	 */
+	public function getDescription(): string {
+		return 'Install a WordPress plugin from WordPress.org or zip URL.';
+	}
 
-    /**
-     * Returns the JSON Schema for input validation.
-     *
-     * @return array
-     */
-    public function getInputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'slug' => array(
-                    'type'        => 'string',
-                    'description' => 'Plugin slug from WordPress.org.',
-                ),
-            ),
-            'required'   => array( 'slug' ),
-        );
-    }
+	/**
+	 * Returns the operation type.
+	 *
+	 * @return string
+	 */
+	public function getOperationType(): string {
+		return 'write';
+	}
 
-    /**
-     * Returns the JSON Schema for output.
-     *
-     * @return array
-     */
-    public function getOutputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'slug'      => array( 'type' => 'string' ),
-                'installed' => array( 'type' => 'boolean' ),
-            ),
-        );
-    }
+	/**
+	 * Returns the JSON Schema for input validation.
+	 *
+	 * @return array
+	 */
+	public function getInputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'slug' => array(
+					'type'        => 'string',
+					'description' => 'Plugin slug from WordPress.org.',
+				),
+			),
+			'required'   => array( 'slug' ),
+		);
+	}
 
-    /**
-     * Returns the WordPress capability required.
-     *
-     * @return string
-     */
-    public function getRequiredCapability(): string
-    {
-        return 'install_plugins';
-    }
+	/**
+	 * Returns the JSON Schema for output.
+	 *
+	 * @return array
+	 */
+	public function getOutputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'slug'      => array( 'type' => 'string' ),
+				'installed' => array( 'type' => 'boolean' ),
+			),
+		);
+	}
 
-    /**
-     * Executes the ability.
-     *
-     * @param array $input Input parameters.
-     * @return array
-     * @throws PluginInstallationException Always, as this ability is not yet implemented.
-     */
-    public function doExecute(array $input): array
-    {
-        throw new PluginInstallationException(
-            'Plugin installation is not yet implemented. This ability requires WordPress Plugin_Upgrader integration.'
-        );
-    }
+	/**
+	 * Returns the WordPress capability required.
+	 *
+	 * @return string
+	 */
+	public function getRequiredCapability(): string {
+		return 'install_plugins';
+	}
+
+	/**
+	 * Executes the ability.
+	 *
+	 * @param array $input Input parameters.
+	 * @return array
+	 * @throws PluginInstallationException Always, as this ability is not yet implemented.
+	 */
+	public function doExecute( array $input ): array {
+		throw new PluginInstallationException(
+			'Plugin installation is not yet implemented. This ability requires WordPress Plugin_Upgrader integration.'
+		);
+	}
 }

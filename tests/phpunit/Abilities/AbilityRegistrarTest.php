@@ -11,86 +11,84 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for AbilityRegistrar.
  */
-class AbilityRegistrarTest extends TestCase
-{
-    /**
-     * Test that registerAll registers all expected abilities.
-     */
-    public function test_register_all_registers_all_abilities(): void
-    {
-        $registry = new AbilityRegistry();
+class AbilityRegistrarTest extends TestCase {
 
-        AbilityRegistrar::registerAll($registry);
+	/**
+	 * Test that registerAll registers all expected abilities.
+	 */
+	public function test_register_all_registers_all_abilities(): void {
+		$registry = new AbilityRegistry();
 
-        $abilities = $registry->all();
+		AbilityRegistrar::registerAll( $registry );
 
-        // Verify we have a substantial number of abilities registered.
-        $this->assertGreaterThanOrEqual(70, count($abilities));
+		$abilities = $registry->all();
 
-        // Verify key abilities from different categories exist.
-        $abilityNames = array_map(fn($a) => $a->getName(), $abilities);
+		// Verify we have a substantial number of abilities registered.
+		$this->assertGreaterThanOrEqual( 70, count( $abilities ) );
 
-        // Posts.
-        $this->assertContains('fa-wpmcp/get-post', $abilityNames);
-        $this->assertContains('fa-wpmcp/list-posts', $abilityNames);
+		// Verify key abilities from different categories exist.
+		$abilityNames = array_map( fn( $a ) => $a->getName(), $abilities );
 
-        // Comments.
-        $this->assertContains('fa-wpmcp/get-comment', $abilityNames);
+		// Posts.
+		$this->assertContains( 'fa-wpmcp/get-post', $abilityNames );
+		$this->assertContains( 'fa-wpmcp/list-posts', $abilityNames );
 
-        // Media.
-        $this->assertContains('fa-wpmcp/get-media', $abilityNames);
+		// Comments.
+		$this->assertContains( 'fa-wpmcp/get-comment', $abilityNames );
 
-        // Taxonomies.
-        $this->assertContains('fa-wpmcp/get-term', $abilityNames);
-        $this->assertContains('fa-wpmcp/list-taxonomies', $abilityNames);
+		// Media.
+		$this->assertContains( 'fa-wpmcp/get-media', $abilityNames );
 
-        // Users.
-        $this->assertContains('fa-wpmcp/get-user', $abilityNames);
+		// Taxonomies.
+		$this->assertContains( 'fa-wpmcp/get-term', $abilityNames );
+		$this->assertContains( 'fa-wpmcp/list-taxonomies', $abilityNames );
 
-        // Settings.
-        $this->assertContains('fa-wpmcp/get-option', $abilityNames);
+		// Users.
+		$this->assertContains( 'fa-wpmcp/get-user', $abilityNames );
 
-        // Plugins.
-        $this->assertContains('fa-wpmcp/list-plugins', $abilityNames);
+		// Settings.
+		$this->assertContains( 'fa-wpmcp/get-option', $abilityNames );
 
-        // Themes.
-        $this->assertContains('fa-wpmcp/list-themes', $abilityNames);
+		// Plugins.
+		$this->assertContains( 'fa-wpmcp/list-plugins', $abilityNames );
 
-        // Privacy.
-        $this->assertContains('fa-wpmcp/list-privacy-requests', $abilityNames);
+		// Themes.
+		$this->assertContains( 'fa-wpmcp/list-themes', $abilityNames );
 
-        // Cache.
-        $this->assertContains('fa-wpmcp/get-cache-type', $abilityNames);
+		// Privacy.
+		$this->assertContains( 'fa-wpmcp/list-privacy-requests', $abilityNames );
 
-        // Maintenance.
-        $this->assertContains('fa-wpmcp/get-maintenance-mode-status', $abilityNames);
+		// Cache.
+		$this->assertContains( 'fa-wpmcp/get-cache-type', $abilityNames );
 
-        // Transients.
-        $this->assertContains('fa-wpmcp/get-transient', $abilityNames);
+		// Maintenance.
+		$this->assertContains( 'fa-wpmcp/get-maintenance-mode-status', $abilityNames );
 
-        // Cron.
-        $this->assertContains('fa-wpmcp/list-cron-events', $abilityNames);
+		// Transients.
+		$this->assertContains( 'fa-wpmcp/get-transient', $abilityNames );
 
-        // Roles.
-        $this->assertContains('fa-wpmcp/list-roles', $abilityNames);
+		// Cron.
+		$this->assertContains( 'fa-wpmcp/list-cron-events', $abilityNames );
 
-        // Menus.
-        $this->assertContains('fa-wpmcp/list-menus', $abilityNames);
-    }
+		// Roles.
+		$this->assertContains( 'fa-wpmcp/list-roles', $abilityNames );
 
-    /**
-     * Test that registering twice throws an exception (registry prevents duplicates).
-     */
-    public function test_register_all_twice_throws_exception(): void
-    {
-        $registry = new AbilityRegistry();
+		// Menus.
+		$this->assertContains( 'fa-wpmcp/list-menus', $abilityNames );
+	}
 
-        AbilityRegistrar::registerAll($registry);
+	/**
+	 * Test that registering twice throws an exception (registry prevents duplicates).
+	 */
+	public function test_register_all_twice_throws_exception(): void {
+		$registry = new AbilityRegistry();
 
-        // Second call should throw because registry prevents duplicates.
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('is already registered');
+		AbilityRegistrar::registerAll( $registry );
 
-        AbilityRegistrar::registerAll($registry);
-    }
+		// Second call should throw because registry prevents duplicates.
+		$this->expectException( \InvalidArgumentException::class );
+		$this->expectExceptionMessage( 'is already registered' );
+
+		AbilityRegistrar::registerAll( $registry );
+	}
 }

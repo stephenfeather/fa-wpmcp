@@ -19,6 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class ThemeDeletionException extends RuntimeException
-{
+class ThemeDeletionException extends RuntimeException {
+
 }

@@ -20,6 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class RoleNotFoundException extends Exception
-{
+class RoleNotFoundException extends Exception {
+
 }

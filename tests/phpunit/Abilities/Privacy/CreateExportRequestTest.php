@@ -10,11 +10,12 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Privacy;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Privacy\CreateExportRequest;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test CreateExportRequest ability functionality.
@@ -27,204 +28,156 @@ use PHPUnit\Framework\TestCase;
  *
  * @package FAWpmcp\Tests\Abilities\Privacy
  */
-class CreateExportRequestTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class CreateExportRequestTest extends BrainMonkeyTestCase {
+	use AbilityTestTrait;
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new CreateExportRequest();
+	}
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new CreateExportRequest();
-        $this->assertEquals('fa-wpmcp/create-export-request', $ability->getName());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/create-export-request',
+			'category'             => 'privacy',
+			'label'                => 'Create Export Request',
+			'description_contains' => 'export request',
+			'operation_type'       => 'write',
+			'required_capability'  => 'manage_options',
+		);
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new CreateExportRequest();
-        $this->assertEquals('privacy', $ability->getCategory());
-    }
+	/**
+	 * Test creating export request successfully.
+	 *
+	 * @return void
+	 */
+	public function testExecuteCreatesExportRequest(): void {
+		$ability = $this->getAbilityInstance();
+		$input   = array(
+			'email' => 'user@example.com',
+		);
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new CreateExportRequest();
-        $this->assertEquals('Create Export Request', $ability->getLabel());
-    }
+		// Mock wp_create_user_request to return success.
+		Functions\expect( 'wp_create_user_request' )
+			->once()
+			->with( 'user@example.com', 'export_personal_data', Mockery::type( 'array' ) )
+			->andReturn( 123 );
 
-    /**
-     * Test ability requires manage_options capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new CreateExportRequest();
-        $this->assertEquals('manage_options', $ability->getRequiredCapability());
-    }
+		// Mock get_post to return request post.
+		$mock_post              = Mockery::mock( '\WP_Post' );
+		$mock_post->ID          = 123;
+		$mock_post->post_status = 'request-pending';
 
-    /**
-     * Test ability returns write operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new CreateExportRequest();
-        $this->assertEquals('write', $ability->getOperationType());
-    }
+		Functions\expect( 'get_post' )
+			->once()
+			->with( 123 )
+			->andReturn( $mock_post );
 
-    /**
-     * Test creating export request successfully.
-     *
-     * @return void
-     */
-    public function testExecuteCreatesExportRequest(): void
-    {
-        $ability = new CreateExportRequest();
-        $input   = array(
-            'email' => 'user@example.com',
-        );
+		Functions\expect( 'get_post_meta' )
+			->once()
+			->with( 123, '_wp_user_request_confirmed_timestamp', true )
+			->andReturn( '' );
 
-        // Mock wp_create_user_request to return success.
-        Functions\expect('wp_create_user_request')
-            ->once()
-            ->with('user@example.com', 'export_personal_data', Mockery::type('array'))
-            ->andReturn(123);
+		$result = $ability->doExecute( $input );
 
-        // Mock get_post to return request post.
-        $mock_post              = Mockery::mock('\WP_Post');
-        $mock_post->ID          = 123;
-        $mock_post->post_status = 'request-pending';
+		$this->assertTrue( $result['success'] );
+		$this->assertEquals( 123, $result['request_id'] );
+		$this->assertEquals( 'request-pending', $result['status'] );
+		$this->assertEquals( 'user@example.com', $result['email'] );
+	}
 
-        Functions\expect('get_post')
-            ->once()
-            ->with(123)
-            ->andReturn($mock_post);
+	/**
+	 * Test creating export request with description.
+	 *
+	 * @return void
+	 */
+	public function testExecuteCreatesExportRequestWithDescription(): void {
+		$ability = $this->getAbilityInstance();
+		$input   = array(
+			'email'       => 'user@example.com',
+			'description' => 'User requested data export',
+		);
 
-        Functions\expect('get_post_meta')
-            ->once()
-            ->with(123, '_wp_user_request_confirmed_timestamp', true)
-            ->andReturn('');
+		// Mock wp_create_user_request to return success.
+		Functions\expect( 'wp_create_user_request' )
+			->once()
+			->with(
+				'user@example.com',
+				'export_personal_data',
+				Mockery::on(
+					function ( $data ) {
+						return isset( $data['description'] ) && 'User requested data export' === $data['description'];
+					}
+				)
+			)
+			->andReturn( 124 );
 
-        $result = $ability->doExecute($input);
+		// Mock get_post to return request post.
+		$mock_post              = Mockery::mock( '\WP_Post' );
+		$mock_post->ID          = 124;
+		$mock_post->post_status = 'request-pending';
 
-        $this->assertTrue($result['success']);
-        $this->assertEquals(123, $result['request_id']);
-        $this->assertEquals('request-pending', $result['status']);
-        $this->assertEquals('user@example.com', $result['email']);
-    }
+		Functions\expect( 'get_post' )
+			->once()
+			->with( 124 )
+			->andReturn( $mock_post );
 
-    /**
-     * Test creating export request with description.
-     *
-     * @return void
-     */
-    public function testExecuteCreatesExportRequestWithDescription(): void
-    {
-        $ability = new CreateExportRequest();
-        $input   = array(
-            'email'       => 'user@example.com',
-            'description' => 'User requested data export',
-        );
+		Functions\expect( 'get_post_meta' )
+			->once()
+			->with( 124, '_wp_user_request_confirmed_timestamp', true )
+			->andReturn( '' );
 
-        // Mock wp_create_user_request to return success.
-        Functions\expect('wp_create_user_request')
-            ->once()
-            ->with(
-                'user@example.com',
-                'export_personal_data',
-                Mockery::on(
-                    function ($data) {
-                        return isset($data['description']) && 'User requested data export' === $data['description'];
-                    }
-                )
-            )
-            ->andReturn(124);
+		$result = $ability->doExecute( $input );
 
-        // Mock get_post to return request post.
-        $mock_post              = Mockery::mock('\WP_Post');
-        $mock_post->ID          = 124;
-        $mock_post->post_status = 'request-pending';
+		$this->assertTrue( $result['success'] );
+		$this->assertEquals( 124, $result['request_id'] );
+	}
 
-        Functions\expect('get_post')
-            ->once()
-            ->with(124)
-            ->andReturn($mock_post);
+	/**
+	 * Test creating export request handles WP_Error.
+	 *
+	 * @return void
+	 */
+	public function testExecuteHandlesWpError(): void {
+		$ability = $this->getAbilityInstance();
+		$input   = array(
+			'email' => 'invalid@example.com',
+		);
 
-        Functions\expect('get_post_meta')
-            ->once()
-            ->with(124, '_wp_user_request_confirmed_timestamp', true)
-            ->andReturn('');
+		// Mock wp_create_user_request to return WP_Error.
+		$error = Mockery::mock( '\WP_Error' );
+		$error->shouldReceive( 'get_error_message' )
+			->andReturn( 'Invalid email address' );
 
-        $result = $ability->doExecute($input);
+		Functions\expect( 'wp_create_user_request' )
+			->once()
+			->andReturn( $error );
 
-        $this->assertTrue($result['success']);
-        $this->assertEquals(124, $result['request_id']);
-    }
+		Functions\expect( 'is_wp_error' )
+			->once()
+			->with( $error )
+			->andReturn( true );
 
-    /**
-     * Test creating export request handles WP_Error.
-     *
-     * @return void
-     */
-    public function testExecuteHandlesWpError(): void
-    {
-        $ability = new CreateExportRequest();
-        $input   = array(
-            'email' => 'invalid@example.com',
-        );
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'Failed to create export request: Invalid email address' );
 
-        // Mock wp_create_user_request to return WP_Error.
-        $error = Mockery::mock('\WP_Error');
-        $error->shouldReceive('get_error_message')
-            ->andReturn('Invalid email address');
-
-        Functions\expect('wp_create_user_request')
-            ->once()
-            ->andReturn($error);
-
-        Functions\expect('is_wp_error')
-            ->once()
-            ->with($error)
-            ->andReturn(true);
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Failed to create export request: Invalid email address');
-
-        $ability->doExecute($input);
-    }
+		$ability->doExecute( $input );
+	}
 }

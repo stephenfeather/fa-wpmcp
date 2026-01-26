@@ -19,6 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class EncryptionException extends RuntimeException
-{
+class EncryptionException extends RuntimeException {
+
 }

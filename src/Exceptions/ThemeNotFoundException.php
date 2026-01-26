@@ -17,6 +17,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-final class ThemeNotFoundException extends RuntimeException
-{
+final class ThemeNotFoundException extends RuntimeException {
+
 }

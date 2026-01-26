@@ -10,292 +10,198 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Cron;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Cron\ScheduleCronEventAbility;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test ScheduleCronEventAbility functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Cron
  */
-class ScheduleCronEventAbilityTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+final class ScheduleCronEventAbilityTest extends BrainMonkeyTestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new ScheduleCronEventAbility();
-        $this->assertEquals('fa-wpmcp/schedule-cron-event', $ability->getName());
-    }
+	/**
+	 * Get the ability instance for testing.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new ScheduleCronEventAbility();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new ScheduleCronEventAbility();
-        $this->assertEquals('cron', $ability->getCategory());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array<string, mixed>
+	 */
+	protected function getExpectedMetadata(): array {
+		return [
+			'name'                 => 'fa-wpmcp/schedule-cron-event',
+			'category'             => 'cron',
+			'label'                => 'Schedule Cron Event',
+			'description_contains' => 'cron',
+			'operation_type'       => 'write',
+			'required_capability'  => 'manage_options',
+		];
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new ScheduleCronEventAbility();
-        $this->assertEquals('Schedule Cron Event', $ability->getLabel());
-    }
+	/**
+	 * Test execute schedules recurring cron event successfully.
+	 *
+	 * @return void
+	 */
+	public function testExecuteSchedulesRecurringEventSuccessfully(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new ScheduleCronEventAbility();
-        $this->assertEquals('write', $ability->getOperationType());
-    }
+		Functions\expect( 'wp_schedule_event' )
+			->once()
+			->with( 1706200000, 'hourly', 'my_custom_hook', array() )
+			->andReturn( true );
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new ScheduleCronEventAbility();
-        $this->assertEquals('manage_options', $ability->getRequiredCapability());
-    }
+		$result = $ability->doExecute(
+			array(
+				'hook'       => 'my_custom_hook',
+				'timestamp'  => 1706200000,
+				'recurrence' => 'hourly',
+			)
+		);
 
-    /**
-     * Test ability returns input schema with required fields.
-     *
-     * @return void
-     */
-    public function testGetInputSchema(): void
-    {
-        $ability = new ScheduleCronEventAbility();
-        $schema  = $ability->getInputSchema();
+		$this->assertIsArray( $result );
+		$this->assertTrue( $result['success'] );
+	}
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('required', $schema);
-        $this->assertArrayHasKey('hook', $schema['properties']);
-        $this->assertArrayHasKey('timestamp', $schema['properties']);
-        $this->assertArrayHasKey('recurrence', $schema['properties']);
-        $this->assertArrayHasKey('args', $schema['properties']);
-        $this->assertContains('hook', $schema['required']);
-        $this->assertContains('timestamp', $schema['required']);
-    }
+	/**
+	 * Test execute schedules single event when no recurrence provided.
+	 *
+	 * @return void
+	 */
+	public function testExecuteSchedulesSingleEventWhenNoRecurrence(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test ability returns output schema.
-     *
-     * @return void
-     */
-    public function testGetOutputSchema(): void
-    {
-        $ability = new ScheduleCronEventAbility();
-        $schema  = $ability->getOutputSchema();
+		Functions\expect( 'wp_schedule_single_event' )
+			->once()
+			->with( 1706200000, 'my_single_event', array() )
+			->andReturn( true );
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('success', $schema['properties']);
-    }
+		$result = $ability->doExecute(
+			array(
+				'hook'      => 'my_single_event',
+				'timestamp' => 1706200000,
+			)
+		);
 
-    /**
-     * Test execute schedules recurring cron event successfully.
-     *
-     * @return void
-     */
-    public function testExecuteSchedulesRecurringEventSuccessfully(): void
-    {
-        $ability = new ScheduleCronEventAbility();
+		$this->assertTrue( $result['success'] );
+	}
 
-        Functions\expect('wp_schedule_event')
-            ->once()
-            ->with(1706200000, 'hourly', 'my_custom_hook', array())
-            ->andReturn(true);
+	/**
+	 * Test execute returns failure when wp_schedule_event fails.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsFailureWhenScheduleFails(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(
-            array(
-                'hook'       => 'my_custom_hook',
-                'timestamp'  => 1706200000,
-                'recurrence' => 'hourly',
-            )
-        );
+		$wp_error = Mockery::mock( 'WP_Error' );
+		$wp_error->shouldReceive( 'get_error_message' )->andReturn( 'Schedule failed' );
 
-        $this->assertIsArray($result);
-        $this->assertTrue($result['success']);
-    }
+		Functions\expect( 'wp_schedule_event' )
+			->once()
+			->andReturn( $wp_error );
 
-    /**
-     * Test execute schedules single event when no recurrence provided.
-     *
-     * @return void
-     */
-    public function testExecuteSchedulesSingleEventWhenNoRecurrence(): void
-    {
-        $ability = new ScheduleCronEventAbility();
+		Functions\when( 'is_wp_error' )->alias(
+			function ( $thing ) use ( $wp_error ) {
+				return $thing === $wp_error;
+			}
+		);
 
-        Functions\expect('wp_schedule_single_event')
-            ->once()
-            ->with(1706200000, 'my_single_event', array())
-            ->andReturn(true);
+		$result = $ability->doExecute(
+			array(
+				'hook'       => 'my_custom_hook',
+				'timestamp'  => 1706200000,
+				'recurrence' => 'hourly',
+			)
+		);
 
-        $result = $ability->doExecute(
-            array(
-                'hook'      => 'my_single_event',
-                'timestamp' => 1706200000,
-            )
-        );
+		$this->assertFalse( $result['success'] );
+		$this->assertArrayHasKey( 'error', $result );
+	}
 
-        $this->assertTrue($result['success']);
-    }
+	/**
+	 * Test execute passes args to wp_schedule_event.
+	 *
+	 * @return void
+	 */
+	public function testExecutePassesArgsToScheduleEvent(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test execute returns failure when wp_schedule_event fails.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsFailureWhenScheduleFails(): void
-    {
-        $ability = new ScheduleCronEventAbility();
+		$args = array( 'param1', 'param2' );
 
-        $wp_error = Mockery::mock('WP_Error');
-        $wp_error->shouldReceive('get_error_message')->andReturn('Schedule failed');
+		Functions\expect( 'wp_schedule_event' )
+			->once()
+			->with( 1706200000, 'daily', 'my_custom_hook', $args )
+			->andReturn( true );
 
-        Functions\expect('wp_schedule_event')
-            ->once()
-            ->andReturn($wp_error);
+		$result = $ability->doExecute(
+			array(
+				'hook'       => 'my_custom_hook',
+				'timestamp'  => 1706200000,
+				'recurrence' => 'daily',
+				'args'       => $args,
+			)
+		);
 
-        Functions\when('is_wp_error')->alias(
-            function ($thing) use ($wp_error) {
-                return $thing === $wp_error;
-            }
-        );
+		$this->assertTrue( $result['success'] );
+	}
 
-        $result = $ability->doExecute(
-            array(
-                'hook'       => 'my_custom_hook',
-                'timestamp'  => 1706200000,
-                'recurrence' => 'hourly',
-            )
-        );
+	/**
+	 * Test annotations indicate write operation.
+	 *
+	 * @return void
+	 */
+	public function testGetAnnotations(): void {
+		$ability     = new ScheduleCronEventAbility();
+		$annotations = $ability->getAnnotations();
 
-        $this->assertFalse($result['success']);
-        $this->assertArrayHasKey('error', $result);
-    }
+		$this->assertFalse( $annotations['readonly'] );
+		$this->assertFalse( $annotations['destructive'] );
+		$this->assertTrue( $annotations['idempotent'] );
+	}
 
-    /**
-     * Test execute passes args to wp_schedule_event.
-     *
-     * @return void
-     */
-    public function testExecutePassesArgsToScheduleEvent(): void
-    {
-        $ability = new ScheduleCronEventAbility();
+	/**
+	 * Test execute returns failure when wp_schedule_single_event fails.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsFailureWhenSingleScheduleFails(): void {
+		$ability = $this->getAbilityInstance();
 
-        $args = array( 'param1', 'param2' );
+		$wp_error = Mockery::mock( 'WP_Error' );
+		$wp_error->shouldReceive( 'get_error_message' )->andReturn( 'Single event schedule failed' );
 
-        Functions\expect('wp_schedule_event')
-            ->once()
-            ->with(1706200000, 'daily', 'my_custom_hook', $args)
-            ->andReturn(true);
+		Functions\expect( 'wp_schedule_single_event' )
+			->once()
+			->andReturn( $wp_error );
 
-        $result = $ability->doExecute(
-            array(
-                'hook'       => 'my_custom_hook',
-                'timestamp'  => 1706200000,
-                'recurrence' => 'daily',
-                'args'       => $args,
-            )
-        );
+		Functions\when( 'is_wp_error' )->alias(
+			function ( $thing ) use ( $wp_error ) {
+				return $thing === $wp_error;
+			}
+		);
 
-        $this->assertTrue($result['success']);
-    }
+		$result = $ability->doExecute(
+			array(
+				'hook'      => 'my_single_event',
+				'timestamp' => 1706200000,
+			)
+		);
 
-    /**
-     * Test annotations indicate write operation.
-     *
-     * @return void
-     */
-    public function testGetAnnotations(): void
-    {
-        $ability     = new ScheduleCronEventAbility();
-        $annotations = $ability->getAnnotations();
-
-        $this->assertFalse($annotations['readonly']);
-        $this->assertFalse($annotations['destructive']);
-        $this->assertTrue($annotations['idempotent']);
-    }
-
-    /**
-     * Test execute returns failure when wp_schedule_single_event fails.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsFailureWhenSingleScheduleFails(): void
-    {
-        $ability = new ScheduleCronEventAbility();
-
-        $wp_error = Mockery::mock('WP_Error');
-        $wp_error->shouldReceive('get_error_message')->andReturn('Single event schedule failed');
-
-        Functions\expect('wp_schedule_single_event')
-            ->once()
-            ->andReturn($wp_error);
-
-        Functions\when('is_wp_error')->alias(
-            function ($thing) use ($wp_error) {
-                return $thing === $wp_error;
-            }
-        );
-
-        $result = $ability->doExecute(
-            array(
-                'hook'      => 'my_single_event',
-                'timestamp' => 1706200000,
-            )
-        );
-
-        $this->assertFalse($result['success']);
-        $this->assertArrayHasKey('error', $result);
-    }
+		$this->assertFalse( $result['success'] );
+		$this->assertArrayHasKey( 'error', $result );
+	}
 }

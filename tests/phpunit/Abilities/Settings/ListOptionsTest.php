@@ -10,11 +10,12 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Settings;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Settings\ListOptions;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test ListOptions ability functionality.
@@ -26,217 +27,170 @@ use PHPUnit\Framework\TestCase;
  *
  * @package FAWpmcp\Tests\Abilities\Settings
  */
-class ListOptionsTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class ListOptionsTest extends BrainMonkeyTestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new ListOptions();
-        $this->assertEquals('fa-wpmcp/list-options', $ability->getName());
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new ListOptions();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new ListOptions();
-        $this->assertEquals('settings', $ability->getCategory());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                  => 'fa-wpmcp/list-options',
+			'category'              => 'settings',
+			'label'                 => 'List Options',
+			'description_contains'  => 'list',
+			'operation_type'        => 'read',
+			'required_capability'   => 'manage_options',
+		);
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new ListOptions();
-        $this->assertEquals('List Options', $ability->getLabel());
-    }
+	/**
+	 * Test execute lists options successfully.
+	 *
+	 * @return void
+	 */
+	public function testExecuteListsOptions(): void {
+		Functions\when( 'sanitize_key' )->returnArg();
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new ListOptions();
-        $this->assertEquals('read', $ability->getOperationType());
-    }
+		$ability   = $this->getAbilityInstance();
+		$mock_wpdb = Mockery::mock( 'wpdb' );
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new ListOptions();
-        $this->assertEquals('manage_options', $ability->getRequiredCapability());
-    }
+		$mock_wpdb->options = 'wp_options';
+		$mock_wpdb->shouldReceive( 'prepare' )
+			->twice()
+			->andReturnUsing( fn( string $query, ...$args ) => $query );
+		$mock_wpdb->shouldReceive( 'get_results' )
+			->once()
+			->with( Mockery::pattern( '/SELECT option_name, option_value/' ) )
+			->andReturn(
+				array(
+					(object) array(
+						'option_name'  => 'option1',
+						'option_value' => 'value1',
+					),
+					(object) array(
+						'option_name'  => 'option2',
+						'option_value' => 'value2',
+					),
+				)
+			);
+		$mock_wpdb->shouldReceive( 'get_var' )
+			->once()
+			->with( Mockery::pattern( '/SELECT COUNT/' ) )
+			->andReturn( '2' );
 
-    /**
-     * Test execute lists options successfully.
-     *
-     * @return void
-     */
-    public function testExecuteListsOptions(): void
-    {
-        Functions\when('sanitize_key')->returnArg();
+		Functions\expect( 'maybe_unserialize' )
+			->twice()
+			->andReturnUsing( fn( $v ) => $v );
 
-        $ability   = new ListOptions();
-        $mock_wpdb = Mockery::mock('wpdb');
+		$GLOBALS['wpdb'] = $mock_wpdb;
 
-        $mock_wpdb->options = 'wp_options';
-        $mock_wpdb->shouldReceive('prepare')
-            ->twice()
-            ->andReturnUsing(fn(string $query, ...$args) => $query);
-        $mock_wpdb->shouldReceive('get_results')
-            ->once()
-            ->with(Mockery::pattern('/SELECT option_name, option_value/'))
-            ->andReturn(
-                array(
-                    (object) array(
-                        'option_name'  => 'option1',
-                        'option_value' => 'value1',
-                    ),
-                    (object) array(
-                        'option_name'  => 'option2',
-                        'option_value' => 'value2',
-                    ),
-                )
-            );
-        $mock_wpdb->shouldReceive('get_var')
-            ->once()
-            ->with(Mockery::pattern('/SELECT COUNT/'))
-            ->andReturn('2');
+		$result = $ability->doExecute( array() );
 
-        Functions\expect('maybe_unserialize')
-            ->twice()
-            ->andReturnUsing(fn($v) => $v);
+		$this->assertIsArray( $result['options'] );
+		$this->assertCount( 2, $result['options'] );
+		$this->assertEquals( 2, $result['total'] );
+		$this->assertEquals( 'option1', $result['options'][0]['option_name'] );
+		$this->assertEquals( 'value1', $result['options'][0]['option_value'] );
+	}
 
-        $GLOBALS['wpdb'] = $mock_wpdb;
+	/**
+	 * Test execute filters by search term.
+	 *
+	 * @return void
+	 */
+	public function testExecuteFiltersBySearch(): void {
+		Functions\when( 'sanitize_key' )->returnArg();
 
-        $result = $ability->doExecute(array());
+		$ability   = $this->getAbilityInstance();
+		$mock_wpdb = Mockery::mock( 'wpdb' );
 
-        $this->assertIsArray($result['options']);
-        $this->assertCount(2, $result['options']);
-        $this->assertEquals(2, $result['total']);
-        $this->assertEquals('option1', $result['options'][0]['option_name']);
-        $this->assertEquals('value1', $result['options'][0]['option_value']);
-    }
+		$mock_wpdb->options = 'wp_options';
+		$mock_wpdb->shouldReceive( 'esc_like' )
+			->once()
+			->with( 'test' )
+			->andReturn( 'test' );
+		$mock_wpdb->shouldReceive( 'prepare' )
+			->twice()
+			->andReturn( 'PREPARED_QUERY' );
+		$mock_wpdb->shouldReceive( 'get_results' )
+			->once()
+			->andReturn(
+				array(
+					(object) array(
+						'option_name'  => 'test_option',
+						'option_value' => 'value',
+					),
+				)
+			);
+		$mock_wpdb->shouldReceive( 'get_var' )
+			->once()
+			->andReturn( '1' );
 
-    /**
-     * Test execute filters by search term.
-     *
-     * @return void
-     */
-    public function testExecuteFiltersBySearch(): void
-    {
-        Functions\when('sanitize_key')->returnArg();
+		Functions\expect( 'maybe_unserialize' )
+			->once()
+			->andReturnUsing( fn( $v ) => $v );
 
-        $ability   = new ListOptions();
-        $mock_wpdb = Mockery::mock('wpdb');
+		$GLOBALS['wpdb'] = $mock_wpdb;
 
-        $mock_wpdb->options = 'wp_options';
-        $mock_wpdb->shouldReceive('esc_like')
-            ->once()
-            ->with('test')
-            ->andReturn('test');
-        $mock_wpdb->shouldReceive('prepare')
-            ->twice()
-            ->andReturn('PREPARED_QUERY');
-        $mock_wpdb->shouldReceive('get_results')
-            ->once()
-            ->andReturn(
-                array(
-                    (object) array(
-                        'option_name'  => 'test_option',
-                        'option_value' => 'value',
-                    ),
-                )
-            );
-        $mock_wpdb->shouldReceive('get_var')
-            ->once()
-            ->andReturn('1');
+		$result = $ability->doExecute( array( 'search' => 'test' ) );
 
-        Functions\expect('maybe_unserialize')
-            ->once()
-            ->andReturnUsing(fn($v) => $v);
+		$this->assertCount( 1, $result['options'] );
+		$this->assertEquals( 'test_option', $result['options'][0]['option_name'] );
+	}
 
-        $GLOBALS['wpdb'] = $mock_wpdb;
+	/**
+	 * Test execute handles pagination.
+	 *
+	 * @return void
+	 */
+	public function testExecuteHandlesPagination(): void {
+		Functions\when( 'sanitize_key' )->returnArg();
 
-        $result = $ability->doExecute(array( 'search' => 'test' ));
+		$ability   = $this->getAbilityInstance();
+		$mock_wpdb = Mockery::mock( 'wpdb' );
 
-        $this->assertCount(1, $result['options']);
-        $this->assertEquals('test_option', $result['options'][0]['option_name']);
-    }
+		$mock_wpdb->options = 'wp_options';
+		$mock_wpdb->shouldReceive( 'prepare' )
+			->twice()
+			->andReturnUsing( fn( string $query, ...$args ) => $query );
+		$mock_wpdb->shouldReceive( 'get_results' )
+			->once()
+			->with( Mockery::pattern( '/SELECT option_name, option_value/' ) )
+			->andReturn( array() );
+		$mock_wpdb->shouldReceive( 'get_var' )
+			->once()
+			->with( Mockery::pattern( '/SELECT COUNT/' ) )
+			->andReturn( '100' );
 
-    /**
-     * Test execute handles pagination.
-     *
-     * @return void
-     */
-    public function testExecuteHandlesPagination(): void
-    {
-        Functions\when('sanitize_key')->returnArg();
+		$GLOBALS['wpdb'] = $mock_wpdb;
 
-        $ability   = new ListOptions();
-        $mock_wpdb = Mockery::mock('wpdb');
+		$result = $ability->doExecute(
+			array(
+				'limit'  => 10,
+				'offset' => 20,
+			)
+		);
 
-        $mock_wpdb->options = 'wp_options';
-        $mock_wpdb->shouldReceive('prepare')
-            ->twice()
-            ->andReturnUsing(fn(string $query, ...$args) => $query);
-        $mock_wpdb->shouldReceive('get_results')
-            ->once()
-            ->with(Mockery::pattern('/SELECT option_name, option_value/'))
-            ->andReturn(array());
-        $mock_wpdb->shouldReceive('get_var')
-            ->once()
-            ->with(Mockery::pattern('/SELECT COUNT/'))
-            ->andReturn('100');
-
-        $GLOBALS['wpdb'] = $mock_wpdb;
-
-        $result = $ability->doExecute(
-            array(
-                'limit'  => 10,
-                'offset' => 20,
-            )
-        );
-
-        $this->assertEquals(100, $result['total']);
-    }
+		$this->assertEquals( 100, $result['total'] );
+	}
 }

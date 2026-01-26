@@ -21,140 +21,134 @@ use FAWpmcp\Exceptions\OptionException;
  *
  * @package FAWpmcp\Abilities\Settings
  */
-final class OptionAccessPolicy
-{
-    /**
-     * Default protected options.
-     *
-     * @var string[]
-     */
-    private const DEFAULT_PROTECTED_OPTIONS = array(
-        'admin_email',
-        'active_plugins',
-        'home',
-        'siteurl',
-        'stylesheet',
-        'template',
-        'users_can_register',
-        'default_role',
-        'db_version',
-        'cron',
-        'auth_key',
-        'secure_auth_key',
-        'logged_in_key',
-        'nonce_key',
-        'auth_salt',
-        'secure_auth_salt',
-        'logged_in_salt',
-        'nonce_salt',
-    );
+final class OptionAccessPolicy {
 
-    /**
-     * Assert an option is allowed to be accessed.
-     *
-     * @param string $option_name Option name.
-     * @return void
-     * @throws OptionException If the option is protected.
-     */
-    public static function assertAllowed(string $option_name): void
-    {
-        if (! self::isAllowed($option_name)) {
-            throw new OptionException('This option is protected and cannot be accessed.');
-        }
-    }
+	/**
+	 * Default protected options.
+	 *
+	 * @var string[]
+	 */
+	private const DEFAULT_PROTECTED_OPTIONS = array(
+		'admin_email',
+		'active_plugins',
+		'home',
+		'siteurl',
+		'stylesheet',
+		'template',
+		'users_can_register',
+		'default_role',
+		'db_version',
+		'cron',
+		'auth_key',
+		'secure_auth_key',
+		'logged_in_key',
+		'nonce_key',
+		'auth_salt',
+		'secure_auth_salt',
+		'logged_in_salt',
+		'nonce_salt',
+	);
 
-    /**
-     * Check if an option is allowed.
-     *
-     * @param string $option_name Option name.
-     * @return bool True if allowed.
-     */
-    public static function isAllowed(string $option_name): bool
-    {
-        $option_name = self::normalizeOptionName($option_name);
+	/**
+	 * Assert an option is allowed to be accessed.
+	 *
+	 * @param string $option_name Option name.
+	 * @return void
+	 * @throws OptionException If the option is protected.
+	 */
+	public static function assertAllowed( string $option_name ): void {
+		if ( ! self::isAllowed( $option_name ) ) {
+			throw new OptionException( 'This option is protected and cannot be accessed.' );
+		}
+	}
 
-        $allowed = self::getAllowedOptions();
-        if (! empty($allowed)) {
-            return in_array($option_name, $allowed, true);
-        }
+	/**
+	 * Check if an option is allowed.
+	 *
+	 * @param string $option_name Option name.
+	 * @return bool True if allowed.
+	 */
+	public static function isAllowed( string $option_name ): bool {
+		$option_name = self::normalizeOptionName( $option_name );
 
-        $protected = self::getProtectedOptions();
-        return ! in_array($option_name, $protected, true);
-    }
+		$allowed = self::getAllowedOptions();
+		if ( ! empty( $allowed ) ) {
+			return in_array( $option_name, $allowed, true );
+		}
 
-    /**
-     * Get allowlist of options (if provided).
-     *
-     * @return string[] Allowed options.
-     */
-    public static function getAllowedOptions(): array
-    {
-        $allowed = array();
-        if (function_exists('apply_filters')) {
-            $allowed = apply_filters('fa_wpmcp_allowed_options', $allowed);
-        }
+		$protected = self::getProtectedOptions();
+		return ! in_array( $option_name, $protected, true );
+	}
 
-        return self::normalizeList($allowed);
-    }
+	/**
+	 * Get allowlist of options (if provided).
+	 *
+	 * @return string[] Allowed options.
+	 */
+	public static function getAllowedOptions(): array {
+		$allowed = array();
+		if ( function_exists( 'apply_filters' ) ) {
+			$allowed = apply_filters( 'fa_wpmcp_allowed_options', $allowed );
+		}
 
-    /**
-     * Get protected options list.
-     *
-     * @return string[] Protected options.
-     */
-    public static function getProtectedOptions(): array
-    {
-        $protected = self::DEFAULT_PROTECTED_OPTIONS;
-        if (function_exists('apply_filters')) {
-            $protected = apply_filters('fa_wpmcp_protected_options', $protected);
-        }
+		return self::normalizeList( $allowed );
+	}
 
-        return self::normalizeList($protected);
-    }
+	/**
+	 * Get protected options list.
+	 *
+	 * @return string[] Protected options.
+	 */
+	public static function getProtectedOptions(): array {
+		$protected = self::DEFAULT_PROTECTED_OPTIONS;
+		if ( function_exists( 'apply_filters' ) ) {
+			$protected = apply_filters( 'fa_wpmcp_protected_options', $protected );
+		}
 
-    /**
-     * Normalize a list of option names.
-     *
-     * @param mixed $options List of option names.
-     * @return string[] Normalized list.
-     */
-    private static function normalizeList($options): array
-    {
-        if (! is_array($options)) {
-            return array();
-        }
+		return self::normalizeList( $protected );
+	}
 
-        $normalized = array();
-        foreach ($options as $option) {
-            if (! is_string($option)) {
-                continue;
-            }
-            $option = self::normalizeOptionName($option);
-            if ('' !== $option) {
-                $normalized[ $option ] = true;
-            }
-        }
+	/**
+	 * Normalize a list of option names.
+	 *
+	 * @param mixed $options List of option names.
+	 * @return string[] Normalized list.
+	 */
+	private static function normalizeList( $options ): array {
+		if ( ! is_array( $options ) ) {
+			return array();
+		}
 
-        return array_keys($normalized);
-    }
+		$normalized = array();
+		foreach ( $options as $option ) {
+			if ( ! is_string( $option ) ) {
+				continue;
+			}
+			$option = self::normalizeOptionName( $option );
+			if ( '' !== $option ) {
+				$normalized[ $option ] = true;
+			}
+		}
 
-    /**
-     * Normalize option name for comparisons.
-     *
-     * @param string $option_name Option name.
-     * @return string Normalized option name.
-     */
-    private static function normalizeOptionName(string $option_name): string
-    {
-        $option_name = trim($option_name);
-        if ('' === $option_name) {
-            return '';
-        }
+		return array_keys( $normalized );
+	}
 
-        if (function_exists('sanitize_key')) {
-            return sanitize_key($option_name);
-        }
+	/**
+	 * Normalize option name for comparisons.
+	 *
+	 * @param string $option_name Option name.
+	 * @return string Normalized option name.
+	 */
+	private static function normalizeOptionName( string $option_name ): string {
+		$option_name = trim( $option_name );
+		if ( '' === $option_name ) {
+			return '';
+		}
 
-        return strtolower($option_name);
-    }
+		if ( function_exists( 'sanitize_key' ) ) {
+			return sanitize_key( $option_name );
+		}
+
+		return strtolower( $option_name );
+	}
 }

@@ -18,267 +18,250 @@ namespace FAWpmcp\Abilities;
  *
  * @package FAWpmcp\Abilities
  */
-final class AbilityRegistrar
-{
-    /**
-     * Register all abilities with the registry.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    public static function registerAll(AbilityRegistry $registry): void
-    {
-        self::registerPostAbilities($registry);
-        self::registerCommentAbilities($registry);
-        self::registerMediaAbilities($registry);
-        self::registerTaxonomyAbilities($registry);
-        self::registerPostTypeAbilities($registry);
-        self::registerUserAbilities($registry);
-        self::registerSettingsAbilities($registry);
-        self::registerPluginAbilities($registry);
-        self::registerThemeAbilities($registry);
-        self::registerPrivacyAbilities($registry);
-        self::registerCacheAbilities($registry);
-        self::registerMaintenanceAbilities($registry);
-        self::registerTransientAbilities($registry);
-        self::registerCronAbilities($registry);
-        self::registerRoleAbilities($registry);
-        self::registerMenuAbilities($registry);
-    }
+final class AbilityRegistrar {
 
-    /**
-     * Register Post abilities with the registry.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerPostAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Posts\GetPost());
-        $registry->register(new \FAWpmcp\Abilities\Posts\ListPosts());
-        $registry->register(new \FAWpmcp\Abilities\Posts\CreatePost());
-        $registry->register(new \FAWpmcp\Abilities\Posts\UpdatePost());
-        $registry->register(new \FAWpmcp\Abilities\Posts\DeletePost());
-    }
+	/**
+	 * Register all abilities with the registry.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	public static function registerAll( AbilityRegistry $registry ): void {
+		self::registerPostAbilities( $registry );
+		self::registerCommentAbilities( $registry );
+		self::registerMediaAbilities( $registry );
+		self::registerTaxonomyAbilities( $registry );
+		self::registerPostTypeAbilities( $registry );
+		self::registerUserAbilities( $registry );
+		self::registerSettingsAbilities( $registry );
+		self::registerPluginAbilities( $registry );
+		self::registerThemeAbilities( $registry );
+		self::registerPrivacyAbilities( $registry );
+		self::registerCacheAbilities( $registry );
+		self::registerMaintenanceAbilities( $registry );
+		self::registerTransientAbilities( $registry );
+		self::registerCronAbilities( $registry );
+		self::registerRoleAbilities( $registry );
+		self::registerMenuAbilities( $registry );
+	}
 
-    /**
-     * Register Comment abilities with the registry.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerCommentAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Comments\GetComment());
-        $registry->register(new \FAWpmcp\Abilities\Comments\ListComments());
-        $registry->register(new \FAWpmcp\Abilities\Comments\CreateComment());
-        $registry->register(new \FAWpmcp\Abilities\Comments\UpdateComment());
-        $registry->register(new \FAWpmcp\Abilities\Comments\DeleteComment());
-    }
+	/**
+	 * Register Post abilities with the registry.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerPostAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Posts\GetPost() );
+		$registry->register( new \FAWpmcp\Abilities\Posts\ListPosts() );
+		$registry->register( new \FAWpmcp\Abilities\Posts\CreatePost() );
+		$registry->register( new \FAWpmcp\Abilities\Posts\UpdatePost() );
+		$registry->register( new \FAWpmcp\Abilities\Posts\DeletePost() );
+	}
 
-    /**
-     * Register Media abilities with the registry.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerMediaAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Media\GetMedia());
-        $registry->register(new \FAWpmcp\Abilities\Media\ListMedia());
-        $registry->register(new \FAWpmcp\Abilities\Media\UploadMedia());
-        $registry->register(new \FAWpmcp\Abilities\Media\UpdateMedia());
-        $registry->register(new \FAWpmcp\Abilities\Media\DeleteMedia());
-    }
+	/**
+	 * Register Comment abilities with the registry.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerCommentAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Comments\GetComment() );
+		$registry->register( new \FAWpmcp\Abilities\Comments\ListComments() );
+		$registry->register( new \FAWpmcp\Abilities\Comments\CreateComment() );
+		$registry->register( new \FAWpmcp\Abilities\Comments\UpdateComment() );
+		$registry->register( new \FAWpmcp\Abilities\Comments\DeleteComment() );
+	}
 
-    /**
-     * Register Taxonomy abilities with the registry.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerTaxonomyAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Taxonomies\GetTerm());
-        $registry->register(new \FAWpmcp\Abilities\Taxonomies\ListTerms());
-        $registry->register(new \FAWpmcp\Abilities\Taxonomies\CreateTerm());
-        $registry->register(new \FAWpmcp\Abilities\Taxonomies\UpdateTerm());
-        $registry->register(new \FAWpmcp\Abilities\Taxonomies\DeleteTerm());
-        $registry->register(new \FAWpmcp\Abilities\Taxonomies\ListTaxonomies());
-        $registry->register(new \FAWpmcp\Abilities\Taxonomies\GetTaxonomy());
-    }
+	/**
+	 * Register Media abilities with the registry.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerMediaAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Media\GetMedia() );
+		$registry->register( new \FAWpmcp\Abilities\Media\ListMedia() );
+		$registry->register( new \FAWpmcp\Abilities\Media\UploadMedia() );
+		$registry->register( new \FAWpmcp\Abilities\Media\UpdateMedia() );
+		$registry->register( new \FAWpmcp\Abilities\Media\DeleteMedia() );
+	}
 
-    /**
-     * Register Post Type abilities with the registry.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerPostTypeAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\PostTypes\ListPostTypes());
-        $registry->register(new \FAWpmcp\Abilities\PostTypes\GetPostType());
-    }
+	/**
+	 * Register Taxonomy abilities with the registry.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerTaxonomyAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Taxonomies\GetTerm() );
+		$registry->register( new \FAWpmcp\Abilities\Taxonomies\ListTerms() );
+		$registry->register( new \FAWpmcp\Abilities\Taxonomies\CreateTerm() );
+		$registry->register( new \FAWpmcp\Abilities\Taxonomies\UpdateTerm() );
+		$registry->register( new \FAWpmcp\Abilities\Taxonomies\DeleteTerm() );
+		$registry->register( new \FAWpmcp\Abilities\Taxonomies\ListTaxonomies() );
+		$registry->register( new \FAWpmcp\Abilities\Taxonomies\GetTaxonomy() );
+	}
 
-    /**
-     * Register User abilities with the registry.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerUserAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Users\GetUser());
-        $registry->register(new \FAWpmcp\Abilities\Users\ListUsers());
-        $registry->register(new \FAWpmcp\Abilities\Users\CreateUser());
-        $registry->register(new \FAWpmcp\Abilities\Users\UpdateUser());
-        $registry->register(new \FAWpmcp\Abilities\Users\DeleteUser());
-    }
+	/**
+	 * Register Post Type abilities with the registry.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerPostTypeAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\PostTypes\ListPostTypes() );
+		$registry->register( new \FAWpmcp\Abilities\PostTypes\GetPostType() );
+	}
 
-    /**
-     * Register Settings abilities with the registry.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerSettingsAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Settings\DeleteOption());
-        $registry->register(new \FAWpmcp\Abilities\Settings\GetOption());
-        $registry->register(new \FAWpmcp\Abilities\Settings\ListOptions());
-        $registry->register(new \FAWpmcp\Abilities\Settings\UpdateOption());
-    }
+	/**
+	 * Register User abilities with the registry.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerUserAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Users\GetUser() );
+		$registry->register( new \FAWpmcp\Abilities\Users\ListUsers() );
+		$registry->register( new \FAWpmcp\Abilities\Users\CreateUser() );
+		$registry->register( new \FAWpmcp\Abilities\Users\UpdateUser() );
+		$registry->register( new \FAWpmcp\Abilities\Users\DeleteUser() );
+	}
 
-    /**
-     * Register Plugin abilities with the registry.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerPluginAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Plugins\ActivatePlugin());
-        $registry->register(new \FAWpmcp\Abilities\Plugins\DeactivatePlugin());
-        $registry->register(new \FAWpmcp\Abilities\Plugins\DeletePlugin());
-        $registry->register(new \FAWpmcp\Abilities\Plugins\GetPlugin());
-        $registry->register(new \FAWpmcp\Abilities\Plugins\InstallPlugin());
-        $registry->register(new \FAWpmcp\Abilities\Plugins\ListPlugins());
-        $registry->register(new \FAWpmcp\Abilities\Plugins\UpdatePlugin());
-    }
+	/**
+	 * Register Settings abilities with the registry.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerSettingsAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Settings\DeleteOption() );
+		$registry->register( new \FAWpmcp\Abilities\Settings\GetOption() );
+		$registry->register( new \FAWpmcp\Abilities\Settings\ListOptions() );
+		$registry->register( new \FAWpmcp\Abilities\Settings\UpdateOption() );
+	}
 
-    /**
-     * Register Theme abilities with the registry.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerThemeAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Themes\ActivateTheme());
-        $registry->register(new \FAWpmcp\Abilities\Themes\DeleteTheme());
-        $registry->register(new \FAWpmcp\Abilities\Themes\GetTheme());
-        $registry->register(new \FAWpmcp\Abilities\Themes\InstallTheme());
-        $registry->register(new \FAWpmcp\Abilities\Themes\ListThemes());
-        $registry->register(new \FAWpmcp\Abilities\Themes\StatusTheme());
-        $registry->register(new \FAWpmcp\Abilities\Themes\UpdateTheme());
-    }
+	/**
+	 * Register Plugin abilities with the registry.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerPluginAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Plugins\ActivatePlugin() );
+		$registry->register( new \FAWpmcp\Abilities\Plugins\DeactivatePlugin() );
+		$registry->register( new \FAWpmcp\Abilities\Plugins\DeletePlugin() );
+		$registry->register( new \FAWpmcp\Abilities\Plugins\GetPlugin() );
+		$registry->register( new \FAWpmcp\Abilities\Plugins\InstallPlugin() );
+		$registry->register( new \FAWpmcp\Abilities\Plugins\ListPlugins() );
+		$registry->register( new \FAWpmcp\Abilities\Plugins\UpdatePlugin() );
+	}
 
-    /**
-     * Register Privacy abilities with the registry.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerPrivacyAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Privacy\CreateErasureRequest());
-        $registry->register(new \FAWpmcp\Abilities\Privacy\CreateExportRequest());
-        $registry->register(new \FAWpmcp\Abilities\Privacy\GetPrivacyRequest());
-        $registry->register(new \FAWpmcp\Abilities\Privacy\ListPrivacyRequests());
-    }
+	/**
+	 * Register Theme abilities with the registry.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerThemeAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Themes\ActivateTheme() );
+		$registry->register( new \FAWpmcp\Abilities\Themes\DeleteTheme() );
+		$registry->register( new \FAWpmcp\Abilities\Themes\GetTheme() );
+		$registry->register( new \FAWpmcp\Abilities\Themes\InstallTheme() );
+		$registry->register( new \FAWpmcp\Abilities\Themes\ListThemes() );
+		$registry->register( new \FAWpmcp\Abilities\Themes\StatusTheme() );
+		$registry->register( new \FAWpmcp\Abilities\Themes\UpdateTheme() );
+	}
 
-    /**
-     * Register cache abilities.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerCacheAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Cache\FlushCache());
-        $registry->register(new \FAWpmcp\Abilities\Cache\GetCacheStatus());
-        $registry->register(new \FAWpmcp\Abilities\Cache\GetCacheType());
-    }
+	/**
+	 * Register Privacy abilities with the registry.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerPrivacyAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Privacy\CreateErasureRequest() );
+		$registry->register( new \FAWpmcp\Abilities\Privacy\CreateExportRequest() );
+		$registry->register( new \FAWpmcp\Abilities\Privacy\GetPrivacyRequest() );
+		$registry->register( new \FAWpmcp\Abilities\Privacy\ListPrivacyRequests() );
+	}
 
-    /**
-     * Register maintenance abilities.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerMaintenanceAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Maintenance\ActivateMaintenanceMode());
-        $registry->register(new \FAWpmcp\Abilities\Maintenance\DeactivateMaintenanceMode());
-        $registry->register(new \FAWpmcp\Abilities\Maintenance\GetMaintenanceModeStatus());
-    }
+	/**
+	 * Register cache abilities.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerCacheAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Cache\FlushCache() );
+		$registry->register( new \FAWpmcp\Abilities\Cache\GetCacheStatus() );
+		$registry->register( new \FAWpmcp\Abilities\Cache\GetCacheType() );
+	}
 
-    /**
-     * Register transient abilities.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerTransientAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Transients\GetTransient());
-        $registry->register(new \FAWpmcp\Abilities\Transients\ListTransients());
-        $registry->register(new \FAWpmcp\Abilities\Transients\SetTransient());
-        $registry->register(new \FAWpmcp\Abilities\Transients\DeleteTransient());
-    }
+	/**
+	 * Register maintenance abilities.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerMaintenanceAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Maintenance\ActivateMaintenanceMode() );
+		$registry->register( new \FAWpmcp\Abilities\Maintenance\DeactivateMaintenanceMode() );
+		$registry->register( new \FAWpmcp\Abilities\Maintenance\GetMaintenanceModeStatus() );
+	}
 
-    /**
-     * Register cron abilities.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerCronAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Cron\ListCronEventsAbility());
-        $registry->register(new \FAWpmcp\Abilities\Cron\GetCronEventAbility());
-        $registry->register(new \FAWpmcp\Abilities\Cron\ScheduleCronEventAbility());
-        $registry->register(new \FAWpmcp\Abilities\Cron\UnscheduleCronEventAbility());
-        $registry->register(new \FAWpmcp\Abilities\Cron\RunCronEventAbility());
-        $registry->register(new \FAWpmcp\Abilities\Cron\ListCronSchedulesAbility());
-    }
+	/**
+	 * Register transient abilities.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerTransientAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Transients\GetTransient() );
+		$registry->register( new \FAWpmcp\Abilities\Transients\ListTransients() );
+		$registry->register( new \FAWpmcp\Abilities\Transients\SetTransient() );
+		$registry->register( new \FAWpmcp\Abilities\Transients\DeleteTransient() );
+	}
 
-    /**
-     * Register role abilities.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerRoleAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Role\ListRolesAbility());
-        $registry->register(new \FAWpmcp\Abilities\Role\GetRoleAbility());
-        $registry->register(new \FAWpmcp\Abilities\Role\CreateRoleAbility());
-        $registry->register(new \FAWpmcp\Abilities\Role\UpdateRoleAbility());
-        $registry->register(new \FAWpmcp\Abilities\Role\DeleteRoleAbility());
-    }
+	/**
+	 * Register cron abilities.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerCronAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Cron\ListCronEventsAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Cron\GetCronEventAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Cron\ScheduleCronEventAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Cron\UnscheduleCronEventAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Cron\RunCronEventAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Cron\ListCronSchedulesAbility() );
+	}
 
-    /**
-     * Register menu abilities.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerMenuAbilities(AbilityRegistry $registry): void
-    {
-        $registry->register(new \FAWpmcp\Abilities\Menu\ListMenusAbility());
-        $registry->register(new \FAWpmcp\Abilities\Menu\GetMenuAbility());
-        $registry->register(new \FAWpmcp\Abilities\Menu\CreateMenuAbility());
-        $registry->register(new \FAWpmcp\Abilities\Menu\DeleteMenuAbility());
-    }
+	/**
+	 * Register role abilities.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerRoleAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Role\ListRolesAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Role\GetRoleAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Role\CreateRoleAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Role\UpdateRoleAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Role\DeleteRoleAbility() );
+	}
+
+	/**
+	 * Register menu abilities.
+	 *
+	 * @param AbilityRegistry $registry Ability registry.
+	 * @return void
+	 */
+	private static function registerMenuAbilities( AbilityRegistry $registry ): void {
+		$registry->register( new \FAWpmcp\Abilities\Menu\ListMenusAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Menu\GetMenuAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Menu\CreateMenuAbility() );
+		$registry->register( new \FAWpmcp\Abilities\Menu\DeleteMenuAbility() );
+	}
 }

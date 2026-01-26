@@ -20,6 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class RoleAlreadyExistsException extends Exception
-{
+class RoleAlreadyExistsException extends Exception {
+
 }

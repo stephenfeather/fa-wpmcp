@@ -19,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class PostNotFoundException extends Exception
-{
+class PostNotFoundException extends Exception {
+
 }

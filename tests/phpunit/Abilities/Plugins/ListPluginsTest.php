@@ -10,85 +10,73 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Plugins;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Plugins\ListPlugins;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
-use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test ListPlugins ability functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Plugins
  */
-class ListPluginsTest extends TestCase
-{
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class ListPluginsTest extends BrainMonkeyTestCase {
+	use AbilityTestTrait;
 
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new ListPlugins();
+	}
 
-    public function testGetName(): void
-    {
-        $ability = new ListPlugins();
-        $this->assertEquals('fa-wpmcp/list-plugins', $ability->getName());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/list-plugins',
+			'category'             => 'plugins',
+			'label'                => 'List Plugins',
+			'description_contains' => 'list installed wordpress plugins',
+			'operation_type'       => 'read',
+			'required_capability'  => 'activate_plugins',
+		);
+	}
 
-    public function testGetCategory(): void
-    {
-        $ability = new ListPlugins();
-        $this->assertEquals('plugins', $ability->getCategory());
-    }
+	public function testExecuteListsAllPlugins(): void {
+		$ability = $this->getAbilityInstance();
 
-    public function testGetOperationType(): void
-    {
-        $ability = new ListPlugins();
-        $this->assertEquals('read', $ability->getOperationType());
-    }
+		Functions\expect( 'get_plugins' )
+			->once()
+			->andReturn(
+				array(
+					'plugin1/plugin1.php' => array(
+						'Name'    => 'Plugin One',
+						'Version' => '1.0',
+					),
+					'plugin2/plugin2.php' => array(
+						'Name'    => 'Plugin Two',
+						'Version' => '2.0',
+					),
+				)
+			);
 
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new ListPlugins();
-        $this->assertEquals('activate_plugins', $ability->getRequiredCapability());
-    }
+		Functions\expect( 'is_plugin_active' )
+			->twice()
+			->andReturnUsing( fn( $plugin ) => $plugin === 'plugin1/plugin1.php' );
 
-    public function testExecuteListsAllPlugins(): void
-    {
-        $ability = new ListPlugins();
+		$result = $ability->doExecute( array() );
 
-        Functions\expect('get_plugins')
-            ->once()
-            ->andReturn(
-                array(
-                    'plugin1/plugin1.php' => array(
-                        'Name'    => 'Plugin One',
-                        'Version' => '1.0',
-                    ),
-                    'plugin2/plugin2.php' => array(
-                        'Name'    => 'Plugin Two',
-                        'Version' => '2.0',
-                    ),
-                )
-            );
-
-        Functions\expect('is_plugin_active')
-            ->twice()
-            ->andReturnUsing(fn($plugin) => $plugin === 'plugin1/plugin1.php');
-
-        $result = $ability->doExecute(array());
-
-        $this->assertCount(2, $result['plugins']);
-        $this->assertEquals('plugin1/plugin1.php', $result['plugins'][0]['plugin']);
-        $this->assertTrue($result['plugins'][0]['active']);
-        $this->assertEquals('plugin2/plugin2.php', $result['plugins'][1]['plugin']);
-        $this->assertFalse($result['plugins'][1]['active']);
-    }
+		$this->assertCount( 2, $result['plugins'] );
+		$this->assertEquals( 'plugin1/plugin1.php', $result['plugins'][0]['plugin'] );
+		$this->assertTrue( $result['plugins'][0]['active'] );
+		$this->assertEquals( 'plugin2/plugin2.php', $result['plugins'][1]['plugin'] );
+		$this->assertFalse( $result['plugins'][1]['active'] );
+	}
 }

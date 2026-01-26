@@ -10,344 +10,241 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Taxonomies;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Taxonomies\GetTaxonomy;
 use FAWpmcp\Exceptions\PostNotFoundException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test GetTaxonomy ability functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Taxonomies
  */
-class GetTaxonomyTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class GetTaxonomyTest extends BrainMonkeyTestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new GetTaxonomy();
-        $this->assertEquals('fa-wpmcp/get-taxonomy', $ability->getName());
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new GetTaxonomy();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new GetTaxonomy();
-        $this->assertEquals('taxonomies', $ability->getCategory());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array<string, string>
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                  => 'fa-wpmcp/get-taxonomy',
+			'category'              => 'taxonomies',
+			'label'                 => 'Get Taxonomy',
+			'description_contains'  => 'retrieve',
+			'operation_type'        => 'read',
+			'required_capability'   => 'read',
+		);
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new GetTaxonomy();
-        $this->assertEquals('Get Taxonomy', $ability->getLabel());
-    }
+	/**
+	 * Test execute throws exception for non-existent taxonomy.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionForNonExistentTaxonomy(): void {
+		Functions\when( 'get_taxonomy' )->justReturn( false );
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new GetTaxonomy();
-        $this->assertEquals('read', $ability->getOperationType());
-    }
+		$this->expectException( PostNotFoundException::class );
+		$this->expectExceptionMessage( 'Taxonomy not found' );
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new GetTaxonomy();
-        $this->assertEquals('read', $ability->getRequiredCapability());
-    }
+		$this->getAbilityInstance()->doExecute( array( 'taxonomy' => 'nonexistent_taxonomy' ) );
+	}
 
-    /**
-     * Test ability returns input schema with required taxonomy field.
-     *
-     * @return void
-     */
-    public function testGetInputSchema(): void
-    {
-        $ability = new GetTaxonomy();
-        $schema  = $ability->getInputSchema();
+	/**
+	 * Test execute returns taxonomy data.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsTaxonomyData(): void {
+		$mock_labels = (object) array(
+			'name'          => 'Categories',
+			'singular_name' => 'Category',
+			'search_items'  => 'Search Categories',
+		);
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('required', $schema);
-        $this->assertArrayHasKey('taxonomy', $schema['properties']);
-        $this->assertContains('taxonomy', $schema['required']);
-    }
+		$mock_cap = (object) array(
+			'manage_terms' => 'manage_categories',
+			'edit_terms'   => 'edit_categories',
+			'delete_terms' => 'delete_categories',
+			'assign_terms' => 'assign_categories',
+		);
 
-    /**
-     * Test ability returns output schema.
-     *
-     * @return void
-     */
-    public function testGetOutputSchema(): void
-    {
-        $ability = new GetTaxonomy();
-        $schema  = $ability->getOutputSchema();
+		$mock_taxonomy              = Mockery::mock( \WP_Taxonomy::class );
+		$mock_taxonomy->name        = 'category';
+		$mock_taxonomy->label       = 'Categories';
+		$mock_taxonomy->labels      = $mock_labels;
+		$mock_taxonomy->description = 'Post categories';
+		$mock_taxonomy->public      = true;
+		$mock_taxonomy->hierarchical = true;
+		$mock_taxonomy->show_ui     = true;
+		$mock_taxonomy->show_in_rest = true;
+		$mock_taxonomy->rest_base   = 'categories';
+		$mock_taxonomy->object_type = array( 'post' );
+		$mock_taxonomy->cap         = $mock_cap;
+		$mock_taxonomy->rewrite     = array(
+			'slug' => 'category',
+			'with_front' => true,
+		);
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('taxonomy', $schema['properties']);
-    }
+		Functions\when( 'get_taxonomy' )->justReturn( $mock_taxonomy );
 
-    /**
-     * Test execute throws exception for non-existent taxonomy.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionForNonExistentTaxonomy(): void
-    {
-        $ability = new GetTaxonomy();
+		$result = $this->getAbilityInstance()->doExecute( array( 'taxonomy' => 'category' ) );
 
-        Functions\when('get_taxonomy')->justReturn(false);
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'taxonomy', $result );
+		$this->assertEquals( 'category', $result['taxonomy']['name'] );
+		$this->assertEquals( 'Categories', $result['taxonomy']['label'] );
+		$this->assertTrue( $result['taxonomy']['hierarchical'] );
+		$this->assertEquals( array( 'post' ), $result['taxonomy']['object_type'] );
+	}
 
-        $this->expectException(PostNotFoundException::class);
-        $this->expectExceptionMessage('Taxonomy not found');
+	/**
+	 * Test execute returns labels as array.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsLabelsAsArray(): void {
+		$mock_labels = (object) array(
+			'name'          => 'Tags',
+			'singular_name' => 'Tag',
+		);
 
-        $ability->doExecute(array( 'taxonomy' => 'nonexistent_taxonomy' ));
-    }
+		$mock_taxonomy              = Mockery::mock( \WP_Taxonomy::class );
+		$mock_taxonomy->name        = 'post_tag';
+		$mock_taxonomy->label       = 'Tags';
+		$mock_taxonomy->labels      = $mock_labels;
+		$mock_taxonomy->description = '';
+		$mock_taxonomy->public      = true;
+		$mock_taxonomy->hierarchical = false;
+		$mock_taxonomy->show_ui     = true;
+		$mock_taxonomy->show_in_rest = true;
+		$mock_taxonomy->rest_base   = 'tags';
+		$mock_taxonomy->object_type = array( 'post' );
+		$mock_taxonomy->cap         = null;
+		$mock_taxonomy->rewrite     = true;
 
-    /**
-     * Test execute returns taxonomy data.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsTaxonomyData(): void
-    {
-        $ability = new GetTaxonomy();
+		Functions\when( 'get_taxonomy' )->justReturn( $mock_taxonomy );
 
-        $mock_labels = (object) array(
-            'name'          => 'Categories',
-            'singular_name' => 'Category',
-            'search_items'  => 'Search Categories',
-        );
+		$result = $this->getAbilityInstance()->doExecute( array( 'taxonomy' => 'post_tag' ) );
 
-        $mock_cap = (object) array(
-            'manage_terms' => 'manage_categories',
-            'edit_terms'   => 'edit_categories',
-            'delete_terms' => 'delete_categories',
-            'assign_terms' => 'assign_categories',
-        );
+		$this->assertIsArray( $result['taxonomy']['labels'] );
+		$this->assertEquals( 'Tags', $result['taxonomy']['labels']['name'] );
+		$this->assertEquals( 'Tag', $result['taxonomy']['labels']['singular_name'] );
+	}
 
-        $mock_taxonomy              = Mockery::mock(\WP_Taxonomy::class);
-        $mock_taxonomy->name        = 'category';
-        $mock_taxonomy->label       = 'Categories';
-        $mock_taxonomy->labels      = $mock_labels;
-        $mock_taxonomy->description = 'Post categories';
-        $mock_taxonomy->public      = true;
-        $mock_taxonomy->hierarchical = true;
-        $mock_taxonomy->show_ui     = true;
-        $mock_taxonomy->show_in_rest = true;
-        $mock_taxonomy->rest_base   = 'categories';
-        $mock_taxonomy->object_type = array( 'post' );
-        $mock_taxonomy->cap         = $mock_cap;
-        $mock_taxonomy->rewrite     = array(
-            'slug' => 'category',
-            'with_front' => true,
-        );
+	/**
+	 * Test execute handles null labels.
+	 *
+	 * @return void
+	 */
+	public function testExecuteHandlesNullLabels(): void {
+		$mock_taxonomy              = Mockery::mock( \WP_Taxonomy::class );
+		$mock_taxonomy->name        = 'custom_tax';
+		$mock_taxonomy->label       = 'Custom';
+		$mock_taxonomy->labels      = null;
+		$mock_taxonomy->description = '';
+		$mock_taxonomy->public      = true;
+		$mock_taxonomy->hierarchical = false;
+		$mock_taxonomy->show_ui     = true;
+		$mock_taxonomy->show_in_rest = false;
+		$mock_taxonomy->rest_base   = null;
+		$mock_taxonomy->object_type = array( 'post' );
+		$mock_taxonomy->cap         = null;
+		$mock_taxonomy->rewrite     = false;
 
-        Functions\when('get_taxonomy')->justReturn($mock_taxonomy);
+		Functions\when( 'get_taxonomy' )->justReturn( $mock_taxonomy );
 
-        $result = $ability->doExecute(array( 'taxonomy' => 'category' ));
+		$result = $this->getAbilityInstance()->doExecute( array( 'taxonomy' => 'custom_tax' ) );
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('taxonomy', $result);
-        $this->assertEquals('category', $result['taxonomy']['name']);
-        $this->assertEquals('Categories', $result['taxonomy']['label']);
-        $this->assertTrue($result['taxonomy']['hierarchical']);
-        $this->assertEquals(array( 'post' ), $result['taxonomy']['object_type']);
-    }
+		$this->assertIsArray( $result['taxonomy']['labels'] );
+		$this->assertEmpty( $result['taxonomy']['labels'] );
+	}
 
-    /**
-     * Test execute returns labels as array.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsLabelsAsArray(): void
-    {
-        $ability = new GetTaxonomy();
+	/**
+	 * Test execute handles boolean rewrite.
+	 *
+	 * @return void
+	 */
+	public function testExecuteHandlesBooleanRewrite(): void {
+		$mock_taxonomy              = Mockery::mock( \WP_Taxonomy::class );
+		$mock_taxonomy->name        = 'post_tag';
+		$mock_taxonomy->label       = 'Tags';
+		$mock_taxonomy->labels      = null;
+		$mock_taxonomy->description = '';
+		$mock_taxonomy->public      = true;
+		$mock_taxonomy->hierarchical = false;
+		$mock_taxonomy->show_ui     = true;
+		$mock_taxonomy->show_in_rest = true;
+		$mock_taxonomy->rest_base   = 'tags';
+		$mock_taxonomy->object_type = array( 'post' );
+		$mock_taxonomy->cap         = null;
+		$mock_taxonomy->rewrite     = false;
 
-        $mock_labels = (object) array(
-            'name'          => 'Tags',
-            'singular_name' => 'Tag',
-        );
+		Functions\when( 'get_taxonomy' )->justReturn( $mock_taxonomy );
 
-        $mock_taxonomy              = Mockery::mock(\WP_Taxonomy::class);
-        $mock_taxonomy->name        = 'post_tag';
-        $mock_taxonomy->label       = 'Tags';
-        $mock_taxonomy->labels      = $mock_labels;
-        $mock_taxonomy->description = '';
-        $mock_taxonomy->public      = true;
-        $mock_taxonomy->hierarchical = false;
-        $mock_taxonomy->show_ui     = true;
-        $mock_taxonomy->show_in_rest = true;
-        $mock_taxonomy->rest_base   = 'tags';
-        $mock_taxonomy->object_type = array( 'post' );
-        $mock_taxonomy->cap         = null;
-        $mock_taxonomy->rewrite     = true;
+		$result = $this->getAbilityInstance()->doExecute( array( 'taxonomy' => 'post_tag' ) );
 
-        Functions\when('get_taxonomy')->justReturn($mock_taxonomy);
+		$this->assertFalse( $result['taxonomy']['rewrite'] );
+	}
 
-        $result = $ability->doExecute(array( 'taxonomy' => 'post_tag' ));
+	/**
+	 * Test execute handles array rewrite.
+	 *
+	 * @return void
+	 */
+	public function testExecuteHandlesArrayRewrite(): void {
+		$mock_taxonomy              = Mockery::mock( \WP_Taxonomy::class );
+		$mock_taxonomy->name        = 'category';
+		$mock_taxonomy->label       = 'Categories';
+		$mock_taxonomy->labels      = null;
+		$mock_taxonomy->description = '';
+		$mock_taxonomy->public      = true;
+		$mock_taxonomy->hierarchical = true;
+		$mock_taxonomy->show_ui     = true;
+		$mock_taxonomy->show_in_rest = true;
+		$mock_taxonomy->rest_base   = 'categories';
+		$mock_taxonomy->object_type = array( 'post' );
+		$mock_taxonomy->cap         = null;
+		$mock_taxonomy->rewrite     = array(
+			'slug' => 'category',
+			'with_front' => true,
+		);
 
-        $this->assertIsArray($result['taxonomy']['labels']);
-        $this->assertEquals('Tags', $result['taxonomy']['labels']['name']);
-        $this->assertEquals('Tag', $result['taxonomy']['labels']['singular_name']);
-    }
+		Functions\when( 'get_taxonomy' )->justReturn( $mock_taxonomy );
 
-    /**
-     * Test execute handles null labels.
-     *
-     * @return void
-     */
-    public function testExecuteHandlesNullLabels(): void
-    {
-        $ability = new GetTaxonomy();
+		$result = $this->getAbilityInstance()->doExecute( array( 'taxonomy' => 'category' ) );
 
-        $mock_taxonomy              = Mockery::mock(\WP_Taxonomy::class);
-        $mock_taxonomy->name        = 'custom_tax';
-        $mock_taxonomy->label       = 'Custom';
-        $mock_taxonomy->labels      = null;
-        $mock_taxonomy->description = '';
-        $mock_taxonomy->public      = true;
-        $mock_taxonomy->hierarchical = false;
-        $mock_taxonomy->show_ui     = true;
-        $mock_taxonomy->show_in_rest = false;
-        $mock_taxonomy->rest_base   = null;
-        $mock_taxonomy->object_type = array( 'post' );
-        $mock_taxonomy->cap         = null;
-        $mock_taxonomy->rewrite     = false;
+		$this->assertIsArray( $result['taxonomy']['rewrite'] );
+		$this->assertEquals( 'category', $result['taxonomy']['rewrite']['slug'] );
+	}
 
-        Functions\when('get_taxonomy')->justReturn($mock_taxonomy);
+	/**
+	 * Test annotations are correct for read-only ability.
+	 *
+	 * @return void
+	 */
+	public function testGetAnnotations(): void {
+		$ability     = $this->getAbilityInstance();
+		$annotations = $ability->getAnnotations();
 
-        $result = $ability->doExecute(array( 'taxonomy' => 'custom_tax' ));
-
-        $this->assertIsArray($result['taxonomy']['labels']);
-        $this->assertEmpty($result['taxonomy']['labels']);
-    }
-
-    /**
-     * Test execute handles boolean rewrite.
-     *
-     * @return void
-     */
-    public function testExecuteHandlesBooleanRewrite(): void
-    {
-        $ability = new GetTaxonomy();
-
-        $mock_taxonomy              = Mockery::mock(\WP_Taxonomy::class);
-        $mock_taxonomy->name        = 'post_tag';
-        $mock_taxonomy->label       = 'Tags';
-        $mock_taxonomy->labels      = null;
-        $mock_taxonomy->description = '';
-        $mock_taxonomy->public      = true;
-        $mock_taxonomy->hierarchical = false;
-        $mock_taxonomy->show_ui     = true;
-        $mock_taxonomy->show_in_rest = true;
-        $mock_taxonomy->rest_base   = 'tags';
-        $mock_taxonomy->object_type = array( 'post' );
-        $mock_taxonomy->cap         = null;
-        $mock_taxonomy->rewrite     = false;
-
-        Functions\when('get_taxonomy')->justReturn($mock_taxonomy);
-
-        $result = $ability->doExecute(array( 'taxonomy' => 'post_tag' ));
-
-        $this->assertFalse($result['taxonomy']['rewrite']);
-    }
-
-    /**
-     * Test execute handles array rewrite.
-     *
-     * @return void
-     */
-    public function testExecuteHandlesArrayRewrite(): void
-    {
-        $ability = new GetTaxonomy();
-
-        $mock_taxonomy              = Mockery::mock(\WP_Taxonomy::class);
-        $mock_taxonomy->name        = 'category';
-        $mock_taxonomy->label       = 'Categories';
-        $mock_taxonomy->labels      = null;
-        $mock_taxonomy->description = '';
-        $mock_taxonomy->public      = true;
-        $mock_taxonomy->hierarchical = true;
-        $mock_taxonomy->show_ui     = true;
-        $mock_taxonomy->show_in_rest = true;
-        $mock_taxonomy->rest_base   = 'categories';
-        $mock_taxonomy->object_type = array( 'post' );
-        $mock_taxonomy->cap         = null;
-        $mock_taxonomy->rewrite     = array(
-            'slug' => 'category',
-            'with_front' => true,
-        );
-
-        Functions\when('get_taxonomy')->justReturn($mock_taxonomy);
-
-        $result = $ability->doExecute(array( 'taxonomy' => 'category' ));
-
-        $this->assertIsArray($result['taxonomy']['rewrite']);
-        $this->assertEquals('category', $result['taxonomy']['rewrite']['slug']);
-    }
-
-    /**
-     * Test annotations are correct for read-only ability.
-     *
-     * @return void
-     */
-    public function testGetAnnotations(): void
-    {
-        $ability     = new GetTaxonomy();
-        $annotations = $ability->getAnnotations();
-
-        $this->assertTrue($annotations['readonly']);
-        $this->assertFalse($annotations['destructive']);
-        $this->assertTrue($annotations['idempotent']);
-    }
+		$this->assertTrue( $annotations['readonly'] );
+		$this->assertFalse( $annotations['destructive'] );
+		$this->assertTrue( $annotations['idempotent'] );
+	}
 }

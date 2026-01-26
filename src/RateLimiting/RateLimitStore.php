@@ -18,30 +18,30 @@ namespace FAWpmcp\RateLimiting;
  *
  * @package FAWpmcp\RateLimiting
  */
-interface RateLimitStore
-{
-    /**
-     * Get current count for a key.
-     *
-     * @param string $key Rate limit key.
-     * @return int Current count (0 if not found).
-     */
-    public function get(string $key): int;
+interface RateLimitStore {
 
-    /**
-     * Increment counter for a key.
-     *
-     * @param string $key Key to increment.
-     * @param int    $ttl Time-to-live in seconds.
-     * @return int New count after increment.
-     */
-    public function increment(string $key, int $ttl): int;
+	/**
+	 * Get current count for a key.
+	 *
+	 * @param string $key Rate limit key.
+	 * @return int Current count (0 if not found).
+	 */
+	public function get( string $key ): int;
 
-    /**
-     * Delete a key.
-     *
-     * @param string $key Key to delete.
-     * @return bool True if deleted, false otherwise.
-     */
-    public function delete(string $key): bool;
+	/**
+	 * Increment counter for a key.
+	 *
+	 * @param string $key Key to increment.
+	 * @param int    $ttl Time-to-live in seconds.
+	 * @return int New count after increment.
+	 */
+	public function increment( string $key, int $ttl ): int;
+
+	/**
+	 * Delete a key.
+	 *
+	 * @param string $key Key to delete.
+	 * @return bool True if deleted, false otherwise.
+	 */
+	public function delete( string $key ): bool;
 }

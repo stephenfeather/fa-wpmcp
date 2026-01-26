@@ -19,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class PrivacyRequestNotFoundException extends Exception
-{
+class PrivacyRequestNotFoundException extends Exception {
+
 }

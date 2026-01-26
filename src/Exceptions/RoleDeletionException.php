@@ -20,6 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class RoleDeletionException extends Exception
-{
+class RoleDeletionException extends Exception {
+
 }

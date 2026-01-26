@@ -18,169 +18,157 @@ use PHPUnit\Framework\TestCase;
 /**
  * Test Result value object.
  */
-class ResultTest extends TestCase
-{
-    /**
-     * Test creating a success result.
-     */
-    public function test_success_creates_successful_result(): void
-    {
-        $result = Result::success('test_value');
+class ResultTest extends TestCase {
 
-        $this->assertTrue($result->is_success);
-        $this->assertSame('test_value', $result->value);
-        $this->assertNull($result->error_code);
-        $this->assertNull($result->error_message);
-    }
+	/**
+	 * Test creating a success result.
+	 */
+	public function test_success_creates_successful_result(): void {
+		$result = Result::success( 'test_value' );
 
-    /**
-     * Test creating a failure result.
-     */
-    public function test_failure_creates_failed_result(): void
-    {
-        $result = Result::failure('ERROR_CODE', 'Error message');
+		$this->assertTrue( $result->is_success );
+		$this->assertSame( 'test_value', $result->value );
+		$this->assertNull( $result->error_code );
+		$this->assertNull( $result->error_message );
+	}
 
-        $this->assertFalse($result->is_success);
-        $this->assertNull($result->value);
-        $this->assertSame('ERROR_CODE', $result->error_code);
-        $this->assertSame('Error message', $result->error_message);
-    }
+	/**
+	 * Test creating a failure result.
+	 */
+	public function test_failure_creates_failed_result(): void {
+		$result = Result::failure( 'ERROR_CODE', 'Error message' );
 
-    /**
-     * Test map on success result.
-     */
-    public function test_map_transforms_success_value(): void
-    {
-        $result = Result::success(5);
+		$this->assertFalse( $result->is_success );
+		$this->assertNull( $result->value );
+		$this->assertSame( 'ERROR_CODE', $result->error_code );
+		$this->assertSame( 'Error message', $result->error_message );
+	}
 
-        $mapped = $result->map(fn($x) => $x * 2);
+	/**
+	 * Test map on success result.
+	 */
+	public function test_map_transforms_success_value(): void {
+		$result = Result::success( 5 );
 
-        $this->assertTrue($mapped->is_success);
-        $this->assertSame(10, $mapped->value);
-    }
+		$mapped = $result->map( fn( $x ) => $x * 2 );
 
-    /**
-     * Test map on failure result.
-     */
-    public function test_map_preserves_failure(): void
-    {
-        $result = Result::failure('ERROR', 'Failed');
+		$this->assertTrue( $mapped->is_success );
+		$this->assertSame( 10, $mapped->value );
+	}
 
-        $mapped = $result->map(fn($x) => $x * 2);
+	/**
+	 * Test map on failure result.
+	 */
+	public function test_map_preserves_failure(): void {
+		$result = Result::failure( 'ERROR', 'Failed' );
 
-        $this->assertFalse($mapped->is_success);
-        $this->assertSame('ERROR', $mapped->error_code);
-    }
+		$mapped = $result->map( fn( $x ) => $x * 2 );
 
-    /**
-     * Test flatMap on success result.
-     */
-    public function test_flat_map_chains_success(): void
-    {
-        $result = Result::success(5);
+		$this->assertFalse( $mapped->is_success );
+		$this->assertSame( 'ERROR', $mapped->error_code );
+	}
 
-        $flat_mapped = $result->flatMap(fn($x) => Result::success($x * 2));
+	/**
+	 * Test flatMap on success result.
+	 */
+	public function test_flat_map_chains_success(): void {
+		$result = Result::success( 5 );
 
-        $this->assertTrue($flat_mapped->is_success);
-        $this->assertSame(10, $flat_mapped->value);
-    }
+		$flat_mapped = $result->flatMap( fn( $x ) => Result::success( $x * 2 ) );
 
-    /**
-     * Test flatMap on failure result.
-     */
-    public function test_flat_map_preserves_failure(): void
-    {
-        $result = Result::failure('ERROR', 'Failed');
+		$this->assertTrue( $flat_mapped->is_success );
+		$this->assertSame( 10, $flat_mapped->value );
+	}
 
-        $flat_mapped = $result->flatMap(fn($x) => Result::success($x * 2));
+	/**
+	 * Test flatMap on failure result.
+	 */
+	public function test_flat_map_preserves_failure(): void {
+		$result = Result::failure( 'ERROR', 'Failed' );
 
-        $this->assertFalse($flat_mapped->is_success);
-        $this->assertSame('ERROR', $flat_mapped->error_code);
-    }
+		$flat_mapped = $result->flatMap( fn( $x ) => Result::success( $x * 2 ) );
 
-    /**
-     * Test flatMap with chained failure.
-     */
-    public function test_flat_map_chains_failure(): void
-    {
-        $result = Result::success(5);
+		$this->assertFalse( $flat_mapped->is_success );
+		$this->assertSame( 'ERROR', $flat_mapped->error_code );
+	}
 
-        $flat_mapped = $result->flatMap(fn($x) => Result::failure('CHAINED_ERROR', 'Failed in chain'));
+	/**
+	 * Test flatMap with chained failure.
+	 */
+	public function test_flat_map_chains_failure(): void {
+		$result = Result::success( 5 );
 
-        $this->assertFalse($flat_mapped->is_success);
-        $this->assertSame('CHAINED_ERROR', $flat_mapped->error_code);
-    }
+		$flat_mapped = $result->flatMap( fn( $x ) => Result::failure( 'CHAINED_ERROR', 'Failed in chain' ) );
 
-    /**
-     * Test Result is readonly (immutable).
-     */
-    public function test_result_is_immutable(): void
-    {
-        $result = Result::success('original');
+		$this->assertFalse( $flat_mapped->is_success );
+		$this->assertSame( 'CHAINED_ERROR', $flat_mapped->error_code );
+	}
 
-        $this->expectException(\Error::class);
-        // @phpstan-ignore-next-line - Intentionally testing immutability.
-        $result->value = 'modified';
-    }
+	/**
+	 * Test Result is readonly (immutable).
+	 */
+	public function test_result_is_immutable(): void {
+		$result = Result::success( 'original' );
 
-    /**
-     * Test success result toResponse format.
-     */
-    public function test_success_result_to_response_format(): void
-    {
-        $result = Result::success(
-            array(
-                'post_id' => 42,
-                'title'   => 'Test Post',
-            )
-        );
+		$this->expectException( \Error::class );
+		// @phpstan-ignore-next-line - Intentionally testing immutability.
+		$result->value = 'modified';
+	}
 
-        $response = $result->toResponse('corr-123', 150);
+	/**
+	 * Test success result toResponse format.
+	 */
+	public function test_success_result_to_response_format(): void {
+		$result = Result::success(
+			array(
+				'post_id' => 42,
+				'title'   => 'Test Post',
+			)
+		);
 
-        $this->assertTrue($response['success']);
-        $this->assertArrayHasKey('data', $response);
-        $this->assertSame(42, $response['data']['post_id']);
-        $this->assertSame('Test Post', $response['data']['title']);
-    }
+		$response = $result->toResponse( 'corr-123', 150 );
 
-    /**
-     * Test failure result toResponse format.
-     */
-    public function test_failure_result_to_response_format(): void
-    {
-        $result = Result::failure(ErrorCodes::NOT_FOUND, 'Post not found');
+		$this->assertTrue( $response['success'] );
+		$this->assertArrayHasKey( 'data', $response );
+		$this->assertSame( 42, $response['data']['post_id'] );
+		$this->assertSame( 'Test Post', $response['data']['title'] );
+	}
 
-        $response = $result->toResponse('corr-456', 50);
+	/**
+	 * Test failure result toResponse format.
+	 */
+	public function test_failure_result_to_response_format(): void {
+		$result = Result::failure( ErrorCodes::NOT_FOUND, 'Post not found' );
 
-        $this->assertFalse($response['success']);
-        $this->assertArrayHasKey('error', $response);
-        $this->assertSame(ErrorCodes::NOT_FOUND, $response['error']['code']);
-        $this->assertSame('Post not found', $response['error']['message']);
-    }
+		$response = $result->toResponse( 'corr-456', 50 );
 
-    /**
-     * Test response includes correlation_id in meta.
-     */
-    public function test_response_includes_correlation_id(): void
-    {
-        $result = Result::success(array( 'status' => 'ok' ));
+		$this->assertFalse( $response['success'] );
+		$this->assertArrayHasKey( 'error', $response );
+		$this->assertSame( ErrorCodes::NOT_FOUND, $response['error']['code'] );
+		$this->assertSame( 'Post not found', $response['error']['message'] );
+	}
 
-        $response = $result->toResponse('unique-corr-id-789', 100);
+	/**
+	 * Test response includes correlation_id in meta.
+	 */
+	public function test_response_includes_correlation_id(): void {
+		$result = Result::success( array( 'status' => 'ok' ) );
 
-        $this->assertArrayHasKey('meta', $response);
-        $this->assertSame('unique-corr-id-789', $response['meta']['correlation_id']);
-    }
+		$response = $result->toResponse( 'unique-corr-id-789', 100 );
 
-    /**
-     * Test response includes execution_time_ms in meta.
-     */
-    public function test_response_includes_execution_time(): void
-    {
-        $result = Result::success(array( 'data' => 'test' ));
+		$this->assertArrayHasKey( 'meta', $response );
+		$this->assertSame( 'unique-corr-id-789', $response['meta']['correlation_id'] );
+	}
 
-        $response = $result->toResponse('corr-time-test', 250);
+	/**
+	 * Test response includes execution_time_ms in meta.
+	 */
+	public function test_response_includes_execution_time(): void {
+		$result = Result::success( array( 'data' => 'test' ) );
 
-        $this->assertArrayHasKey('meta', $response);
-        $this->assertSame(250, $response['meta']['execution_time_ms']);
-    }
+		$response = $result->toResponse( 'corr-time-test', 250 );
+
+		$this->assertArrayHasKey( 'meta', $response );
+		$this->assertSame( 250, $response['meta']['execution_time_ms'] );
+	}
 }

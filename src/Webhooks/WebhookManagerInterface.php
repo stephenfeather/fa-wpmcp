@@ -17,25 +17,25 @@ namespace FAWpmcp\Webhooks;
  *
  * @package FAWpmcp\Webhooks
  */
-interface WebhookManagerInterface
-{
-    /**
-     * Trigger webhooks for an event.
-     *
-     * Builds payload and enqueues webhooks for subscribed URLs.
-     *
-     * @param string               $event   Event name.
-     * @param array<string, mixed> $context Event context data.
-     * @return void
-     */
-    public function trigger(string $event, array $context): void;
+interface WebhookManagerInterface {
 
-    /**
-     * Process pending webhooks from queue.
-     *
-     * Retrieves pending webhooks and attempts delivery.
-     *
-     * @return void
-     */
-    public function processQueue(): void;
+	/**
+	 * Trigger webhooks for an event.
+	 *
+	 * Builds payload and enqueues webhooks for subscribed URLs.
+	 *
+	 * @param string               $event   Event name.
+	 * @param array<string, mixed> $context Event context data.
+	 * @return void
+	 */
+	public function trigger( string $event, array $context ): void;
+
+	/**
+	 * Process pending webhooks from queue.
+	 *
+	 * Retrieves pending webhooks and attempts delivery.
+	 *
+	 * @return void
+	 */
+	public function processQueue(): void;
 }

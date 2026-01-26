@@ -13,107 +13,98 @@ namespace FAWpmcp\Tests\Webhooks;
 use FAWpmcp\Webhooks\SignatureGenerator;
 use PHPUnit\Framework\TestCase;
 
-class SignatureGeneratorTest extends TestCase
-{
-    public function test_generates_hmac_signature(): void
-    {
-        $payload = '{"event":"test"}';
-        $secret  = 'test-secret';
+class SignatureGeneratorTest extends TestCase {
 
-        $signature = SignatureGenerator::generate($payload, $secret);
+	public function test_generates_hmac_signature(): void {
+		$payload = '{"event":"test"}';
+		$secret  = 'test-secret';
 
-        $this->assertStringStartsWith('sha256=', $signature);
-        $this->assertMatchesRegularExpression('/^sha256=[a-f0-9]{64}$/', $signature);
-    }
+		$signature = SignatureGenerator::generate( $payload, $secret );
 
-    public function test_same_input_produces_same_signature(): void
-    {
-        $payload = '{"event":"test","data":"value"}';
-        $secret  = 'test-secret';
+		$this->assertStringStartsWith( 'sha256=', $signature );
+		$this->assertMatchesRegularExpression( '/^sha256=[a-f0-9]{64}$/', $signature );
+	}
 
-        $sig1 = SignatureGenerator::generate($payload, $secret);
-        $sig2 = SignatureGenerator::generate($payload, $secret);
+	public function test_same_input_produces_same_signature(): void {
+		$payload = '{"event":"test","data":"value"}';
+		$secret  = 'test-secret';
 
-        // Pure function: deterministic output
-        $this->assertEquals($sig1, $sig2);
-    }
+		$sig1 = SignatureGenerator::generate( $payload, $secret );
+		$sig2 = SignatureGenerator::generate( $payload, $secret );
 
-    public function test_different_payload_produces_different_signature(): void
-    {
-        $secret = 'test-secret';
+		// Pure function: deterministic output
+		$this->assertEquals( $sig1, $sig2 );
+	}
 
-        $sig1 = SignatureGenerator::generate('{"event":"test1"}', $secret);
-        $sig2 = SignatureGenerator::generate('{"event":"test2"}', $secret);
+	public function test_different_payload_produces_different_signature(): void {
+		$secret = 'test-secret';
 
-        $this->assertNotEquals($sig1, $sig2);
-    }
+		$sig1 = SignatureGenerator::generate( '{"event":"test1"}', $secret );
+		$sig2 = SignatureGenerator::generate( '{"event":"test2"}', $secret );
 
-    public function test_different_secret_produces_different_signature(): void
-    {
-        $payload = '{"event":"test"}';
+		$this->assertNotEquals( $sig1, $sig2 );
+	}
 
-        $sig1 = SignatureGenerator::generate($payload, 'secret-1');
-        $sig2 = SignatureGenerator::generate($payload, 'secret-2');
+	public function test_different_secret_produces_different_signature(): void {
+		$payload = '{"event":"test"}';
 
-        $this->assertNotEquals($sig1, $sig2);
-    }
+		$sig1 = SignatureGenerator::generate( $payload, 'secret-1' );
+		$sig2 = SignatureGenerator::generate( $payload, 'secret-2' );
 
-    public function test_verify_returns_true_for_valid_signature(): void
-    {
-        $payload   = '{"event":"ability.after_execute","success":true}';
-        $secret    = 'webhook-secret-key';
-        $signature = SignatureGenerator::generate($payload, $secret);
+		$this->assertNotEquals( $sig1, $sig2 );
+	}
 
-        $result = SignatureGenerator::verify($payload, $signature, $secret);
+	public function test_verify_returns_true_for_valid_signature(): void {
+		$payload   = '{"event":"ability.after_execute","success":true}';
+		$secret    = 'webhook-secret-key';
+		$signature = SignatureGenerator::generate( $payload, $secret );
 
-        $this->assertTrue($result);
-    }
+		$result = SignatureGenerator::verify( $payload, $signature, $secret );
 
-    public function test_verify_returns_false_for_invalid_signature(): void
-    {
-        $payload   = '{"event":"ability.after_execute"}';
-        $secret    = 'webhook-secret-key';
-        $signature = 'sha256=invalidhash';
+		$this->assertTrue( $result );
+	}
 
-        $result = SignatureGenerator::verify($payload, $signature, $secret);
+	public function test_verify_returns_false_for_invalid_signature(): void {
+		$payload   = '{"event":"ability.after_execute"}';
+		$secret    = 'webhook-secret-key';
+		$signature = 'sha256=invalidhash';
 
-        $this->assertFalse($result);
-    }
+		$result = SignatureGenerator::verify( $payload, $signature, $secret );
 
-    public function test_verify_returns_false_for_tampered_payload(): void
-    {
-        $original_payload = '{"event":"test","amount":100}';
-        $secret           = 'webhook-secret-key';
-        $signature        = SignatureGenerator::generate($original_payload, $secret);
+		$this->assertFalse( $result );
+	}
 
-        // Attacker changes the payload
-        $tampered_payload = '{"event":"test","amount":999}';
+	public function test_verify_returns_false_for_tampered_payload(): void {
+		$original_payload = '{"event":"test","amount":100}';
+		$secret           = 'webhook-secret-key';
+		$signature        = SignatureGenerator::generate( $original_payload, $secret );
 
-        $result = SignatureGenerator::verify($tampered_payload, $signature, $secret);
+		// Attacker changes the payload
+		$tampered_payload = '{"event":"test","amount":999}';
 
-        $this->assertFalse($result);
-    }
+		$result = SignatureGenerator::verify( $tampered_payload, $signature, $secret );
 
-    public function test_verify_returns_false_for_wrong_secret(): void
-    {
-        $payload   = '{"event":"test"}';
-        $secret    = 'correct-secret';
-        $signature = SignatureGenerator::generate($payload, $secret);
+		$this->assertFalse( $result );
+	}
 
-        $result = SignatureGenerator::verify($payload, $signature, 'wrong-secret');
+	public function test_verify_returns_false_for_wrong_secret(): void {
+		$payload   = '{"event":"test"}';
+		$secret    = 'correct-secret';
+		$signature = SignatureGenerator::generate( $payload, $secret );
 
-        $this->assertFalse($result);
-    }
+		$result = SignatureGenerator::verify( $payload, $signature, 'wrong-secret' );
 
-    public function test_uses_timing_safe_comparison(): void
-    {
-        // This test verifies that hash_equals is used internally
-        // by checking that verify() works correctly
-        $payload   = '{"event":"test"}';
-        $secret    = 'test-secret';
-        $signature = SignatureGenerator::generate($payload, $secret);
+		$this->assertFalse( $result );
+	}
 
-        // Timing-safe comparison should still work
-        $this->assertTrue(SignatureGenerator::verify($payload, $signature, $secret));
-    }
+	public function test_uses_timing_safe_comparison(): void {
+		// This test verifies that hash_equals is used internally
+		// by checking that verify() works correctly
+		$payload   = '{"event":"test"}';
+		$secret    = 'test-secret';
+		$signature = SignatureGenerator::generate( $payload, $secret );
+
+		// Timing-safe comparison should still work
+		$this->assertTrue( SignatureGenerator::verify( $payload, $signature, $secret ) );
+	}
 }

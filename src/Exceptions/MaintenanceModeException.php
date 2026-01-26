@@ -15,6 +15,6 @@ use RuntimeException;
 /**
  * Exception for maintenance mode operation failures.
  */
-class MaintenanceModeException extends RuntimeException
-{
+class MaintenanceModeException extends RuntimeException {
+
 }

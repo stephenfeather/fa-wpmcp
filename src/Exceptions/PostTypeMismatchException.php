@@ -20,6 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class PostTypeMismatchException extends Exception
-{
+class PostTypeMismatchException extends Exception {
+
 }

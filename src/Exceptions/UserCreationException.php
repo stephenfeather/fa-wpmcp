@@ -19,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class UserCreationException extends Exception
-{
+class UserCreationException extends Exception {
+
 }

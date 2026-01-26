@@ -19,6 +19,6 @@ use RuntimeException;
  *
  * @package FAWpmcp\Exceptions
  */
-class PluginInstallationException extends RuntimeException
-{
+class PluginInstallationException extends RuntimeException {
+
 }

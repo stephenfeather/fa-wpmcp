@@ -19,6 +19,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class UserNotFoundException extends Exception
-{
+class UserNotFoundException extends Exception {
+
 }

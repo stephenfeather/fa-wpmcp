@@ -10,12 +10,13 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Privacy;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Privacy\GetPrivacyRequest;
 use FAWpmcp\Exceptions\PrivacyRequestNotFoundException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test GetPrivacyRequest ability functionality.
@@ -27,183 +28,135 @@ use PHPUnit\Framework\TestCase;
  *
  * @package FAWpmcp\Tests\Abilities\Privacy
  */
-class GetPrivacyRequestTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class GetPrivacyRequestTest extends BrainMonkeyTestCase {
+	use AbilityTestTrait;
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new GetPrivacyRequest();
+	}
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new GetPrivacyRequest();
-        $this->assertEquals('fa-wpmcp/get-privacy-request', $ability->getName());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array{
+	 *     name: string,
+	 *     category: string,
+	 *     label: string,
+	 *     description_contains: string,
+	 *     operation_type: string,
+	 *     required_capability: string
+	 * }
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/get-privacy-request',
+			'category'             => 'privacy',
+			'label'                => 'Get Privacy Request',
+			'description_contains' => 'privacy request',
+			'operation_type'       => 'read',
+			'required_capability'  => 'manage_options',
+		);
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new GetPrivacyRequest();
-        $this->assertEquals('privacy', $ability->getCategory());
-    }
+	/**
+	 * Test getting privacy request successfully.
+	 *
+	 * @return void
+	 */
+	public function testExecuteGetsPrivacyRequest(): void {
+		$ability = $this->getAbilityInstance();
+		$input   = array(
+			'request_id' => 123,
+		);
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new GetPrivacyRequest();
-        $this->assertEquals('Get Privacy Request', $ability->getLabel());
-    }
+		// Mock get_post to return request post.
+		$mock_post              = Mockery::mock( '\WP_Post' );
+		$mock_post->ID          = 123;
+		$mock_post->post_type   = 'user_request';
+		$mock_post->post_status = 'request-confirmed';
+		$mock_post->post_date   = '2026-01-20 10:00:00';
 
-    /**
-     * Test ability requires manage_options capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new GetPrivacyRequest();
-        $this->assertEquals('manage_options', $ability->getRequiredCapability());
-    }
+		Functions\expect( 'get_post' )
+			->once()
+			->with( 123 )
+			->andReturn( $mock_post );
 
-    /**
-     * Test ability returns read operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new GetPrivacyRequest();
-        $this->assertEquals('read', $ability->getOperationType());
-    }
+		Functions\expect( 'get_post_meta' )
+			->times( 3 )
+			->andReturnUsing(
+				function ( $post_id, $key, $single ) {
+					if ( '_wp_user_request_user_email' === $key ) {
+						return 'user@example.com';
+					}
+					if ( 'action_name' === $key ) {
+						return 'export_personal_data';
+					}
+					if ( '_wp_user_request_confirmed_timestamp' === $key ) {
+						return '1737369600';
+					}
+					return '';
+				}
+			);
 
-    /**
-     * Test getting privacy request successfully.
-     *
-     * @return void
-     */
-    public function testExecuteGetsPrivacyRequest(): void
-    {
-        $ability = new GetPrivacyRequest();
-        $input   = array(
-            'request_id' => 123,
-        );
+		$result = $ability->doExecute( $input );
 
-        // Mock get_post to return request post.
-        $mock_post              = Mockery::mock('\WP_Post');
-        $mock_post->ID          = 123;
-        $mock_post->post_type   = 'user_request';
-        $mock_post->post_status = 'request-confirmed';
-        $mock_post->post_date   = '2026-01-20 10:00:00';
+		$this->assertEquals( 123, $result['id'] );
+		$this->assertEquals( 'user@example.com', $result['email'] );
+		$this->assertEquals( 'export_personal_data', $result['type'] );
+		$this->assertEquals( 'request-confirmed', $result['status'] );
+	}
 
-        Functions\expect('get_post')
-            ->once()
-            ->with(123)
-            ->andReturn($mock_post);
+	/**
+	 * Test getting non-existent request throws exception.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionForNonExistentRequest(): void {
+		$ability = $this->getAbilityInstance();
+		$input   = array(
+			'request_id' => 999,
+		);
 
-        Functions\expect('get_post_meta')
-            ->times(3)
-            ->andReturnUsing(
-                function ($post_id, $key, $single) {
-                    if ('_wp_user_request_user_email' === $key) {
-                        return 'user@example.com';
-                    }
-                    if ('action_name' === $key) {
-                        return 'export_personal_data';
-                    }
-                    if ('_wp_user_request_confirmed_timestamp' === $key) {
-                        return '1737369600';
-                    }
-                    return '';
-                }
-            );
+		Functions\expect( 'get_post' )
+			->once()
+			->with( 999 )
+			->andReturn( null );
 
-        $result = $ability->doExecute($input);
+		$this->expectException( PrivacyRequestNotFoundException::class );
+		$this->expectExceptionMessage( 'Privacy request not found' );
 
-        $this->assertEquals(123, $result['id']);
-        $this->assertEquals('user@example.com', $result['email']);
-        $this->assertEquals('export_personal_data', $result['type']);
-        $this->assertEquals('request-confirmed', $result['status']);
-    }
+		$ability->doExecute( $input );
+	}
 
-    /**
-     * Test getting non-existent request throws exception.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionForNonExistentRequest(): void
-    {
-        $ability = new GetPrivacyRequest();
-        $input   = array(
-            'request_id' => 999,
-        );
+	/**
+	 * Test getting non-request post throws exception.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionForWrongPostType(): void {
+		$ability = $this->getAbilityInstance();
+		$input   = array(
+			'request_id' => 123,
+		);
 
-        Functions\expect('get_post')
-            ->once()
-            ->with(999)
-            ->andReturn(null);
+		// Mock get_post to return a regular post.
+		$mock_post            = Mockery::mock( '\WP_Post' );
+		$mock_post->ID        = 123;
+		$mock_post->post_type = 'post';
 
-        $this->expectException(PrivacyRequestNotFoundException::class);
-        $this->expectExceptionMessage('Privacy request not found');
+		Functions\expect( 'get_post' )
+			->once()
+			->with( 123 )
+			->andReturn( $mock_post );
 
-        $ability->doExecute($input);
-    }
+		$this->expectException( PrivacyRequestNotFoundException::class );
+		$this->expectExceptionMessage( 'Privacy request not found' );
 
-    /**
-     * Test getting non-request post throws exception.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionForWrongPostType(): void
-    {
-        $ability = new GetPrivacyRequest();
-        $input   = array(
-            'request_id' => 123,
-        );
-
-        // Mock get_post to return a regular post.
-        $mock_post            = Mockery::mock('\WP_Post');
-        $mock_post->ID        = 123;
-        $mock_post->post_type = 'post';
-
-        Functions\expect('get_post')
-            ->once()
-            ->with(123)
-            ->andReturn($mock_post);
-
-        $this->expectException(PrivacyRequestNotFoundException::class);
-        $this->expectExceptionMessage('Privacy request not found');
-
-        $ability->doExecute($input);
-    }
+		$ability->doExecute( $input );
+	}
 }

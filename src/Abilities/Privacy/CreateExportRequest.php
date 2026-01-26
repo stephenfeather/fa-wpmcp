@@ -21,182 +21,172 @@ use FAWpmcp\Exceptions\PrivacyRequestException;
  *
  * @package FAWpmcp\Abilities\Privacy
  */
-final class CreateExportRequest extends AbstractAbility
-{
-    /**
-     * Get the unique ability name.
-     *
-     * @return string Ability name.
-     */
-    public function getName(): string
-    {
-        return 'fa-wpmcp/create-export-request';
-    }
+final class CreateExportRequest extends AbstractAbility {
 
-    /**
-     * Get the ability category.
-     *
-     * @return string Category name.
-     */
-    public function getCategory(): string
-    {
-        return 'privacy';
-    }
+	/**
+	 * Get the unique ability name.
+	 *
+	 * @return string Ability name.
+	 */
+	public function getName(): string {
+		return 'fa-wpmcp/create-export-request';
+	}
 
-    /**
-     * Get the human-readable label.
-     *
-     * @return string Ability label.
-     */
-    public function getLabel(): string
-    {
-        return 'Create Export Request';
-    }
+	/**
+	 * Get the ability category.
+	 *
+	 * @return string Category name.
+	 */
+	public function getCategory(): string {
+		return 'privacy';
+	}
 
-    /**
-     * Get the ability description.
-     *
-     * @return string Description.
-     */
-    public function getDescription(): string
-    {
-        return 'Create a personal data export request for GDPR compliance. The user will receive a confirmation email.';
-    }
+	/**
+	 * Get the human-readable label.
+	 *
+	 * @return string Ability label.
+	 */
+	public function getLabel(): string {
+		return 'Create Export Request';
+	}
 
-    /**
-     * Get the input schema.
-     *
-     * @return array<string, mixed> JSON Schema array.
-     */
-    public function getInputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'required'   => array( 'email' ),
-            'properties' => array(
-                'email'       => array(
-                    'type'        => 'string',
-                    'format'      => 'email',
-                    'description' => 'Email address of the user requesting data export.',
-                ),
-                'description' => array(
-                    'type'        => 'string',
-                    'description' => 'Optional description or reason for the request.',
-                ),
-            ),
-        );
-    }
+	/**
+	 * Get the ability description.
+	 *
+	 * @return string Description.
+	 */
+	public function getDescription(): string {
+		return 'Create a personal data export request for GDPR compliance. The user will receive a confirmation email.';
+	}
 
-    /**
-     * Get the output schema.
-     *
-     * @return array<string, mixed> JSON Schema array.
-     */
-    public function getOutputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'success'      => array(
-                    'type'        => 'boolean',
-                    'description' => 'Whether the request was created successfully.',
-                ),
-                'request_id'   => array(
-                    'type'        => 'integer',
-                    'description' => 'The ID of the created request.',
-                ),
-                'status'       => array(
-                    'type'        => 'string',
-                    'description' => 'Current status of the request (request-pending, request-confirmed, request-failed, request-completed).',
-                ),
-                'email'        => array(
-                    'type'        => 'string',
-                    'description' => 'Email address of the requester.',
-                ),
-                'confirmed_at' => array(
-                    'type'        => 'string',
-                    'description' => 'Timestamp when the request was confirmed (if confirmed).',
-                ),
-            ),
-        );
-    }
+	/**
+	 * Get the input schema.
+	 *
+	 * @return array<string, mixed> JSON Schema array.
+	 */
+	public function getInputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'required'   => array( 'email' ),
+			'properties' => array(
+				'email'       => array(
+					'type'        => 'string',
+					'format'      => 'email',
+					'description' => 'Email address of the user requesting data export.',
+				),
+				'description' => array(
+					'type'        => 'string',
+					'description' => 'Optional description or reason for the request.',
+				),
+			),
+		);
+	}
 
-    /**
-     * Get the required WordPress capability.
-     *
-     * @return string WordPress capability name.
-     */
-    public function getRequiredCapability(): string
-    {
-        return 'manage_options';
-    }
+	/**
+	 * Get the output schema.
+	 *
+	 * @return array<string, mixed> JSON Schema array.
+	 */
+	public function getOutputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'success'      => array(
+					'type'        => 'boolean',
+					'description' => 'Whether the request was created successfully.',
+				),
+				'request_id'   => array(
+					'type'        => 'integer',
+					'description' => 'The ID of the created request.',
+				),
+				'status'       => array(
+					'type'        => 'string',
+					'description' => 'Current status of the request (request-pending, request-confirmed, request-failed, request-completed).',
+				),
+				'email'        => array(
+					'type'        => 'string',
+					'description' => 'Email address of the requester.',
+				),
+				'confirmed_at' => array(
+					'type'        => 'string',
+					'description' => 'Timestamp when the request was confirmed (if confirmed).',
+				),
+			),
+		);
+	}
 
-    /**
-     * Get the operation type.
-     *
-     * @return string Operation type (read, write, delete).
-     */
-    public function getOperationType(): string
-    {
-        return 'write';
-    }
+	/**
+	 * Get the required WordPress capability.
+	 *
+	 * @return string WordPress capability name.
+	 */
+	public function getRequiredCapability(): string {
+		return 'manage_options';
+	}
 
-    /**
-     * Get ability annotations.
-     *
-     * Create operations are non-idempotent - repeated calls create new resources.
-     *
-     * @return array<string, mixed> Annotations array.
-     */
-    public function getAnnotations(): array
-    {
-        $annotations               = parent::getAnnotations();
-        $annotations['idempotent'] = false;
-        return $annotations;
-    }
+	/**
+	 * Get the operation type.
+	 *
+	 * @return string Operation type (read, write, delete).
+	 */
+	public function getOperationType(): string {
+		return 'write';
+	}
 
-    /**
-     * Execute the ability.
-     *
-     * @param array<string, mixed> $input Validated input data.
-     * @return array<string, mixed> Request creation result.
-     * @throws PrivacyRequestException If request creation fails.
-     */
-    public function doExecute(array $input): array
-    {
-        $email = $input['email'];
-        $data  = array();
+	/**
+	 * Get ability annotations.
+	 *
+	 * Create operations are non-idempotent - repeated calls create new resources.
+	 *
+	 * @return array<string, mixed> Annotations array.
+	 */
+	public function getAnnotations(): array {
+		$annotations               = parent::getAnnotations();
+		$annotations['idempotent'] = false;
+		return $annotations;
+	}
 
-        if (isset($input['description']) && '' !== $input['description']) {
-            $data['description'] = $input['description'];
-        }
+	/**
+	 * Execute the ability.
+	 *
+	 * @param array<string, mixed> $input Validated input data.
+	 * @return array<string, mixed> Request creation result.
+	 * @throws PrivacyRequestException If request creation fails.
+	 */
+	public function doExecute( array $input ): array {
+		$email = $input['email'];
+		$data  = array();
 
-        // Create the export request.
-        $request_id = wp_create_user_request($email, 'export_personal_data', $data);
+		if ( isset( $input['description'] ) && '' !== $input['description'] ) {
+			$data['description'] = $input['description'];
+		}
 
-        if (is_wp_error($request_id)) {
-            throw new PrivacyRequestException(
-                sprintf('Failed to create export request: %s', $request_id->get_error_message())
-            );
-        }
+		// Create the export request.
+		$request_id = wp_create_user_request( $email, 'export_personal_data', $data );
 
-        // Get the request post to return details.
-        $request = get_post($request_id);
+		if ( is_wp_error( $request_id ) ) {
+			throw new PrivacyRequestException(
+				sprintf( 'Failed to create export request: %s', $request_id->get_error_message() )
+			);
+		}
 
-        if (! $request) {
-            throw new PrivacyRequestException('Failed to retrieve created request.');
-        }
+		// Get the request post to return details.
+		$request = get_post( $request_id );
 
-        // Get confirmation timestamp if available.
-        $confirmed_timestamp = get_post_meta($request_id, '_wp_user_request_confirmed_timestamp', true);
-        $confirmed_at        = $confirmed_timestamp ? gmdate('Y-m-d H:i:s', (int) $confirmed_timestamp) : null;
+		if ( ! $request ) {
+			throw new PrivacyRequestException( 'Failed to retrieve created request.' );
+		}
 
-        return array(
-            'success'      => true,
-            'request_id'   => $request_id,
-            'status'       => $request->post_status,
-            'email'        => $email,
-            'confirmed_at' => $confirmed_at,
-        );
-    }
+		// Get confirmation timestamp if available.
+		$confirmed_timestamp = get_post_meta( $request_id, '_wp_user_request_confirmed_timestamp', true );
+		$confirmed_at        = $confirmed_timestamp ? gmdate( 'Y-m-d H:i:s', (int) $confirmed_timestamp ) : null;
+
+		return array(
+			'success'      => true,
+			'request_id'   => $request_id,
+			'status'       => $request->post_status,
+			'email'        => $email,
+			'confirmed_at' => $confirmed_at,
+		);
+	}
 }

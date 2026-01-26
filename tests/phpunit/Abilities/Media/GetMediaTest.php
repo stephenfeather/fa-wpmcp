@@ -10,234 +10,170 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Media;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Media\GetMedia;
 use FAWpmcp\Exceptions\PostNotFoundException;
 use FAWpmcp\Exceptions\PostTypeMismatchException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test GetMedia ability functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Media
  */
-class GetMediaTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class GetMediaTest extends BrainMonkeyTestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new GetMedia();
-        $this->assertEquals('fa-wpmcp/get-media', $ability->getName());
-    }
+	protected function getAbilityInstance(): AbstractAbility {
+		return new GetMedia();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new GetMedia();
-        $this->assertEquals('media', $ability->getCategory());
-    }
+	protected function getExpectedMetadata(): array {
+		return [
+			'name'                 => 'fa-wpmcp/get-media',
+			'category'             => 'media',
+			'label'                => 'Get Media',
+			'description_contains' => 'retrieve',
+			'required_capability'  => 'upload_files',
+			'operation_type'       => 'read',
+		];
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new GetMedia();
-        $this->assertEquals('Get Media', $ability->getLabel());
-    }
+	/**
+	 * Test execute throws exception for non-existent media.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionForNonExistentMedia(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new GetMedia();
-        $this->assertEquals('read', $ability->getOperationType());
-    }
+		Functions\when( 'get_post' )->justReturn( null );
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new GetMedia();
-        $this->assertEquals('upload_files', $ability->getRequiredCapability());
-    }
+		$this->expectException( PostNotFoundException::class );
+		$ability->doExecute( array( 'media_id' => 999 ) );
+	}
 
-    /**
-     * Test execute throws exception for non-existent media.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionForNonExistentMedia(): void
-    {
-        $ability = new GetMedia();
+	/**
+	 * Test execute throws exception for non-attachment post.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionForNonAttachment(): void {
+		$ability = $this->getAbilityInstance();
 
-        Functions\when('get_post')->justReturn(null);
+		$mock_post            = new \stdClass();
+		$mock_post->ID        = 1;
+		$mock_post->post_type = 'post';
 
-        $this->expectException(PostNotFoundException::class);
-        $ability->doExecute(array( 'media_id' => 999 ));
-    }
+		Functions\when( 'get_post' )->justReturn( $mock_post );
 
-    /**
-     * Test execute throws exception for non-attachment post.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionForNonAttachment(): void
-    {
-        $ability = new GetMedia();
+		$this->expectException( PostTypeMismatchException::class );
+		$ability->doExecute( array( 'media_id' => 1 ) );
+	}
 
-        $mock_post            = new \stdClass();
-        $mock_post->ID        = 1;
-        $mock_post->post_type = 'post';
+	/**
+	 * Test execute returns media data.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsMediaData(): void {
+		$ability = $this->getAbilityInstance();
 
-        Functions\when('get_post')->justReturn($mock_post);
+		$mock_post                   = Mockery::mock( \WP_Post::class );
+		$mock_post->ID               = 1;
+		$mock_post->post_type        = 'attachment';
+		$mock_post->post_title       = 'Test Image';
+		$mock_post->post_mime_type   = 'image/jpeg';
+		$mock_post->post_date        = '2024-01-01 00:00:00';
+		$mock_post->post_modified    = '2024-01-01 00:00:00';
+		$mock_post->post_author      = 1;
+		$mock_post->post_excerpt     = 'Test caption';
+		$mock_post->post_content     = 'Test description';
 
-        $this->expectException(PostTypeMismatchException::class);
-        $ability->doExecute(array( 'media_id' => 1 ));
-    }
+		Functions\when( 'get_post' )->justReturn( $mock_post );
+		Functions\when( 'wp_get_attachment_metadata' )->justReturn(
+			array(
+				'width' => 800,
+				'height' => 600,
+			)
+		);
+		Functions\when( 'get_attached_file' )->justReturn( 'file.jpg' );
+		Functions\when( 'wp_get_attachment_url' )->justReturn( 'https://example.com/file.jpg' );
+		Functions\when( 'get_post_meta' )->justReturn( array() );
+		Functions\when( 'get_the_author_meta' )->justReturn( 'Test Author' );
+		Functions\when( 'wp_get_attachment_image_src' )->justReturn( false );
 
-    /**
-     * Test execute returns media data.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsMediaData(): void
-    {
-        $ability = new GetMedia();
+		$result = $ability->doExecute( array( 'media_id' => 1 ) );
 
-        $mock_post                   = Mockery::mock(\WP_Post::class);
-        $mock_post->ID               = 1;
-        $mock_post->post_type        = 'attachment';
-        $mock_post->post_title       = 'Test Image';
-        $mock_post->post_mime_type   = 'image/jpeg';
-        $mock_post->post_date        = '2024-01-01 00:00:00';
-        $mock_post->post_modified    = '2024-01-01 00:00:00';
-        $mock_post->post_author      = 1;
-        $mock_post->post_excerpt     = 'Test caption';
-        $mock_post->post_content     = 'Test description';
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'media', $result );
+		$this->assertEquals( 1, $result['media']['id'] );
+		$this->assertEquals( 'Test Image', $result['media']['title'] );
+	}
 
-        Functions\when('get_post')->justReturn($mock_post);
-        Functions\when('wp_get_attachment_metadata')->justReturn(
-            array(
-                'width' => 800,
-                'height' => 600,
-            )
-        );
-        Functions\when('get_attached_file')->justReturn('file.jpg');
-        Functions\when('wp_get_attachment_url')->justReturn('https://example.com/file.jpg');
-        Functions\when('get_post_meta')->justReturn(array());
-        Functions\when('get_the_author_meta')->justReturn('Test Author');
-        Functions\when('wp_get_attachment_image_src')->justReturn(false);
+	/**
+	 * Test execute formats sizes and filters meta data.
+	 *
+	 * @return void
+	 */
+	public function testExecuteFormatsSizesAndMeta(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(array( 'media_id' => 1 ));
+		$temp_file = sys_get_temp_dir() . '/fa-wpmcp-get-media.tmp';
+		file_put_contents( $temp_file, 'data' );
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('media', $result);
-        $this->assertEquals(1, $result['media']['id']);
-        $this->assertEquals('Test Image', $result['media']['title']);
-    }
+		$mock_post                   = Mockery::mock( \WP_Post::class );
+		$mock_post->ID               = 2;
+		$mock_post->post_type        = 'attachment';
+		$mock_post->post_title       = 'Doc';
+		$mock_post->post_mime_type   = 'application/pdf';
+		$mock_post->post_date        = '2024-01-01 00:00:00';
+		$mock_post->post_modified    = '2024-01-02 00:00:00';
+		$mock_post->post_author      = 5;
+		$mock_post->post_excerpt     = '';
+		$mock_post->post_content     = '';
 
-    /**
-     * Test execute formats sizes and filters meta data.
-     *
-     * @return void
-     */
-    public function testExecuteFormatsSizesAndMeta(): void
-    {
-        $ability = new GetMedia();
+		Functions\when( 'get_post' )->justReturn( $mock_post );
+		Functions\when( 'wp_get_attachment_metadata' )->justReturn(
+			array(
+				'width'  => 1200,
+				'height' => 800,
+				'sizes'  => array(
+					'thumbnail' => array(
+						'width' => 150,
+						'height' => 150,
+					),
+				),
+			)
+		);
+		Functions\when( 'get_attached_file' )->justReturn( $temp_file );
+		Functions\when( 'wp_get_attachment_url' )->justReturn( 'https://example.com/file.pdf' );
+		Functions\when( 'wp_get_attachment_image_src' )->justReturn( array( 'https://example.com/thumb.jpg', 150, 150, true ) );
+		Functions\when( 'get_the_author_meta' )->justReturn( 'Doc Author' );
+		Functions\when( 'get_post_meta' )->alias(
+			static function ( int $post_id, string $key, bool $single ) {
+				if ( '_wp_attachment_image_alt' === $key ) {
+					return 'Alt';
+				}
+				return array(
+					'_internal' => array( 'skip' ),
+					'custom'    => array( 'keep' ),
+				);
+			}
+		);
 
-        $temp_file = sys_get_temp_dir() . '/fa-wpmcp-get-media.tmp';
-        file_put_contents($temp_file, 'data');
+		$result = $ability->doExecute( array( 'media_id' => 2 ) );
 
-        $mock_post                   = Mockery::mock(\WP_Post::class);
-        $mock_post->ID               = 2;
-        $mock_post->post_type        = 'attachment';
-        $mock_post->post_title       = 'Doc';
-        $mock_post->post_mime_type   = 'application/pdf';
-        $mock_post->post_date        = '2024-01-01 00:00:00';
-        $mock_post->post_modified    = '2024-01-02 00:00:00';
-        $mock_post->post_author      = 5;
-        $mock_post->post_excerpt     = '';
-        $mock_post->post_content     = '';
+		$this->assertSame( 'document', $result['media']['type'] );
+		$this->assertSame( 'Alt', $result['media']['alt_text'] );
+		$this->assertArrayHasKey( 'full', $result['media']['sizes'] );
+		$this->assertArrayHasKey( 'thumbnail', $result['media']['sizes'] );
+		$this->assertSame( array( 'custom' => 'keep' ), $result['media']['meta'] );
 
-        Functions\when('get_post')->justReturn($mock_post);
-        Functions\when('wp_get_attachment_metadata')->justReturn(
-            array(
-                'width'  => 1200,
-                'height' => 800,
-                'sizes'  => array(
-                    'thumbnail' => array(
-                        'width' => 150,
-                        'height' => 150,
-                    ),
-                ),
-            )
-        );
-        Functions\when('get_attached_file')->justReturn($temp_file);
-        Functions\when('wp_get_attachment_url')->justReturn('https://example.com/file.pdf');
-        Functions\when('wp_get_attachment_image_src')->justReturn(array( 'https://example.com/thumb.jpg', 150, 150, true ));
-        Functions\when('get_the_author_meta')->justReturn('Doc Author');
-        Functions\when('get_post_meta')->alias(
-            static function (int $post_id, string $key, bool $single) {
-                if ('_wp_attachment_image_alt' === $key) {
-                    return 'Alt';
-                }
-                return array(
-                    '_internal' => array( 'skip' ),
-                    'custom'    => array( 'keep' ),
-                );
-            }
-        );
-
-        $result = $ability->doExecute(array( 'media_id' => 2 ));
-
-        $this->assertSame('document', $result['media']['type']);
-        $this->assertSame('Alt', $result['media']['alt_text']);
-        $this->assertArrayHasKey('full', $result['media']['sizes']);
-        $this->assertArrayHasKey('thumbnail', $result['media']['sizes']);
-        $this->assertSame(array( 'custom' => 'keep' ), $result['media']['meta']);
-
-        unlink($temp_file);
-    }
+		unlink( $temp_file );
+	}
 }

@@ -19,182 +19,176 @@ use PHPUnit\Framework\TestCase;
  *
  * @coversDefaultClass \FAWpmcp\Database\SecretStorageMigration
  */
-final class SecretStorageMigrationTest extends TestCase
-{
-    use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+final class SecretStorageMigrationTest extends TestCase {
 
-    /**
-     * Set up before each test
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        \Brain\Monkey\setUp();
-    }
-    /**
-     * Clean up after each test
-     */
-    public function tearDown(): void
-    {
-        \Brain\Monkey\tearDown();
-        parent::tearDown();
-    }
+	use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    /**
-     * Test migration consolidates secret from canonical location
-     *
-     * @covers ::migrate
-     */
-    public function testMigrationPrefersCanonicalSource(): void
-    {
-        // Migration flag not set yet.
-        Functions\expect('get_option')
-            ->once()
-            ->with('fa_wpmcp_secret_migration_v1', false)
-            ->andReturn(false);
+	/**
+	 * Set up before each test
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+		\Brain\Monkey\setUp();
+	}
+	/**
+	 * Clean up after each test
+	 */
+	public function tearDown(): void {
+		\Brain\Monkey\tearDown();
+		parent::tearDown();
+	}
 
-        // Get canonical secret.
-        Functions\expect('get_option')
-            ->once()
-            ->with('fa_wpmcp_webhook_secret')
-            ->andReturn('canonical-secret');
+	/**
+	 * Test migration consolidates secret from canonical location
+	 *
+	 * @covers ::migrate
+	 */
+	public function testMigrationPrefersCanonicalSource(): void {
+		// Migration flag not set yet.
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'fa_wpmcp_secret_migration_v1', false )
+			->andReturn( false );
 
-        // Get webhooks array with UI secret.
-        Functions\expect('get_option')
-            ->once()
-            ->with('fa_wpmcp_webhooks', array())
-            ->andReturn(
-                array(
-                    'webhook_secret'    => 'ui-secret',
-                    'webhook_endpoints' => array(),
-                )
-            );
+		// Get canonical secret.
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'fa_wpmcp_webhook_secret' )
+			->andReturn( 'canonical-secret' );
 
-        // Should update canonical location.
-        Functions\expect('update_option')
-            ->once()
-            ->with('fa_wpmcp_webhook_secret', 'canonical-secret')
-            ->andReturn(true);
+		// Get webhooks array with UI secret.
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'fa_wpmcp_webhooks', array() )
+			->andReturn(
+				array(
+					'webhook_secret'    => 'ui-secret',
+					'webhook_endpoints' => array(),
+				)
+			);
 
-        // Should remove secret from webhooks array.
-        Functions\expect('update_option')
-            ->once()
-            ->with('fa_wpmcp_webhooks', array( 'webhook_endpoints' => array() ))
-            ->andReturn(true);
+		// Should update canonical location.
+		Functions\expect( 'update_option' )
+			->once()
+			->with( 'fa_wpmcp_webhook_secret', 'canonical-secret' )
+			->andReturn( true );
 
-        // Should set migration flag.
-        Functions\expect('update_option')
-            ->once()
-            ->with('fa_wpmcp_secret_migration_v1', true)
-            ->andReturn(true);
+		// Should remove secret from webhooks array.
+		Functions\expect( 'update_option' )
+			->once()
+			->with( 'fa_wpmcp_webhooks', array( 'webhook_endpoints' => array() ) )
+			->andReturn( true );
 
-        SecretStorageMigration::migrate();
+		// Should set migration flag.
+		Functions\expect( 'update_option' )
+			->once()
+			->with( 'fa_wpmcp_secret_migration_v1', true )
+			->andReturn( true );
 
-        // Expectations verified by Mockery.
-        $this->assertTrue(true);
-    }
+		SecretStorageMigration::migrate();
 
-    /**
-     * Test migration uses UI secret if canonical not set
-     *
-     * @covers ::migrate
-     */
-    public function testMigrationUsesUiSecretAsFallback(): void
-    {
-        Functions\expect('get_option')
-            ->once()
-            ->with('fa_wpmcp_secret_migration_v1', false)
-            ->andReturn(false);
+		// Expectations verified by Mockery.
+		$this->assertTrue( true );
+	}
 
-        // No canonical secret.
-        Functions\expect('get_option')
-            ->once()
-            ->with('fa_wpmcp_webhook_secret')
-            ->andReturn(false);
+	/**
+	 * Test migration uses UI secret if canonical not set
+	 *
+	 * @covers ::migrate
+	 */
+	public function testMigrationUsesUiSecretAsFallback(): void {
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'fa_wpmcp_secret_migration_v1', false )
+			->andReturn( false );
 
-        // Get UI secret.
-        Functions\expect('get_option')
-            ->once()
-            ->with('fa_wpmcp_webhooks', array())
-            ->andReturn(
-                array(
-                    'webhook_secret'    => 'ui-secret',
-                    'webhook_endpoints' => array(),
-                )
-            );
+		// No canonical secret.
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'fa_wpmcp_webhook_secret' )
+			->andReturn( false );
 
-        // Should save UI secret to canonical location.
-        Functions\expect('update_option')
-            ->once()
-            ->with('fa_wpmcp_webhook_secret', 'ui-secret')
-            ->andReturn(true);
+		// Get UI secret.
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'fa_wpmcp_webhooks', array() )
+			->andReturn(
+				array(
+					'webhook_secret'    => 'ui-secret',
+					'webhook_endpoints' => array(),
+				)
+			);
 
-        // Should remove secret from webhooks array.
-        Functions\expect('update_option')
-            ->once()
-            ->with('fa_wpmcp_webhooks', array( 'webhook_endpoints' => array() ))
-            ->andReturn(true);
+		// Should save UI secret to canonical location.
+		Functions\expect( 'update_option' )
+			->once()
+			->with( 'fa_wpmcp_webhook_secret', 'ui-secret' )
+			->andReturn( true );
 
-        // Should set migration flag.
-        Functions\expect('update_option')
-            ->once()
-            ->with('fa_wpmcp_secret_migration_v1', true)
-            ->andReturn(true);
+		// Should remove secret from webhooks array.
+		Functions\expect( 'update_option' )
+			->once()
+			->with( 'fa_wpmcp_webhooks', array( 'webhook_endpoints' => array() ) )
+			->andReturn( true );
 
-        SecretStorageMigration::migrate();
+		// Should set migration flag.
+		Functions\expect( 'update_option' )
+			->once()
+			->with( 'fa_wpmcp_secret_migration_v1', true )
+			->andReturn( true );
 
-        $this->assertTrue(true);
-    }
+		SecretStorageMigration::migrate();
 
-    /**
-     * Test migration handles missing secrets gracefully
-     *
-     * @covers ::migrate
-     */
-    public function testMigrationHandlesMissingSecrets(): void
-    {
-        Functions\expect('get_option')
-            ->once()
-            ->with('fa_wpmcp_secret_migration_v1', false)
-            ->andReturn(false);
+		$this->assertTrue( true );
+	}
 
-        Functions\expect('get_option')
-            ->once()
-            ->with('fa_wpmcp_webhook_secret')
-            ->andReturn(false);
+	/**
+	 * Test migration handles missing secrets gracefully
+	 *
+	 * @covers ::migrate
+	 */
+	public function testMigrationHandlesMissingSecrets(): void {
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'fa_wpmcp_secret_migration_v1', false )
+			->andReturn( false );
 
-        Functions\expect('get_option')
-            ->once()
-            ->with('fa_wpmcp_webhooks', array())
-            ->andReturn(array());
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'fa_wpmcp_webhook_secret' )
+			->andReturn( false );
 
-        // Should only set migration flag (no secret to save).
-        Functions\expect('update_option')
-            ->once()
-            ->with('fa_wpmcp_secret_migration_v1', true)
-            ->andReturn(true);
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'fa_wpmcp_webhooks', array() )
+			->andReturn( array() );
 
-        SecretStorageMigration::migrate();
+		// Should only set migration flag (no secret to save).
+		Functions\expect( 'update_option' )
+			->once()
+			->with( 'fa_wpmcp_secret_migration_v1', true )
+			->andReturn( true );
 
-        $this->assertTrue(true);
-    }
+		SecretStorageMigration::migrate();
 
-    /**
-     * Test migration runs only once
-     *
-     * @covers ::migrate
-     */
-    public function testMigrationRunsOnlyOnce(): void
-    {
-        // Migration already done.
-        Functions\expect('get_option')
-            ->once()
-            ->with('fa_wpmcp_secret_migration_v1', false)
-            ->andReturn(true);
+		$this->assertTrue( true );
+	}
 
-        // Should not make any other calls.
-        SecretStorageMigration::migrate();
+	/**
+	 * Test migration runs only once
+	 *
+	 * @covers ::migrate
+	 */
+	public function testMigrationRunsOnlyOnce(): void {
+		// Migration already done.
+		Functions\expect( 'get_option' )
+			->once()
+			->with( 'fa_wpmcp_secret_migration_v1', false )
+			->andReturn( true );
 
-        $this->assertTrue(true);
-    }
+		// Should not make any other calls.
+		SecretStorageMigration::migrate();
+
+		$this->assertTrue( true );
+	}
 }

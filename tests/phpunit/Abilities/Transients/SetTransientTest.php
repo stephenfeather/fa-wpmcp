@@ -21,300 +21,283 @@ use PHPUnit\Framework\TestCase;
  *
  * @package FAWpmcp\Tests\Abilities\Transients
  */
-class SetTransientTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class SetTransientTest extends TestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	/**
+	 * Set up Brain\Monkey before each test.
+	 *
+	 * @return void
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+		Monkey\setUp();
+	}
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new SetTransient();
-        $this->assertEquals('fa-wpmcp/set-transient', $ability->getName());
-    }
+	/**
+	 * Tear down Brain\Monkey after each test.
+	 *
+	 * @return void
+	 */
+	protected function tearDown(): void {
+		Monkey\tearDown();
+		Mockery::close();
+		parent::tearDown();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new SetTransient();
-        $this->assertEquals('transients', $ability->getCategory());
-    }
+	/**
+	 * Test ability returns correct name.
+	 *
+	 * @return void
+	 */
+	public function testGetName(): void {
+		$ability = new SetTransient();
+		$this->assertEquals( 'fa-wpmcp/set-transient', $ability->getName() );
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new SetTransient();
-        $this->assertEquals('Set Transient', $ability->getLabel());
-    }
+	/**
+	 * Test ability returns correct category.
+	 *
+	 * @return void
+	 */
+	public function testGetCategory(): void {
+		$ability = new SetTransient();
+		$this->assertEquals( 'transients', $ability->getCategory() );
+	}
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new SetTransient();
-        $this->assertEquals('create', $ability->getOperationType());
-    }
+	/**
+	 * Test ability returns correct label.
+	 *
+	 * @return void
+	 */
+	public function testGetLabel(): void {
+		$ability = new SetTransient();
+		$this->assertEquals( 'Set Transient', $ability->getLabel() );
+	}
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new SetTransient();
-        $this->assertEquals('manage_options', $ability->getRequiredCapability());
-    }
+	/**
+	 * Test ability returns correct operation type.
+	 *
+	 * @return void
+	 */
+	public function testGetOperationType(): void {
+		$ability = new SetTransient();
+		$this->assertEquals( 'create', $ability->getOperationType() );
+	}
 
-    /**
-     * Test ability returns input schema with required fields.
-     *
-     * @return void
-     */
-    public function testGetInputSchema(): void
-    {
-        $ability = new SetTransient();
-        $schema  = $ability->getInputSchema();
+	/**
+	 * Test ability returns correct required capability.
+	 *
+	 * @return void
+	 */
+	public function testGetRequiredCapability(): void {
+		$ability = new SetTransient();
+		$this->assertEquals( 'manage_options', $ability->getRequiredCapability() );
+	}
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('required', $schema);
-        $this->assertArrayHasKey('key', $schema['properties']);
-        $this->assertArrayHasKey('value', $schema['properties']);
-        $this->assertContains('key', $schema['required']);
-        $this->assertContains('value', $schema['required']);
-    }
+	/**
+	 * Test ability returns input schema with required fields.
+	 *
+	 * @return void
+	 */
+	public function testGetInputSchema(): void {
+		$ability = new SetTransient();
+		$schema  = $ability->getInputSchema();
 
-    /**
-     * Test input schema includes optional expiration and network parameters.
-     *
-     * @return void
-     */
-    public function testGetInputSchemaHasOptionalParameters(): void
-    {
-        $ability = new SetTransient();
-        $schema  = $ability->getInputSchema();
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'required', $schema );
+		$this->assertArrayHasKey( 'key', $schema['properties'] );
+		$this->assertArrayHasKey( 'value', $schema['properties'] );
+		$this->assertContains( 'key', $schema['required'] );
+		$this->assertContains( 'value', $schema['required'] );
+	}
 
-        $this->assertArrayHasKey('expiration', $schema['properties']);
-        $this->assertArrayHasKey('network', $schema['properties']);
-        $this->assertEquals('integer', $schema['properties']['expiration']['type']);
-        $this->assertEquals('boolean', $schema['properties']['network']['type']);
-    }
+	/**
+	 * Test input schema includes optional expiration and network parameters.
+	 *
+	 * @return void
+	 */
+	public function testGetInputSchemaHasOptionalParameters(): void {
+		$ability = new SetTransient();
+		$schema  = $ability->getInputSchema();
 
-    /**
-     * Test ability returns output schema.
-     *
-     * @return void
-     */
-    public function testGetOutputSchema(): void
-    {
-        $ability = new SetTransient();
-        $schema  = $ability->getOutputSchema();
+		$this->assertArrayHasKey( 'expiration', $schema['properties'] );
+		$this->assertArrayHasKey( 'network', $schema['properties'] );
+		$this->assertEquals( 'integer', $schema['properties']['expiration']['type'] );
+		$this->assertEquals( 'boolean', $schema['properties']['network']['type'] );
+	}
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('success', $schema['properties']);
-    }
+	/**
+	 * Test ability returns output schema.
+	 *
+	 * @return void
+	 */
+	public function testGetOutputSchema(): void {
+		$ability = new SetTransient();
+		$schema  = $ability->getOutputSchema();
 
-    /**
-     * Test execute sets transient successfully.
-     *
-     * @return void
-     */
-    public function testExecuteSetsTransientSuccessfully(): void
-    {
-        $ability = new SetTransient();
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'success', $schema['properties'] );
+	}
 
-        Functions\expect('set_transient')
-            ->once()
-            ->with('my_cache', 'cached_value', 0)
-            ->andReturn(true);
+	/**
+	 * Test execute sets transient successfully.
+	 *
+	 * @return void
+	 */
+	public function testExecuteSetsTransientSuccessfully(): void {
+		$ability = new SetTransient();
 
-        $result = $ability->doExecute(
-            array(
-                'key'   => 'my_cache',
-                'value' => 'cached_value',
-            )
-        );
+		Functions\expect( 'set_transient' )
+			->once()
+			->with( 'my_cache', 'cached_value', 0 )
+			->andReturn( true );
 
-        $this->assertIsArray($result);
-        $this->assertTrue($result['success']);
-    }
+		$result = $ability->doExecute(
+			array(
+				'key'   => 'my_cache',
+				'value' => 'cached_value',
+			)
+		);
 
-    /**
-     * Test execute returns failure when set_transient fails.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsFailureWhenSetFails(): void
-    {
-        $ability = new SetTransient();
+		$this->assertIsArray( $result );
+		$this->assertTrue( $result['success'] );
+	}
 
-        Functions\when('set_transient')->justReturn(false);
+	/**
+	 * Test execute returns failure when set_transient fails.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsFailureWhenSetFails(): void {
+		$ability = new SetTransient();
 
-        $result = $ability->doExecute(
-            array(
-                'key'   => 'my_cache',
-                'value' => 'cached_value',
-            )
-        );
+		Functions\when( 'set_transient' )->justReturn( false );
 
-        $this->assertIsArray($result);
-        $this->assertFalse($result['success']);
-    }
+		$result = $ability->doExecute(
+			array(
+				'key'   => 'my_cache',
+				'value' => 'cached_value',
+			)
+		);
 
-    /**
-     * Test execute uses expiration when provided.
-     *
-     * @return void
-     */
-    public function testExecuteUsesExpirationWhenProvided(): void
-    {
-        $ability = new SetTransient();
+		$this->assertIsArray( $result );
+		$this->assertFalse( $result['success'] );
+	}
 
-        Functions\expect('set_transient')
-            ->once()
-            ->with('timed_cache', 'value', 3600)
-            ->andReturn(true);
+	/**
+	 * Test execute uses expiration when provided.
+	 *
+	 * @return void
+	 */
+	public function testExecuteUsesExpirationWhenProvided(): void {
+		$ability = new SetTransient();
 
-        $result = $ability->doExecute(
-            array(
-                'key'        => 'timed_cache',
-                'value'      => 'value',
-                'expiration' => 3600,
-            )
-        );
+		Functions\expect( 'set_transient' )
+			->once()
+			->with( 'timed_cache', 'value', 3600 )
+			->andReturn( true );
 
-        $this->assertTrue($result['success']);
-    }
+		$result = $ability->doExecute(
+			array(
+				'key'        => 'timed_cache',
+				'value'      => 'value',
+				'expiration' => 3600,
+			)
+		);
 
-    /**
-     * Test execute uses set_site_transient for network transients.
-     *
-     * @return void
-     */
-    public function testExecuteUsesSetSiteTransientForNetwork(): void
-    {
-        $ability = new SetTransient();
+		$this->assertTrue( $result['success'] );
+	}
 
-        Functions\expect('set_site_transient')
-            ->once()
-            ->with('network_cache', 'network_value', 0)
-            ->andReturn(true);
+	/**
+	 * Test execute uses set_site_transient for network transients.
+	 *
+	 * @return void
+	 */
+	public function testExecuteUsesSetSiteTransientForNetwork(): void {
+		$ability = new SetTransient();
 
-        $result = $ability->doExecute(
-            array(
-                'key'     => 'network_cache',
-                'value'   => 'network_value',
-                'network' => true,
-            )
-        );
+		Functions\expect( 'set_site_transient' )
+			->once()
+			->with( 'network_cache', 'network_value', 0 )
+			->andReturn( true );
 
-        $this->assertTrue($result['success']);
-    }
+		$result = $ability->doExecute(
+			array(
+				'key'     => 'network_cache',
+				'value'   => 'network_value',
+				'network' => true,
+			)
+		);
 
-    /**
-     * Test execute handles array values.
-     *
-     * @return void
-     */
-    public function testExecuteHandlesArrayValues(): void
-    {
-        $ability = new SetTransient();
+		$this->assertTrue( $result['success'] );
+	}
 
-        $array_value = array(
-            'key1' => 'value1',
-            'key2' => 'value2',
-        );
+	/**
+	 * Test execute handles array values.
+	 *
+	 * @return void
+	 */
+	public function testExecuteHandlesArrayValues(): void {
+		$ability = new SetTransient();
 
-        Functions\expect('set_transient')
-            ->once()
-            ->with('array_cache', $array_value, 0)
-            ->andReturn(true);
+		$array_value = array(
+			'key1' => 'value1',
+			'key2' => 'value2',
+		);
 
-        $result = $ability->doExecute(
-            array(
-                'key'   => 'array_cache',
-                'value' => $array_value,
-            )
-        );
+		Functions\expect( 'set_transient' )
+			->once()
+			->with( 'array_cache', $array_value, 0 )
+			->andReturn( true );
 
-        $this->assertTrue($result['success']);
-    }
+		$result = $ability->doExecute(
+			array(
+				'key'   => 'array_cache',
+				'value' => $array_value,
+			)
+		);
 
-    /**
-     * Test execute defaults expiration to 0 (no expiration).
-     *
-     * @return void
-     */
-    public function testExecuteDefaultsExpirationToZero(): void
-    {
-        $ability = new SetTransient();
+		$this->assertTrue( $result['success'] );
+	}
 
-        Functions\expect('set_transient')
-            ->once()
-            ->with('no_expiry_cache', 'value', 0)
-            ->andReturn(true);
+	/**
+	 * Test execute defaults expiration to 0 (no expiration).
+	 *
+	 * @return void
+	 */
+	public function testExecuteDefaultsExpirationToZero(): void {
+		$ability = new SetTransient();
 
-        $result = $ability->doExecute(
-            array(
-                'key'   => 'no_expiry_cache',
-                'value' => 'value',
-            )
-        );
+		Functions\expect( 'set_transient' )
+			->once()
+			->with( 'no_expiry_cache', 'value', 0 )
+			->andReturn( true );
 
-        $this->assertTrue($result['success']);
-    }
+		$result = $ability->doExecute(
+			array(
+				'key'   => 'no_expiry_cache',
+				'value' => 'value',
+			)
+		);
 
-    /**
-     * Test annotations are correct for create operation.
-     *
-     * @return void
-     */
-    public function testGetAnnotations(): void
-    {
-        $ability     = new SetTransient();
-        $annotations = $ability->getAnnotations();
+		$this->assertTrue( $result['success'] );
+	}
 
-        $this->assertFalse($annotations['readonly']);
-        $this->assertFalse($annotations['destructive']);
-        $this->assertTrue($annotations['idempotent']);
-    }
+	/**
+	 * Test annotations are correct for create operation.
+	 *
+	 * @return void
+	 */
+	public function testGetAnnotations(): void {
+		$ability     = new SetTransient();
+		$annotations = $ability->getAnnotations();
+
+		$this->assertFalse( $annotations['readonly'] );
+		$this->assertFalse( $annotations['destructive'] );
+		$this->assertTrue( $annotations['idempotent'] );
+	}
 }

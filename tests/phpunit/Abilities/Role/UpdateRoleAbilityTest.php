@@ -10,338 +10,279 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Role;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Role\UpdateRoleAbility;
 use FAWpmcp\Exceptions\RoleNotFoundException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test UpdateRoleAbility functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Role
  */
-class UpdateRoleAbilityTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class UpdateRoleAbilityTest extends BrainMonkeyTestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new UpdateRoleAbility();
-        $this->assertEquals('fa-wpmcp/update-role', $ability->getName());
-    }
+	/**
+	 * Get the ability instance to test.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new UpdateRoleAbility();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new UpdateRoleAbility();
-        $this->assertEquals('role', $ability->getCategory());
-    }
+	/**
+	 * Get the expected metadata for this ability.
+	 *
+	 * @return array<string, mixed>
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/update-role',
+			'category'             => 'role',
+			'label'                => 'Update Role',
+			'description_contains' => 'update',
+			'operation_type'       => 'write',
+			'required_capability'  => 'promote_users',
+		);
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new UpdateRoleAbility();
-        $this->assertEquals('Update Role', $ability->getLabel());
-    }
+	/**
+	 * Test ability returns input schema with required role field.
+	 *
+	 * @return void
+	 */
+	public function testGetInputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getInputSchema();
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new UpdateRoleAbility();
-        $this->assertEquals('write', $ability->getOperationType());
-    }
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'required', $schema );
+		$this->assertArrayHasKey( 'role', $schema['properties'] );
+		$this->assertArrayHasKey( 'add_caps', $schema['properties'] );
+		$this->assertArrayHasKey( 'remove_caps', $schema['properties'] );
+		$this->assertContains( 'role', $schema['required'] );
+	}
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new UpdateRoleAbility();
-        $this->assertEquals('promote_users', $ability->getRequiredCapability());
-    }
+	/**
+	 * Test ability returns output schema.
+	 *
+	 * @return void
+	 */
+	public function testGetOutputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getOutputSchema();
 
-    /**
-     * Test ability returns input schema with required role field.
-     *
-     * @return void
-     */
-    public function testGetInputSchema(): void
-    {
-        $ability = new UpdateRoleAbility();
-        $schema  = $ability->getInputSchema();
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'name', $schema['properties'] );
+		$this->assertArrayHasKey( 'capabilities', $schema['properties'] );
+	}
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('required', $schema);
-        $this->assertArrayHasKey('role', $schema['properties']);
-        $this->assertArrayHasKey('add_caps', $schema['properties']);
-        $this->assertArrayHasKey('remove_caps', $schema['properties']);
-        $this->assertContains('role', $schema['required']);
-    }
+	/**
+	 * Test execute adds capabilities to role.
+	 *
+	 * @return void
+	 */
+	public function testExecuteAddsCapabilitiesToRole(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test ability returns output schema.
-     *
-     * @return void
-     */
-    public function testGetOutputSchema(): void
-    {
-        $ability = new UpdateRoleAbility();
-        $schema  = $ability->getOutputSchema();
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'editor';
+		$mock_role->capabilities = array(
+			'edit_posts'        => true,
+			'manage_categories' => true,
+		);
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('name', $schema['properties']);
-        $this->assertArrayHasKey('capabilities', $schema['properties']);
-    }
+		$mock_role->shouldReceive( 'add_cap' )
+			->once()
+			->with( 'manage_categories', true );
 
-    /**
-     * Test execute adds capabilities to role.
-     *
-     * @return void
-     */
-    public function testExecuteAddsCapabilitiesToRole(): void
-    {
-        $ability = new UpdateRoleAbility();
+		Functions\when( 'get_role' )->justReturn( $mock_role );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'editor';
-        $mock_role->capabilities = array(
-            'edit_posts'        => true,
-            'manage_categories' => true,
-        );
+		$result = $ability->doExecute(
+			array(
+				'role'     => 'editor',
+				'add_caps' => array( 'manage_categories' ),
+			)
+		);
 
-        $mock_role->shouldReceive('add_cap')
-            ->once()
-            ->with('manage_categories', true);
+		$this->assertIsArray( $result );
+		$this->assertEquals( 'editor', $result['name'] );
+		$this->assertArrayHasKey( 'capabilities', $result );
+	}
 
-        Functions\when('get_role')->justReturn($mock_role);
+	/**
+	 * Test execute removes capabilities from role.
+	 *
+	 * @return void
+	 */
+	public function testExecuteRemovesCapabilitiesFromRole(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(
-            array(
-                'role'     => 'editor',
-                'add_caps' => array( 'manage_categories' ),
-            )
-        );
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'editor';
+		$mock_role->capabilities = array(
+			'edit_posts' => true,
+		);
 
-        $this->assertIsArray($result);
-        $this->assertEquals('editor', $result['name']);
-        $this->assertArrayHasKey('capabilities', $result);
-    }
+		$mock_role->shouldReceive( 'remove_cap' )
+			->once()
+			->with( 'edit_others_posts' );
 
-    /**
-     * Test execute removes capabilities from role.
-     *
-     * @return void
-     */
-    public function testExecuteRemovesCapabilitiesFromRole(): void
-    {
-        $ability = new UpdateRoleAbility();
+		Functions\when( 'get_role' )->justReturn( $mock_role );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'editor';
-        $mock_role->capabilities = array(
-            'edit_posts' => true,
-        );
+		$result = $ability->doExecute(
+			array(
+				'role'        => 'editor',
+				'remove_caps' => array( 'edit_others_posts' ),
+			)
+		);
 
-        $mock_role->shouldReceive('remove_cap')
-            ->once()
-            ->with('edit_others_posts');
+		$this->assertIsArray( $result );
+		$this->assertEquals( 'editor', $result['name'] );
+	}
 
-        Functions\when('get_role')->justReturn($mock_role);
+	/**
+	 * Test execute adds and removes capabilities simultaneously.
+	 *
+	 * @return void
+	 */
+	public function testExecuteAddsAndRemovesCapabilitiesSimultaneously(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(
-            array(
-                'role'        => 'editor',
-                'remove_caps' => array( 'edit_others_posts' ),
-            )
-        );
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'author';
+		$mock_role->capabilities = array(
+			'edit_posts'       => true,
+			'upload_files'     => true,
+			'manage_downloads' => true,
+		);
 
-        $this->assertIsArray($result);
-        $this->assertEquals('editor', $result['name']);
-    }
+		$mock_role->shouldReceive( 'add_cap' )
+			->once()
+			->with( 'upload_files', true );
+		$mock_role->shouldReceive( 'add_cap' )
+			->once()
+			->with( 'manage_downloads', true );
+		$mock_role->shouldReceive( 'remove_cap' )
+			->once()
+			->with( 'delete_posts' );
 
-    /**
-     * Test execute adds and removes capabilities simultaneously.
-     *
-     * @return void
-     */
-    public function testExecuteAddsAndRemovesCapabilitiesSimultaneously(): void
-    {
-        $ability = new UpdateRoleAbility();
+		Functions\when( 'get_role' )->justReturn( $mock_role );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'author';
-        $mock_role->capabilities = array(
-            'edit_posts'       => true,
-            'upload_files'     => true,
-            'manage_downloads' => true,
-        );
+		$result = $ability->doExecute(
+			array(
+				'role'        => 'author',
+				'add_caps'    => array( 'upload_files', 'manage_downloads' ),
+				'remove_caps' => array( 'delete_posts' ),
+			)
+		);
 
-        $mock_role->shouldReceive('add_cap')
-            ->once()
-            ->with('upload_files', true);
-        $mock_role->shouldReceive('add_cap')
-            ->once()
-            ->with('manage_downloads', true);
-        $mock_role->shouldReceive('remove_cap')
-            ->once()
-            ->with('delete_posts');
+		$this->assertEquals( 'author', $result['name'] );
+		$this->assertIsArray( $result['capabilities'] );
+	}
 
-        Functions\when('get_role')->justReturn($mock_role);
+	/**
+	 * Test execute throws exception when role not found.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenRoleNotFound(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(
-            array(
-                'role'        => 'author',
-                'add_caps'    => array( 'upload_files', 'manage_downloads' ),
-                'remove_caps' => array( 'delete_posts' ),
-            )
-        );
+		Functions\when( 'get_role' )->justReturn( null );
 
-        $this->assertEquals('author', $result['name']);
-        $this->assertIsArray($result['capabilities']);
-    }
+		$this->expectException( RoleNotFoundException::class );
+		$this->expectExceptionMessage( 'Role "nonexistent" not found.' );
 
-    /**
-     * Test execute throws exception when role not found.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionWhenRoleNotFound(): void
-    {
-        $ability = new UpdateRoleAbility();
+		$ability->doExecute(
+			array(
+				'role'     => 'nonexistent',
+				'add_caps' => array( 'some_cap' ),
+			)
+		);
+	}
 
-        Functions\when('get_role')->justReturn(null);
+	/**
+	 * Test execute with no capability changes returns current state.
+	 *
+	 * @return void
+	 */
+	public function testExecuteWithNoCapabilityChangesReturnsCurrentState(): void {
+		$ability = $this->getAbilityInstance();
 
-        $this->expectException(RoleNotFoundException::class);
-        $this->expectExceptionMessage('Role "nonexistent" not found.');
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'subscriber';
+		$mock_role->capabilities = array(
+			'read' => true,
+		);
 
-        $ability->doExecute(
-            array(
-                'role'     => 'nonexistent',
-                'add_caps' => array( 'some_cap' ),
-            )
-        );
-    }
+		Functions\when( 'get_role' )->justReturn( $mock_role );
 
-    /**
-     * Test execute with no capability changes returns current state.
-     *
-     * @return void
-     */
-    public function testExecuteWithNoCapabilityChangesReturnsCurrentState(): void
-    {
-        $ability = new UpdateRoleAbility();
+		$result = $ability->doExecute(
+			array(
+				'role' => 'subscriber',
+			)
+		);
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'subscriber';
-        $mock_role->capabilities = array(
-            'read' => true,
-        );
+		$this->assertEquals( 'subscriber', $result['name'] );
+		$this->assertEquals( array( 'read' => true ), $result['capabilities'] );
+	}
 
-        Functions\when('get_role')->justReturn($mock_role);
+	/**
+	 * Test annotations indicate write operation.
+	 *
+	 * @return void
+	 */
+	public function testGetAnnotations(): void {
+		$ability     = new UpdateRoleAbility();
+		$annotations = $ability->getAnnotations();
 
-        $result = $ability->doExecute(
-            array(
-                'role' => 'subscriber',
-            )
-        );
+		$this->assertFalse( $annotations['readonly'] );
+		$this->assertFalse( $annotations['destructive'] );
+		$this->assertTrue( $annotations['idempotent'] );
+	}
 
-        $this->assertEquals('subscriber', $result['name']);
-        $this->assertEquals(array( 'read' => true ), $result['capabilities']);
-    }
+	/**
+	 * Test execute returns updated capabilities.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsUpdatedCapabilities(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test annotations indicate write operation.
-     *
-     * @return void
-     */
-    public function testGetAnnotations(): void
-    {
-        $ability     = new UpdateRoleAbility();
-        $annotations = $ability->getAnnotations();
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'contributor';
+		$mock_role->capabilities = array(
+			'read'        => true,
+			'edit_posts'  => true,
+			'custom_cap'  => true,
+		);
 
-        $this->assertFalse($annotations['readonly']);
-        $this->assertFalse($annotations['destructive']);
-        $this->assertTrue($annotations['idempotent']);
-    }
+		$mock_role->shouldReceive( 'add_cap' )
+			->once()
+			->with( 'custom_cap', true );
 
-    /**
-     * Test execute returns updated capabilities.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsUpdatedCapabilities(): void
-    {
-        $ability = new UpdateRoleAbility();
+		Functions\when( 'get_role' )->justReturn( $mock_role );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'contributor';
-        $mock_role->capabilities = array(
-            'read'        => true,
-            'edit_posts'  => true,
-            'custom_cap'  => true,
-        );
+		$result = $ability->doExecute(
+			array(
+				'role'     => 'contributor',
+				'add_caps' => array( 'custom_cap' ),
+			)
+		);
 
-        $mock_role->shouldReceive('add_cap')
-            ->once()
-            ->with('custom_cap', true);
-
-        Functions\when('get_role')->justReturn($mock_role);
-
-        $result = $ability->doExecute(
-            array(
-                'role'     => 'contributor',
-                'add_caps' => array( 'custom_cap' ),
-            )
-        );
-
-        $this->assertIsArray($result['capabilities']);
-        // Capabilities should include the existing ones.
-        $this->assertArrayHasKey('read', $result['capabilities']);
-    }
+		$this->assertIsArray( $result['capabilities'] );
+		// Capabilities should include the existing ones.
+		$this->assertArrayHasKey( 'read', $result['capabilities'] );
+	}
 }

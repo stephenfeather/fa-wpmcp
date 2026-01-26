@@ -10,319 +10,260 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Menu;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Menu\CreateMenuAbility;
 use FAWpmcp\Exceptions\MenuCreationException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test CreateMenuAbility functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Menu
  */
-class CreateMenuAbilityTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class CreateMenuAbilityTest extends BrainMonkeyTestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new CreateMenuAbility();
-        $this->assertEquals('fa-wpmcp/create-menu', $ability->getName());
-    }
+	/**
+	 * Get an instance of the ability being tested.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new CreateMenuAbility();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new CreateMenuAbility();
-        $this->assertEquals('menu', $ability->getCategory());
-    }
+	/**
+	 * Get expected metadata for the ability.
+	 *
+	 * @return array<string, string>
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/create-menu',
+			'category'             => 'menu',
+			'label'                => 'Create Menu',
+			'description_contains' => 'create',
+			'operation_type'       => 'write',
+			'required_capability'  => 'edit_theme_options',
+		);
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new CreateMenuAbility();
-        $this->assertEquals('Create Menu', $ability->getLabel());
-    }
+	/**
+	 * Test ability returns input schema with required name field.
+	 *
+	 * @return void
+	 */
+	public function testGetInputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getInputSchema();
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new CreateMenuAbility();
-        $this->assertEquals('write', $ability->getOperationType());
-    }
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'required', $schema );
+		$this->assertArrayHasKey( 'name', $schema['properties'] );
+		$this->assertContains( 'name', $schema['required'] );
+	}
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new CreateMenuAbility();
-        $this->assertEquals('edit_theme_options', $ability->getRequiredCapability());
-    }
+	/**
+	 * Test input schema has optional location field.
+	 *
+	 * @return void
+	 */
+	public function testGetInputSchemaHasLocationField(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getInputSchema();
 
-    /**
-     * Test ability returns input schema with required name field.
-     *
-     * @return void
-     */
-    public function testGetInputSchema(): void
-    {
-        $ability = new CreateMenuAbility();
-        $schema  = $ability->getInputSchema();
+		$this->assertArrayHasKey( 'location', $schema['properties'] );
+		$this->assertNotContains( 'location', $schema['required'] );
+	}
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('required', $schema);
-        $this->assertArrayHasKey('name', $schema['properties']);
-        $this->assertContains('name', $schema['required']);
-    }
+	/**
+	 * Test ability returns output schema.
+	 *
+	 * @return void
+	 */
+	public function testGetOutputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getOutputSchema();
 
-    /**
-     * Test input schema has optional location field.
-     *
-     * @return void
-     */
-    public function testGetInputSchemaHasLocationField(): void
-    {
-        $ability = new CreateMenuAbility();
-        $schema  = $ability->getInputSchema();
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'term_id', $schema['properties'] );
+		$this->assertArrayHasKey( 'name', $schema['properties'] );
+		$this->assertArrayHasKey( 'slug', $schema['properties'] );
+	}
 
-        $this->assertArrayHasKey('location', $schema['properties']);
-        $this->assertNotContains('location', $schema['required']);
-    }
+	/**
+	 * Test execute creates menu successfully.
+	 *
+	 * @return void
+	 */
+	public function testExecuteCreatesMenuSuccessfully(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test ability returns output schema.
-     *
-     * @return void
-     */
-    public function testGetOutputSchema(): void
-    {
-        $ability = new CreateMenuAbility();
-        $schema  = $ability->getOutputSchema();
+		// Mock the created menu.
+		$menu = Mockery::mock( 'WP_Term' );
+		$menu->term_id = 10;
+		$menu->name = 'New Menu';
+		$menu->slug = 'new-menu';
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('term_id', $schema['properties']);
-        $this->assertArrayHasKey('name', $schema['properties']);
-        $this->assertArrayHasKey('slug', $schema['properties']);
-    }
+		Functions\when( 'wp_create_nav_menu' )->justReturn( 10 );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'wp_get_nav_menu_object' )->justReturn( $menu );
 
-    /**
-     * Test execute creates menu successfully.
-     *
-     * @return void
-     */
-    public function testExecuteCreatesMenuSuccessfully(): void
-    {
-        $ability = new CreateMenuAbility();
+		$result = $ability->doExecute( array( 'name' => 'New Menu' ) );
 
-        // Mock the created menu.
-        $menu = Mockery::mock('WP_Term');
-        $menu->term_id = 10;
-        $menu->name = 'New Menu';
-        $menu->slug = 'new-menu';
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'term_id', $result );
+		$this->assertArrayHasKey( 'name', $result );
+		$this->assertArrayHasKey( 'slug', $result );
+		$this->assertEquals( 10, $result['term_id'] );
+		$this->assertEquals( 'New Menu', $result['name'] );
+		$this->assertEquals( 'new-menu', $result['slug'] );
+	}
 
-        Functions\when('wp_create_nav_menu')->justReturn(10);
-        Functions\when('is_wp_error')->justReturn(false);
-        Functions\when('wp_get_nav_menu_object')->justReturn($menu);
+	/**
+	 * Test execute creates menu and assigns location.
+	 *
+	 * @return void
+	 */
+	public function testExecuteCreatesMenuAndAssignsLocation(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(array( 'name' => 'New Menu' ));
+		$menu = Mockery::mock( 'WP_Term' );
+		$menu->term_id = 10;
+		$menu->name = 'New Menu';
+		$menu->slug = 'new-menu';
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('term_id', $result);
-        $this->assertArrayHasKey('name', $result);
-        $this->assertArrayHasKey('slug', $result);
-        $this->assertEquals(10, $result['term_id']);
-        $this->assertEquals('New Menu', $result['name']);
-        $this->assertEquals('new-menu', $result['slug']);
-    }
+		Functions\when( 'wp_create_nav_menu' )->justReturn( 10 );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'wp_get_nav_menu_object' )->justReturn( $menu );
+		Functions\when( 'get_nav_menu_locations' )->justReturn( array() );
 
-    /**
-     * Test execute creates menu and assigns location.
-     *
-     * @return void
-     */
-    public function testExecuteCreatesMenuAndAssignsLocation(): void
-    {
-        $ability = new CreateMenuAbility();
+		// Expect set_theme_mod to be called with the location.
+		Functions\expect( 'set_theme_mod' )
+			->once()
+			->with( 'nav_menu_locations', array( 'primary' => 10 ) );
 
-        $menu = Mockery::mock('WP_Term');
-        $menu->term_id = 10;
-        $menu->name = 'New Menu';
-        $menu->slug = 'new-menu';
+		$result = $ability->doExecute(
+			array(
+				'name'     => 'New Menu',
+				'location' => 'primary',
+			)
+		);
 
-        Functions\when('wp_create_nav_menu')->justReturn(10);
-        Functions\when('is_wp_error')->justReturn(false);
-        Functions\when('wp_get_nav_menu_object')->justReturn($menu);
-        Functions\when('get_nav_menu_locations')->justReturn(array());
+		$this->assertArrayHasKey( 'location', $result );
+		$this->assertEquals( 'primary', $result['location'] );
+	}
 
-        // Expect set_theme_mod to be called with the location.
-        Functions\expect('set_theme_mod')
-            ->once()
-            ->with('nav_menu_locations', array( 'primary' => 10 ));
+	/**
+	 * Test execute throws exception when menu creation fails.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenCreationFails(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(
-            array(
-                'name'     => 'New Menu',
-                'location' => 'primary',
-            )
-        );
+		$wp_error = Mockery::mock( 'WP_Error' );
+		$wp_error->shouldReceive( 'get_error_message' )
+			->andReturn( 'A menu with that name already exists.' );
 
-        $this->assertArrayHasKey('location', $result);
-        $this->assertEquals('primary', $result['location']);
-    }
+		Functions\when( 'wp_create_nav_menu' )->justReturn( $wp_error );
+		Functions\when( 'is_wp_error' )->justReturn( true );
 
-    /**
-     * Test execute throws exception when menu creation fails.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionWhenCreationFails(): void
-    {
-        $ability = new CreateMenuAbility();
+		$this->expectException( MenuCreationException::class );
+		$this->expectExceptionMessage( 'Failed to create menu: A menu with that name already exists.' );
 
-        $wp_error = Mockery::mock('WP_Error');
-        $wp_error->shouldReceive('get_error_message')
-            ->andReturn('A menu with that name already exists.');
+		$ability->doExecute( array( 'name' => 'Existing Menu' ) );
+	}
 
-        Functions\when('wp_create_nav_menu')->justReturn($wp_error);
-        Functions\when('is_wp_error')->justReturn(true);
+	/**
+	 * Test annotations are correct for write ability.
+	 *
+	 * @return void
+	 */
+	public function testGetAnnotations(): void {
+		$ability     = new CreateMenuAbility();
+		$annotations = $ability->getAnnotations();
 
-        $this->expectException(MenuCreationException::class);
-        $this->expectExceptionMessage('Failed to create menu: A menu with that name already exists.');
+		$this->assertFalse( $annotations['readonly'] );
+		$this->assertFalse( $annotations['destructive'] );
+		$this->assertFalse( $annotations['idempotent'] );
+	}
 
-        $ability->doExecute(array( 'name' => 'Existing Menu' ));
-    }
+	/**
+	 * Test execute does not assign location when not provided.
+	 *
+	 * @return void
+	 */
+	public function testExecuteDoesNotAssignLocationWhenNotProvided(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test annotations are correct for write ability.
-     *
-     * @return void
-     */
-    public function testGetAnnotations(): void
-    {
-        $ability     = new CreateMenuAbility();
-        $annotations = $ability->getAnnotations();
+		$menu = Mockery::mock( 'WP_Term' );
+		$menu->term_id = 10;
+		$menu->name = 'New Menu';
+		$menu->slug = 'new-menu';
 
-        $this->assertFalse($annotations['readonly']);
-        $this->assertFalse($annotations['destructive']);
-        $this->assertFalse($annotations['idempotent']);
-    }
+		Functions\when( 'wp_create_nav_menu' )->justReturn( 10 );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'wp_get_nav_menu_object' )->justReturn( $menu );
 
-    /**
-     * Test execute does not assign location when not provided.
-     *
-     * @return void
-     */
-    public function testExecuteDoesNotAssignLocationWhenNotProvided(): void
-    {
-        $ability = new CreateMenuAbility();
+		// set_theme_mod should not be called.
+		Functions\expect( 'set_theme_mod' )->never();
 
-        $menu = Mockery::mock('WP_Term');
-        $menu->term_id = 10;
-        $menu->name = 'New Menu';
-        $menu->slug = 'new-menu';
+		$result = $ability->doExecute( array( 'name' => 'New Menu' ) );
 
-        Functions\when('wp_create_nav_menu')->justReturn(10);
-        Functions\when('is_wp_error')->justReturn(false);
-        Functions\when('wp_get_nav_menu_object')->justReturn($menu);
+		$this->assertArrayNotHasKey( 'location', $result );
+	}
 
-        // set_theme_mod should not be called.
-        Functions\expect('set_theme_mod')->never();
+	/**
+	 * Test execute preserves existing menu locations when assigning new one.
+	 *
+	 * @return void
+	 */
+	public function testExecutePreservesExistingLocationsWhenAssigningNew(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(array( 'name' => 'New Menu' ));
+		$menu = Mockery::mock( 'WP_Term' );
+		$menu->term_id = 10;
+		$menu->name = 'New Menu';
+		$menu->slug = 'new-menu';
 
-        $this->assertArrayNotHasKey('location', $result);
-    }
+		Functions\when( 'wp_create_nav_menu' )->justReturn( 10 );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+		Functions\when( 'wp_get_nav_menu_object' )->justReturn( $menu );
+		Functions\when( 'get_nav_menu_locations' )->justReturn(
+			array(
+				'secondary' => 5,
+				'footer'    => 6,
+			)
+		);
 
-    /**
-     * Test execute preserves existing menu locations when assigning new one.
-     *
-     * @return void
-     */
-    public function testExecutePreservesExistingLocationsWhenAssigningNew(): void
-    {
-        $ability = new CreateMenuAbility();
+		// Expect set_theme_mod to preserve existing locations.
+		Functions\expect( 'set_theme_mod' )
+			->once()
+			->with(
+				'nav_menu_locations',
+				array(
+					'secondary' => 5,
+					'footer'    => 6,
+					'primary'   => 10,
+				)
+			);
 
-        $menu = Mockery::mock('WP_Term');
-        $menu->term_id = 10;
-        $menu->name = 'New Menu';
-        $menu->slug = 'new-menu';
+		$result = $ability->doExecute(
+			array(
+				'name'     => 'New Menu',
+				'location' => 'primary',
+			)
+		);
 
-        Functions\when('wp_create_nav_menu')->justReturn(10);
-        Functions\when('is_wp_error')->justReturn(false);
-        Functions\when('wp_get_nav_menu_object')->justReturn($menu);
-        Functions\when('get_nav_menu_locations')->justReturn(
-            array(
-                'secondary' => 5,
-                'footer'    => 6,
-            )
-        );
-
-        // Expect set_theme_mod to preserve existing locations.
-        Functions\expect('set_theme_mod')
-            ->once()
-            ->with(
-                'nav_menu_locations',
-                array(
-                    'secondary' => 5,
-                    'footer'    => 6,
-                    'primary'   => 10,
-                )
-            );
-
-        $result = $ability->doExecute(
-            array(
-                'name'     => 'New Menu',
-                'location' => 'primary',
-            )
-        );
-
-        $this->assertEquals('primary', $result['location']);
-    }
+		$this->assertEquals( 'primary', $result['location'] );
+	}
 }

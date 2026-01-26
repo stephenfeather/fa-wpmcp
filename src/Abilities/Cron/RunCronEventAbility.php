@@ -19,172 +19,162 @@ use FAWpmcp\Abilities\AbstractAbility;
  *
  * @package FAWpmcp\Abilities\Cron
  */
-final class RunCronEventAbility extends AbstractAbility
-{
-    /**
-     * Get the unique ability name.
-     *
-     * @return string Ability name.
-     */
-    public function getName(): string
-    {
-        return 'fa-wpmcp/run-cron-event';
-    }
+final class RunCronEventAbility extends AbstractAbility {
 
-    /**
-     * Get the ability category.
-     *
-     * @return string Category name.
-     */
-    public function getCategory(): string
-    {
-        return 'cron';
-    }
+	/**
+	 * Get the unique ability name.
+	 *
+	 * @return string Ability name.
+	 */
+	public function getName(): string {
+		return 'fa-wpmcp/run-cron-event';
+	}
 
-    /**
-     * Get the human-readable label.
-     *
-     * @return string Ability label.
-     */
-    public function getLabel(): string
-    {
-        return 'Run Cron Event';
-    }
+	/**
+	 * Get the ability category.
+	 *
+	 * @return string Category name.
+	 */
+	public function getCategory(): string {
+		return 'cron';
+	}
 
-    /**
-     * Get the ability description.
-     *
-     * @return string Description.
-     */
-    public function getDescription(): string
-    {
-        return 'Manually trigger a WordPress cron event hook. Runs the first scheduled instance of the hook immediately.';
-    }
+	/**
+	 * Get the human-readable label.
+	 *
+	 * @return string Ability label.
+	 */
+	public function getLabel(): string {
+		return 'Run Cron Event';
+	}
 
-    /**
-     * Get the input schema.
-     *
-     * @return array<string, mixed> JSON Schema array.
-     */
-    public function getInputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'hook' => array(
-                    'type'        => 'string',
-                    'description' => 'The hook name to run.',
-                ),
-            ),
-            'required'   => array( 'hook' ),
-        );
-    }
+	/**
+	 * Get the ability description.
+	 *
+	 * @return string Description.
+	 */
+	public function getDescription(): string {
+		return 'Manually trigger a WordPress cron event hook. Runs the first scheduled instance of the hook immediately.';
+	}
 
-    /**
-     * Get the output schema.
-     *
-     * @return array<string, mixed> JSON Schema array.
-     */
-    public function getOutputSchema(): array
-    {
-        return array(
-            'type'       => 'object',
-            'properties' => array(
-                'success'  => array(
-                    'type'        => 'boolean',
-                    'description' => 'Whether the hook was executed.',
-                ),
-                'executed' => array(
-                    'type'        => 'boolean',
-                    'description' => 'Whether the do_action was called.',
-                ),
-                'error'    => array(
-                    'type'        => 'string',
-                    'description' => 'Error message if execution failed.',
-                ),
-            ),
-        );
-    }
+	/**
+	 * Get the input schema.
+	 *
+	 * @return array<string, mixed> JSON Schema array.
+	 */
+	public function getInputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'hook' => array(
+					'type'        => 'string',
+					'description' => 'The hook name to run.',
+				),
+			),
+			'required'   => array( 'hook' ),
+		);
+	}
 
-    /**
-     * Get the required WordPress capability.
-     *
-     * @return string WordPress capability name.
-     */
-    public function getRequiredCapability(): string
-    {
-        return 'manage_options';
-    }
+	/**
+	 * Get the output schema.
+	 *
+	 * @return array<string, mixed> JSON Schema array.
+	 */
+	public function getOutputSchema(): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'success'  => array(
+					'type'        => 'boolean',
+					'description' => 'Whether the hook was executed.',
+				),
+				'executed' => array(
+					'type'        => 'boolean',
+					'description' => 'Whether the do_action was called.',
+				),
+				'error'    => array(
+					'type'        => 'string',
+					'description' => 'Error message if execution failed.',
+				),
+			),
+		);
+	}
 
-    /**
-     * Get the operation type.
-     *
-     * @return string 'write' for this ability.
-     */
-    public function getOperationType(): string
-    {
-        return 'write';
-    }
+	/**
+	 * Get the required WordPress capability.
+	 *
+	 * @return string WordPress capability name.
+	 */
+	public function getRequiredCapability(): string {
+		return 'manage_options';
+	}
 
-    /**
-     * Get ability annotations.
-     *
-     * @return array<string, mixed> Annotations array.
-     */
-    public function getAnnotations(): array
-    {
-        return array(
-            'readonly'     => false,
-            'destructive'  => false,
-            'idempotent'   => false,
-            'instructions' => $this->getDescription(),
-        );
-    }
+	/**
+	 * Get the operation type.
+	 *
+	 * @return string 'write' for this ability.
+	 */
+	public function getOperationType(): string {
+		return 'write';
+	}
 
-    /**
-     * Execute the ability.
-     *
-     * @param array<string, mixed> $input Validated input data.
-     * @return array<string, mixed> Run result.
-     */
-    public function doExecute(array $input): array
-    {
-        $hook       = (string) $input['hook'];
-        $cron_array = _get_cron_array();
+	/**
+	 * Get ability annotations.
+	 *
+	 * @return array<string, mixed> Annotations array.
+	 */
+	public function getAnnotations(): array {
+		return array(
+			'readonly'     => false,
+			'destructive'  => false,
+			'idempotent'   => false,
+			'instructions' => $this->getDescription(),
+		);
+	}
 
-        // Find the first scheduled instance of this hook.
-        $event_args = null;
+	/**
+	 * Execute the ability.
+	 *
+	 * @param array<string, mixed> $input Validated input data.
+	 * @return array<string, mixed> Run result.
+	 */
+	public function doExecute( array $input ): array {
+		$hook       = (string) $input['hook'];
+		$cron_array = _get_cron_array();
 
-        if (! empty($cron_array) && is_array($cron_array)) {
-            // Sort by timestamp to get the earliest event first.
-            ksort($cron_array);
+		// Find the first scheduled instance of this hook.
+		$event_args = null;
 
-            foreach ($cron_array as $timestamp => $hooks) {
-                if (isset($hooks[ $hook ])) {
-                    // Get the first event's args.
-                    $events     = $hooks[ $hook ];
-                    $event_data = reset($events);
-                    $event_args = $event_data['args'] ?? array();
-                    break;
-                }
-            }
-        }
+		if ( ! empty( $cron_array ) && is_array( $cron_array ) ) {
+			// Sort by timestamp to get the earliest event first.
+			ksort( $cron_array );
 
-        // If hook not found in scheduled events, return error.
-        if (null === $event_args) {
-            return array(
-                'success'  => false,
-                'executed' => false,
-                'error'    => 'Hook not found in scheduled cron events.',
-            );
-        }
+			foreach ( $cron_array as $timestamp => $hooks ) {
+				if ( isset( $hooks[ $hook ] ) ) {
+					// Get the first event's args.
+					$events     = $hooks[ $hook ];
+					$event_data = reset( $events );
+					$event_args = $event_data['args'] ?? array();
+					break;
+				}
+			}
+		}
 
-        // Execute the hook with its arguments.
-        do_action($hook, ...$event_args);
+		// If hook not found in scheduled events, return error.
+		if ( null === $event_args ) {
+			return array(
+				'success'  => false,
+				'executed' => false,
+				'error'    => 'Hook not found in scheduled cron events.',
+			);
+		}
 
-        return array(
-            'success'  => true,
-            'executed' => true,
-        );
-    }
+		// Execute the hook with its arguments.
+		do_action( $hook, ...$event_args );
+
+		return array(
+			'success'  => true,
+			'executed' => true,
+		);
+	}
 }

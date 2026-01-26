@@ -20,6 +20,6 @@ use Exception;
  *
  * @package FAWpmcp\Exceptions
  */
-class MenuNotFoundException extends Exception
-{
+class MenuNotFoundException extends Exception {
+
 }

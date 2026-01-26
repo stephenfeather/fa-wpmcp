@@ -17,225 +17,214 @@ use PHPUnit\Framework\TestCase;
 /**
  * Test PermissionChecker logic.
  */
-class PermissionCheckerTest extends TestCase
-{
-    /**
-     * Test global read disabled blocks all reads.
-     */
-    public function test_global_read_disabled_blocks_all_reads(): void
-    {
-        $settings = new PermissionSettings(
-            global_read_enabled: false,
-            global_write_enabled: true,
-            category_settings: array(),
-            ability_settings: array(),
-        );
+class PermissionCheckerTest extends TestCase {
 
-        $result = PermissionChecker::check($settings, 'fa-wpmcp/list-posts', 'read');
+	/**
+	 * Test global read disabled blocks all reads.
+	 */
+	public function test_global_read_disabled_blocks_all_reads(): void {
+		$settings = new PermissionSettings(
+			global_read_enabled: false,
+			global_write_enabled: true,
+			category_settings: array(),
+			ability_settings: array(),
+		);
 
-        $this->assertFalse($result->is_success);
-        $this->assertSame('ability_disabled', $result->error_code);
-    }
+		$result = PermissionChecker::check( $settings, 'fa-wpmcp/list-posts', 'read' );
 
-    /**
-     * Test global write disabled blocks all writes.
-     */
-    public function test_global_write_disabled_blocks_all_writes(): void
-    {
-        $settings = new PermissionSettings(
-            global_read_enabled: true,
-            global_write_enabled: false,
-            category_settings: array(),
-            ability_settings: array(),
-        );
+		$this->assertFalse( $result->is_success );
+		$this->assertSame( 'ability_disabled', $result->error_code );
+	}
 
-        $result = PermissionChecker::check($settings, 'fa-wpmcp/create-post', 'write');
+	/**
+	 * Test global write disabled blocks all writes.
+	 */
+	public function test_global_write_disabled_blocks_all_writes(): void {
+		$settings = new PermissionSettings(
+			global_read_enabled: true,
+			global_write_enabled: false,
+			category_settings: array(),
+			ability_settings: array(),
+		);
 
-        $this->assertFalse($result->is_success);
-        $this->assertSame('ability_disabled', $result->error_code);
-    }
+		$result = PermissionChecker::check( $settings, 'fa-wpmcp/create-post', 'write' );
 
-    /**
-     * Test category write disabled blocks category writes.
-     */
-    public function test_category_write_disabled_blocks_category_writes(): void
-    {
-        $settings = new PermissionSettings(
-            global_read_enabled: true,
-            global_write_enabled: true,
-            category_settings: array(
-                'posts-pages' => array(
-                    'enable_read'  => true,
-                    'enable_write' => false,
-                ),
-            ),
-            ability_settings: array(),
-        );
+		$this->assertFalse( $result->is_success );
+		$this->assertSame( 'ability_disabled', $result->error_code );
+	}
 
-        $result = PermissionChecker::checkCategory($settings, 'posts-pages', 'write');
+	/**
+	 * Test category write disabled blocks category writes.
+	 */
+	public function test_category_write_disabled_blocks_category_writes(): void {
+		$settings = new PermissionSettings(
+			global_read_enabled: true,
+			global_write_enabled: true,
+			category_settings: array(
+				'posts-pages' => array(
+					'enable_read'  => true,
+					'enable_write' => false,
+				),
+			),
+			ability_settings: array(),
+		);
 
-        $this->assertFalse($result->is_success);
-    }
+		$result = PermissionChecker::checkCategory( $settings, 'posts-pages', 'write' );
 
-    /**
-     * Test ability level override works.
-     */
-    public function test_ability_level_override_works(): void
-    {
-        $settings = new PermissionSettings(
-            global_read_enabled: true,
-            global_write_enabled: true,
-            category_settings: array(
-                'posts-pages' => array(
-                    'enable_read'  => true,
-                    'enable_write' => true,
-                ),
-            ),
-            ability_settings: array(
-                'fa-wpmcp/create-post' => array( 'enabled' => false ),
-            ),
-        );
+		$this->assertFalse( $result->is_success );
+	}
 
-        $result = PermissionChecker::checkAbility($settings, 'fa-wpmcp/create-post');
+	/**
+	 * Test ability level override works.
+	 */
+	public function test_ability_level_override_works(): void {
+		$settings = new PermissionSettings(
+			global_read_enabled: true,
+			global_write_enabled: true,
+			category_settings: array(
+				'posts-pages' => array(
+					'enable_read'  => true,
+					'enable_write' => true,
+				),
+			),
+			ability_settings: array(
+				'fa-wpmcp/create-post' => array( 'enabled' => false ),
+			),
+		);
 
-        $this->assertFalse($result->is_success);
-    }
+		$result = PermissionChecker::checkAbility( $settings, 'fa-wpmcp/create-post' );
 
-    /**
-     * Test hierarchy check follows correct order.
-     */
-    public function test_hierarchy_check_follows_correct_order(): void
-    {
-        $settings = new PermissionSettings(
-            global_read_enabled: true,
-            global_write_enabled: true,
-            category_settings: array(),
-            ability_settings: array(),
-        );
+		$this->assertFalse( $result->is_success );
+	}
 
-        $result = PermissionChecker::check($settings, 'fa-wpmcp/list-posts', 'read');
+	/**
+	 * Test hierarchy check follows correct order.
+	 */
+	public function test_hierarchy_check_follows_correct_order(): void {
+		$settings = new PermissionSettings(
+			global_read_enabled: true,
+			global_write_enabled: true,
+			category_settings: array(),
+			ability_settings: array(),
+		);
 
-        $this->assertTrue($result->is_success);
-    }
+		$result = PermissionChecker::check( $settings, 'fa-wpmcp/list-posts', 'read' );
 
-    /**
-     * Test check_global allows enabled operations.
-     */
-    public function test_check_global_allows_enabled_operations(): void
-    {
-        $settings = new PermissionSettings(
-            global_read_enabled: true,
-            global_write_enabled: true,
-            category_settings: array(),
-            ability_settings: array(),
-        );
+		$this->assertTrue( $result->is_success );
+	}
 
-        $read_result  = PermissionChecker::checkGlobal($settings, 'read');
-        $write_result = PermissionChecker::checkGlobal($settings, 'write');
+	/**
+	 * Test check_global allows enabled operations.
+	 */
+	public function test_check_global_allows_enabled_operations(): void {
+		$settings = new PermissionSettings(
+			global_read_enabled: true,
+			global_write_enabled: true,
+			category_settings: array(),
+			ability_settings: array(),
+		);
 
-        $this->assertTrue($read_result->is_success);
-        $this->assertTrue($write_result->is_success);
-    }
+		$read_result  = PermissionChecker::checkGlobal( $settings, 'read' );
+		$write_result = PermissionChecker::checkGlobal( $settings, 'write' );
 
-    /**
-     * Test check_global blocks disabled operations.
-     */
-    public function test_check_global_blocks_disabled_operations(): void
-    {
-        $settings = new PermissionSettings(
-            global_read_enabled: false,
-            global_write_enabled: false,
-            category_settings: array(),
-            ability_settings: array(),
-        );
+		$this->assertTrue( $read_result->is_success );
+		$this->assertTrue( $write_result->is_success );
+	}
 
-        $read_result  = PermissionChecker::checkGlobal($settings, 'read');
-        $write_result = PermissionChecker::checkGlobal($settings, 'write');
+	/**
+	 * Test check_global blocks disabled operations.
+	 */
+	public function test_check_global_blocks_disabled_operations(): void {
+		$settings = new PermissionSettings(
+			global_read_enabled: false,
+			global_write_enabled: false,
+			category_settings: array(),
+			ability_settings: array(),
+		);
 
-        $this->assertFalse($read_result->is_success);
-        $this->assertFalse($write_result->is_success);
-    }
+		$read_result  = PermissionChecker::checkGlobal( $settings, 'read' );
+		$write_result = PermissionChecker::checkGlobal( $settings, 'write' );
 
-    /**
-     * Test check_category inherits from global when no category settings.
-     */
-    public function test_check_category_inherits_when_no_settings(): void
-    {
-        $settings = new PermissionSettings(
-            global_read_enabled: true,
-            global_write_enabled: true,
-            category_settings: array(),
-            ability_settings: array(),
-        );
+		$this->assertFalse( $read_result->is_success );
+		$this->assertFalse( $write_result->is_success );
+	}
 
-        $result = PermissionChecker::checkCategory($settings, 'posts-pages', 'read');
+	/**
+	 * Test check_category inherits from global when no category settings.
+	 */
+	public function test_check_category_inherits_when_no_settings(): void {
+		$settings = new PermissionSettings(
+			global_read_enabled: true,
+			global_write_enabled: true,
+			category_settings: array(),
+			ability_settings: array(),
+		);
 
-        $this->assertTrue($result->is_success);
-    }
+		$result = PermissionChecker::checkCategory( $settings, 'posts-pages', 'read' );
 
-    /**
-     * Test check_ability allows when no specific settings.
-     */
-    public function test_check_ability_allows_when_no_settings(): void
-    {
-        $settings = new PermissionSettings(
-            global_read_enabled: true,
-            global_write_enabled: true,
-            category_settings: array(),
-            ability_settings: array(),
-        );
+		$this->assertTrue( $result->is_success );
+	}
 
-        $result = PermissionChecker::checkAbility($settings, 'fa-wpmcp/list-posts');
+	/**
+	 * Test check_ability allows when no specific settings.
+	 */
+	public function test_check_ability_allows_when_no_settings(): void {
+		$settings = new PermissionSettings(
+			global_read_enabled: true,
+			global_write_enabled: true,
+			category_settings: array(),
+			ability_settings: array(),
+		);
 
-        $this->assertTrue($result->is_success);
-    }
+		$result = PermissionChecker::checkAbility( $settings, 'fa-wpmcp/list-posts' );
 
-    /**
-     * Test full hierarchy with all levels enabled.
-     */
-    public function test_full_hierarchy_all_enabled(): void
-    {
-        $settings = new PermissionSettings(
-            global_read_enabled: true,
-            global_write_enabled: true,
-            category_settings: array(
-                'posts-pages' => array(
-                    'enable_read'  => true,
-                    'enable_write' => true,
-                ),
-            ),
-            ability_settings: array(
-                'fa-wpmcp/list-posts' => array( 'enabled' => true ),
-            ),
-        );
+		$this->assertTrue( $result->is_success );
+	}
 
-        $result = PermissionChecker::check($settings, 'fa-wpmcp/list-posts', 'read', 'posts-pages');
+	/**
+	 * Test full hierarchy with all levels enabled.
+	 */
+	public function test_full_hierarchy_all_enabled(): void {
+		$settings = new PermissionSettings(
+			global_read_enabled: true,
+			global_write_enabled: true,
+			category_settings: array(
+				'posts-pages' => array(
+					'enable_read'  => true,
+					'enable_write' => true,
+				),
+			),
+			ability_settings: array(
+				'fa-wpmcp/list-posts' => array( 'enabled' => true ),
+			),
+		);
 
-        $this->assertTrue($result->is_success);
-    }
+		$result = PermissionChecker::check( $settings, 'fa-wpmcp/list-posts', 'read', 'posts-pages' );
 
-    /**
-     * Test full hierarchy blocks at first failure.
-     */
-    public function test_full_hierarchy_blocks_at_first_failure(): void
-    {
-        $settings = new PermissionSettings(
-            global_read_enabled: false,
-            global_write_enabled: false,
-            category_settings: array(
-                'posts-pages' => array(
-                    'enable_read'  => true,
-                    'enable_write' => true,
-                ),
-            ),
-            ability_settings: array(
-                'fa-wpmcp/list-posts' => array( 'enabled' => true ),
-            ),
-        );
+		$this->assertTrue( $result->is_success );
+	}
 
-        $result = PermissionChecker::check($settings, 'fa-wpmcp/list-posts', 'read', 'posts-pages');
+	/**
+	 * Test full hierarchy blocks at first failure.
+	 */
+	public function test_full_hierarchy_blocks_at_first_failure(): void {
+		$settings = new PermissionSettings(
+			global_read_enabled: false,
+			global_write_enabled: false,
+			category_settings: array(
+				'posts-pages' => array(
+					'enable_read'  => true,
+					'enable_write' => true,
+				),
+			),
+			ability_settings: array(
+				'fa-wpmcp/list-posts' => array( 'enabled' => true ),
+			),
+		);
 
-        $this->assertFalse($result->is_success);
-        $this->assertStringContainsString('Global', $result->error_message);
-    }
+		$result = PermissionChecker::check( $settings, 'fa-wpmcp/list-posts', 'read', 'posts-pages' );
+
+		$this->assertFalse( $result->is_success );
+		$this->assertStringContainsString( 'Global', $result->error_message );
+	}
 }

@@ -10,237 +10,181 @@ declare(strict_types=1);
 
 namespace FAWpmcp\Tests\Abilities\Role;
 
+use FAWpmcp\Abilities\AbstractAbility;
 use FAWpmcp\Abilities\Role\GetRoleAbility;
 use FAWpmcp\Exceptions\RoleNotFoundException;
-use Brain\Monkey;
+use FAWpmcp\Tests\TestCase\AbilityTestTrait;
+use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
 use Mockery;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test GetRoleAbility functionality.
  *
  * @package FAWpmcp\Tests\Abilities\Role
  */
-class GetRoleAbilityTest extends TestCase
-{
-    /**
-     * Set up Brain\Monkey before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
+class GetRoleAbilityTest extends BrainMonkeyTestCase {
 
-    /**
-     * Tear down Brain\Monkey after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Monkey\tearDown();
-        Mockery::close();
-        parent::tearDown();
-    }
+	use AbilityTestTrait;
 
-    /**
-     * Test ability returns correct name.
-     *
-     * @return void
-     */
-    public function testGetName(): void
-    {
-        $ability = new GetRoleAbility();
-        $this->assertEquals('fa-wpmcp/get-role', $ability->getName());
-    }
+	/**
+	 * Get the ability instance to test.
+	 *
+	 * @return AbstractAbility
+	 */
+	protected function getAbilityInstance(): AbstractAbility {
+		return new GetRoleAbility();
+	}
 
-    /**
-     * Test ability returns correct category.
-     *
-     * @return void
-     */
-    public function testGetCategory(): void
-    {
-        $ability = new GetRoleAbility();
-        $this->assertEquals('role', $ability->getCategory());
-    }
+	/**
+	 * Get the expected metadata for this ability.
+	 *
+	 * @return array<string, mixed>
+	 */
+	protected function getExpectedMetadata(): array {
+		return array(
+			'name'                 => 'fa-wpmcp/get-role',
+			'category'             => 'role',
+			'label'                => 'Get Role',
+			'description_contains' => 'details',
+			'operation_type'       => 'read',
+			'required_capability'  => 'list_users',
+		);
+	}
 
-    /**
-     * Test ability returns correct label.
-     *
-     * @return void
-     */
-    public function testGetLabel(): void
-    {
-        $ability = new GetRoleAbility();
-        $this->assertEquals('Get Role', $ability->getLabel());
-    }
+	/**
+	 * Test ability returns input schema with required role field.
+	 *
+	 * @return void
+	 */
+	public function testGetInputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getInputSchema();
 
-    /**
-     * Test ability returns correct operation type.
-     *
-     * @return void
-     */
-    public function testGetOperationType(): void
-    {
-        $ability = new GetRoleAbility();
-        $this->assertEquals('read', $ability->getOperationType());
-    }
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'required', $schema );
+		$this->assertArrayHasKey( 'role', $schema['properties'] );
+		$this->assertContains( 'role', $schema['required'] );
+	}
 
-    /**
-     * Test ability returns correct required capability.
-     *
-     * @return void
-     */
-    public function testGetRequiredCapability(): void
-    {
-        $ability = new GetRoleAbility();
-        $this->assertEquals('list_users', $ability->getRequiredCapability());
-    }
+	/**
+	 * Test ability returns output schema.
+	 *
+	 * @return void
+	 */
+	public function testGetOutputSchema(): void {
+		$ability = $this->getAbilityInstance();
+		$schema  = $ability->getOutputSchema();
 
-    /**
-     * Test ability returns input schema with required role field.
-     *
-     * @return void
-     */
-    public function testGetInputSchema(): void
-    {
-        $ability = new GetRoleAbility();
-        $schema  = $ability->getInputSchema();
+		$this->assertIsArray( $schema );
+		$this->assertArrayHasKey( 'type', $schema );
+		$this->assertArrayHasKey( 'properties', $schema );
+		$this->assertArrayHasKey( 'name', $schema['properties'] );
+		$this->assertArrayHasKey( 'display_name', $schema['properties'] );
+		$this->assertArrayHasKey( 'capabilities', $schema['properties'] );
+		$this->assertArrayHasKey( 'capabilities_count', $schema['properties'] );
+	}
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('required', $schema);
-        $this->assertArrayHasKey('role', $schema['properties']);
-        $this->assertContains('role', $schema['required']);
-    }
+	/**
+	 * Test execute returns role details.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsRoleDetails(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test ability returns output schema.
-     *
-     * @return void
-     */
-    public function testGetOutputSchema(): void
-    {
-        $ability = new GetRoleAbility();
-        $schema  = $ability->getOutputSchema();
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'editor';
+		$mock_role->capabilities = array(
+			'edit_posts'        => true,
+			'edit_others_posts' => true,
+			'publish_posts'     => true,
+		);
 
-        $this->assertIsArray($schema);
-        $this->assertArrayHasKey('type', $schema);
-        $this->assertArrayHasKey('properties', $schema);
-        $this->assertArrayHasKey('name', $schema['properties']);
-        $this->assertArrayHasKey('display_name', $schema['properties']);
-        $this->assertArrayHasKey('capabilities', $schema['properties']);
-        $this->assertArrayHasKey('capabilities_count', $schema['properties']);
-    }
+		$mock_roles = Mockery::mock( 'WP_Roles' );
+		$mock_roles->shouldReceive( 'get_names' )->andReturn(
+			array(
+				'editor' => 'Editor',
+			)
+		);
 
-    /**
-     * Test execute returns role details.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsRoleDetails(): void
-    {
-        $ability = new GetRoleAbility();
+		Functions\when( 'get_role' )->justReturn( $mock_role );
+		Functions\when( 'wp_roles' )->justReturn( $mock_roles );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'editor';
-        $mock_role->capabilities = array(
-            'edit_posts'        => true,
-            'edit_others_posts' => true,
-            'publish_posts'     => true,
-        );
+		$result = $ability->doExecute( array( 'role' => 'editor' ) );
 
-        $mock_roles = Mockery::mock('WP_Roles');
-        $mock_roles->shouldReceive('get_names')->andReturn(
-            array(
-                'editor' => 'Editor',
-            )
-        );
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'name', $result );
+		$this->assertArrayHasKey( 'display_name', $result );
+		$this->assertArrayHasKey( 'capabilities', $result );
+		$this->assertArrayHasKey( 'capabilities_count', $result );
+		$this->assertEquals( 'editor', $result['name'] );
+		$this->assertEquals( 'Editor', $result['display_name'] );
+		$this->assertEquals( 3, $result['capabilities_count'] );
+	}
 
-        Functions\when('get_role')->justReturn($mock_role);
-        Functions\when('wp_roles')->justReturn($mock_roles);
+	/**
+	 * Test execute throws exception when role not found.
+	 *
+	 * @return void
+	 */
+	public function testExecuteThrowsExceptionWhenRoleNotFound(): void {
+		$ability = $this->getAbilityInstance();
 
-        $result = $ability->doExecute(array( 'role' => 'editor' ));
+		Functions\when( 'get_role' )->justReturn( null );
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('name', $result);
-        $this->assertArrayHasKey('display_name', $result);
-        $this->assertArrayHasKey('capabilities', $result);
-        $this->assertArrayHasKey('capabilities_count', $result);
-        $this->assertEquals('editor', $result['name']);
-        $this->assertEquals('Editor', $result['display_name']);
-        $this->assertEquals(3, $result['capabilities_count']);
-    }
+		$this->expectException( RoleNotFoundException::class );
+		$this->expectExceptionMessage( 'Role "nonexistent" not found.' );
 
-    /**
-     * Test execute throws exception when role not found.
-     *
-     * @return void
-     */
-    public function testExecuteThrowsExceptionWhenRoleNotFound(): void
-    {
-        $ability = new GetRoleAbility();
+		$ability->doExecute( array( 'role' => 'nonexistent' ) );
+	}
 
-        Functions\when('get_role')->justReturn(null);
+	/**
+	 * Test annotations are correct for read-only ability.
+	 *
+	 * @return void
+	 */
+	public function testGetAnnotations(): void {
+		$ability     = new GetRoleAbility();
+		$annotations = $ability->getAnnotations();
 
-        $this->expectException(RoleNotFoundException::class);
-        $this->expectExceptionMessage('Role "nonexistent" not found.');
+		$this->assertTrue( $annotations['readonly'] );
+		$this->assertFalse( $annotations['destructive'] );
+		$this->assertTrue( $annotations['idempotent'] );
+	}
 
-        $ability->doExecute(array( 'role' => 'nonexistent' ));
-    }
+	/**
+	 * Test execute returns capabilities as array.
+	 *
+	 * @return void
+	 */
+	public function testExecuteReturnsCapabilitiesAsArray(): void {
+		$ability = $this->getAbilityInstance();
 
-    /**
-     * Test annotations are correct for read-only ability.
-     *
-     * @return void
-     */
-    public function testGetAnnotations(): void
-    {
-        $ability     = new GetRoleAbility();
-        $annotations = $ability->getAnnotations();
+		$mock_role = Mockery::mock( 'WP_Role' );
+		$mock_role->name = 'author';
+		$mock_role->capabilities = array(
+			'edit_posts'    => true,
+			'publish_posts' => true,
+			'upload_files'  => true,
+		);
 
-        $this->assertTrue($annotations['readonly']);
-        $this->assertFalse($annotations['destructive']);
-        $this->assertTrue($annotations['idempotent']);
-    }
+		$mock_roles = Mockery::mock( 'WP_Roles' );
+		$mock_roles->shouldReceive( 'get_names' )->andReturn(
+			array(
+				'author' => 'Author',
+			)
+		);
 
-    /**
-     * Test execute returns capabilities as array.
-     *
-     * @return void
-     */
-    public function testExecuteReturnsCapabilitiesAsArray(): void
-    {
-        $ability = new GetRoleAbility();
+		Functions\when( 'get_role' )->justReturn( $mock_role );
+		Functions\when( 'wp_roles' )->justReturn( $mock_roles );
 
-        $mock_role = Mockery::mock('WP_Role');
-        $mock_role->name = 'author';
-        $mock_role->capabilities = array(
-            'edit_posts'    => true,
-            'publish_posts' => true,
-            'upload_files'  => true,
-        );
+		$result = $ability->doExecute( array( 'role' => 'author' ) );
 
-        $mock_roles = Mockery::mock('WP_Roles');
-        $mock_roles->shouldReceive('get_names')->andReturn(
-            array(
-                'author' => 'Author',
-            )
-        );
-
-        Functions\when('get_role')->justReturn($mock_role);
-        Functions\when('wp_roles')->justReturn($mock_roles);
-
-        $result = $ability->doExecute(array( 'role' => 'author' ));
-
-        $this->assertIsArray($result['capabilities']);
-        $this->assertArrayHasKey('edit_posts', $result['capabilities']);
-        $this->assertTrue($result['capabilities']['edit_posts']);
-    }
+		$this->assertIsArray( $result['capabilities'] );
+		$this->assertArrayHasKey( 'edit_posts', $result['capabilities'] );
+		$this->assertTrue( $result['capabilities']['edit_posts'] );
+	}
 }

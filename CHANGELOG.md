@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha.5] - 2026-01-26
+
 ### Added
 - **File Error Logging** - Optional file-based MCP error logging:
   - `FileErrorHandler` - Logs errors to `wp-content/mcp-errors.log`
@@ -42,6 +44,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `CreateRole` - Create new custom roles with capabilities
   - `UpdateRole` - Add or remove capabilities from existing roles
   - `DeleteRole` - Delete custom roles (default WordPress roles protected)
+
+### Changed
+- **Code Quality** - SonarQube compliance improvements:
+  - Reduced cognitive complexity across multiple classes
+  - Reduced class size for better maintainability
+  - Fixed schema type mismatches in 4 abilities
+  - Applied PSR-12 formatting fixes (63,796 auto-fixes in 289 files)
+- README restructured to be user-focused (791→237 lines)
+
+### Security
+- **Risk Level: LOW** (0 critical, 0 high, 3 medium mitigated, 4 low)
+- Security posture maintained from alpha.4
+
+### Testing
+- **Test Coverage: 81.15%** (1228 tests, 0 failures)
+- 25 tests marked risky (no assertions) - cosmetic issue
 
 ## [1.0.0-alpha.4] - 2026-01-25
 
@@ -214,7 +232,8 @@ Alpha 3 release focusing on core functionality stabilization and production-read
 - Settings page for configuration
 - Webhook scheduling with Action Scheduler
 
-[Unreleased]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.4...HEAD
+[Unreleased]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.5...HEAD
+[1.0.0-alpha.5]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.4...v1.0.0-alpha.5
 [1.0.0-alpha.4]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.3...v1.0.0-alpha.4
 [1.0.0-alpha.3]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-beta.1...v1.0.0-alpha.3
 [1.0.0-beta.1]: https://github.com/featherart/fa-wpmcp/compare/v1.0-alpha-2...v1.0.0-beta.1
