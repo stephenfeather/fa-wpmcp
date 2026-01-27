@@ -140,7 +140,7 @@ final class UploadMedia extends AbstractAbility
                     'type'        => 'string',
                     'description' => 'The MIME type of the uploaded file.',
                 ),
-                'type'      => array(
+                'media_type' => array(
                     'type'        => 'string',
                     'description' => 'The media type (image, video, audio, document, other).',
                 ),
@@ -443,11 +443,11 @@ final class UploadMedia extends AbstractAbility
         $mime_type = $post ? $post->post_mime_type : '';
 
         return array(
-            'media_id'  => $attachment_id,
-            'url'       => wp_get_attachment_url($attachment_id),
-            'mime_type' => $mime_type,
-            'type'      => $this->getMediaType($mime_type),
-            'filesize'  => $filesize,
+            'media_id'   => $attachment_id,
+            'url'        => wp_get_attachment_url($attachment_id),
+            'mime_type'  => $mime_type,
+            'media_type' => $this->getMediaType($mime_type),
+            'filesize'   => $filesize,
         );
     }
 

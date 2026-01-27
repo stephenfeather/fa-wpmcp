@@ -42,7 +42,7 @@ Testing all fa-wpmcp abilities via REST (curl) and MCP (Claude Code `mcp__wordpr
 
 | # | Ability | REST | MCP | Notes |
 |---|---------|------|-----|-------|
-| 11 | `fa-wpmcp-upload-media` | ✅ | | Requires `url`, `title` |
+| 11 | `fa-wpmcp-upload-media` | ✅ | | Requires `filename` + (`file_data` OR `url`); optional `title`, `alt_text`, `caption`, `description` |
 | 12 | `fa-wpmcp-list-media` | ✅ | | |
 | 13 | `fa-wpmcp-get-media` | ✅ | | Requires `media_id` |
 | 14 | `fa-wpmcp-update-media` | ✅ | | Requires `media_id` |
@@ -254,6 +254,8 @@ Testing all fa-wpmcp abilities via REST (curl) and MCP (Claude Code `mcp__wordpr
 
 4. **list-post-types / get-post-type**: Not exposed as MCP tools - `post-types` category was missing from MCP adapter filter. Added to exposed categories list and fixed `rest_base` type normalization.
 
+5. **upload-media**: Tool failed with TypeError - UploadMedia used `'type' => 'image'` which collided with MCP ToolsHandler's embedded image detection. Renamed to `'media_type'` to avoid collision.
+
 ### Bugs Fixed (2026-01-25)
 
 1. **CreateComment/UpdateComment missing getOperationType()**: Both were missing the override, defaulting to 'read' and bypassing `global_write_enabled` check. Fixed in commit `c599b4b`.
@@ -293,3 +295,71 @@ docker exec wordpress wp --allow-root plugin list
 docker exec wordpress wp --allow-root theme list
 docker exec wordpress wp --allow-root option get OPTION_NAME
 ```
+
+---
+
+## Automated Integration Test Suite
+
+A PHPUnit-based integration test suite tests core CRUD abilities via actual MCP protocol calls.
+
+### Test Infrastructure
+
+| File | Purpose |
+|------|---------|
+| `tests/integration/bootstrap.php` | PHPUnit bootstrap, autoloader setup |
+| `tests/integration/Support/McpClient.php` | MCP protocol client (HTTP, JSON-RPC 2.0) |
+| `tests/integration/Support/McpIntegrationTestCase.php` | Base test case with session management & cleanup |
+
+### Test Coverage (68 tests, 257 assertions)
+
+| Ability Category | Test File | Tests | Key Coverage |
+|------------------|-----------|-------|--------------|
+| **Posts** | `Abilities/Posts/PostsAbilityTest.php` | 10 | CRUD, status filter, lifecycle |
+| **Comments** | `Abilities/Comments/CommentsAbilityTest.php` | 11 | CRUD, moderation status, post filter |
+| **Users** | `Abilities/Users/UsersAbilityTest.php` | 15 | CRUD, roles, profile fields, lookup by ID/username/email |
+| **Terms** | `Abilities/Terms/TermsAbilityTest.php` | 16 | CRUD for categories/tags, hierarchical parent-child, search |
+| **Media** | `Abilities/Media/MediaAbilityTest.php` | 16 | Upload (base64), CRUD, metadata, MIME filtering, pagination |
+
+### Running Integration Tests
+
+```bash
+# Load credentials and run all integration tests
+export $(cat docker/wordpress-data/.mcp-test-credentials | grep -v '^#' | xargs)
+./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php --testsuite integration
+
+# Run specific ability tests
+./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php --filter PostsAbilityTest
+./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php --filter CommentsAbilityTest
+./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php --filter UsersAbilityTest
+./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php --filter TermsAbilityTest
+./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php --filter MediaAbilityTest
+```
+
+### Test Credentials
+
+Credentials are stored in `docker/wordpress-data/.mcp-test-credentials`:
+```
+MCP_TEST_BASE_URL=http://localhost/wp-json/mcp/mcp-adapter-default-server
+MCP_TEST_USERNAME=<username>
+MCP_TEST_PASSWORD=<app-password>
+```
+
+### Key Learnings from Integration Tests
+
+1. **ID Normalization**: MCP responses use type-specific IDs (`post_id`, `comment_id`, `user_id`, `term_id`). The test base class normalizes these to generic `id` field.
+
+2. **Nested Responses**: `GetComment` and `GetTerm` return nested objects (`{comment: {...}}`, `{term: {...}}`). Tests extract the inner object.
+
+3. **UpdateComment is Moderation-Only**: Only supports status changes (`approve`, `hold`, `spam`, `trash`), not content/author updates.
+
+4. **Comment Status Values**: WordPress returns mixed types (`'1'`, `1`, `'approved'`). Tests use `assertContains()` for flexibility.
+
+5. **Terms Require Taxonomy**: All term operations require `taxonomy` parameter. Cleanup stores both `id` and `taxonomy`.
+
+6. **No Trash for Users/Terms**: Deletion is always permanent (no trash support in WordPress for these types).
+
+7. **Global Namespace Constants**: `McpClient.php` constants need backslash prefix (`\MCP_TEST_BASE_URL`) in namespaced classes.
+
+8. **Media Upload via Base64**: `UploadMedia` accepts `file_data` (base64-encoded) for testing without external URLs. Tests use a minimal 1x1 PNG.
+
+9. **Media Type Key Collision**: Avoid using `'type'` key in ability responses - MCP ToolsHandler interprets `type === 'image'` as embedded binary data. Use `'media_type'` instead.
