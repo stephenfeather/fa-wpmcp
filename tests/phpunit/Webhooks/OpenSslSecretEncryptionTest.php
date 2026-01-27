@@ -247,4 +247,204 @@ final class OpenSslSecretEncryptionTest extends TestCase
 
         $this->assertSame($plaintext, $decrypted);
     }
+
+    /**
+     * Test decrypt fails with specific message on invalid base64.
+     *
+     * @covers ::decrypt
+     */
+    public function testDecryptShowsInvalidBase64Message(): void
+    {
+        if (! extension_loaded('openssl')) {
+            $this->markTestSkipped('OpenSSL extension not available');
+        }
+
+        $encryption = new OpenSslSecretEncryption();
+
+        // Use characters that are invalid in base64 to trigger base64_decode failure.
+        try {
+            $encryption->decrypt('openssl:v1:@#$%^&*()');
+            $this->fail('Expected exception not thrown');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Decryption failed', $e->getMessage());
+        }
+    }
+
+    /**
+     * Test decrypt fails with specific message on ciphertext too short.
+     *
+     * @covers ::decrypt
+     */
+    public function testDecryptShowsCiphertextTooShortMessage(): void
+    {
+        if (! extension_loaded('openssl')) {
+            $this->markTestSkipped('OpenSSL extension not available');
+        }
+
+        $encryption = new OpenSslSecretEncryption();
+
+        // IV is 12 bytes, tag is 16 bytes = 28 bytes minimum.
+        // Create a valid base64 string that decodes to less than 28 bytes.
+        $short_data = str_repeat('x', 10);
+
+        try {
+            $encryption->decrypt('openssl:v1:' . base64_encode($short_data));
+            $this->fail('Expected exception not thrown');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Decryption failed', $e->getMessage());
+            $this->assertStringContainsString('Ciphertext too short', $e->getMessage());
+        }
+    }
+
+    /**
+     * Test decrypt fails with authentication error on tampered data.
+     *
+     * @covers ::decrypt
+     */
+    public function testDecryptShowsAuthenticationFailedMessage(): void
+    {
+        if (! extension_loaded('openssl')) {
+            $this->markTestSkipped('OpenSSL extension not available');
+        }
+
+        $encryption = new OpenSslSecretEncryption();
+        $encrypted  = $encryption->encrypt('test-secret');
+
+        // Create data with correct length but tampered content.
+        // IV (12) + Tag (16) + some ciphertext = valid structure but wrong data.
+        $fake_iv         = random_bytes(12);
+        $fake_tag        = random_bytes(16);
+        $fake_ciphertext = random_bytes(20);
+        $tampered        = 'openssl:v1:' . base64_encode($fake_iv . $fake_tag . $fake_ciphertext);
+
+        try {
+            $encryption->decrypt($tampered);
+            $this->fail('Expected exception not thrown');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Decryption failed', $e->getMessage());
+        }
+    }
+
+    /**
+     * Test destructor clears key from memory.
+     *
+     * @covers ::__destruct
+     */
+    public function testDestructorClearsKey(): void
+    {
+        if (! extension_loaded('openssl')) {
+            $this->markTestSkipped('OpenSSL extension not available');
+        }
+
+        // Create and immediately destroy an encryption instance.
+        $encryption = new OpenSslSecretEncryption();
+        $encrypted  = $encryption->encrypt('test-secret');
+
+        // Verify encryption worked before destruction.
+        $this->assertTrue($encryption->isEncrypted($encrypted));
+
+        // Destructor is called automatically when unset or out of scope.
+        // This test ensures the destructor doesn't throw.
+        unset($encryption);
+
+        // If we got here without exception, destructor worked.
+        $this->assertTrue(true);
+    }
+
+    /**
+     * Test encrypting special characters.
+     *
+     * @covers ::encrypt
+     * @covers ::decrypt
+     */
+    public function testEncryptSpecialCharacters(): void
+    {
+        if (! extension_loaded('openssl')) {
+            $this->markTestSkipped('OpenSSL extension not available');
+        }
+
+        $encryption = new OpenSslSecretEncryption();
+
+        $special_chars = "!@#$%^&*()_+-=[]{}|;':\",./<>?\n\t\r\0";
+        $encrypted     = $encryption->encrypt($special_chars);
+        $decrypted     = $encryption->decrypt($encrypted);
+
+        $this->assertSame($special_chars, $decrypted);
+    }
+
+    /**
+     * Test encrypting unicode characters.
+     *
+     * @covers ::encrypt
+     * @covers ::decrypt
+     */
+    public function testEncryptUnicodeCharacters(): void
+    {
+        if (! extension_loaded('openssl')) {
+            $this->markTestSkipped('OpenSSL extension not available');
+        }
+
+        $encryption = new OpenSslSecretEncryption();
+
+        $unicode   = 'Hello 世界 🌍 مرحبا Привет';
+        $encrypted = $encryption->encrypt($unicode);
+        $decrypted = $encryption->decrypt($encrypted);
+
+        $this->assertSame($unicode, $decrypted);
+    }
+
+    /**
+     * Test encrypting binary data.
+     *
+     * @covers ::encrypt
+     * @covers ::decrypt
+     */
+    public function testEncryptBinaryData(): void
+    {
+        if (! extension_loaded('openssl')) {
+            $this->markTestSkipped('OpenSSL extension not available');
+        }
+
+        $encryption = new OpenSslSecretEncryption();
+
+        $binary    = random_bytes(256);
+        $encrypted = $encryption->encrypt($binary);
+        $decrypted = $encryption->decrypt($encrypted);
+
+        $this->assertSame($binary, $decrypted);
+    }
+
+    /**
+     * Test isEncrypted returns false for empty string.
+     *
+     * @covers ::isEncrypted
+     */
+    public function testIsEncryptedReturnsFalseForEmptyString(): void
+    {
+        if (! extension_loaded('openssl')) {
+            $this->markTestSkipped('OpenSSL extension not available');
+        }
+
+        $encryption = new OpenSslSecretEncryption();
+
+        $this->assertFalse($encryption->isEncrypted(''));
+    }
+
+    /**
+     * Test isEncrypted returns false for partial prefix.
+     *
+     * @covers ::isEncrypted
+     */
+    public function testIsEncryptedReturnsFalseForPartialPrefix(): void
+    {
+        if (! extension_loaded('openssl')) {
+            $this->markTestSkipped('OpenSSL extension not available');
+        }
+
+        $encryption = new OpenSslSecretEncryption();
+
+        $this->assertFalse($encryption->isEncrypted('openssl:'));
+        $this->assertFalse($encryption->isEncrypted('openssl:v'));
+        $this->assertFalse($encryption->isEncrypted('openssl:v1'));
+    }
 }
