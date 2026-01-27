@@ -28,6 +28,12 @@ use FAWpmcp\Exceptions\DotenvException;
 final class EnvFileParser
 {
     /**
+     * Export prefix used in .env files.
+     *
+     * @var string
+     */
+    private const EXPORT_PREFIX = 'export ';
+    /**
      * Parse a .env file into key-value pairs.
      *
      * @param string $content File content.
@@ -46,9 +52,9 @@ final class EnvFileParser
                 continue;
             }
 
-            // Remove 'export ' prefix if present.
-            if (str_starts_with($trimmed, 'export ')) {
-                $trimmed = substr($trimmed, 7);
+            // Remove export prefix if present.
+            if (str_starts_with($trimmed, self::EXPORT_PREFIX)) {
+                $trimmed = substr($trimmed, strlen(self::EXPORT_PREFIX));
             }
 
             // Find the first = sign.
@@ -123,25 +129,13 @@ final class EnvFileParser
                 continue;
             }
 
-            // Check for export prefix.
-            $check_line = $trimmed;
-            $has_export = false;
-            if (str_starts_with($check_line, 'export ')) {
-                $check_line = substr($check_line, 7);
-                $has_export = true;
-            }
-
-            // Check if this line defines the key.
-            $equals_pos = strpos($check_line, '=');
-            if ($equals_pos !== false) {
-                $line_key = trim(substr($check_line, 0, $equals_pos));
-                if ($line_key === $key) {
-                    // Replace this line.
-                    $prefix = $has_export ? 'export ' : '';
-                    $lines[$index] = $prefix . $key . '=' . $formatted_value;
-                    $found = true;
-                    break;
-                }
+            // Check if this line defines the key we're looking for.
+            $line_info = $this->parseLineKey($trimmed);
+            if ($line_info !== null && $line_info['key'] === $key) {
+                $prefix = $line_info['has_export'] ? self::EXPORT_PREFIX : '';
+                $lines[$index] = $prefix . $key . '=' . $formatted_value;
+                $found = true;
+                break;
             }
         }
 
@@ -188,20 +182,11 @@ final class EnvFileParser
                 continue;
             }
 
-            // Check for export prefix.
-            $check_line = $trimmed;
-            if (str_starts_with($check_line, 'export ')) {
-                $check_line = substr($check_line, 7);
-            }
-
-            // Check if this line defines the key.
-            $equals_pos = strpos($check_line, '=');
-            if ($equals_pos !== false) {
-                $line_key = trim(substr($check_line, 0, $equals_pos));
-                if ($line_key === $key) {
-                    $deleted = true;
-                    continue; // Skip this line (delete it).
-                }
+            // Check if this line defines the key we're deleting.
+            $line_info = $this->parseLineKey($trimmed);
+            if ($line_info !== null && $line_info['key'] === $key) {
+                $deleted = true;
+                continue; // Skip this line (delete it).
             }
 
             $new_lines[] = $line;
@@ -237,5 +222,32 @@ final class EnvFileParser
     {
         $variables = $this->parse($content);
         return $variables[$key] ?? null;
+    }
+
+    /**
+     * Parse a line to extract the key and export status.
+     *
+     * @param string $line Trimmed line from .env file.
+     * @return array{key: string, has_export: bool}|null Key info or null if not a variable line.
+     */
+    private function parseLineKey(string $line): ?array
+    {
+        $check_line = $line;
+        $has_export = false;
+
+        if (str_starts_with($check_line, self::EXPORT_PREFIX)) {
+            $check_line = substr($check_line, strlen(self::EXPORT_PREFIX));
+            $has_export = true;
+        }
+
+        $equals_pos = strpos($check_line, '=');
+        if ($equals_pos === false) {
+            return null;
+        }
+
+        return array(
+            'key'        => trim(substr($check_line, 0, $equals_pos)),
+            'has_export' => $has_export,
+        );
     }
 }

@@ -25,6 +25,12 @@ use FAWpmcp\Exceptions\DotenvException;
 class EnvFileLocator
 {
     /**
+     * The .env filename with leading slash for path concatenation.
+     *
+     * @var string
+     */
+    private const ENV_FILENAME = '/.env';
+    /**
      * Locate the .env file path.
      *
      * @return string Full path to the .env file.
@@ -51,20 +57,20 @@ class EnvFileLocator
         // .env is at /path/to/project/.env (2 levels up).
         if (str_ends_with($abspath, '/web/wp')) {
             $bedrock_root = dirname($abspath, 2);
-            $env_path = $bedrock_root . '/.env';
+            $env_path = $bedrock_root . self::ENV_FILENAME;
             if (file_exists($env_path)) {
                 return $env_path;
             }
         }
 
         // 3. Standard WordPress fallback (one level up from ABSPATH).
-        $standard_path = dirname($abspath) . '/.env';
+        $standard_path = dirname($abspath) . self::ENV_FILENAME;
         if (file_exists($standard_path)) {
             return $standard_path;
         }
 
         // 4. Try ABSPATH directly (some setups have .env in WordPress root).
-        $wp_root_path = $abspath . '/.env';
+        $wp_root_path = $abspath . self::ENV_FILENAME;
         if (file_exists($wp_root_path)) {
             return $wp_root_path;
         }
@@ -72,7 +78,7 @@ class EnvFileLocator
         throw new DotenvException(
             'Could not locate .env file. Checked: ' . implode(', ', array_filter([
                 $filtered_path ?: null,
-                str_ends_with($abspath, '/web/wp') ? dirname($abspath, 2) . '/.env' : null,
+                str_ends_with($abspath, '/web/wp') ? dirname($abspath, 2) . self::ENV_FILENAME : null,
                 $standard_path,
                 $wp_root_path,
             ]))

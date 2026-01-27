@@ -167,7 +167,7 @@ final class AddWidgetAbility extends AbstractAbility
      */
     public function doExecute(array $input): array
     {
-        global $wp_registered_sidebars, $wp_widget_factory;
+        global $wp_registered_sidebars;
 
         $widget_type = (string) $input['widget_type'];
         $sidebar_id  = (string) $input['sidebar_id'];
@@ -182,21 +182,7 @@ final class AddWidgetAbility extends AbstractAbility
         }
 
         // Verify widget type exists.
-        $widget_class = null;
-        if (isset($wp_widget_factory) && isset($wp_widget_factory->widgets)) {
-            foreach ($wp_widget_factory->widgets as $widget) {
-                if (isset($widget->id_base) && $widget->id_base === $widget_type) {
-                    $widget_class = $widget;
-                    break;
-                }
-            }
-        }
-
-        if (null === $widget_class) {
-            throw new WidgetTypeNotFoundException(
-                sprintf('Widget type "%s" not found.', $widget_type)
-            );
-        }
+        $this->verifyWidgetTypeExists($widget_type);
 
         // Get next available instance number.
         $instance_number = $this->getNextInstanceNumber($widget_type);
@@ -238,6 +224,34 @@ final class AddWidgetAbility extends AbstractAbility
             'widget_id'  => $widget_id,
             'sidebar_id' => $sidebar_id,
             'position'   => $final_position,
+        );
+    }
+
+    /**
+     * Verify that a widget type exists in the widget factory.
+     *
+     * @param string $widget_type Widget type id_base.
+     * @return void
+     * @throws WidgetTypeNotFoundException If widget type does not exist.
+     */
+    private function verifyWidgetTypeExists(string $widget_type): void
+    {
+        global $wp_widget_factory;
+
+        if (!isset($wp_widget_factory) || !isset($wp_widget_factory->widgets)) {
+            throw new WidgetTypeNotFoundException(
+                sprintf('Widget type "%s" not found.', $widget_type)
+            );
+        }
+
+        foreach ($wp_widget_factory->widgets as $widget) {
+            if (isset($widget->id_base) && $widget->id_base === $widget_type) {
+                return; // Found it.
+            }
+        }
+
+        throw new WidgetTypeNotFoundException(
+            sprintf('Widget type "%s" not found.', $widget_type)
         );
     }
 
