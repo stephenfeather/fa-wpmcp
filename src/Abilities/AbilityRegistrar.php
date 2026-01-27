@@ -44,6 +44,7 @@ final class AbilityRegistrar
         self::registerCronAbilities($registry);
         self::registerRoleAbilities($registry);
         self::registerMenuAbilities($registry);
+        self::registerWidgetAbilities($registry);
     }
 
     /**
@@ -280,5 +281,25 @@ final class AbilityRegistrar
         $registry->register(new \FAWpmcp\Abilities\Menu\GetMenuAbility());
         $registry->register(new \FAWpmcp\Abilities\Menu\CreateMenuAbility());
         $registry->register(new \FAWpmcp\Abilities\Menu\DeleteMenuAbility());
+    }
+
+    /**
+     * Register widget abilities.
+     *
+     * @param AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private static function registerWidgetAbilities(AbilityRegistry $registry): void
+    {
+        $registry->register(new \FAWpmcp\Abilities\Widgets\ListSidebarsAbility());
+        $registry->register(new \FAWpmcp\Abilities\Widgets\GetSidebarAbility());
+        $registry->register(new \FAWpmcp\Abilities\Widgets\ListWidgetTypesAbility());
+        $registry->register(new \FAWpmcp\Abilities\Widgets\ListWidgetsAbility());
+        $registry->register(new \FAWpmcp\Abilities\Widgets\GetWidgetAbility());
+        $registry->register(new \FAWpmcp\Abilities\Widgets\AddWidgetAbility());
+        $registry->register(new \FAWpmcp\Abilities\Widgets\UpdateWidgetAbility());
+        $registry->register(new \FAWpmcp\Abilities\Widgets\DeleteWidgetAbility());
+        $registry->register(new \FAWpmcp\Abilities\Widgets\MoveWidgetAbility());
+        $registry->register(new \FAWpmcp\Abilities\Widgets\ResetWidgetsAbility());
     }
 }

@@ -173,6 +173,7 @@ final class Plugin
                     'role',
                     'site',
                     'menu',
+                    'widgets',
                 );
 
                 $fa_abilities = array();
@@ -288,6 +289,10 @@ final class Plugin
             'menu'        => array(
                 'label'       => __('Menus', 'fa-wpmcp'),
                 'description' => __('Abilities for managing WordPress navigation menus', 'fa-wpmcp'),
+            ),
+            'widgets'     => array(
+                'label'       => __('Widgets', 'fa-wpmcp'),
+                'description' => __('Abilities for managing WordPress sidebar widgets', 'fa-wpmcp'),
             ),
         );
 
