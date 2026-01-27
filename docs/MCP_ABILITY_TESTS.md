@@ -194,20 +194,20 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 94 | `fa-wpmcp-list-rewrite-rules` | [UNTESTED] | Lists all rewrite rules |
-| 95 | `fa-wpmcp-flush-rewrite-rules` | [UNTESTED] | Flushes/regenerates rewrite rules |
-| 96 | `fa-wpmcp-get-permalink-structure` | [UNTESTED] | Gets current permalink structure |
-| 97 | `fa-wpmcp-update-permalink-structure` | [UNTESTED] | Updates permalink structure |
+| 94 | `fa-wpmcp-list-rewrite-rules` | [PASS] | Lists all rewrite rules; 0 when plain permalinks, 187+ with pretty |
+| 95 | `fa-wpmcp-flush-rewrite-rules` | [PASS] | Flushes/regenerates rewrite rules |
+| 96 | `fa-wpmcp-get-permalink-structure` | [PASS] | Gets current permalink structure |
+| 97 | `fa-wpmcp-update-permalink-structure` | [PASS] | Updates permalink structure + auto-flush |
 
 ## Core
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 98 | `fa-wpmcp-get-core-version` | [UNTESTED] | Gets WordPress core version info |
-| 99 | `fa-wpmcp-check-core-updates` | [UNTESTED] | Checks for available core updates |
-| 100 | `fa-wpmcp-verify-checksums` | [UNTESTED] | Verifies core file checksums |
-| 101 | `fa-wpmcp-is-installed` | [UNTESTED] | Checks if WordPress is installed |
-| 102 | `fa-wpmcp-update-database` | [UNTESTED] | Updates database schema |
+| 98 | `fa-wpmcp-get-core-version` | [PASS] | Returns WP 6.9, PHP, MySQL versions |
+| 99 | `fa-wpmcp-check-core-updates` | [PASS] | Checks for available core updates |
+| 100 | `fa-wpmcp-verify-checksums` | [PASS] | Verifies 3349 files; reports missing bundled themes |
+| 101 | `fa-wpmcp-is-installed` | [PASS] | Returns installed status, db_ready, has_admin |
+| 102 | `fa-wpmcp-update-database` | [PASS] | Reports db version; supports dry_run |
 
 ---
 
@@ -215,8 +215,7 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 
 **Total**: 102 abilities registered
 **Exposed as MCP Tools**: 100
-**Passed**: 88/91 (97% of tested)
-**Untested**: 9 (4 Rewrite + 5 Core - newly implemented)
+**Passed**: 97/100 (97%)
 **Failed**: 3 (output validation errors: list-taxonomies, delete-user, list-cron-events)
 **Not Exposed**: 2 (list-post-types, get-post-type - missing `mcp.public` annotation)
 
