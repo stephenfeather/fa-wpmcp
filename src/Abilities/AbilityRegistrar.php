@@ -74,11 +74,23 @@ final class AbilityRegistrar
      */
     private static function registerCommentAbilities(AbilityRegistry $registry): void
     {
+        // Core CRUD operations.
         $registry->register(new \FAWpmcp\Abilities\Comments\GetComment());
         $registry->register(new \FAWpmcp\Abilities\Comments\ListComments());
         $registry->register(new \FAWpmcp\Abilities\Comments\CreateComment());
         $registry->register(new \FAWpmcp\Abilities\Comments\UpdateComment());
         $registry->register(new \FAWpmcp\Abilities\Comments\DeleteComment());
+
+        // Comment metadata operations.
+        $registry->register(new \FAWpmcp\Abilities\Comments\GetCommentMeta());
+        $registry->register(new \FAWpmcp\Abilities\Comments\SetCommentMeta());
+        $registry->register(new \FAWpmcp\Abilities\Comments\DeleteCommentMeta());
+        $registry->register(new \FAWpmcp\Abilities\Comments\ListCommentMeta());
+
+        // Comment statistics and bulk operations.
+        $registry->register(new \FAWpmcp\Abilities\Comments\GetCommentCounts());
+        $registry->register(new \FAWpmcp\Abilities\Comments\BulkModerateComments());
+        $registry->register(new \FAWpmcp\Abilities\Comments\GetCommentReplies());
     }
 
     /**
