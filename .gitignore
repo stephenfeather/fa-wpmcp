@@ -8,8 +8,7 @@ composer.lock
 # continuous-claude
 opc/
 thoughts/
-.claude/tsc-cache/
-.claude/cache/agents/
+.claude/
 .tldr/
 
 scratchpad/
