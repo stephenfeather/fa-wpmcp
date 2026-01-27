@@ -82,8 +82,17 @@ The plugin provides comprehensive WordPress content management through the follo
 - **Cron:** Scheduled tasks management
   - List, Get, Schedule, Unschedule, Run cron events
 
-- **Roles:** User role and capability management
+- **Roles & Capabilities:** User role and capability management
   - List, Get, Create, Update, Delete roles
+  - List, Add, Remove capabilities per role
+
+- **Widgets:** Sidebar and widget management
+  - List Sidebars, Get Sidebar, List Widget Types
+  - List, Get, Add, Update, Delete, Move, Reset widgets
+
+- **Dotenv:** Environment variable management (.env files)
+  - List, Get, Set, Delete environment variables
+  - Secure access policy with sensitive key filtering
 
 ### Permission System
 
@@ -187,18 +196,21 @@ For comprehensive development documentation including adding new abilities, test
 ### Completed
 
 - Core framework, permissions, rate limiting, logging, webhooks
-- Posts, Comments, Media, Taxonomies, Users, Settings abilities
-- Plugin, Theme, Privacy, Cron, Roles abilities
+- Posts, Comments, Media, Taxonomies, Users, Settings abilities (full CRUD)
+- Plugin, Theme, Privacy, Cron, Roles, Menu abilities
+- Widget abilities (sidebars, widget types, add/update/delete/move/reset widgets)
+- Capability management abilities (list-caps, add-cap, remove-cap)
+- Dotenv abilities (list, get, set, delete environment variables)
 - MCP Server integration with OAuth and Application Password support
+- Delete operations for posts, media, taxonomies, comments, users
+- Activity logging with PII redaction and correlation IDs
 
 ### Planned
 
-- Delete operations for posts, media, taxonomies
-- Bulk operations
-- Menu and widget abilities
+- Bulk operations (batch create/update/delete)
 - Multisite support
 - GraphQL endpoint
-- Prometheus observability
+- Prometheus observability metrics
 
 ## Security
 
@@ -235,4 +247,4 @@ Email: stephen@feather.us
 
 ---
 
-**Version:** 1.0.0 | **74 Abilities Implemented** | Posts, Comments, Media, Taxonomy, User, Settings, Plugin, Theme, Privacy, Cache, Maintenance, Transients, PostTypes, Cron, and Role management complete
+**Version:** 1.0.0 | **93 Abilities Implemented** | Posts, Comments, Media, Taxonomy, User, Settings, Plugin, Theme, Privacy, Cache, Maintenance, Transients, PostTypes, Cron, Role, Menu, Widget, Capabilities, and Dotenv management complete

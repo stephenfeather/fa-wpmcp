@@ -45,6 +45,7 @@ final class AbilityRegistrar
         self::registerRoleAbilities($registry);
         self::registerMenuAbilities($registry);
         self::registerWidgetAbilities($registry);
+        self::registerDotenvAbilities($registry);
     }
 
     /**
@@ -267,6 +268,9 @@ final class AbilityRegistrar
         $registry->register(new \FAWpmcp\Abilities\Role\CreateRoleAbility());
         $registry->register(new \FAWpmcp\Abilities\Role\UpdateRoleAbility());
         $registry->register(new \FAWpmcp\Abilities\Role\DeleteRoleAbility());
+        $registry->register(new \FAWpmcp\Abilities\Role\ListCapsAbility());
+        $registry->register(new \FAWpmcp\Abilities\Role\AddCapAbility());
+        $registry->register(new \FAWpmcp\Abilities\Role\RemoveCapAbility());
     }
 
     /**
@@ -301,5 +305,19 @@ final class AbilityRegistrar
         $registry->register(new \FAWpmcp\Abilities\Widgets\DeleteWidgetAbility());
         $registry->register(new \FAWpmcp\Abilities\Widgets\MoveWidgetAbility());
         $registry->register(new \FAWpmcp\Abilities\Widgets\ResetWidgetsAbility());
+    }
+
+    /**
+     * Register dotenv abilities.
+     *
+     * @param AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private static function registerDotenvAbilities(AbilityRegistry $registry): void
+    {
+        $registry->register(new \FAWpmcp\Abilities\Dotenv\ListEnvVarsAbility());
+        $registry->register(new \FAWpmcp\Abilities\Dotenv\GetEnvVarAbility());
+        $registry->register(new \FAWpmcp\Abilities\Dotenv\SetEnvVarAbility());
+        $registry->register(new \FAWpmcp\Abilities\Dotenv\DeleteEnvVarAbility());
     }
 }

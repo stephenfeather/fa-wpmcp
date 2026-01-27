@@ -2,7 +2,7 @@
 
 Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 
-**Test Date**: 2026-01-25 (Final)
+**Test Date**: 2026-01-26
 **Server**: localhost (Docker)
 
 ---
@@ -15,94 +15,206 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 | 2 | `fa-wpmcp-list-posts` | [PASS] | |
 | 3 | `fa-wpmcp-get-post` | [PASS] | Requires `post_id` |
 | 4 | `fa-wpmcp-update-post` | [PASS] | Requires `post_id` |
+| 5 | `fa-wpmcp-delete-post` | [PASS] | Requires `post_id`; moves to trash |
 
 ## Comments
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 5 | `fa-wpmcp-create-comment` | [PASS] | Requires `post_id`, `author`, `email`, `content` |
-| 6 | `fa-wpmcp-list-comments` | [PASS] | |
-| 7 | `fa-wpmcp-get-comment` | [PASS] | Requires `comment_id` |
-| 8 | `fa-wpmcp-update-comment` | [PASS] | Requires `comment_id`, `status` (approve/hold/spam/trash) |
+| 6 | `fa-wpmcp-create-comment` | [PASS] | Requires `post_id`, `author`, `email`, `content` |
+| 7 | `fa-wpmcp-list-comments` | [PASS] | |
+| 8 | `fa-wpmcp-get-comment` | [PASS] | Requires `comment_id` |
+| 9 | `fa-wpmcp-update-comment` | [PASS] | Requires `comment_id`, `status` (approve/hold/spam/trash) |
+| 10 | `fa-wpmcp-delete-comment` | [PASS] | Requires `comment_id`; moves to trash |
 
 ## Media
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 9 | `fa-wpmcp-upload-media` | [PASS] | Requires `url`, `title` |
-| 10 | `fa-wpmcp-list-media` | [PASS] | |
-| 11 | `fa-wpmcp-get-media` | [PASS] | Requires `media_id` |
-| 12 | `fa-wpmcp-update-media` | [PASS] | Requires `media_id` |
+| 11 | `fa-wpmcp-upload-media` | [PASS] | Requires `url`, `title` |
+| 12 | `fa-wpmcp-list-media` | [PASS] | |
+| 13 | `fa-wpmcp-get-media` | [PASS] | Requires `media_id` |
+| 14 | `fa-wpmcp-update-media` | [PASS] | Requires `media_id` |
+| 15 | `fa-wpmcp-delete-media` | [PASS] | Requires `media_id`; moves to trash |
 
 ## Terms (Taxonomies)
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 13 | `fa-wpmcp-create-term` | [PASS] | Requires `taxonomy`, `name` |
-| 14 | `fa-wpmcp-list-terms` | [PASS] | Requires `taxonomy` |
-| 15 | `fa-wpmcp-get-term` | [PASS] | Requires `term_id`, `taxonomy` |
-| 16 | `fa-wpmcp-update-term` | [PASS] | Requires `term_id`, `taxonomy` |
+| 16 | `fa-wpmcp-create-term` | [PASS] | Requires `taxonomy`, `name` |
+| 17 | `fa-wpmcp-list-terms` | [PASS] | Requires `taxonomy` |
+| 18 | `fa-wpmcp-get-term` | [PASS] | Requires `term_id`, `taxonomy` |
+| 19 | `fa-wpmcp-update-term` | [PASS] | Requires `term_id`, `taxonomy` |
+| 20 | `fa-wpmcp-delete-term` | [PASS] | Requires `term_id`, `taxonomy` |
+| 21 | `fa-wpmcp-list-taxonomies` | [FAIL] | Output validation: `rest_base` not string |
+| 22 | `fa-wpmcp-get-taxonomy` | [PASS] | Requires `taxonomy` |
+
+## Post Types
+
+| # | Ability | Status | Notes |
+|---|---------|--------|-------|
+| 23 | `fa-wpmcp-list-post-types` | [N/A] | Not exposed as MCP tool (missing `mcp.public`) |
+| 24 | `fa-wpmcp-get-post-type` | [N/A] | Not exposed as MCP tool (missing `mcp.public`) |
 
 ## Users
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 17 | `fa-wpmcp-create-user` | [PASS] | Requires `username`, `email`, `password` |
-| 18 | `fa-wpmcp-list-users` | [PASS] | Fixed: count_users() returns array not object |
-| 19 | `fa-wpmcp-get-user` | [PASS] | Requires `user_id` |
-| 20 | `fa-wpmcp-update-user` | [PASS] | Requires `user_id` |
+| 25 | `fa-wpmcp-create-user` | [PASS] | Requires `username`, `email`, `password` |
+| 26 | `fa-wpmcp-list-users` | [PASS] | Fixed: count_users() returns array not object |
+| 27 | `fa-wpmcp-get-user` | [PASS] | Requires `user_id` |
+| 28 | `fa-wpmcp-update-user` | [PASS] | Requires `user_id` |
+| 29 | `fa-wpmcp-delete-user` | [FAIL] | Output validation: `reassigned` not integer |
 
 ## Options (Settings)
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 21 | `fa-wpmcp-update-option` | [PASS] | Requires `option_name`, `option_value` |
-| 22 | `fa-wpmcp-list-options` | [PASS] | |
-| 23 | `fa-wpmcp-get-option` | [PASS] | Requires `option_name` |
-| 24 | `fa-wpmcp-delete-option` | [PASS] | Requires `option_name` |
+| 30 | `fa-wpmcp-update-option` | [PASS] | Requires `option_name`, `option_value` |
+| 31 | `fa-wpmcp-list-options` | [PASS] | |
+| 32 | `fa-wpmcp-get-option` | [PASS] | Requires `option_name` |
+| 33 | `fa-wpmcp-delete-option` | [PASS] | Requires `option_name` |
 
 ## Plugins
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 25 | `fa-wpmcp-list-plugins` | [PASS] | |
-| 26 | `fa-wpmcp-get-plugin` | [PASS] | Requires `plugin` (full path e.g. `fa-wpmcp/fa-wpmcp.php`) |
-| 27 | `fa-wpmcp-install-plugin` | [PASS] | Requires `slug` |
-| 28 | `fa-wpmcp-activate-plugin` | [PASS] | Requires `plugin` |
-| 29 | `fa-wpmcp-deactivate-plugin` | [PASS] | Requires `plugin` |
-| 30 | `fa-wpmcp-update-plugin` | [PASS] | Requires `plugin` |
-| 31 | `fa-wpmcp-delete-plugin` | [PASS] | Requires `plugin` |
+| 34 | `fa-wpmcp-list-plugins` | [PASS] | |
+| 35 | `fa-wpmcp-get-plugin` | [PASS] | Requires `plugin` (full path e.g. `fa-wpmcp/fa-wpmcp.php`) |
+| 36 | `fa-wpmcp-install-plugin` | [PASS] | Requires `slug` |
+| 37 | `fa-wpmcp-activate-plugin` | [PASS] | Requires `plugin` |
+| 38 | `fa-wpmcp-deactivate-plugin` | [PASS] | Requires `plugin` |
+| 39 | `fa-wpmcp-update-plugin` | [PASS] | Requires `plugin` |
+| 40 | `fa-wpmcp-delete-plugin` | [PASS] | Requires `plugin` |
 
 ## Themes
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 32 | `fa-wpmcp-list-themes` | [PASS] | |
-| 33 | `fa-wpmcp-get-theme` | [PASS] | Requires `stylesheet` |
-| 34 | `fa-wpmcp-status-theme` | [PASS] | Requires `stylesheet` |
-| 35 | `fa-wpmcp-install-theme` | [PASS] | Requires `slug` |
-| 36 | `fa-wpmcp-activate-theme` | [PASS]* | Requires `stylesheet`; *see warning below |
-| 37 | `fa-wpmcp-update-theme` | [PASS] | Requires `stylesheet` |
-| 38 | `fa-wpmcp-delete-theme` | [PASS] | Requires `stylesheet` |
+| 41 | `fa-wpmcp-list-themes` | [PASS] | |
+| 42 | `fa-wpmcp-get-theme` | [PASS] | Requires `stylesheet` |
+| 43 | `fa-wpmcp-status-theme` | [PASS] | Requires `stylesheet` |
+| 44 | `fa-wpmcp-install-theme` | [PASS] | Requires `slug` |
+| 45 | `fa-wpmcp-activate-theme` | [PASS]* | Requires `stylesheet`; *see warning below |
+| 46 | `fa-wpmcp-update-theme` | [PASS] | Requires `stylesheet` |
+| 47 | `fa-wpmcp-delete-theme` | [PASS] | Requires `stylesheet` |
 
 ## Privacy (GDPR)
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 39 | `fa-wpmcp-create-export-request` | [PASS] | Requires `email` |
-| 40 | `fa-wpmcp-create-erasure-request` | [PASS] | Requires `email` |
-| 41 | `fa-wpmcp-list-privacy-requests` | [PASS] | |
-| 42 | `fa-wpmcp-get-privacy-request` | [PASS] | Requires `request_id` |
+| 48 | `fa-wpmcp-create-export-request` | [PASS] | Requires `email` |
+| 49 | `fa-wpmcp-create-erasure-request` | [PASS] | Requires `email` |
+| 50 | `fa-wpmcp-list-privacy-requests` | [PASS] | |
+| 51 | `fa-wpmcp-get-privacy-request` | [PASS] | Requires `request_id` |
+
+## Cache
+
+| # | Ability | Status | Notes |
+|---|---------|--------|-------|
+| 52 | `fa-wpmcp-get-cache-type` | [PASS] | Returns cache type (e.g., redis), persistent flag |
+| 53 | `fa-wpmcp-get-cache-status` | [PASS] | Returns supported features and groups |
+| 54 | `fa-wpmcp-flush-cache` | [PASS] | Flushes entire object cache |
+
+## Maintenance
+
+| # | Ability | Status | Notes |
+|---|---------|--------|-------|
+| 55 | `fa-wpmcp-get-maintenance-mode-status` | [PASS] | Returns active status and timestamp |
+| 56 | `fa-wpmcp-activate-maintenance-mode` | [PASS] | Optional `expire_seconds` (default 600, max 3600) |
+| 57 | `fa-wpmcp-deactivate-maintenance-mode` | [PASS] | Removes .maintenance file |
+
+## Transients
+
+| # | Ability | Status | Notes |
+|---|---------|--------|-------|
+| 58 | `fa-wpmcp-set-transient` | [PASS] | Requires `key`, `value`, `expiration` |
+| 59 | `fa-wpmcp-get-transient` | [PASS] | Requires `key` |
+| 60 | `fa-wpmcp-list-transients` | [PASS] | Returns 0 when Redis is active (transients in Redis) |
+| 61 | `fa-wpmcp-delete-transient` | [PASS] | Requires `key` |
+
+## Cron
+
+| # | Ability | Status | Notes |
+|---|---------|--------|-------|
+| 62 | `fa-wpmcp-list-cron-events` | [FAIL] | Output validation: `schedule` not string for some events |
+| 63 | `fa-wpmcp-get-cron-event` | [PASS] | Requires `hook` |
+| 64 | `fa-wpmcp-schedule-cron-event` | [PASS] | Requires `hook`, `timestamp`, `recurrence` |
+| 65 | `fa-wpmcp-unschedule-cron-event` | [PASS] | Requires `hook` |
+| 66 | `fa-wpmcp-run-cron-event` | [PASS] | Requires `hook` |
+| 67 | `fa-wpmcp-list-cron-schedules` | [PASS] | Returns available recurrence schedules |
+
+## Roles
+
+| # | Ability | Status | Notes |
+|---|---------|--------|-------|
+| 68 | `fa-wpmcp-list-roles` | [PASS] | Returns all roles with capabilities |
+| 69 | `fa-wpmcp-get-role` | [PASS] | Requires `role` |
+| 70 | `fa-wpmcp-create-role` | [PASS] | Requires `role`, `display_name`, `capabilities` |
+| 71 | `fa-wpmcp-update-role` | [PASS] | Requires `role`, optional `add_capabilities`, `remove_capabilities` |
+| 72 | `fa-wpmcp-delete-role` | [PASS] | Requires `role` |
+| 87 | `fa-wpmcp-list-caps` | [PASS] | Requires `role`; returns capability names as array |
+| 88 | `fa-wpmcp-add-cap` | [PASS] | Requires `role`, `capabilities` array |
+| 89 | `fa-wpmcp-remove-cap` | [PASS] | Requires `role`, `capabilities` array |
+
+## Menus
+
+| # | Ability | Status | Notes |
+|---|---------|--------|-------|
+| 73 | `fa-wpmcp-list-menus` | [PASS] | Returns menus with locations and item counts |
+| 74 | `fa-wpmcp-create-menu` | [PASS] | Requires `name`, optional `location` |
+| 75 | `fa-wpmcp-get-menu` | [PASS] | Requires `menu` (ID or slug) |
+| 76 | `fa-wpmcp-delete-menu` | [PASS] | Requires `menu` (ID or slug) |
+
+## Widgets
+
+| # | Ability | Status | Notes |
+|---|---------|--------|-------|
+| 77 | `fa-wpmcp-list-sidebars` | [PASS] | Returns all registered sidebars |
+| 78 | `fa-wpmcp-get-sidebar` | [PASS] | Requires `sidebar_id` |
+| 79 | `fa-wpmcp-list-widget-types` | [PASS] | Returns available widget types (33 on test site) |
+| 80 | `fa-wpmcp-list-widgets` | [PASS] | Optional `sidebar_id` filter |
+| 81 | `fa-wpmcp-get-widget` | [PASS] | Requires `widget_id` (format: {id_base}-{instance}) |
+| 82 | `fa-wpmcp-add-widget` | [PASS] | Requires `id_base`, `sidebar_id`; optional `settings` |
+| 83 | `fa-wpmcp-update-widget` | [PASS] | Requires `widget_id`; optional `settings` |
+| 84 | `fa-wpmcp-delete-widget` | [PASS] | Requires `widget_id`; destructive |
+| 85 | `fa-wpmcp-move-widget` | [PASS] | Requires `widget_id`, `sidebar_id`; optional `position` |
+| 86 | `fa-wpmcp-reset-widgets` | [PASS] | Requires `sidebar_id`; destructive - removes all widgets from sidebar |
+
+## Dotenv
+
+| # | Ability | Status | Notes |
+|---|---------|--------|-------|
+| 90 | `fa-wpmcp-list-env-vars` | [PASS] | Lists environment variables from .env file |
+| 91 | `fa-wpmcp-get-env-var` | [PASS] | Requires `key`; returns variable value |
+| 92 | `fa-wpmcp-set-env-var` | [PASS] | Requires `key`, `value`; creates or updates variable |
+| 93 | `fa-wpmcp-delete-env-var` | [PASS] | Requires `key`; removes variable from .env |
 
 ---
 
 ## Summary
 
-**Passed**: 42/42 (100%)
+**Total**: 93 abilities registered
+**Exposed as MCP Tools**: 91
+**Passed**: 88/91 (97%)
+**Failed**: 3 (output validation errors: list-taxonomies, delete-user, list-cron-events)
+**Not Exposed**: 2 (list-post-types, get-post-type - missing `mcp.public` annotation)
 
 ### Warnings
 
 1. **activate-theme**: Activating a theme that lacks `add_filter('wp_is_application_passwords_available', '__return_true')` in its functions.php will break MCP authentication for subsequent requests.
+
+2. **activate-maintenance-mode**: Creates `.maintenance` file in ABSPATH. If this locks you out, remove it manually: `docker exec wordpress rm -f /var/www/html/web/wp/.maintenance`
+
+### Known Issues (2026-01-26)
+
+1. **list-taxonomies**: Output validation fails - `rest_base` is sometimes not a string (likely `false` for some taxonomies)
+
+2. **delete-user**: Output validation fails - `reassigned` returns `null` instead of integer when no reassignment target
+
+3. **list-cron-events**: Output validation fails - `schedule` is `false` for single (non-recurring) events
+
+4. **list-post-types / get-post-type**: Not exposed as MCP tools - abilities exist but lack `mcp.public` annotation
 
 ### Bugs Fixed (2026-01-25)
 
