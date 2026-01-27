@@ -14,6 +14,7 @@ This document outlines the WooCommerce abilities planned for Version 2 of the FA
 **All WooCommerce abilities MUST verify that WooCommerce is installed and active before execution.**
 
 Implementation pattern:
+
 ```php
 public function execute(array $args): ExecutionResult
 {
