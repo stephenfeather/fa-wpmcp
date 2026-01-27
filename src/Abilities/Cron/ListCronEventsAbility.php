@@ -99,8 +99,8 @@ final class ListCronEventsAbility extends AbstractAbility
                             'hook'      => array( 'type' => 'string' ),
                             'timestamp' => array( 'type' => 'integer' ),
                             'schedule'  => array(
-                                'type' => array( 'string', 'boolean' ),
-                                'description' => 'Recurrence schedule name or false for single events.',
+                                'type' => 'string',
+                                'description' => 'Recurrence schedule name, or empty string for single (non-recurring) events.',
                             ),
                             'args'      => array( 'type' => 'array' ),
                         ),
@@ -152,10 +152,11 @@ final class ListCronEventsAbility extends AbstractAbility
                 }
 
                 foreach ($events_data as $event_data) {
+                    $schedule = $event_data['schedule'] ?? false;
                     $events[] = array(
                         'hook'      => $hook,
                         'timestamp' => (int) $timestamp,
-                        'schedule'  => $event_data['schedule'] ?? false,
+                        'schedule'  => is_string($schedule) ? $schedule : '',
                         'args'      => $event_data['args'] ?? array(),
                     );
                 }

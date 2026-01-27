@@ -2,7 +2,7 @@
 
 Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 
-**Test Date**: 2026-01-26
+**Test Date**: 2026-01-27
 **Server**: localhost (Docker)
 
 ---
@@ -46,7 +46,7 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 | 18 | `fa-wpmcp-get-term` | [PASS] | Requires `term_id`, `taxonomy` |
 | 19 | `fa-wpmcp-update-term` | [PASS] | Requires `term_id`, `taxonomy` |
 | 20 | `fa-wpmcp-delete-term` | [PASS] | Requires `term_id`, `taxonomy` |
-| 21 | `fa-wpmcp-list-taxonomies` | [FAIL] | Output validation: `rest_base` not string |
+| 21 | `fa-wpmcp-list-taxonomies` | [PASS] | Fixed: `rest_base` now returns empty string instead of false |
 | 22 | `fa-wpmcp-get-taxonomy` | [PASS] | Requires `taxonomy` |
 
 ## Post Types
@@ -64,7 +64,7 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 | 26 | `fa-wpmcp-list-users` | [PASS] | Fixed: count_users() returns array not object |
 | 27 | `fa-wpmcp-get-user` | [PASS] | Requires `user_id` |
 | 28 | `fa-wpmcp-update-user` | [PASS] | Requires `user_id` |
-| 29 | `fa-wpmcp-delete-user` | [FAIL] | Output validation: `reassigned` not integer |
+| 29 | `fa-wpmcp-delete-user` | [PASS] | Fixed: `reassigned` returns 0 instead of null |
 
 ## Options (Settings)
 
@@ -137,7 +137,7 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 62 | `fa-wpmcp-list-cron-events` | [FAIL] | Output validation: `schedule` not string for some events |
+| 62 | `fa-wpmcp-list-cron-events` | [PASS] | Fixed: `schedule` returns empty string for single events |
 | 63 | `fa-wpmcp-get-cron-event` | [PASS] | Requires `hook` |
 | 64 | `fa-wpmcp-schedule-cron-event` | [PASS] | Requires `hook`, `timestamp`, `recurrence` |
 | 65 | `fa-wpmcp-unschedule-cron-event` | [PASS] | Requires `hook` |
@@ -215,8 +215,8 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 
 **Total**: 102 abilities registered
 **Exposed as MCP Tools**: 100
-**Passed**: 97/100 (97%)
-**Failed**: 3 (output validation errors: list-taxonomies, delete-user, list-cron-events)
+**Passed**: 100/100 (100%)
+**Failed**: 0
 **Not Exposed**: 2 (list-post-types, get-post-type - missing `mcp.public` annotation)
 
 ### Warnings
@@ -225,15 +225,17 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 
 2. **activate-maintenance-mode**: Creates `.maintenance` file in ABSPATH. If this locks you out, remove it manually: `docker exec wordpress rm -f /var/www/html/web/wp/.maintenance`
 
-### Known Issues (2026-01-26)
+### Known Issues (2026-01-27)
 
-1. **list-taxonomies**: Output validation fails - `rest_base` is sometimes not a string (likely `false` for some taxonomies)
+1. **list-post-types / get-post-type**: Not exposed as MCP tools - abilities exist but lack `mcp.public` annotation
 
-2. **delete-user**: Output validation fails - `reassigned` returns `null` instead of integer when no reassignment target
+### Bugs Fixed (2026-01-27)
 
-3. **list-cron-events**: Output validation fails - `schedule` is `false` for single (non-recurring) events
+1. **list-taxonomies**: Output validation failed - `rest_base` returned `false` for some taxonomies. Fixed to return empty string.
 
-4. **list-post-types / get-post-type**: Not exposed as MCP tools - abilities exist but lack `mcp.public` annotation
+2. **delete-user**: Output validation failed - `reassigned` returned `null` when no reassignment. Fixed to return `0`.
+
+3. **list-cron-events**: Output validation failed - `schedule` was `false` for single events. Fixed to return empty string.
 
 ### Bugs Fixed (2026-01-25)
 

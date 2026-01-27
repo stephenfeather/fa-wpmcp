@@ -117,7 +117,7 @@ final class DeleteUserTest extends BrainMonkeyTestCase
         $result  = $ability->doExecute(array( 'user_id' => 42 ));
 
         $this->assertEquals(42, $result['user_id']);
-        $this->assertNull($result['reassigned']);
+        $this->assertEquals(0, $result['reassigned']);
         $this->assertEquals('deleted', $result['action']);
         $this->assertTrue($result['success']);
     }

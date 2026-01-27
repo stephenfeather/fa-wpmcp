@@ -119,8 +119,8 @@ final class ListTaxonomies extends AbstractAbility
                             'show_ui'      => array( 'type' => 'boolean' ),
                             'show_in_rest' => array( 'type' => 'boolean' ),
                             'rest_base'    => array(
-                                'type' => array( 'string', 'boolean' ),
-                                'description' => 'REST API base or false if disabled.',
+                                'type' => 'string',
+                                'description' => 'REST API base, or empty string if disabled.',
                             ),
                             'object_type'  => array(
                                 'type'  => 'array',
@@ -226,7 +226,7 @@ final class ListTaxonomies extends AbstractAbility
             'hierarchical' => (bool) $taxonomy->hierarchical,
             'show_ui'      => (bool) $taxonomy->show_ui,
             'show_in_rest' => (bool) $taxonomy->show_in_rest,
-            'rest_base'    => $taxonomy->rest_base,
+            'rest_base'    => is_string($taxonomy->rest_base) ? $taxonomy->rest_base : '',
             'object_type'  => (array) $taxonomy->object_type,
         );
     }

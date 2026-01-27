@@ -104,8 +104,8 @@ final class DeleteUser extends AbstractAbility
                     'description' => 'The ID of the deleted user.',
                 ),
                 'reassigned' => array(
-                    'type'        => array( 'integer', 'null' ),
-                    'description' => 'User ID that posts were reassigned to, or null if posts were deleted.',
+                    'type'        => 'integer',
+                    'description' => 'User ID that posts were reassigned to, or 0 if posts were deleted.',
                 ),
                 'action'     => array(
                     'type'        => 'string',
@@ -203,7 +203,7 @@ final class DeleteUser extends AbstractAbility
 
         return array(
             'user_id'    => $user_id,
-            'reassigned' => $reassign,
+            'reassigned' => $reassign ?? 0,
             'action'     => 'deleted',
             'success'    => true,
         );
