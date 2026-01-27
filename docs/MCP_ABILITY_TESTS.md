@@ -190,13 +190,33 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 | 92 | `fa-wpmcp-set-env-var` | [PASS] | Requires `key`, `value`; creates or updates variable |
 | 93 | `fa-wpmcp-delete-env-var` | [PASS] | Requires `key`; removes variable from .env |
 
+## Rewrite
+
+| # | Ability | Status | Notes |
+|---|---------|--------|-------|
+| 94 | `fa-wpmcp-list-rewrite-rules` | [UNTESTED] | Lists all rewrite rules |
+| 95 | `fa-wpmcp-flush-rewrite-rules` | [UNTESTED] | Flushes/regenerates rewrite rules |
+| 96 | `fa-wpmcp-get-permalink-structure` | [UNTESTED] | Gets current permalink structure |
+| 97 | `fa-wpmcp-update-permalink-structure` | [UNTESTED] | Updates permalink structure |
+
+## Core
+
+| # | Ability | Status | Notes |
+|---|---------|--------|-------|
+| 98 | `fa-wpmcp-get-core-version` | [UNTESTED] | Gets WordPress core version info |
+| 99 | `fa-wpmcp-check-core-updates` | [UNTESTED] | Checks for available core updates |
+| 100 | `fa-wpmcp-verify-checksums` | [UNTESTED] | Verifies core file checksums |
+| 101 | `fa-wpmcp-is-installed` | [UNTESTED] | Checks if WordPress is installed |
+| 102 | `fa-wpmcp-update-database` | [UNTESTED] | Updates database schema |
+
 ---
 
 ## Summary
 
-**Total**: 93 abilities registered
-**Exposed as MCP Tools**: 91
-**Passed**: 88/91 (97%)
+**Total**: 102 abilities registered
+**Exposed as MCP Tools**: 100
+**Passed**: 88/91 (97% of tested)
+**Untested**: 9 (4 Rewrite + 5 Core - newly implemented)
 **Failed**: 3 (output validation errors: list-taxonomies, delete-user, list-cron-events)
 **Not Exposed**: 2 (list-post-types, get-post-type - missing `mcp.public` annotation)
 

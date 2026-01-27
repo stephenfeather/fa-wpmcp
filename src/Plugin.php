@@ -174,6 +174,9 @@ final class Plugin
                     'site',
                     'menu',
                     'widgets',
+                    'dotenv',
+                    'core',
+                    'rewrite',
                 );
 
                 $fa_abilities = array();
@@ -293,6 +296,18 @@ final class Plugin
             'widgets'     => array(
                 'label'       => __('Widgets', 'fa-wpmcp'),
                 'description' => __('Abilities for managing WordPress sidebar widgets', 'fa-wpmcp'),
+            ),
+            'dotenv'      => array(
+                'label'       => __('Environment', 'fa-wpmcp'),
+                'description' => __('Abilities for managing Bedrock .env environment variables', 'fa-wpmcp'),
+            ),
+            'core'        => array(
+                'label'       => __('Core', 'fa-wpmcp'),
+                'description' => __('Abilities for WordPress core version, updates, and database management', 'fa-wpmcp'),
+            ),
+            'rewrite'     => array(
+                'label'       => __('Rewrite Rules', 'fa-wpmcp'),
+                'description' => __('Abilities for managing WordPress rewrite rules and permalink structure', 'fa-wpmcp'),
             ),
         );
 

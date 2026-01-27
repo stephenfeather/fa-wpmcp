@@ -46,6 +46,8 @@ final class AbilityRegistrar
         self::registerMenuAbilities($registry);
         self::registerWidgetAbilities($registry);
         self::registerDotenvAbilities($registry);
+        self::registerCoreAbilities($registry);
+        self::registerRewriteAbilities($registry);
     }
 
     /**
@@ -319,5 +321,34 @@ final class AbilityRegistrar
         $registry->register(new \FAWpmcp\Abilities\Dotenv\GetEnvVarAbility());
         $registry->register(new \FAWpmcp\Abilities\Dotenv\SetEnvVarAbility());
         $registry->register(new \FAWpmcp\Abilities\Dotenv\DeleteEnvVarAbility());
+    }
+
+    /**
+     * Register core abilities.
+     *
+     * @param AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private static function registerCoreAbilities(AbilityRegistry $registry): void
+    {
+        $registry->register(new \FAWpmcp\Abilities\Core\GetCoreVersionAbility());
+        $registry->register(new \FAWpmcp\Abilities\Core\CheckCoreUpdatesAbility());
+        $registry->register(new \FAWpmcp\Abilities\Core\VerifyChecksumsAbility());
+        $registry->register(new \FAWpmcp\Abilities\Core\IsInstalledAbility());
+        $registry->register(new \FAWpmcp\Abilities\Core\UpdateDatabaseAbility());
+    }
+
+    /**
+     * Register rewrite abilities.
+     *
+     * @param AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private static function registerRewriteAbilities(AbilityRegistry $registry): void
+    {
+        $registry->register(new \FAWpmcp\Abilities\Rewrite\ListRewriteRulesAbility());
+        $registry->register(new \FAWpmcp\Abilities\Rewrite\FlushRewriteRulesAbility());
+        $registry->register(new \FAWpmcp\Abilities\Rewrite\GetPermalinkStructureAbility());
+        $registry->register(new \FAWpmcp\Abilities\Rewrite\UpdatePermalinkStructureAbility());
     }
 }
