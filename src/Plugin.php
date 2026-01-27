@@ -178,6 +178,7 @@ final class Plugin
                     'dotenv',
                     'core',
                     'rewrite',
+                    'config',
                 );
 
                 $fa_abilities = array();
@@ -309,6 +310,10 @@ final class Plugin
             'rewrite'     => array(
                 'label'       => __('Rewrite Rules', 'fa-wpmcp'),
                 'description' => __('Abilities for managing WordPress rewrite rules and permalink structure', 'fa-wpmcp'),
+            ),
+            'config'      => array(
+                'label'       => __('Configuration', 'fa-wpmcp'),
+                'description' => __('Abilities for inspecting WordPress configuration constants', 'fa-wpmcp'),
             ),
         );
 

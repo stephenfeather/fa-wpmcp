@@ -48,6 +48,7 @@ final class AbilityRegistrar
         self::registerDotenvAbilities($registry);
         self::registerCoreAbilities($registry);
         self::registerRewriteAbilities($registry);
+        self::registerConfigAbilities($registry);
     }
 
     /**
@@ -350,5 +351,17 @@ final class AbilityRegistrar
         $registry->register(new \FAWpmcp\Abilities\Rewrite\FlushRewriteRulesAbility());
         $registry->register(new \FAWpmcp\Abilities\Rewrite\GetPermalinkStructureAbility());
         $registry->register(new \FAWpmcp\Abilities\Rewrite\UpdatePermalinkStructureAbility());
+    }
+
+    /**
+     * Register config abilities.
+     *
+     * @param AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private static function registerConfigAbilities(AbilityRegistry $registry): void
+    {
+        $registry->register(new \FAWpmcp\Abilities\Config\ListConfigConstantsAbility());
+        $registry->register(new \FAWpmcp\Abilities\Config\GetConfigConstantAbility());
     }
 }
