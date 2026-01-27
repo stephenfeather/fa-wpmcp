@@ -218,21 +218,14 @@ final class CheckCoreUpdatesAbility extends AbstractAbility
         }
 
         // No filtering requested - include all.
-        if (! $minor_only && ! $major_only) {
-            return true;
-        }
-
+        // Or include if filter matches: minor_only+minor or major_only+major.
         $is_minor = $this->isMinorUpdate($current_version, $update->version);
 
-        if ($minor_only && ! $is_minor) {
-            return false;
-        }
+        $no_filter   = ! $minor_only && ! $major_only;
+        $minor_match = $minor_only && $is_minor;
+        $major_match = $major_only && ! $is_minor;
 
-        if ($major_only && $is_minor) {
-            return false;
-        }
-
-        return true;
+        return $no_filter || $minor_match || $major_match;
     }
 
     /**

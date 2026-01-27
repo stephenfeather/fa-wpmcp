@@ -44,7 +44,7 @@ class EnvFileLocator
             return $filtered_path;
         }
 
-        // 2. Detect Bedrock structure.
+        // 2. Get and validate ABSPATH.
         $abspath = defined('ABSPATH') ? ABSPATH : '';
         if ($abspath === '') {
             throw new DotenvException('ABSPATH is not defined.');
@@ -53,36 +53,44 @@ class EnvFileLocator
         // Normalize path separators and remove trailing slash.
         $abspath = rtrim(str_replace('\\', '/', $abspath), '/');
 
-        // Bedrock: ABSPATH is /path/to/project/web/wp/
-        // .env is at /path/to/project/.env (2 levels up).
-        if (str_ends_with($abspath, '/web/wp')) {
-            $bedrock_root = dirname($abspath, 2);
-            $env_path = $bedrock_root . self::ENV_FILENAME;
-            if (file_exists($env_path)) {
-                return $env_path;
+        // 3. Check candidate paths in priority order.
+        $candidates = $this->buildCandidatePaths($abspath);
+        foreach ($candidates as $path) {
+            if (file_exists($path)) {
+                return $path;
             }
         }
 
-        // 3. Standard WordPress fallback (one level up from ABSPATH).
-        $standard_path = dirname($abspath) . self::ENV_FILENAME;
-        if (file_exists($standard_path)) {
-            return $standard_path;
-        }
-
-        // 4. Try ABSPATH directly (some setups have .env in WordPress root).
-        $wp_root_path = $abspath . self::ENV_FILENAME;
-        if (file_exists($wp_root_path)) {
-            return $wp_root_path;
-        }
-
         throw new DotenvException(
-            'Could not locate .env file. Checked: ' . implode(', ', array_filter([
-                $filtered_path ?: null,
-                str_ends_with($abspath, '/web/wp') ? dirname($abspath, 2) . self::ENV_FILENAME : null,
-                $standard_path,
-                $wp_root_path,
-            ]))
+            'Could not locate .env file. Checked: ' . implode(', ', array_filter(
+                array_merge([$filtered_path ?: null], $candidates)
+            ))
         );
+    }
+
+    /**
+     * Build list of candidate .env file paths in priority order.
+     *
+     * @param string $abspath Normalized ABSPATH.
+     * @return array<int, string> Candidate paths.
+     */
+    private function buildCandidatePaths(string $abspath): array
+    {
+        $candidates = array();
+
+        // Bedrock: ABSPATH is /path/to/project/web/wp/
+        // .env is at /path/to/project/.env (2 levels up).
+        if (str_ends_with($abspath, '/web/wp')) {
+            $candidates[] = dirname($abspath, 2) . self::ENV_FILENAME;
+        }
+
+        // Standard WordPress fallback (one level up from ABSPATH).
+        $candidates[] = dirname($abspath) . self::ENV_FILENAME;
+
+        // WordPress root (some setups have .env in WordPress root).
+        $candidates[] = $abspath . self::ENV_FILENAME;
+
+        return $candidates;
     }
 
     /**
