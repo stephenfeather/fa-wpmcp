@@ -1,0 +1,128 @@
+# Integration Test Environment for fa-wpmcp
+#
+# Usage:
+#   docker compose -f docker/docker-compose.test.yml up -d
+#   composer test:integration
+#   docker compose -f docker/docker-compose.test.yml down -v
+#
+# Runs on port 8080 to avoid conflicts with dev environment on port 80.
+
+services:
+  db-test:
+    image: mariadb:11.4
+    container_name: fa-wpmcp-db-test
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: test_root_password
+      MYSQL_USER: wordpress_test
+      MYSQL_PASSWORD: wordpress_test_password
+      MYSQL_DATABASE: wordpress_test
+    volumes:
+      - db-test-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+    networks:
+      - test-network
+
+  wordpress-test:
+    depends_on:
+      db-test:
+        condition: service_healthy
+    build:
+      context: ./wordpress
+      dockerfile: Dockerfile
+    container_name: fa-wpmcp-wordpress-test
+    restart: unless-stopped
+    environment:
+      WORDPRESS_DB_HOST: db-test:3306
+      WORDPRESS_DB_USER: wordpress_test
+      WORDPRESS_DB_PASSWORD: wordpress_test_password
+      WORDPRESS_DB_NAME: wordpress_test
+      WORDPRESS_TABLE_PREFIX: wp_
+      WP_REDIS_HOST: redis-test
+    volumes:
+      - wordpress-test-data:/var/www/html
+      - ../:/var/www/html/wp-content/plugins/fa-wpmcp:ro
+      - ./wordpress/zz-healthcheck.conf:/etc/php/8.3/fpm/pool.d/zz-healthcheck.conf:ro
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD-SHELL", "SCRIPT_NAME=/ping SCRIPT_FILENAME=/ping REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000 | grep -q pong || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  webserver-test:
+    depends_on:
+      wordpress-test:
+        condition: service_healthy
+    image: nginx:1.27-alpine
+    container_name: fa-wpmcp-webserver-test
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - wordpress-test-data:/var/www/html:ro
+      - ../:/var/www/html/wp-content/plugins/fa-wpmcp:ro
+      - ./nginx-conf:/etc/nginx/conf.d:ro
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ping >/dev/null || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  redis-test:
+    image: redis:7-alpine
+    container_name: fa-wpmcp-redis-test
+    restart: unless-stopped
+    volumes:
+      - redis-test-data:/data
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # One-time setup container that installs WordPress and creates test user
+  setup-test:
+    depends_on:
+      webserver-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    build:
+      context: ./wordpress
+      dockerfile: Dockerfile
+    container_name: fa-wpmcp-setup-test
+    user: root
+    environment:
+      WORDPRESS_DB_HOST: db-test:3306
+      WORDPRESS_DB_USER: wordpress_test
+      WORDPRESS_DB_PASSWORD: wordpress_test_password
+      WORDPRESS_DB_NAME: wordpress_test
+    volumes:
+      - wordpress-test-data:/var/www/html
+      - ../:/var/www/html/wp-content/plugins/fa-wpmcp:ro
+      - ./scripts:/scripts:ro
+    networks:
+      - test-network
+    entrypoint: ["/bin/bash", "/scripts/setup-wordpress.sh"]
+    restart: "no"
+
+volumes:
+  db-test-data:
+  wordpress-test-data:
+  redis-test-data:
+
+networks:
+  test-network:
+    driver: bridge
