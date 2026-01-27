@@ -285,10 +285,12 @@ final class AbilityExecutor
     /**
      * Check WordPress capability for this ability.
      *
+     * Uses guard clauses for early exit - intentional pattern for readability.
+     *
      * @param array<string, mixed> $context Execution context.
      * @return Result|null Failure result if denied, null if allowed or unavailable.
      */
-    private function checkCapability(array $context): ?Result
+    private function checkCapability(array $context): ?Result // NOSONAR S1142 - guard clauses are intentional
     {
         $ability    = $context['ability'];
         $capability = $ability->getRequiredCapability();

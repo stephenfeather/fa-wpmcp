@@ -137,11 +137,12 @@ final class SettingsSanitizer
      *
      * Enforces HTTPS in production environments.
      * Warns but allows HTTP in staging/development environments.
+     * Uses guard clauses for validation - intentional pattern.
      *
      * @param mixed $endpoint Endpoint data.
      * @return array<string, mixed>|null Sanitized endpoint or null if invalid.
      */
-    private function sanitizeSingleEndpoint($endpoint): ?array
+    private function sanitizeSingleEndpoint($endpoint): ?array // NOSONAR S1142 - validation guard clauses
     {
         if (! is_array($endpoint)) {
             return null;
@@ -171,10 +172,12 @@ final class SettingsSanitizer
      * - Production: HTTPS required (returns false for HTTP)
      * - Staging/Development/Local: HTTPS recommended, HTTP allowed with warning
      *
+     * Uses early returns for boolean decision tree - clearer than nested conditionals.
+     *
      * @param string $url The webhook URL to validate.
      * @return bool True if URL is acceptable, false if rejected.
      */
-    private function validateWebhookUrlHttps(string $url): bool
+    private function validateWebhookUrlHttps(string $url): bool // NOSONAR S1142 - boolean decision tree
     {
         // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- Using native for consistency.
         $parsed = parse_url($url);

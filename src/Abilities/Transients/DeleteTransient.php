@@ -152,11 +152,13 @@ final class DeleteTransient extends AbstractAbility
     /**
      * Execute the ability.
      *
+     * Dispatches to specific handlers based on input - each path returns directly.
+     *
      * @param array<string, mixed> $input Validated input data.
      * @return array<string, mixed> Deletion result.
      * @throws \InvalidArgumentException If no action is specified.
      */
-    public function doExecute(array $input): array
+    public function doExecute(array $input): array // NOSONAR S1142 - dispatch pattern with direct returns
     {
         $key     = $input['key'] ?? '';
         $all     = ! empty($input['all']);

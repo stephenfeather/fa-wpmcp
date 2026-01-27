@@ -216,10 +216,12 @@ final class GetCacheType extends AbstractAbility
     /**
      * Detect cache type from the drop-in file content.
      *
+     * Uses early returns for error conditions - intentional guard clause pattern.
+     *
      * @param string $drop_in_path Path to the drop-in file.
      * @return string The detected cache type or 'unknown'.
      */
-    private function detectFromDropInFile(string $drop_in_path): string
+    private function detectFromDropInFile(string $drop_in_path): string // NOSONAR S1142 - guard clauses are intentional
     {
         if (! file_exists($drop_in_path) || ! is_readable($drop_in_path)) {
             return 'unknown';
