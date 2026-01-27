@@ -53,8 +53,8 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 23 | `fa-wpmcp-list-post-types` | [N/A] | Not exposed as MCP tool (missing `mcp.public`) |
-| 24 | `fa-wpmcp-get-post-type` | [N/A] | Not exposed as MCP tool (missing `mcp.public`) |
+| 23 | `fa-wpmcp-list-post-types` | [PASS] | Lists all registered post types |
+| 24 | `fa-wpmcp-get-post-type` | [PASS] | Requires `post_type` |
 
 ## Users
 
@@ -214,20 +214,16 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 ## Summary
 
 **Total**: 102 abilities registered
-**Exposed as MCP Tools**: 100
-**Passed**: 100/100 (100%)
+**Exposed as MCP Tools**: 102
+**Passed**: 102/102 (100%)
 **Failed**: 0
-**Not Exposed**: 2 (list-post-types, get-post-type - missing `mcp.public` annotation)
+**Not Exposed**: 0
 
 ### Warnings
 
 1. **activate-theme**: Activating a theme that lacks `add_filter('wp_is_application_passwords_available', '__return_true')` in its functions.php will break MCP authentication for subsequent requests.
 
 2. **activate-maintenance-mode**: Creates `.maintenance` file in ABSPATH. If this locks you out, remove it manually: `docker exec wordpress rm -f /var/www/html/web/wp/.maintenance`
-
-### Known Issues (2026-01-27)
-
-1. **list-post-types / get-post-type**: Not exposed as MCP tools - abilities exist but lack `mcp.public` annotation
 
 ### Bugs Fixed (2026-01-27)
 
@@ -236,6 +232,8 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 2. **delete-user**: Output validation failed - `reassigned` returned `null` when no reassignment. Fixed to return `0`.
 
 3. **list-cron-events**: Output validation failed - `schedule` was `false` for single events. Fixed to return empty string.
+
+4. **list-post-types / get-post-type**: Not exposed as MCP tools - `post-types` category was missing from MCP adapter filter. Added to exposed categories list and fixed `rest_base` type normalization.
 
 ### Bugs Fixed (2026-01-25)
 

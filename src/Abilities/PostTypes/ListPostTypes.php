@@ -231,7 +231,7 @@ final class ListPostTypes extends AbstractAbility
             'hierarchical' => (bool) $post_type->hierarchical,
             'show_ui'      => (bool) $post_type->show_ui,
             'show_in_rest' => (bool) $post_type->show_in_rest,
-            'rest_base'    => $post_type->rest_base ?? $post_type->name,
+            'rest_base'    => is_string($post_type->rest_base) ? $post_type->rest_base : ($post_type->name ?? ''),
         );
     }
 }

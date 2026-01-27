@@ -161,6 +161,7 @@ final class Plugin
                     'comments',
                     'media',
                     'taxonomies',
+                    'post-types',
                     'users',
                     'settings',
                     'plugins',
