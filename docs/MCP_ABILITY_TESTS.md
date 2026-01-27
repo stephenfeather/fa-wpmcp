@@ -31,7 +31,7 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 
 | # | Ability | Status | Notes |
 |---|---------|--------|-------|
-| 11 | `fa-wpmcp-upload-media` | [PASS] | Requires `url`, `title` |
+| 11 | `fa-wpmcp-upload-media` | [PASS] | Requires `filename` + (`file_data` OR `url`); optional `title`, `alt_text`, `caption`, `description` |
 | 12 | `fa-wpmcp-list-media` | [PASS] | |
 | 13 | `fa-wpmcp-get-media` | [PASS] | Requires `media_id` |
 | 14 | `fa-wpmcp-update-media` | [PASS] | Requires `media_id` |
@@ -235,6 +235,8 @@ Testing all fa-wpmcp abilities via MCP direct tool calls, verified with WP-CLI.
 
 4. **list-post-types / get-post-type**: Not exposed as MCP tools - `post-types` category was missing from MCP adapter filter. Added to exposed categories list and fixed `rest_base` type normalization.
 
+5. **upload-media**: Tool failed with TypeError - UploadMedia used `'type' => 'image'` which collided with MCP ToolsHandler's embedded image detection. Renamed to `'media_type'` to avoid collision.
+
 ### Bugs Fixed (2026-01-25)
 
 1. **CreateComment/UpdateComment missing getOperationType()**: Both were missing the override, defaulting to 'read' and bypassing `global_write_enabled` check. Fixed in commit `c599b4b`.
@@ -289,7 +291,7 @@ A PHPUnit-based integration test suite tests core CRUD abilities via actual MCP 
 | `tests/integration/Support/McpClient.php` | MCP protocol client (HTTP, JSON-RPC 2.0) |
 | `tests/integration/Support/McpIntegrationTestCase.php` | Base test case with session management & cleanup |
 
-### Test Coverage (52 tests, 176 assertions)
+### Test Coverage (68 tests, 257 assertions)
 
 | Ability Category | Test File | Tests | Key Coverage |
 |------------------|-----------|-------|--------------|
@@ -297,6 +299,7 @@ A PHPUnit-based integration test suite tests core CRUD abilities via actual MCP 
 | **Comments** | `Abilities/Comments/CommentsAbilityTest.php` | 11 | CRUD, moderation status, post filter |
 | **Users** | `Abilities/Users/UsersAbilityTest.php` | 15 | CRUD, roles, profile fields, lookup by ID/username/email |
 | **Terms** | `Abilities/Terms/TermsAbilityTest.php` | 16 | CRUD for categories/tags, hierarchical parent-child, search |
+| **Media** | `Abilities/Media/MediaAbilityTest.php` | 16 | Upload (base64), CRUD, metadata, MIME filtering, pagination |
 
 ### Running Integration Tests
 
@@ -310,6 +313,7 @@ export $(cat docker/wordpress-data/.mcp-test-credentials | grep -v '^#' | xargs)
 ./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php --filter CommentsAbilityTest
 ./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php --filter UsersAbilityTest
 ./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php --filter TermsAbilityTest
+./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php --filter MediaAbilityTest
 ```
 
 ### Test Credentials
@@ -336,3 +340,7 @@ MCP_TEST_PASSWORD=<app-password>
 6. **No Trash for Users/Terms**: Deletion is always permanent (no trash support in WordPress for these types).
 
 7. **Global Namespace Constants**: `McpClient.php` constants need backslash prefix (`\MCP_TEST_BASE_URL`) in namespaced classes.
+
+8. **Media Upload via Base64**: `UploadMedia` accepts `file_data` (base64-encoded) for testing without external URLs. Tests use a minimal 1x1 PNG.
+
+9. **Media Type Key Collision**: Avoid using `'type'` key in ability responses - MCP ToolsHandler interprets `type === 'image'` as embedded binary data. Use `'media_type'` instead.
