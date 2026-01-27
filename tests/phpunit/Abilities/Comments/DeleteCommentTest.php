@@ -62,7 +62,7 @@ final class DeleteCommentTest extends BrainMonkeyTestCase
     }
 
     /**
-     * Test annotations mark as destructive and non-idempotent.
+     * Test annotations mark as destructive and idempotent (HTTP DELETE standard).
      *
      * @return void
      */
@@ -71,7 +71,7 @@ final class DeleteCommentTest extends BrainMonkeyTestCase
         $annotations = $this->getAbilityInstance()->getAnnotations();
 
         $this->assertTrue($annotations['destructive']);
-        $this->assertFalse($annotations['idempotent']);
+        $this->assertTrue($annotations['idempotent']);
     }
 
     /**
