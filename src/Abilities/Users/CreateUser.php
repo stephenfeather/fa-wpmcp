@@ -40,7 +40,7 @@ final class CreateUser extends AbstractAbility
      */
     public function __construct(?RolePolicy $rolePolicy = null)
     {
-        $this->role_policy = $rolePolicy ?? new RolePolicy();
+        $this->rolePolicy = $rolePolicy ?? new RolePolicy();
     }
 
     /**
@@ -110,9 +110,9 @@ final class CreateUser extends AbstractAbility
                     'type'        => 'string',
                     'description' => sprintf(
                         'User role (defaults to subscriber). Maximum assignable role: %s.',
-                        $this->role_policy->getMaxRole()
+                        $this->rolePolicy->getMaxRole()
                     ),
-                    'enum'        => array_values($this->role_policy->getAllowedRoles()),
+                    'enum'        => array_values($this->rolePolicy->getAllowedRoles()),
                     'default'     => 'subscriber',
                 ),
                 'first_name'   => array(
@@ -301,10 +301,10 @@ final class CreateUser extends AbstractAbility
     private function validateRole(string $role): string
     {
         // First check if it's a standard role that exceeds max allowed.
-        $this->role_policy->validateRole($role);
+        $this->rolePolicy->validateRole($role);
 
         // For standard roles, return as-is. For unknown roles, default to subscriber.
-        if ($this->role_policy->isStandardRole($role)) {
+        if ($this->rolePolicy->isStandardRole($role)) {
             return $role;
         }
 

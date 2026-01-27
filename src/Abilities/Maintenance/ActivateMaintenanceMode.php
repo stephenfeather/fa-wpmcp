@@ -87,8 +87,8 @@ final class ActivateMaintenanceMode extends AbstractAbility
                     'type'        => 'integer',
                     'description' => 'Auto-expire after this many seconds. Default: 600 (10 minutes). Max: 3600 (1 hour). Set to 0 for no auto-expiration (not recommended).',
                     'minimum'     => 0,
-                    'maximum'     => 3600,
-                    'default'     => 600,
+                    'maximum'     => self::MAX_EXPIRE_SECONDS,
+                    'default'     => self::DEFAULT_EXPIRE_SECONDS,
                 ),
             ),
         );

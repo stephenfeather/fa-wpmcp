@@ -189,8 +189,9 @@ final class DeleteUser extends AbstractAbility
         }
 
         // Require the user functions file for wp_delete_user if not already loaded.
+        // phpcs:ignore -- WordPress procedural include, not autoloadable
         if (! function_exists('wp_delete_user')) {
-            require_once ABSPATH . 'wp-admin/includes/user.php';
+            require_once ABSPATH . 'wp-admin/includes/user.php'; // NOSONAR S4833
         }
 
         // Delete the user.

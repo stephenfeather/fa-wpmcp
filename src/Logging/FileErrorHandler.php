@@ -65,7 +65,7 @@ final class FileErrorHandler implements McpErrorHandlerInterface
      */
     public function __construct(?string $logPath = null)
     {
-        $this->log_path = $logPath;
+        $this->logPath = $logPath;
     }
 
     /**
@@ -114,8 +114,8 @@ final class FileErrorHandler implements McpErrorHandlerInterface
      */
     public function getLogFilePath(): string
     {
-        if (null !== $this->log_path) {
-            return $this->log_path;
+        if (null !== $this->logPath) {
+            return $this->logPath;
         }
 
         return ( defined('WP_CONTENT_DIR') ? WP_CONTENT_DIR : '' ) . '/' . self::LOG_FILE;

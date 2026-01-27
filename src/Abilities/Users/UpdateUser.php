@@ -42,7 +42,7 @@ final class UpdateUser extends AbstractAbility
      */
     public function __construct(?RolePolicy $rolePolicy = null)
     {
-        $this->role_policy = $rolePolicy ?? new RolePolicy();
+        $this->rolePolicy = $rolePolicy ?? new RolePolicy();
     }
 
     /**
@@ -113,9 +113,9 @@ final class UpdateUser extends AbstractAbility
                     'type'        => 'string',
                     'description' => sprintf(
                         'New user role. Maximum assignable role: %s.',
-                        $this->role_policy->getMaxRole()
+                        $this->rolePolicy->getMaxRole()
                     ),
-                    'enum'        => array_values($this->role_policy->getAllowedRoles()),
+                    'enum'        => array_values($this->rolePolicy->getAllowedRoles()),
                 ),
                 'first_name'   => array(
                     'type'        => 'string',
@@ -305,7 +305,7 @@ final class UpdateUser extends AbstractAbility
     private function validateRole(string $role): string
     {
         // Check if role is allowed per policy (throws if not).
-        $this->role_policy->validateRole($role);
+        $this->rolePolicy->validateRole($role);
 
         return $role;
     }

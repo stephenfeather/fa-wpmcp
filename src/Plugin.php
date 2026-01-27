@@ -463,7 +463,8 @@ final class Plugin
     {
         global $wpdb;
 
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        // phpcs:ignore -- WordPress procedural include for dbDelta(), not autoloadable
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php'; // NOSONAR S4833
 
         $schemas = \FAWpmcp\Database\Schema::getAllSchemas($wpdb->prefix);
 
