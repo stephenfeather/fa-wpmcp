@@ -258,7 +258,7 @@ class UpdateRoleAbilityTest extends BrainMonkeyTestCase
         $annotations = $ability->getAnnotations();
 
         $this->assertFalse($annotations['readonly']);
-        $this->assertFalse($annotations['destructive']);
+        $this->assertTrue($annotations['destructive']);
         $this->assertTrue($annotations['idempotent']);
     }
 

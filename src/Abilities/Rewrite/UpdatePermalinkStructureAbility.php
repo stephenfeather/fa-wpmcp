@@ -133,15 +133,17 @@ final class UpdatePermalinkStructureAbility extends AbstractAbility
     /**
      * Get ability annotations.
      *
-     * Marks this ability as idempotent (setting the same structure multiple times is safe).
+     * Marks this ability as idempotent (setting the same structure multiple times is safe)
+     * and destructive (modifies existing data).
      *
      * @return array<string, mixed> Annotations array.
      */
     public function getAnnotations(): array
     {
-        $annotations               = parent::getAnnotations();
-        $annotations['mcp.public'] = true;
-        $annotations['idempotent'] = true;
+        $annotations                = parent::getAnnotations();
+        $annotations['mcp.public']  = true;
+        $annotations['idempotent']  = true;
+        $annotations['destructive'] = true;
         return $annotations;
     }
 

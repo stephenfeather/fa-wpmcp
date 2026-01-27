@@ -147,7 +147,7 @@ final class DeletePost extends AbstractAbility
     {
         $annotations                = parent::getAnnotations();
         $annotations['destructive'] = true;
-        $annotations['idempotent']  = false;
+        $annotations['idempotent']  = true;
         return $annotations;
     }
 

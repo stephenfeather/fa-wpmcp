@@ -202,7 +202,7 @@ class CreateRoleAbilityTest extends BrainMonkeyTestCase
 
         $this->assertFalse($annotations['readonly']);
         $this->assertFalse($annotations['destructive']);
-        $this->assertTrue($annotations['idempotent']);
+        $this->assertFalse($annotations['idempotent']);
     }
 
     /**

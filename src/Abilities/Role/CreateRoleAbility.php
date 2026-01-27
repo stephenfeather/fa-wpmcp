@@ -137,6 +137,20 @@ final class CreateRoleAbility extends AbstractAbility
     }
 
     /**
+     * Get ability annotations.
+     *
+     * Create operations are non-idempotent - repeated calls create new resources.
+     *
+     * @return array<string, mixed> Annotations array.
+     */
+    public function getAnnotations(): array
+    {
+        $annotations               = parent::getAnnotations();
+        $annotations['idempotent'] = false;
+        return $annotations;
+    }
+
+    /**
      * Execute the ability.
      *
      * @param array<string, mixed> $input Validated input data.

@@ -147,7 +147,7 @@ final class DeleteRoleAbility extends AbstractAbility
         return array(
             'readonly'     => false,
             'destructive'  => true,
-            'idempotent'   => false,
+            'idempotent'   => true,
             'instructions' => $this->getDescription(),
         );
     }

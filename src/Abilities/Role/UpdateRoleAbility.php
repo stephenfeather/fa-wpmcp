@@ -134,6 +134,20 @@ final class UpdateRoleAbility extends AbstractAbility
     }
 
     /**
+     * Get ability annotations.
+     *
+     * Update operations are destructive - they modify existing data.
+     *
+     * @return array<string, mixed> Annotations array.
+     */
+    public function getAnnotations(): array
+    {
+        $annotations                = parent::getAnnotations();
+        $annotations['destructive'] = true;
+        return $annotations;
+    }
+
+    /**
      * Execute the ability.
      *
      * @param array<string, mixed> $input Validated input data.

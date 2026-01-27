@@ -247,6 +247,6 @@ class DeleteRoleAbilityTest extends BrainMonkeyTestCase
 
         $this->assertFalse($annotations['readonly']);
         $this->assertTrue($annotations['destructive']);
-        $this->assertFalse($annotations['idempotent']);
+        $this->assertTrue($annotations['idempotent']);
     }
 }

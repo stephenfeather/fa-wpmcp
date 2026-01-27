@@ -75,6 +75,20 @@ final class UpdateOption extends AbstractAbility
     }
 
     /**
+     * Get ability annotations.
+     *
+     * Update operations are destructive - they modify existing data.
+     *
+     * @return array<string, mixed> Annotations array.
+     */
+    public function getAnnotations(): array
+    {
+        $annotations                = parent::getAnnotations();
+        $annotations['destructive'] = true;
+        return $annotations;
+    }
+
+    /**
      * Returns the JSON Schema for input validation.
      *
      * @return array<string, mixed> JSON Schema array.

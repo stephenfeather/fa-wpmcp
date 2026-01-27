@@ -131,13 +131,15 @@ final class UpdateWidgetAbility extends AbstractAbility
     /**
      * Get ability annotations.
      *
+     * Update operations are destructive - they modify existing data.
+     *
      * @return array<string, mixed> Annotations array.
      */
     public function getAnnotations(): array
     {
         return array(
             'readonly'     => false,
-            'destructive'  => false,
+            'destructive'  => true,
             'idempotent'   => true,
             'instructions' => $this->getDescription(),
         );
