@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Insecure Salt Warning** - Admin notice when WordPress salts are misconfigured:
+  - Displays on FA-WPMCP settings pages when `SECURE_AUTH_KEY`, `LOGGED_IN_KEY`, or `NONCE_SALT` are empty or set to default "put your unique phrase here" values
+  - Warns administrators before webhook encryption fails due to bad salts
+  - Dismissible per-user (stored in user meta)
+  - Links to WordPress salt generator API for easy remediation
+
+### Changed
+- **Docker Test Environment** - MCP adapter now auto-installed from official GitHub release (v0.4.1)
+
 ## [1.0.0-alpha.5] - 2026-01-26
 
 ### Added
