@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-01-28
+
+### Summary
+
+**First stable release of FA-WPMCP** - A comprehensive WordPress plugin exposing WordPress functionality to AI agents via the WordPress 6.9 Abilities API and MCP (Model Context Protocol) Adapter.
+
+**Key Metrics:**
+- **111+ abilities** across 18 categories
+- **1608 tests** with 95% code coverage
+- **Security posture: MEDIUM risk** (0 critical, 0 high, 3 medium mitigated, 4 low)
+- **Production-ready** with comprehensive documentation
+
+**Categories:** posts, comments, media, taxonomies, users, settings, plugins, themes, privacy, cache, maintenance, transients, cron, roles, capabilities, menus, widgets, dotenv, post-types
+
 ### Added
 - **Insecure Salt Warning** - Admin notice when WordPress salts are misconfigured:
   - Displays on FA-WPMCP settings pages when `SECURE_AUTH_KEY`, `LOGGED_IN_KEY`, or `NONCE_SALT` are empty or set to default "put your unique phrase here" values
@@ -242,7 +256,8 @@ Alpha 3 release focusing on core functionality stabilization and production-read
 - Settings page for configuration
 - Webhook scheduling with Action Scheduler
 
-[Unreleased]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.5...HEAD
+[Unreleased]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.5...v1.0.0
 [1.0.0-alpha.5]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.4...v1.0.0-alpha.5
 [1.0.0-alpha.4]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-alpha.3...v1.0.0-alpha.4
 [1.0.0-alpha.3]: https://github.com/featherart/fa-wpmcp/compare/v1.0.0-beta.1...v1.0.0-alpha.3
