@@ -115,8 +115,18 @@ chown www-data:www-data "${WP_PATH}/wp-content/mu-plugins/fa-wpmcp-test-setup.ph
 echo "Activating fa-wpmcp plugin..."
 wp plugin activate fa-wpmcp --path="$WP_PATH" --allow-root || true
 
-# Activate WordPress MCP adapter if available
-wp plugin activate mcp-adapter --path="$WP_PATH" --allow-root 2>/dev/null || true
+# Install and activate WordPress MCP adapter from official release
+echo "Installing MCP adapter plugin..."
+MCP_ADAPTER_VERSION="0.4.1"
+MCP_ADAPTER_URL="https://github.com/WordPress/mcp-adapter/releases/download/v${MCP_ADAPTER_VERSION}/mcp-adapter.zip"
+
+if ! wp plugin is-installed mcp-adapter --path="$WP_PATH" --allow-root 2>/dev/null; then
+    echo "Downloading MCP adapter v${MCP_ADAPTER_VERSION}..."
+    wp plugin install "$MCP_ADAPTER_URL" --path="$WP_PATH" --allow-root
+fi
+
+echo "Activating MCP adapter plugin..."
+wp plugin activate mcp-adapter --path="$WP_PATH" --allow-root
 
 # Create application password for MCP testing
 echo "Creating application password..."
