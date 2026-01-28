@@ -47,4 +47,4 @@ jobs:
             -Dsonar.php.tests.reportPath=tests/coverage/junit.xml
             -Dsonar.language=php
             -Dsonar.exclusions=vendor/**/*,node_modules/**/*,tests/**/*,.claude/**/*,.tldr/**/*,opc/**/*,thoughts/**/*
-            -sonar.cpd.exclusions==tests/**/*,src/**/*
+            -Dsonar.cpd.exclusions=tests/**/*
