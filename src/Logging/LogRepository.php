@@ -195,7 +195,7 @@ class LogRepository
      */
     private function maybeAnonymizeIp(string $ip_address): string
     {
-        $should_anonymize = get_option('fa_wpmcp_anonymize_ip', true);
+        $should_anonymize = get_option('fa_wpmcp_anonymize_ip', false);
 
         if (! $should_anonymize) {
             return $ip_address;

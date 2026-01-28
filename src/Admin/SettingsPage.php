@@ -289,6 +289,22 @@ final class SettingsPage
 
         $output .= '</table>';
 
+        // Privacy Settings.
+        $output .= '<h2>' . esc_html('Privacy') . '</h2>';
+        $output .= '<table class="form-table">';
+
+        $output .= '<tr>';
+        $output .= '<th scope="row"><label for="anonymize_ip">' . esc_html('Anonymize IP Addresses') . '</label></th>';
+        $output .= '<td>';
+        $output .= '<input type="checkbox" id="anonymize_ip" name="anonymize_ip" value="1" ';
+        $output .= checked($settings['anonymize_ip'] ?? false, true, false);
+        $output .= ' />';
+        $output .= '<p class="description">' . esc_html('Mask IP addresses in activity logs for GDPR compliance. IPv4: last octet masked (192.168.1.x → 192.168.1.0). IPv6: last 80 bits masked.') . '</p>';
+        $output .= '</td>';
+        $output .= '</tr>';
+
+        $output .= '</table>';
+
         $output .= '<p class="submit">';
         $output .= '<input type="submit" name="submit" class="button button-primary" value="' . esc_attr('Save Settings') . '" />';
         $output .= '</p>';
@@ -688,9 +704,14 @@ final class SettingsPage
             'version'                    => FA_WPMCP_VERSION,
             'file_error_logging_enabled' => isset($_POST['file_error_logging_enabled'])
                 && '1' === sanitize_text_field(wp_unslash($_POST['file_error_logging_enabled'])),
+            'anonymize_ip'               => isset($_POST['anonymize_ip'])
+                && '1' === sanitize_text_field(wp_unslash($_POST['anonymize_ip'])),
         );
 
         update_option('fa_wpmcp_settings', $settings);
+
+        // Also update the standalone option for LogRepository.
+        update_option('fa_wpmcp_anonymize_ip', $settings['anonymize_ip']);
 
         wp_safe_redirect(
             add_query_arg(
@@ -864,6 +885,7 @@ final class SettingsPage
         $defaults = array(
             'version'                    => '',
             'file_error_logging_enabled' => false,
+            'anonymize_ip'               => false,
         );
 
         $settings = get_option('fa_wpmcp_settings', $defaults);

@@ -49,7 +49,7 @@ final class LogRepositoryTest extends TestCase
 
         Functions\expect('get_option')
             ->once()
-            ->with('fa_wpmcp_anonymize_ip', true)
+            ->with('fa_wpmcp_anonymize_ip', false)
             ->andReturn(true);
 
         Functions\expect('wp_json_encode')
@@ -106,7 +106,7 @@ final class LogRepositoryTest extends TestCase
         Functions\expect('current_time')->andReturn('2026-01-21 10:00:00');
         Functions\expect('get_option')
             ->once()
-            ->with('fa_wpmcp_anonymize_ip', true)
+            ->with('fa_wpmcp_anonymize_ip', false)
             ->andReturn(true);
 
         $entry = new LogEntry(
@@ -270,7 +270,7 @@ final class LogRepositoryTest extends TestCase
         Functions\expect('current_time')->andReturn('2026-01-25 10:00:00');
         Functions\expect('get_option')
             ->once()
-            ->with('fa_wpmcp_anonymize_ip', true)
+            ->with('fa_wpmcp_anonymize_ip', false)
             ->andReturn(true);
 
         $entry = new LogEntry(
@@ -318,7 +318,7 @@ final class LogRepositoryTest extends TestCase
         Functions\expect('current_time')->andReturn('2026-01-25 10:00:00');
         Functions\expect('get_option')
             ->once()
-            ->with('fa_wpmcp_anonymize_ip', true)
+            ->with('fa_wpmcp_anonymize_ip', false)
             ->andReturn(true);
 
         $entry = new LogEntry(
@@ -366,7 +366,7 @@ final class LogRepositoryTest extends TestCase
         Functions\expect('current_time')->andReturn('2026-01-25 10:00:00');
         Functions\expect('get_option')
             ->once()
-            ->with('fa_wpmcp_anonymize_ip', true)
+            ->with('fa_wpmcp_anonymize_ip', false)
             ->andReturn(false);
 
         $entry = new LogEntry(
@@ -414,7 +414,7 @@ final class LogRepositoryTest extends TestCase
         Functions\expect('current_time')->andReturn('2026-01-25 10:00:00');
         Functions\expect('get_option')
             ->times(3)
-            ->with('fa_wpmcp_anonymize_ip', true)
+            ->with('fa_wpmcp_anonymize_ip', false)
             ->andReturn(true);
 
         $wpdb = Mockery::mock('wpdb');
@@ -526,7 +526,7 @@ final class LogRepositoryTest extends TestCase
         Functions\expect('current_time')->andReturn('2026-01-25 10:00:00');
         Functions\expect('get_option')
             ->times(2)
-            ->with('fa_wpmcp_anonymize_ip', true)
+            ->with('fa_wpmcp_anonymize_ip', false)
             ->andReturn(true);
 
         $wpdb = Mockery::mock('wpdb');
@@ -607,7 +607,7 @@ final class LogRepositoryTest extends TestCase
         Functions\expect('current_time')->andReturn('2026-01-25 10:00:00');
         Functions\expect('get_option')
             ->once()
-            ->with('fa_wpmcp_anonymize_ip', true)
+            ->with('fa_wpmcp_anonymize_ip', false)
             ->andReturn(true);
 
         $entry = new LogEntry(
