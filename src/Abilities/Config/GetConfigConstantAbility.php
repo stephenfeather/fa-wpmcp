@@ -23,6 +23,7 @@ use FAWpmcp\Exceptions\ConfigConstantException;
  */
 final class GetConfigConstantAbility extends AbstractAbility
 {
+    use ConfigValueFormatterTrait;
     /**
      * Constants that contain sensitive data and cannot be retrieved.
      *
@@ -226,26 +227,4 @@ final class GetConfigConstantAbility extends AbstractAbility
         return false;
     }
 
-    /**
-     * Format a constant value as a string for output.
-     *
-     * @param mixed $value The constant value.
-     * @return string Formatted value.
-     */
-    private function formatValue(mixed $value): string
-    {
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        if (is_null($value)) {
-            return 'null';
-        }
-
-        if (is_array($value)) {
-            return json_encode($value, JSON_THROW_ON_ERROR) ?: '[]';
-        }
-
-        return (string) $value;
-    }
 }

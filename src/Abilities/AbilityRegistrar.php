@@ -38,8 +38,7 @@ final class AbilityRegistrar
         self::registerPluginAbilities($registry);
         self::registerThemeAbilities($registry);
         self::registerPrivacyAbilities($registry);
-        self::registerCacheAbilities($registry);
-        self::registerMaintenanceAbilities($registry);
+        self::registerSystemAbilities($registry);
         self::registerTransientAbilities($registry);
         self::registerCronAbilities($registry);
         self::registerRoleAbilities($registry);
@@ -47,8 +46,7 @@ final class AbilityRegistrar
         self::registerWidgetAbilities($registry);
         self::registerDotenvAbilities($registry);
         self::registerCoreAbilities($registry);
-        self::registerRewriteAbilities($registry);
-        self::registerConfigAbilities($registry);
+        self::registerConfigurationAbilities($registry);
     }
 
     /**
@@ -215,26 +213,19 @@ final class AbilityRegistrar
     }
 
     /**
-     * Register cache abilities.
+     * Register system abilities (cache and maintenance).
      *
      * @param AbilityRegistry $registry Ability registry.
      * @return void
      */
-    private static function registerCacheAbilities(AbilityRegistry $registry): void
+    private static function registerSystemAbilities(AbilityRegistry $registry): void
     {
+        // Cache abilities.
         $registry->register(new \FAWpmcp\Abilities\Cache\FlushCache());
         $registry->register(new \FAWpmcp\Abilities\Cache\GetCacheStatus());
         $registry->register(new \FAWpmcp\Abilities\Cache\GetCacheType());
-    }
 
-    /**
-     * Register maintenance abilities.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerMaintenanceAbilities(AbilityRegistry $registry): void
-    {
+        // Maintenance abilities.
         $registry->register(new \FAWpmcp\Abilities\Maintenance\ActivateMaintenanceMode());
         $registry->register(new \FAWpmcp\Abilities\Maintenance\DeactivateMaintenanceMode());
         $registry->register(new \FAWpmcp\Abilities\Maintenance\GetMaintenanceModeStatus());
@@ -352,27 +343,20 @@ final class AbilityRegistrar
     }
 
     /**
-     * Register rewrite abilities.
+     * Register configuration abilities (rewrite and config constants).
      *
      * @param AbilityRegistry $registry Ability registry.
      * @return void
      */
-    private static function registerRewriteAbilities(AbilityRegistry $registry): void
+    private static function registerConfigurationAbilities(AbilityRegistry $registry): void
     {
+        // Rewrite abilities.
         $registry->register(new \FAWpmcp\Abilities\Rewrite\ListRewriteRulesAbility());
         $registry->register(new \FAWpmcp\Abilities\Rewrite\FlushRewriteRulesAbility());
         $registry->register(new \FAWpmcp\Abilities\Rewrite\GetPermalinkStructureAbility());
         $registry->register(new \FAWpmcp\Abilities\Rewrite\UpdatePermalinkStructureAbility());
-    }
 
-    /**
-     * Register config abilities.
-     *
-     * @param AbilityRegistry $registry Ability registry.
-     * @return void
-     */
-    private static function registerConfigAbilities(AbilityRegistry $registry): void
-    {
+        // Config constant abilities.
         $registry->register(new \FAWpmcp\Abilities\Config\ListConfigConstantsAbility());
         $registry->register(new \FAWpmcp\Abilities\Config\GetConfigConstantAbility());
     }

@@ -248,9 +248,9 @@ final class UpdateDatabaseAbility extends AbstractAbility
      */
     private function runDatabaseUpdate(): void
     {
-        // Include WordPress upgrade functions.
+        // Include WordPress upgrade functions (procedural file, cannot use 'use' keyword).
         if (! function_exists('wp_upgrade')) {
-            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+            require_once ABSPATH . 'wp-admin/includes/upgrade.php'; // NOSONAR - WordPress procedural include
         }
 
         // Run the database upgrade.

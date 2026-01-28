@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace FAWpmcp\Abilities\Core;
 
 use FAWpmcp\Abilities\AbstractAbility;
+use FAWpmcp\Exceptions\ChecksumException;
 
 /**
  * Ability to verify WordPress core file checksums.
@@ -153,7 +154,7 @@ final class VerifyChecksumsAbility extends AbstractAbility
      *
      * @param array<string, mixed> $input Validated input data.
      * @return array<string, mixed> Verification results.
-     * @throws \RuntimeException If checksums cannot be retrieved.
+     * @throws ChecksumException If checksums cannot be retrieved.
      */
     public function doExecute(array $input): array
     {
@@ -164,7 +165,7 @@ final class VerifyChecksumsAbility extends AbstractAbility
         $checksums = $this->fetchChecksums($version, $locale);
 
         if (empty($checksums)) {
-            throw new \RuntimeException(
+            throw new ChecksumException(
                 sprintf(
                     'Unable to fetch checksums for WordPress %s (%s).',
                     $version,

@@ -142,30 +142,57 @@ final class ListCronEventsAbility extends AbstractAbility
             );
         }
 
+        $events = $this->extractEventsFromCronArray($cron_array, $hook_filter);
+
+        return array(
+            'events' => $events,
+            'total'  => count($events),
+        );
+    }
+
+    /**
+     * Extract events from cron array with optional hook filtering.
+     *
+     * @param array<int, array<string, array<int, array<string, mixed>>>> $cron_array Cron array.
+     * @param string $hook_filter Optional hook name filter.
+     * @return array<int, array<string, mixed>> Extracted events.
+     */
+    private function extractEventsFromCronArray(array $cron_array, string $hook_filter): array
+    {
         $events = array();
 
         foreach ($cron_array as $timestamp => $hooks) {
             foreach ($hooks as $hook => $events_data) {
-                // Apply hook filter if provided.
                 if (! empty($hook_filter) && strpos($hook, $hook_filter) === false) {
                     continue;
                 }
 
                 foreach ($events_data as $event_data) {
-                    $schedule = $event_data['schedule'] ?? false;
-                    $events[] = array(
-                        'hook'      => $hook,
-                        'timestamp' => (int) $timestamp,
-                        'schedule'  => is_string($schedule) ? $schedule : '',
-                        'args'      => $event_data['args'] ?? array(),
-                    );
+                    $events[] = $this->buildEventEntry($hook, (int) $timestamp, $event_data);
                 }
             }
         }
 
+        return $events;
+    }
+
+    /**
+     * Build a single event entry array.
+     *
+     * @param string $hook Hook name.
+     * @param int $timestamp Unix timestamp.
+     * @param array<string, mixed> $event_data Event data from cron array.
+     * @return array<string, mixed> Formatted event entry.
+     */
+    private function buildEventEntry(string $hook, int $timestamp, array $event_data): array
+    {
+        $schedule = $event_data['schedule'] ?? false;
+
         return array(
-            'events' => $events,
-            'total'  => count($events),
+            'hook'      => $hook,
+            'timestamp' => $timestamp,
+            'schedule'  => is_string($schedule) ? $schedule : '',
+            'args'      => $event_data['args'] ?? array(),
         );
     }
 }

@@ -23,6 +23,7 @@ use FAWpmcp\Abilities\AbstractAbility;
  */
 final class ListConfigConstantsAbility extends AbstractAbility
 {
+    use ConfigValueFormatterTrait;
     /**
      * Constants considered safe to expose.
      *
@@ -273,29 +274,6 @@ final class ListConfigConstantsAbility extends AbstractAbility
             'constants' => $constants,
             'total'     => count($constants),
         );
-    }
-
-    /**
-     * Format a constant value as a string for output.
-     *
-     * @param mixed $value The constant value.
-     * @return string Formatted value.
-     */
-    private function formatValue(mixed $value): string
-    {
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        if (is_null($value)) {
-            return 'null';
-        }
-
-        if (is_array($value)) {
-            return json_encode($value, JSON_THROW_ON_ERROR) ?: '[]';
-        }
-
-        return (string) $value;
     }
 
     /**
