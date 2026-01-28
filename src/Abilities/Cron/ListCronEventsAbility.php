@@ -162,18 +162,48 @@ final class ListCronEventsAbility extends AbstractAbility
         $events = array();
 
         foreach ($cron_array as $timestamp => $hooks) {
-            foreach ($hooks as $hook => $events_data) {
-                if (! empty($hook_filter) && strpos($hook, $hook_filter) === false) {
-                    continue;
-                }
+            $timestamp_events = $this->extractEventsAtTimestamp($hooks, (int) $timestamp, $hook_filter);
+            $events           = array_merge($events, $timestamp_events);
+        }
 
-                foreach ($events_data as $event_data) {
-                    $events[] = $this->buildEventEntry($hook, (int) $timestamp, $event_data);
-                }
+        return $events;
+    }
+
+    /**
+     * Extract events at a specific timestamp with optional hook filtering.
+     *
+     * @param array<string, array<int, array<string, mixed>>> $hooks Hooks array at timestamp.
+     * @param int $timestamp Unix timestamp.
+     * @param string $hook_filter Optional hook name filter.
+     * @return array<int, array<string, mixed>> Events at this timestamp.
+     */
+    private function extractEventsAtTimestamp(array $hooks, int $timestamp, string $hook_filter): array
+    {
+        $events = array();
+
+        foreach ($hooks as $hook => $events_data) {
+            if ($this->shouldSkipHook($hook, $hook_filter)) {
+                continue;
+            }
+
+            foreach ($events_data as $event_data) {
+                $events[] = $this->buildEventEntry($hook, $timestamp, $event_data);
             }
         }
 
         return $events;
+    }
+
+    /**
+     * Check if a hook should be skipped based on filter.
+     *
+     * @param string $hook Hook name.
+     * @param string $hook_filter Filter pattern.
+     * @return bool True if hook should be skipped.
+     */
+    private function shouldSkipHook(string $hook, string $hook_filter): bool
+    {
+        return ! empty($hook_filter) && strpos($hook, $hook_filter) === false;
     }
 
     /**
