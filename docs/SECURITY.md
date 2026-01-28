@@ -143,6 +143,27 @@ openssl:v1:base64(iv||tag||ciphertext)
 - Changing WordPress salts will invalidate existing encrypted secrets
 - Requires properly configured salts (not default "put your unique phrase here" values)
 
+### 5a. Insecure Salt Warning
+**Status:** ✅ Implemented (v1.0-beta-2)
+
+A dismissible admin notice appears on FA-WPMCP settings pages when WordPress security keys contain default or empty values:
+
+```php
+// SettingsPage.php - areSaltsSecure() checks:
+// - SECURE_AUTH_KEY
+// - LOGGED_IN_KEY
+// - NONCE_SALT
+// Returns false if any are empty or equal to "put your unique phrase here"
+```
+
+**Protection:** Proactively warns administrators about insecure salt configuration before encryption features fail.
+
+**Behavior:**
+- Only displays on FA-WPMCP admin pages
+- Requires `manage_options` capability to see
+- Can be dismissed (stored in user meta: `fa_wpmcp_salt_warning_dismissed`)
+- Links to WordPress salt generator API for easy remediation
+
 ### 6. Option Name Validation
 **Status:** ✅ Implemented (v1.0-beta-1)
 

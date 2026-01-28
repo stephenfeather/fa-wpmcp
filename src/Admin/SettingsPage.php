@@ -65,6 +65,20 @@ final class SettingsPage
     );
 
     /**
+     * User meta key for dismissing salt warning.
+     *
+     * @var string
+     */
+    private const SALT_WARNING_DISMISSED_META = 'fa_wpmcp_salt_warning_dismissed';
+
+    /**
+     * Default WordPress salt value that indicates unconfigured salts.
+     *
+     * @var string
+     */
+    private const DEFAULT_SALT_VALUE = 'put your unique phrase here';
+
+    /**
      * Error message: Permission denied to access page.
      *
      * @var string
@@ -139,6 +153,8 @@ final class SettingsPage
         add_action('admin_post_fa_wpmcp_save_permissions', array( $this, 'handlePermissionsSave' ));
         add_action('admin_post_fa_wpmcp_save_rate_limits', array( $this, 'handleRateLimitsSave' ));
         add_action('admin_post_fa_wpmcp_save_webhooks', array( $this, 'handleWebhooksSave' ));
+        add_action('admin_notices', array( $this, 'renderSaltWarning' ));
+        add_action('wp_ajax_fa_wpmcp_dismiss_salt_warning', array( $this, 'handleDismissSaltWarning' ));
     }
 
     /**
@@ -959,5 +975,127 @@ final class SettingsPage
             'webhook_secret'    => is_string($webhook_secret) ? $webhook_secret : '',
             'webhook_endpoints' => is_array($webhooks) ? ( $webhooks['webhook_endpoints'] ?? array() ) : array(),
         );
+    }
+
+    /**
+     * Check if WordPress security salts are properly configured.
+     *
+     * Verifies that the salts used for encryption key derivation
+     * are not empty or set to the default placeholder value.
+     *
+     * @return bool True if salts are secure, false if any are insecure.
+     */
+    public function areSaltsSecure(): bool
+    {
+        $salts = array(
+            defined('SECURE_AUTH_KEY') ? SECURE_AUTH_KEY : '',
+            defined('LOGGED_IN_KEY') ? LOGGED_IN_KEY : '',
+            defined('NONCE_SALT') ? NONCE_SALT : '',
+        );
+
+        foreach ($salts as $salt) {
+            if (empty($salt) || self::DEFAULT_SALT_VALUE === $salt) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Render security warning if WordPress salts are not configured.
+     *
+     * Displays a dismissible admin notice on FA-WPMCP pages when
+     * WordPress security keys contain default or empty values.
+     *
+     * @return void
+     */
+    public function renderSaltWarning(): void
+    {
+        // Only show on plugin pages.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking current page.
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
+        if (0 !== strpos($page, 'fa-wpmcp')) {
+            return;
+        }
+
+        // Check if user can manage options.
+        if (! current_user_can(self::CAPABILITY)) {
+            return;
+        }
+
+        // Check if warning was dismissed by this user.
+        $user_id = get_current_user_id();
+        if (get_user_meta($user_id, self::SALT_WARNING_DISMISSED_META, true)) {
+            return;
+        }
+
+        // Check if salts are secure.
+        if ($this->areSaltsSecure()) {
+            return;
+        }
+
+        // Render the warning notice.
+        $dismiss_url = wp_nonce_url(
+            admin_url('admin-ajax.php?action=fa_wpmcp_dismiss_salt_warning'),
+            'fa_wpmcp_dismiss_salt_warning'
+        );
+
+        $output  = '<div class="notice notice-warning is-dismissible fa-wpmcp-salt-warning">';
+        $output .= '<p><strong>' . esc_html('Security Warning:') . '</strong> ';
+        $output .= esc_html('Your WordPress security keys contain default values. ');
+        $output .= esc_html('Webhook secret encryption and other security features require properly configured salts. ');
+        $output .= '<a href="https://api.wordpress.org/secret-key/1.1/salt/" target="_blank" rel="noopener noreferrer">';
+        $output .= esc_html('Generate new salts');
+        $output .= '</a>';
+        $output .= ' | ';
+        $output .= '<a href="' . esc_url($dismiss_url) . '" class="fa-wpmcp-dismiss-salt-warning">';
+        $output .= esc_html('Dismiss');
+        $output .= '</a>';
+        $output .= '</p>';
+        $output .= '</div>';
+
+        $output .= '<script type="text/javascript">';
+        $output .= 'jQuery(document).ready(function($) {';
+        $output .= '  $(".fa-wpmcp-salt-warning").on("click", ".notice-dismiss, .fa-wpmcp-dismiss-salt-warning", function(e) {';
+        $output .= '    e.preventDefault();';
+        $output .= '    $.post("' . esc_url(admin_url('admin-ajax.php')) . '", {';
+        $output .= '      action: "fa_wpmcp_dismiss_salt_warning",';
+        $output .= '      _wpnonce: "' . esc_js(wp_create_nonce('fa_wpmcp_dismiss_salt_warning')) . '"';
+        $output .= '    });';
+        $output .= '    $(".fa-wpmcp-salt-warning").fadeOut();';
+        $output .= '  });';
+        $output .= '});';
+        $output .= '</script>';
+
+        echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped above.
+    }
+
+    /**
+     * Handle AJAX request to dismiss salt warning.
+     *
+     * Stores dismissal in user meta so the warning doesn't reappear.
+     *
+     * @return void
+     */
+    public function handleDismissSaltWarning(): void
+    {
+        // Verify nonce.
+        if (! check_ajax_referer('fa_wpmcp_dismiss_salt_warning', '_wpnonce', false)) {
+            wp_send_json_error('Invalid nonce', 403);
+            return;
+        }
+
+        // Verify capability.
+        if (! current_user_can(self::CAPABILITY)) {
+            wp_send_json_error('Permission denied', 403);
+            return;
+        }
+
+        // Store dismissal in user meta.
+        $user_id = get_current_user_id();
+        update_user_meta($user_id, self::SALT_WARNING_DISMISSED_META, true);
+
+        wp_send_json_success();
     }
 }

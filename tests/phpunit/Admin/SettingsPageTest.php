@@ -1033,8 +1033,11 @@ class SettingsPageTest extends TestCase
         Functions\expect('sanitize_text_field')
             ->andReturnFirstArg();
 
+        // handleSettingsSave calls update_option twice:
+        // 1. fa_wpmcp_settings (main settings)
+        // 2. fa_wpmcp_anonymize_ip (standalone option for LogRepository)
         Functions\expect('update_option')
-            ->once();
+            ->twice();
 
         Functions\expect('admin_url')
             ->andReturn('http://example.com/wp-admin/admin.php');
@@ -1117,8 +1120,11 @@ class SettingsPageTest extends TestCase
         Functions\expect('sanitize_text_field')
             ->andReturnFirstArg();
 
+        // handleSettingsSave calls update_option twice:
+        // 1. fa_wpmcp_settings (main settings)
+        // 2. fa_wpmcp_anonymize_ip (standalone option for LogRepository)
         Functions\expect('update_option')
-            ->once();
+            ->twice();
 
         Functions\expect('admin_url')
             ->andReturn('http://example.com/wp-admin/admin.php');
@@ -1663,6 +1669,14 @@ class SettingsPageTest extends TestCase
             ->once()
             ->with('admin_post_fa_wpmcp_save_webhooks', Mockery::type('array'));
 
+        Functions\expect('add_action')
+            ->once()
+            ->with('admin_notices', Mockery::type('array'));
+
+        Functions\expect('add_action')
+            ->once()
+            ->with('wp_ajax_fa_wpmcp_dismiss_salt_warning', Mockery::type('array'));
+
         $registry      = $this->create_registry_with_abilities();
         $settings_page = new SettingsPage($registry);
 
@@ -1766,5 +1780,244 @@ class SettingsPageTest extends TestCase
 
         // Clean up.
         unset($_GET['settings-error']);
+    }
+
+    // =========================================================================
+    // Salt Warning Tests
+    // =========================================================================
+
+    /**
+     * Test areSaltsSecure returns true when salts are properly configured.
+     *
+     * @return void
+     */
+    public function test_are_salts_secure_returns_true_with_proper_salts(): void
+    {
+        // Constants are already defined in bootstrap.php with proper values.
+        $registry      = $this->create_registry_with_abilities();
+        $settings_page = new SettingsPage($registry);
+
+        $this->assertTrue($settings_page->areSaltsSecure());
+    }
+
+    /**
+     * Test salt warning not rendered when salts are secure.
+     *
+     * @return void
+     */
+    public function test_salt_warning_not_rendered_when_salts_secure(): void
+    {
+        $_GET['page'] = 'fa-wpmcp';
+
+        Functions\expect('current_user_can')
+            ->with('manage_options')
+            ->andReturn(true);
+
+        Functions\expect('get_current_user_id')
+            ->andReturn(1);
+
+        Functions\expect('get_user_meta')
+            ->with(1, 'fa_wpmcp_salt_warning_dismissed', true)
+            ->andReturn(false);
+
+        Functions\expect('sanitize_text_field')
+            ->andReturnFirstArg();
+
+        Functions\expect('wp_unslash')
+            ->andReturnFirstArg();
+
+        // Salts are already defined properly in bootstrap.php.
+        $registry      = $this->create_registry_with_abilities();
+        $settings_page = new SettingsPage($registry);
+
+        $output = $this->captureOutput(fn() => $settings_page->renderSaltWarning());
+
+        // Warning should not appear since salts are secure.
+        $this->assertEmpty($output);
+
+        // Clean up.
+        unset($_GET['page']);
+    }
+
+    /**
+     * Test salt warning not rendered on non-plugin pages.
+     *
+     * @return void
+     */
+    public function test_salt_warning_not_rendered_on_non_plugin_pages(): void
+    {
+        $_GET['page'] = 'options-general';
+
+        Functions\expect('sanitize_text_field')
+            ->andReturnFirstArg();
+
+        Functions\expect('wp_unslash')
+            ->andReturnFirstArg();
+
+        $registry      = $this->create_registry_with_abilities();
+        $settings_page = new SettingsPage($registry);
+
+        $output = $this->captureOutput(fn() => $settings_page->renderSaltWarning());
+
+        // Warning should not appear on non-plugin pages.
+        $this->assertEmpty($output);
+
+        // Clean up.
+        unset($_GET['page']);
+    }
+
+    /**
+     * Test salt warning not rendered when dismissed by user.
+     *
+     * @return void
+     */
+    public function test_salt_warning_not_rendered_when_dismissed(): void
+    {
+        $_GET['page'] = 'fa-wpmcp';
+
+        Functions\expect('current_user_can')
+            ->with('manage_options')
+            ->andReturn(true);
+
+        Functions\expect('get_current_user_id')
+            ->andReturn(1);
+
+        Functions\expect('get_user_meta')
+            ->with(1, 'fa_wpmcp_salt_warning_dismissed', true)
+            ->andReturn(true);  // User has dismissed the warning.
+
+        Functions\expect('sanitize_text_field')
+            ->andReturnFirstArg();
+
+        Functions\expect('wp_unslash')
+            ->andReturnFirstArg();
+
+        $registry      = $this->create_registry_with_abilities();
+        $settings_page = new SettingsPage($registry);
+
+        $output = $this->captureOutput(fn() => $settings_page->renderSaltWarning());
+
+        // Warning should not appear when dismissed.
+        $this->assertEmpty($output);
+
+        // Clean up.
+        unset($_GET['page']);
+    }
+
+    /**
+     * Test salt warning not rendered for users without capability.
+     *
+     * @return void
+     */
+    public function test_salt_warning_not_rendered_without_capability(): void
+    {
+        $_GET['page'] = 'fa-wpmcp';
+
+        Functions\expect('current_user_can')
+            ->with('manage_options')
+            ->andReturn(false);
+
+        Functions\expect('sanitize_text_field')
+            ->andReturnFirstArg();
+
+        Functions\expect('wp_unslash')
+            ->andReturnFirstArg();
+
+        $registry      = $this->create_registry_with_abilities();
+        $settings_page = new SettingsPage($registry);
+
+        $output = $this->captureOutput(fn() => $settings_page->renderSaltWarning());
+
+        // Warning should not appear without capability.
+        $this->assertEmpty($output);
+
+        // Clean up.
+        unset($_GET['page']);
+    }
+
+    /**
+     * Test dismiss salt warning handler verifies nonce.
+     *
+     * @return void
+     */
+    public function test_dismiss_salt_warning_verifies_nonce(): void
+    {
+        Functions\expect('check_ajax_referer')
+            ->once()
+            ->with('fa_wpmcp_dismiss_salt_warning', '_wpnonce', false)
+            ->andReturn(false);
+
+        Functions\expect('wp_send_json_error')
+            ->once()
+            ->with('Invalid nonce', 403);
+
+        $registry      = $this->create_registry_with_abilities();
+        $settings_page = new SettingsPage($registry);
+
+        $settings_page->handleDismissSaltWarning();
+
+        $this->assertTrue(true, 'Nonce verified on dismiss');
+    }
+
+    /**
+     * Test dismiss salt warning handler verifies capability.
+     *
+     * @return void
+     */
+    public function test_dismiss_salt_warning_verifies_capability(): void
+    {
+        Functions\expect('check_ajax_referer')
+            ->once()
+            ->with('fa_wpmcp_dismiss_salt_warning', '_wpnonce', false)
+            ->andReturn(true);
+
+        Functions\expect('current_user_can')
+            ->with('manage_options')
+            ->andReturn(false);
+
+        Functions\expect('wp_send_json_error')
+            ->once()
+            ->with('Permission denied', 403);
+
+        $registry      = $this->create_registry_with_abilities();
+        $settings_page = new SettingsPage($registry);
+
+        $settings_page->handleDismissSaltWarning();
+
+        $this->assertTrue(true, 'Capability verified on dismiss');
+    }
+
+    /**
+     * Test dismiss salt warning handler stores dismissal in user meta.
+     *
+     * @return void
+     */
+    public function test_dismiss_salt_warning_stores_user_meta(): void
+    {
+        Functions\expect('check_ajax_referer')
+            ->once()
+            ->with('fa_wpmcp_dismiss_salt_warning', '_wpnonce', false)
+            ->andReturn(true);
+
+        Functions\expect('current_user_can')
+            ->with('manage_options')
+            ->andReturn(true);
+
+        Functions\expect('get_current_user_id')
+            ->andReturn(42);
+
+        Functions\expect('update_user_meta')
+            ->once()
+            ->with(42, 'fa_wpmcp_salt_warning_dismissed', true);
+
+        Functions\expect('wp_send_json_success')
+            ->once();
+
+        $registry      = $this->create_registry_with_abilities();
+        $settings_page = new SettingsPage($registry);
+
+        $settings_page->handleDismissSaltWarning();
+
+        $this->assertTrue(true, 'User meta updated on dismiss');
     }
 }
