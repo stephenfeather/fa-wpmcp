@@ -24,6 +24,7 @@ use FAWpmcp\Exceptions\ConfigConstantException;
 final class GetConfigConstantAbility extends AbstractAbility
 {
     use ConfigValueFormatterTrait;
+
     /**
      * Constants that contain sensitive data and cannot be retrieved.
      *
@@ -226,5 +227,4 @@ final class GetConfigConstantAbility extends AbstractAbility
 
         return false;
     }
-
 }

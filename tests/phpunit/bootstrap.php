@@ -58,6 +58,40 @@ if (! defined('NONCE_SALT')) {
     define('NONCE_SALT', 'test-nonce-salt-for-phpunit-testing-only-32characters!');
 }
 
+// phpcs:disable Squiz.Classes.ValidClassName.NotCamelCaps, PSR1.Classes.ClassDeclaration.MissingNamespace
+if (! class_exists('WP_Error')) {
+    /**
+     * Stub WP_Error class for unit tests.
+     *
+     * WordPress WP_Error is not available in unit test context.
+     */
+    class WP_Error
+    {
+        /** @var array<string, array<string>> */
+        public $errors = array();
+
+        /** @var string */
+        public $code = '';
+
+        /** @var string */
+        public $message = '';
+
+        /**
+         * Constructor.
+         *
+         * @param string $code    Error code.
+         * @param string $message Error message.
+         */
+        public function __construct(string $code = '', string $message = '')
+        {
+            $this->code    = $code;
+            $this->message = $message;
+            $this->errors  = array( $code => array( $message ) );
+        }
+    }
+}
+// phpcs:enable Squiz.Classes.ValidClassName.NotCamelCaps
+
 if (! function_exists('user_can')) {
     /**
      * Test stub for user_can.

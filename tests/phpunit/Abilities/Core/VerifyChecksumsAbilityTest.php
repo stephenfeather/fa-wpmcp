@@ -15,24 +15,7 @@ use FAWpmcp\Abilities\Core\VerifyChecksumsAbility;
 use FAWpmcp\Tests\TestCase\AbilityTestTrait;
 use FAWpmcp\Tests\TestCase\BrainMonkeyTestCase;
 use Brain\Monkey\Functions;
-
-// Define WP_Error stub if not exists.
-if (! class_exists('WP_Error')) {
-    // phpcs:ignore Generic.Classes.DuplicateClassName.Found
-    class WP_Error
-    {
-        public $errors   = array();
-        public $code     = '';
-        public $message  = '';
-
-        public function __construct(string $code = '', string $message = '')
-        {
-            $this->code    = $code;
-            $this->message = $message;
-            $this->errors  = array( $code => array( $message ) );
-        }
-    }
-}
+use WP_Error;
 
 /**
  * Test VerifyChecksumsAbility functionality.

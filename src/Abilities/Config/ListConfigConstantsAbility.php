@@ -24,6 +24,7 @@ use FAWpmcp\Abilities\AbstractAbility;
 final class ListConfigConstantsAbility extends AbstractAbility
 {
     use ConfigValueFormatterTrait;
+
     /**
      * Constants considered safe to expose.
      *
