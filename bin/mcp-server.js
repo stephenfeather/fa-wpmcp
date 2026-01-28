@@ -221,7 +221,7 @@ async function main() {
 }
 
 // Start server
-main().catch((error) => {
+main().catch((error) => { // NOSONAR S7785 - main() pattern preferred for centralized error handling
 	console.error("Fatal error:", error);
 	process.exit(1);
 });
