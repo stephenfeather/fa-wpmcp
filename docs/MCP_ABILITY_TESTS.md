@@ -2,8 +2,8 @@
 
 Testing all fa-wpmcp abilities via REST (curl) and MCP (Claude Code `mcp__wordpress__*` tools).
 
-**Test Date**: 2026-01-27
-**Server**: localhost (Docker)
+**Test Date**: 2026-01-28
+**Server**: localhost:8080 (Docker test environment)
 
 **Legend**:
 - **REST**: Tested via curl to `http://localhost/wp-json/mcp/mcp-adapter-default-server`
@@ -242,15 +242,15 @@ Testing all fa-wpmcp abilities via REST (curl) and MCP (Claude Code `mcp__wordpr
 
 1. **activate-theme**: Activating a theme that lacks `add_filter('wp_is_application_passwords_available', '__return_true')` in its functions.php will break MCP authentication for subsequent requests.
 
-2. **activate-maintenance-mode**: Creates `.maintenance` file in ABSPATH. If this locks you out, remove it manually: `docker exec wordpress rm -f /var/www/html/web/wp/.maintenance`
+2. **activate-maintenance-mode**: Creates `.maintenance` file in ABSPATH. If this locks you out, remove it manually: `docker exec fa-wpmcp-wordpress-test rm -f /var/www/html/.maintenance`
 
 ### Bugs Fixed (2026-01-27)
 
-1. **list-taxonomies**: Output validation failed - `rest_base` returned `false` for some taxonomies. Fixed to return empty string.
+1. **list-taxonomies**: Output validation failed - `rest_base` returned `false` for some taxonomies. Fixed to return empty string. ✅ Re-verified via MCP 2026-01-28.
 
-2. **delete-user**: Output validation failed - `reassigned` returned `null` when no reassignment. Fixed to return `0`.
+2. **delete-user**: Output validation failed - `reassigned` returned `null` when no reassignment. Fixed to return `0`. ✅ Re-verified via MCP 2026-01-28.
 
-3. **list-cron-events**: Output validation failed - `schedule` was `false` for single events. Fixed to return empty string.
+3. **list-cron-events**: Output validation failed - `schedule` was `false` for single events. Fixed to return empty string. ✅ Re-verified via MCP 2026-01-28.
 
 4. **list-post-types / get-post-type**: Not exposed as MCP tools - `post-types` category was missing from MCP adapter filter. Added to exposed categories list and fixed `rest_base` type normalization.
 
@@ -266,13 +266,18 @@ Testing all fa-wpmcp abilities via REST (curl) and MCP (Claude Code `mcp__wordpr
 
 ## Test Commands
 
-### MCP Session Setup
+See [LOCAL_DOCKER_TESTING.md](LOCAL_DOCKER_TESTING.md) for Docker environment setup.
+
+### MCP Session Setup (Docker Test Environment)
 ```bash
+# Get credentials from docker/wordpress-data/.mcp-test-credentials
+# Default: test_admin with generated app password
+
 SESSION=$(curl -s -X POST \
-  -H "Authorization: Basic $(echo -n 'featherarms_admin:uFNyTM2nrGx0qc84347wCAbI' | base64)" \
+  -H "Authorization: Basic $(echo -n 'test_admin:YOUR_APP_PASSWORD' | base64)" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' \
-  "http://localhost/wp-json/mcp/mcp-adapter-default-server" -i 2>/dev/null | \
+  "http://localhost:8080/wp-json/mcp/mcp-adapter-default-server" -i 2>/dev/null | \
   grep -i "Mcp-Session-Id" | cut -d' ' -f2 | tr -d '\r')
 echo "Session: $SESSION"
 ```
@@ -280,20 +285,20 @@ echo "Session: $SESSION"
 ### MCP Tool Call Template
 ```bash
 curl -s -X POST \
-  -H "Authorization: Basic $(echo -n 'featherarms_admin:uFNyTM2nrGx0qc84347wCAbI' | base64)" \
+  -H "Authorization: Basic $(echo -n 'test_admin:YOUR_APP_PASSWORD' | base64)" \
   -H "Content-Type: application/json" \
   -H "Mcp-Session-Id: $SESSION" \
   -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"TOOL_NAME","arguments":{}}}' \
-  "http://localhost/wp-json/mcp/mcp-adapter-default-server" | jq .
+  "http://localhost:8080/wp-json/mcp/mcp-adapter-default-server" | jq .
 ```
 
-### WP-CLI Verification
+### WP-CLI Verification (Docker Test Environment)
 ```bash
-docker exec wordpress wp --allow-root post list
-docker exec wordpress wp --allow-root user list
-docker exec wordpress wp --allow-root plugin list
-docker exec wordpress wp --allow-root theme list
-docker exec wordpress wp --allow-root option get OPTION_NAME
+docker exec fa-wpmcp-wordpress-test wp --allow-root post list
+docker exec fa-wpmcp-wordpress-test wp --allow-root user list
+docker exec fa-wpmcp-wordpress-test wp --allow-root plugin list
+docker exec fa-wpmcp-wordpress-test wp --allow-root theme list
+docker exec fa-wpmcp-wordpress-test wp --allow-root option get OPTION_NAME
 ```
 
 ---
