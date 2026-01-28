@@ -179,6 +179,7 @@ final class Plugin
                     'core',
                     'rewrite',
                     'config',
+                    'search-replace',
                 );
 
                 $fa_abilities = array();
@@ -311,9 +312,13 @@ final class Plugin
                 'label'       => __('Rewrite Rules', 'fa-wpmcp'),
                 'description' => __('Abilities for managing WordPress rewrite rules and permalink structure', 'fa-wpmcp'),
             ),
-            'config'      => array(
+            'config'         => array(
                 'label'       => __('Configuration', 'fa-wpmcp'),
                 'description' => __('Abilities for inspecting WordPress configuration constants', 'fa-wpmcp'),
+            ),
+            'search-replace' => array(
+                'label'       => __('Search Replace', 'fa-wpmcp'),
+                'description' => __('Preview search and replace operations (dry-run only)', 'fa-wpmcp'),
             ),
         );
 

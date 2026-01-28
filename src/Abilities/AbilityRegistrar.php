@@ -47,6 +47,7 @@ final class AbilityRegistrar
         self::registerDotenvAbilities($registry);
         self::registerCoreAbilities($registry);
         self::registerConfigurationAbilities($registry);
+        self::registerSearchReplaceAbilities($registry);
     }
 
     /**
@@ -359,5 +360,16 @@ final class AbilityRegistrar
         // Config constant abilities.
         $registry->register(new \FAWpmcp\Abilities\Config\ListConfigConstantsAbility());
         $registry->register(new \FAWpmcp\Abilities\Config\GetConfigConstantAbility());
+    }
+
+    /**
+     * Register search-replace abilities.
+     *
+     * @param AbilityRegistry $registry Ability registry.
+     * @return void
+     */
+    private static function registerSearchReplaceAbilities(AbilityRegistry $registry): void
+    {
+        $registry->register(new \FAWpmcp\Abilities\SearchReplace\SearchReplaceAbility());
     }
 }
