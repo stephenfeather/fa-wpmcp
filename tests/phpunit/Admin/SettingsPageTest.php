@@ -352,6 +352,13 @@ class SettingsPageTest extends TestCase
                 }
             );
 
+        Functions\expect('selected')
+            ->andReturnUsing(
+                function ($selected, $current, $echo) {
+                    return $selected === $current ? 'selected="selected"' : '';
+                }
+            );
+
         Functions\expect('admin_url')
             ->andReturn('http://example.com/wp-admin/admin-post.php');
 
@@ -397,6 +404,13 @@ class SettingsPageTest extends TestCase
                 }
             );
 
+        Functions\expect('selected')
+            ->andReturnUsing(
+                function ($selected, $current, $echo) {
+                    return $selected === $current ? 'selected="selected"' : '';
+                }
+            );
+
         Functions\expect('admin_url')
             ->andReturn('http://example.com/wp-admin/admin-post.php');
 
@@ -438,6 +452,13 @@ class SettingsPageTest extends TestCase
                 }
             );
 
+        Functions\expect('selected')
+            ->andReturnUsing(
+                function ($selected, $current, $echo) {
+                    return $selected === $current ? 'selected="selected"' : '';
+                }
+            );
+
         Functions\expect('admin_url')
             ->once()
             ->with('admin-post.php')
@@ -450,6 +471,247 @@ class SettingsPageTest extends TestCase
 
         $this->assertStringContainsString('action="http://example.com/wp-admin/admin-post.php"', $output);
         $this->assertStringContainsString('name="action" value="fa_wpmcp_save_settings"', $output);
+    }
+
+    // =========================================================================
+    // Security Settings Tests (Max API Role)
+    // =========================================================================
+
+    /**
+     * Test renders security section with max API role dropdown.
+     *
+     * @return void
+     */
+    public function test_renders_security_section_with_max_api_role(): void
+    {
+        Functions\expect('current_user_can')
+            ->with('manage_options')
+            ->andReturn(true);
+
+        Functions\expect('get_option')
+            ->andReturn(array( 'max_api_role' => 'editor' ));
+
+        Functions\expect('wp_nonce_field')
+            ->andReturn('');
+
+        Functions\expect('esc_attr')
+            ->andReturnFirstArg();
+
+        Functions\expect('esc_html')
+            ->andReturnFirstArg();
+
+        Functions\expect('checked')
+            ->andReturnUsing(
+                function ($checked, $current, $echo) {
+                    return $checked === $current ? 'checked="checked"' : '';
+                }
+            );
+
+        Functions\expect('selected')
+            ->andReturnUsing(
+                function ($selected, $current, $echo) {
+                    return $selected === $current ? 'selected="selected"' : '';
+                }
+            );
+
+        Functions\expect('admin_url')
+            ->andReturn('http://example.com/wp-admin/admin-post.php');
+
+        $registry = $this->create_registry_with_abilities();
+
+        $settings_page = new SettingsPage($registry);
+        $output        = $this->captureOutput(fn() => $settings_page->renderSettingsPage());
+
+        $this->assertStringContainsString('Security', $output);
+        $this->assertStringContainsString('max_api_role', $output);
+        $this->assertStringContainsString('<select', $output);
+        $this->assertStringContainsString('subscriber', $output);
+        $this->assertStringContainsString('administrator', $output);
+    }
+
+    /**
+     * Test max API role dropdown shows all roles.
+     *
+     * @return void
+     */
+    public function test_max_api_role_dropdown_shows_all_roles(): void
+    {
+        Functions\expect('current_user_can')
+            ->with('manage_options')
+            ->andReturn(true);
+
+        Functions\expect('get_option')
+            ->andReturn(array( 'max_api_role' => 'author' ));
+
+        Functions\expect('wp_nonce_field')
+            ->andReturn('');
+
+        Functions\expect('esc_attr')
+            ->andReturnFirstArg();
+
+        Functions\expect('esc_html')
+            ->andReturnFirstArg();
+
+        Functions\expect('checked')
+            ->andReturnUsing(
+                function ($checked, $current, $echo) {
+                    return $checked === $current ? 'checked="checked"' : '';
+                }
+            );
+
+        Functions\expect('selected')
+            ->andReturnUsing(
+                function ($selected, $current, $echo) {
+                    return $selected === $current ? 'selected="selected"' : '';
+                }
+            );
+
+        Functions\expect('admin_url')
+            ->andReturn('http://example.com/wp-admin/admin-post.php');
+
+        $registry = $this->create_registry_with_abilities();
+
+        $settings_page = new SettingsPage($registry);
+        $output        = $this->captureOutput(fn() => $settings_page->renderSettingsPage());
+
+        // All five standard roles should appear.
+        $this->assertStringContainsString('subscriber', $output);
+        $this->assertStringContainsString('contributor', $output);
+        $this->assertStringContainsString('author', $output);
+        $this->assertStringContainsString('editor', $output);
+        $this->assertStringContainsString('administrator', $output);
+    }
+
+    /**
+     * Test saves max API role setting.
+     *
+     * @return void
+     */
+    public function test_saves_max_api_role_setting(): void
+    {
+        $_POST['fa_wpmcp_nonce'] = 'valid-nonce';
+        $_POST['action']         = 'fa_wpmcp_save_settings';
+        $_POST['max_api_role']   = 'author';
+
+        Functions\expect('wp_unslash')
+            ->andReturnFirstArg();
+
+        Functions\expect('wp_verify_nonce')
+            ->once()
+            ->with('valid-nonce', 'fa_wpmcp_settings')
+            ->andReturn(1);
+
+        Functions\expect('current_user_can')
+            ->with('manage_options')
+            ->andReturn(true);
+
+        Functions\expect('sanitize_text_field')
+            ->andReturnFirstArg();
+
+        // Expect fa_wpmcp_settings to include max_api_role.
+        Functions\expect('update_option')
+            ->once()
+            ->with(
+                'fa_wpmcp_settings',
+                Mockery::on(
+                    function ($value) {
+                        return is_array($value) && 'author' === $value['max_api_role'];
+                    }
+                )
+            );
+
+        // Standalone options.
+        Functions\expect('update_option')
+            ->once()
+            ->with('fa_wpmcp_anonymize_ip', false);
+
+        Functions\expect('update_option')
+            ->once()
+            ->with('fa_wpmcp_max_api_role', 'author');
+
+        Functions\expect('admin_url')
+            ->andReturn('http://example.com/wp-admin/admin.php');
+
+        Functions\expect('add_query_arg')
+            ->andReturn('http://example.com/wp-admin/admin.php?page=fa-wpmcp&settings-updated=true');
+
+        Functions\expect('wp_safe_redirect')
+            ->once();
+
+        $registry      = $this->create_registry_with_abilities();
+        $settings_page = new SettingsPage($registry);
+
+        $settings_page->handleSettingsSave();
+
+        $this->assertTrue(true, 'Max API role saved');
+
+        // Clean up.
+        unset($_POST['fa_wpmcp_nonce'], $_POST['action'], $_POST['max_api_role']);
+    }
+
+    /**
+     * Test sanitizes invalid max API role to default.
+     *
+     * @return void
+     */
+    public function test_sanitizes_invalid_max_api_role(): void
+    {
+        $_POST['fa_wpmcp_nonce'] = 'valid-nonce';
+        $_POST['action']         = 'fa_wpmcp_save_settings';
+        $_POST['max_api_role']   = 'superadmin';  // Invalid role.
+
+        Functions\expect('wp_unslash')
+            ->andReturnFirstArg();
+
+        Functions\expect('wp_verify_nonce')
+            ->once()
+            ->andReturn(1);
+
+        Functions\expect('current_user_can')
+            ->with('manage_options')
+            ->andReturn(true);
+
+        Functions\expect('sanitize_text_field')
+            ->andReturnFirstArg();
+
+        // Should default to 'editor' for invalid role.
+        Functions\expect('update_option')
+            ->once()
+            ->with(
+                'fa_wpmcp_settings',
+                Mockery::on(
+                    function ($value) {
+                        return is_array($value) && 'editor' === $value['max_api_role'];
+                    }
+                )
+            );
+
+        Functions\expect('update_option')
+            ->once()
+            ->with('fa_wpmcp_anonymize_ip', false);
+
+        Functions\expect('update_option')
+            ->once()
+            ->with('fa_wpmcp_max_api_role', 'editor');
+
+        Functions\expect('admin_url')
+            ->andReturn('http://example.com/wp-admin/admin.php');
+
+        Functions\expect('add_query_arg')
+            ->andReturn('http://example.com/wp-admin/admin.php?page=fa-wpmcp&settings-updated=true');
+
+        Functions\expect('wp_safe_redirect')
+            ->once();
+
+        $registry      = $this->create_registry_with_abilities();
+        $settings_page = new SettingsPage($registry);
+
+        $settings_page->handleSettingsSave();
+
+        $this->assertTrue(true, 'Invalid role sanitized to default');
+
+        // Clean up.
+        unset($_POST['fa_wpmcp_nonce'], $_POST['action'], $_POST['max_api_role']);
     }
 
     // =========================================================================
@@ -1033,11 +1295,12 @@ class SettingsPageTest extends TestCase
         Functions\expect('sanitize_text_field')
             ->andReturnFirstArg();
 
-        // handleSettingsSave calls update_option twice:
+        // handleSettingsSave calls update_option three times:
         // 1. fa_wpmcp_settings (main settings)
         // 2. fa_wpmcp_anonymize_ip (standalone option for LogRepository)
+        // 3. fa_wpmcp_max_api_role (standalone option for RolePolicy)
         Functions\expect('update_option')
-            ->twice();
+            ->times(3);
 
         Functions\expect('admin_url')
             ->andReturn('http://example.com/wp-admin/admin.php');
@@ -1120,11 +1383,12 @@ class SettingsPageTest extends TestCase
         Functions\expect('sanitize_text_field')
             ->andReturnFirstArg();
 
-        // handleSettingsSave calls update_option twice:
+        // handleSettingsSave calls update_option three times:
         // 1. fa_wpmcp_settings (main settings)
         // 2. fa_wpmcp_anonymize_ip (standalone option for LogRepository)
+        // 3. fa_wpmcp_max_api_role (standalone option for RolePolicy)
         Functions\expect('update_option')
-            ->twice();
+            ->times(3);
 
         Functions\expect('admin_url')
             ->andReturn('http://example.com/wp-admin/admin.php');
@@ -1178,6 +1442,13 @@ class SettingsPageTest extends TestCase
             ->andReturnUsing(
                 function ($checked, $current, $echo) {
                     return $checked === $current ? 'checked="checked"' : '';
+                }
+            );
+
+        Functions\expect('selected')
+            ->andReturnUsing(
+                function ($selected, $current, $echo) {
+                    return $selected === $current ? 'selected="selected"' : '';
                 }
             );
 
@@ -1252,6 +1523,13 @@ class SettingsPageTest extends TestCase
             ->andReturnUsing(
                 function ($checked, $current, $echo) {
                     return $checked === $current ? 'checked="checked"' : '';
+                }
+            );
+
+        Functions\expect('selected')
+            ->andReturnUsing(
+                function ($selected, $current, $echo) {
+                    return $selected === $current ? 'selected="selected"' : '';
                 }
             );
 
@@ -1721,6 +1999,13 @@ class SettingsPageTest extends TestCase
                 }
             );
 
+        Functions\expect('selected')
+            ->andReturnUsing(
+                function ($selected, $current, $echo) {
+                    return $selected === $current ? 'selected="selected"' : '';
+                }
+            );
+
         Functions\expect('admin_url')
             ->andReturn('http://example.com/wp-admin/admin-post.php');
 
@@ -1765,6 +2050,13 @@ class SettingsPageTest extends TestCase
             ->andReturnUsing(
                 function ($checked, $current, $echo) {
                     return $checked === $current ? 'checked="checked"' : '';
+                }
+            );
+
+        Functions\expect('selected')
+            ->andReturnUsing(
+                function ($selected, $current, $echo) {
+                    return $selected === $current ? 'selected="selected"' : '';
                 }
             );
 

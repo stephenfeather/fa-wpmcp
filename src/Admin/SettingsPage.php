@@ -321,6 +321,36 @@ final class SettingsPage
 
         $output .= '</table>';
 
+        // Security Settings.
+        $output .= '<h2>' . esc_html('Security') . '</h2>';
+        $output .= '<table class="form-table">';
+
+        $output .= '<tr>';
+        $output .= '<th scope="row"><label for="max_api_role">' . esc_html('Maximum API Role') . '</label></th>';
+        $output .= '<td>';
+        $output .= '<select id="max_api_role" name="max_api_role">';
+
+        $roles = array(
+            'subscriber'    => 'Subscriber (safest)',
+            'contributor'   => 'Contributor',
+            'author'        => 'Author',
+            'editor'        => 'Editor (default)',
+            'administrator' => 'Administrator (use with caution)',
+        );
+        $current_role = $settings['max_api_role'] ?? 'editor';
+
+        foreach ($roles as $role_value => $role_label) {
+            $selected = selected($current_role, $role_value, false);
+            $output  .= '<option value="' . esc_attr($role_value) . '"' . $selected . '>' . esc_html($role_label) . '</option>';
+        }
+
+        $output .= '</select>';
+        $output .= '<p class="description">' . esc_html('The highest role that can be assigned to users via the API. Roles above this level cannot be created or assigned through MCP abilities. Default: Editor (prevents API-created administrators).') . '</p>';
+        $output .= '</td>';
+        $output .= '</tr>';
+
+        $output .= '</table>';
+
         $output .= '<p class="submit">';
         $output .= '<input type="submit" name="submit" class="button button-primary" value="' . esc_attr('Save Settings') . '" />';
         $output .= '</p>';
@@ -715,6 +745,13 @@ final class SettingsPage
             return;
         }
 
+        // Validate and sanitize max_api_role.
+        $valid_roles  = array( 'subscriber', 'contributor', 'author', 'editor', 'administrator' );
+        $max_api_role = isset($_POST['max_api_role']) ? sanitize_text_field(wp_unslash($_POST['max_api_role'])) : 'editor';
+        if (! in_array($max_api_role, $valid_roles, true)) {
+            $max_api_role = 'editor';
+        }
+
         // Save general settings.
         $settings = array(
             'version'                    => FA_WPMCP_VERSION,
@@ -722,12 +759,14 @@ final class SettingsPage
                 && '1' === sanitize_text_field(wp_unslash($_POST['file_error_logging_enabled'])),
             'anonymize_ip'               => isset($_POST['anonymize_ip'])
                 && '1' === sanitize_text_field(wp_unslash($_POST['anonymize_ip'])),
+            'max_api_role'               => $max_api_role,
         );
 
         update_option('fa_wpmcp_settings', $settings);
 
-        // Also update the standalone option for LogRepository.
+        // Also update standalone options for components that read them directly.
         update_option('fa_wpmcp_anonymize_ip', $settings['anonymize_ip']);
+        update_option('fa_wpmcp_max_api_role', $max_api_role);
 
         wp_safe_redirect(
             add_query_arg(
@@ -902,12 +941,19 @@ final class SettingsPage
             'version'                    => '',
             'file_error_logging_enabled' => false,
             'anonymize_ip'               => false,
+            'max_api_role'               => 'editor',
         );
 
         $settings = get_option('fa_wpmcp_settings', $defaults);
 
         if (! is_array($settings)) {
             return $defaults;
+        }
+
+        // Also check the standalone option for backwards compatibility.
+        $standalone_max_role = get_option('fa_wpmcp_max_api_role', '');
+        if (! empty($standalone_max_role) && empty($settings['max_api_role'])) {
+            $settings['max_api_role'] = $standalone_max_role;
         }
 
         return array_merge($defaults, $settings);
