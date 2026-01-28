@@ -6,31 +6,31 @@
 
 /* Webhook endpoint styling */
 .webhook-endpoint {
-	background: #fff;
-	border: 1px solid #ccd0d4;
-	border-radius: 4px;
-	padding: 15px;
-	margin-bottom: 15px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
 }
 
 .webhook-endpoint:last-child {
-	margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 /* Form table enhancements */
 .form-table th {
-	width: 200px;
+    width: 200px;
 }
 
 /* Toggle switches (optional enhancement) */
 .fa-wpmcp-toggle {
-	position: relative;
-	display: inline-block;
-	width: 40px;
-	height: 20px;
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
 }
 
 /* Notice styling */
 .wrap .notice {
-	margin: 15px 0;
+    margin: 15px 0;
 }
