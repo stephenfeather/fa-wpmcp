@@ -219,7 +219,7 @@ class UploadMediaTest extends BrainMonkeyTestCase
         $this->assertSame(42, $result['media_id']);
         $this->assertSame('https://example.com/test.jpg', $result['url']);
         $this->assertSame('image/jpeg', $result['mime_type']);
-        $this->assertSame('image', $result['type']);
+        $this->assertSame('image', $result['media_type']);
 
         $temp_file = $upload_dir . '/test.jpg';
         if (file_exists($temp_file)) {
