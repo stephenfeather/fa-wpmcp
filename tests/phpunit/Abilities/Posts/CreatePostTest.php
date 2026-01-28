@@ -643,7 +643,10 @@ class CreatePostTest extends BrainMonkeyTestCase
         Functions\expect('get_edit_post_link')->andReturn('https://example.com/wp-admin/post.php?post=1&action=edit');
 
         $ability = $this->getAbilityInstance();
-        $ability->doExecute(array( 'title' => 'Test' ));
+        $result = $ability->doExecute(array( 'title' => 'Test' ));
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('post_id', $result);
     }
 
     /**
@@ -673,12 +676,15 @@ class CreatePostTest extends BrainMonkeyTestCase
         Functions\expect('get_edit_post_link')->andReturn('https://example.com/wp-admin/post.php?post=1&action=edit');
 
         $ability = $this->getAbilityInstance();
-        $ability->doExecute(
+        $result = $ability->doExecute(
             array(
                 'title'     => 'Test',
                 'post_type' => 'page',
             )
         );
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('post_id', $result);
     }
 
     /**
@@ -708,11 +714,14 @@ class CreatePostTest extends BrainMonkeyTestCase
         Functions\expect('get_edit_post_link')->andReturn('https://example.com/wp-admin/post.php?post=1&action=edit');
 
         $ability = $this->getAbilityInstance();
-        $ability->doExecute(
+        $result = $ability->doExecute(
             array(
                 'title'     => 'Test',
                 'post_type' => 'custom_type',
             )
         );
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('post_id', $result);
     }
 }

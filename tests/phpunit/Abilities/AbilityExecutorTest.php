@@ -318,7 +318,9 @@ class AbilityExecutorTest extends TestCase
             category: 'posts-pages',
             operation: 'read'
         );
-        $executor->execute($ability, array( 'limit' => 10 ), 1, 'admin', '192.168.1.1');
+        $result = $executor->execute($ability, array( 'limit' => 10 ), 1, 'admin', '192.168.1.1');
+
+        $this->assertTrue($result->is_success);
     }
 
     /**
@@ -363,7 +365,9 @@ class AbilityExecutorTest extends TestCase
         );
 
         $ability = $this->create_mock_ability();
-        $executor->execute($ability, array(), 1, 'admin', '127.0.0.1');
+        $result = $executor->execute($ability, array(), 1, 'admin', '127.0.0.1');
+
+        $this->assertTrue($result->is_success);
     }
 
     /**
@@ -417,7 +421,9 @@ class AbilityExecutorTest extends TestCase
             category: 'posts-pages',
             operation: 'write'
         );
-        $executor->execute($ability, array( 'title' => 'Test' ), 1, 'admin', '127.0.0.1');
+        $result = $executor->execute($ability, array( 'title' => 'Test' ), 1, 'admin', '127.0.0.1');
+
+        $this->assertTrue($result->is_success);
     }
 
     /**
@@ -467,7 +473,9 @@ class AbilityExecutorTest extends TestCase
         );
 
         $ability = $this->create_mock_ability(name: 'fa-wpmcp/list-posts');
-        $executor->execute($ability, array(), 1, 'admin', '127.0.0.1');
+        $result = $executor->execute($ability, array(), 1, 'admin', '127.0.0.1');
+
+        $this->assertTrue($result->is_success);
     }
 
     /**
@@ -585,7 +593,9 @@ class AbilityExecutorTest extends TestCase
             $webhook_manager,
         );
 
-        $executor->execute($ability, array(), 1, 'admin', '127.0.0.1');
+        $result = $executor->execute($ability, array(), 1, 'admin', '127.0.0.1');
+
+        $this->assertFalse($result->is_success);
     }
 
     /**
@@ -776,7 +786,9 @@ class AbilityExecutorTest extends TestCase
         );
 
         $ability = $this->create_mock_ability();
-        $executor->execute($ability, array(), 42, 'testuser', '10.0.0.1');
+        $result = $executor->execute($ability, array(), 42, 'testuser', '10.0.0.1');
+
+        $this->assertTrue($result->is_success);
     }
 
     /**
