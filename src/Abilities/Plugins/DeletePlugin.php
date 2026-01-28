@@ -150,7 +150,7 @@ final class DeletePlugin extends AbstractAbility
     {
         $annotations                = parent::getAnnotations();
         $annotations['destructive'] = true;
-        $annotations['idempotent']  = true;
+        $annotations['idempotent']  = false;
         return $annotations;
     }
 

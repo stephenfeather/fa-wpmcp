@@ -171,7 +171,7 @@ final class DeleteEnvVarAbility extends AbstractAbility
         $annotations = parent::getAnnotations();
         $annotations['readonly'] = false;
         $annotations['destructive'] = true;
-        $annotations['idempotent'] = true;
+        $annotations['idempotent'] = false;
         return $annotations;
     }
 

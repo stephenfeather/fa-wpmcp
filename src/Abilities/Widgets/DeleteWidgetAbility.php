@@ -133,7 +133,7 @@ final class DeleteWidgetAbility extends AbstractAbility
         return array(
             'readonly'     => false,
             'destructive'  => true,
-            'idempotent'   => true,
+            'idempotent'   => false,
             'instructions' => $this->getDescription(),
         );
     }
