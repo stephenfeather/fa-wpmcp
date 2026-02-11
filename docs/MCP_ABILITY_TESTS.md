@@ -2,7 +2,7 @@
 
 Testing all fa-wpmcp abilities via REST (curl) and MCP (Claude Code `mcp__wordpress__*` tools).
 
-**Test Date**: 2026-01-28
+**Test Date**: 2026-02-11
 **Server**: localhost:8080 (Docker test environment)
 
 **Legend**:
@@ -30,13 +30,13 @@ Testing all fa-wpmcp abilities via REST (curl) and MCP (Claude Code `mcp__wordpr
 | 8 | `fa-wpmcp-get-comment` | ✅ | | Requires `comment_id` |
 | 9 | `fa-wpmcp-update-comment` | ✅ | | Requires `comment_id`, `status` (approve/hold/spam/trash) |
 | 10 | `fa-wpmcp-delete-comment` | ✅ | | Requires `comment_id`; moves to trash |
-| 105 | `fa-wpmcp-get-comment-meta` | | | Requires `comment_id`; optional `meta_key` |
-| 106 | `fa-wpmcp-set-comment-meta` | | | Requires `comment_id`, `meta_key`, `meta_value` |
-| 107 | `fa-wpmcp-delete-comment-meta` | | | Requires `comment_id`, `meta_key`; optional `meta_value` |
-| 108 | `fa-wpmcp-list-comment-meta` | | | Requires `comment_id` |
-| 109 | `fa-wpmcp-get-comment-counts` | | | Optional `post_id` filter |
-| 110 | `fa-wpmcp-bulk-moderate-comments` | | | Requires `comment_ids`, `action` (approve/unapprove/spam/unspam/trash/untrash) |
-| 111 | `fa-wpmcp-get-comment-replies` | | | Requires `comment_id`; optional `hierarchical`, `status` |
+| 105 | `fa-wpmcp-get-comment-meta` | ✅ | | Requires `comment_id`; optional `meta_key` |
+| 106 | `fa-wpmcp-set-comment-meta` | ✅ | | Requires `comment_id`, `meta_key`, `meta_value` |
+| 107 | `fa-wpmcp-delete-comment-meta` | ✅ | | Requires `comment_id`, `meta_key`; optional `meta_value` |
+| 108 | `fa-wpmcp-list-comment-meta` | ✅ | | Requires `comment_id` |
+| 109 | `fa-wpmcp-get-comment-counts` | ✅ | | Optional `post_id` filter |
+| 110 | `fa-wpmcp-bulk-moderate-comments` | ✅ | | Requires `comment_ids`, `action` (approve/unapprove/spam/unspam/trash/untrash) |
+| 111 | `fa-wpmcp-get-comment-replies` | ✅ | | Requires `comment_id`; optional `hierarchical`, `status` |
 
 ## Media
 
@@ -235,7 +235,7 @@ Testing all fa-wpmcp abilities via REST (curl) and MCP (Claude Code `mcp__wordpr
 
 | Test Type | Passed | Failed | Not Tested |
 |-----------|--------|--------|------------|
-| REST (curl) | 104 | 0 | 7 |
+| REST (curl) | 111 | 0 | 0 |
 | MCP (Claude Code) | 0 | 0 | 111 |
 
 ### Warnings
