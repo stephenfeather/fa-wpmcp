@@ -207,6 +207,7 @@ For comprehensive development documentation including adding new abilities, test
 
 ### Planned
 
+- WooCommerce abilities (customers, products, orders, coupons, shipping, payments)
 - Bulk operations (batch create/update/delete)
 - Multisite support
 - GraphQL endpoint
