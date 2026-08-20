@@ -70,7 +70,7 @@ final class ListRewriteRulesAbility extends AbstractAbility
     {
         return array(
             'type'       => 'object',
-            'properties' => array(),
+            'properties' => new \stdClass(),
         );
     }
 

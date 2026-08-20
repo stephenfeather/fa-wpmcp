@@ -1,0 +1,46 @@
+# wp
+
+## Ability API
+
+- `fa-wpmcp/cache` — Adds, removes, fetches, and flushes the WP Object Cache object.
+- `fa-wpmcp/cap` — Adds, removes, and lists capabilities of a user role.
+- `fa-wpmcp/cli` — Reviews current WP-CLI info, checks for updates, or views defined aliases.
+- `fa-wpmcp/comment` — Creates, updates, deletes, and moderates comments.
+- `fa-wpmcp/config` — Generates and reads the wp-config.php file.
+- `fa-wpmcp/core` — Downloads, installs, updates, and manages a WordPress installation.
+- `fa-wpmcp/cron` — Tests, runs, and deletes WP-Cron events; manages WP-Cron schedules.
+- `fa-wpmcp/db` — Performs basic database operations using credentials stored in wp-config.php.
+- `fa-wpmcp/dotenv` — Manage a .env file
+- `fa-wpmcp/embed` — Inspects oEmbed providers, clears embed cache, and more.
+- `fa-wpmcp/eval` — Executes arbitrary PHP code.
+- `fa-wpmcp/eval-file` — Loads and executes a PHP file.
+- `fa-wpmcp/export` — Exports WordPress content to a WXR file.
+- `fa-wpmcp/help` — Gets help on WP-CLI, or on a specific command.
+- `fa-wpmcp/i18n` — Provides internationalization tools for WordPress projects.
+- `fa-wpmcp/import` — Imports content from a given WXR file.
+- `fa-wpmcp/language` — Installs, activates, and manages language packs.
+- `fa-wpmcp/maintenance-mode` — Activates, deactivates or checks the status of the maintenance mode of a site.
+- `fa-wpmcp/media` — Imports files as attachments, regenerates thumbnails, or lists registered image sizes.
+- `fa-wpmcp/menu` — Lists, creates, assigns, and deletes the active theme's navigation menus.
+- `fa-wpmcp/network` — Perform network-wide operations.
+- `fa-wpmcp/option` — Retrieves and sets site options, including plugin and WordPress settings.
+- `fa-wpmcp/package` — Lists, installs, and removes WP-CLI packages.
+- `fa-wpmcp/plugin` — Manages plugins, including installs, activations, and updates.
+- `fa-wpmcp/post` — Manages posts, content, and meta.
+- `fa-wpmcp/post-type` — Retrieves details on the site's registered post types.
+- `fa-wpmcp/rewrite` — Lists or flushes the site's rewrite rules, updates the permalink structure.
+- `fa-wpmcp/role` — Manages user roles, including creating new roles and resetting to defaults.
+- `fa-wpmcp/scaffold` — Generates code for post types, taxonomies, plugins, child themes, etc.
+- `fa-wpmcp/search-replace` — Searches/replaces strings in the database.
+- `fa-wpmcp/server` — Launches PHP's built-in web server for a specific WordPress installation.
+- `fa-wpmcp/shell` — Opens an interactive PHP console for running and testing PHP code.
+- `fa-wpmcp/sidebar` — Lists registered sidebars.
+- `fa-wpmcp/site` — Creates, deletes, empties, moderates, and lists one or more sites on a multisite installation.
+- `fa-wpmcp/ssh`
+- `fa-wpmcp/super-admin` — Lists, adds, or removes super admin users on a multisite installation.
+- `fa-wpmcp/taxonomy` — Retrieves information about registered taxonomies.
+- `fa-wpmcp/term` — Manages taxonomy terms and term meta, with create, delete, and list commands.
+- `fa-wpmcp/theme` — Manages themes, including installs, activations, and updates.
+- `fa-wpmcp/transient` — Adds, gets, and deletes entries in the WordPress Transient Cache.
+- `fa-wpmcp/user` — Manages users, along with their roles, capabilities, and meta.
+- `fa-wpmcp/widget` — Manages widgets, including adding and moving them within sidebars.

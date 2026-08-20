@@ -182,6 +182,15 @@ final class Plugin
                     'search-replace',
                 );
 
+                // Add WooCommerce categories if WooCommerce is active.
+                if (function_exists('is_plugin_active') && is_plugin_active('woocommerce/woocommerce.php')) {
+                    $fa_wpmcp_categories = array_merge($fa_wpmcp_categories, array(
+                        'woocommerce-products',
+                        'woocommerce-orders',
+                        'woocommerce-customers',
+                    ));
+                }
+
                 $fa_abilities = array();
                 foreach (wp_get_abilities() as $ability) {
                     $category = $ability->get_category();
@@ -324,6 +333,28 @@ final class Plugin
 
         foreach ($categories as $slug => $args) {
             wp_register_ability_category($slug, $args);
+        }
+
+        // Register WooCommerce categories only if WooCommerce is active.
+        if (function_exists('is_plugin_active') && is_plugin_active('woocommerce/woocommerce.php')) {
+            $woocommerce_categories = array(
+                'woocommerce-products'  => array(
+                    'label'       => __('WooCommerce Products', 'fa-wpmcp'),
+                    'description' => __('Abilities for managing WooCommerce products and variations', 'fa-wpmcp'),
+                ),
+                'woocommerce-orders'    => array(
+                    'label'       => __('WooCommerce Orders', 'fa-wpmcp'),
+                    'description' => __('Abilities for managing WooCommerce orders and order data', 'fa-wpmcp'),
+                ),
+                'woocommerce-customers' => array(
+                    'label'       => __('WooCommerce Customers', 'fa-wpmcp'),
+                    'description' => __('Abilities for managing WooCommerce customer accounts', 'fa-wpmcp'),
+                ),
+            );
+
+            foreach ($woocommerce_categories as $slug => $args) {
+                wp_register_ability_category($slug, $args);
+            }
         }
     }
 
